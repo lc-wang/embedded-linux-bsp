@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-26T13:30:41.982Z",
+  "generated_at": "2026-04-30T07:05:15.119Z",
   "index": {
     "notes": [
       {
@@ -398,6 +398,11 @@
                 "name": "gic-architecture.md",
                 "path": "notes/subsystems/interrupt/gic-architecture.md",
                 "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/interrupt/gic-architecture.md"
+              },
+              {
+                "name": "irq-domain-and-mapping.md",
+                "path": "notes/subsystems/interrupt/irq-domain-and-mapping.md",
+                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/interrupt/irq-domain-and-mapping.md"
               }
             ]
           },
