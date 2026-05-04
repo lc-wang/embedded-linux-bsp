@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-04T06:20:27.195Z",
+  "generated_at": "2026-05-04T06:31:08.753Z",
   "index": {
     "notes": [
       {
@@ -394,6 +394,11 @@
           {
             "subfolder": "interrupt",
             "files": [
+              {
+                "name": "debug-playbook.md",
+                "path": "notes/subsystems/interrupt/debug-playbook.md",
+                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/interrupt/debug-playbook.md"
+              },
               {
                 "name": "gic-architecture.md",
                 "path": "notes/subsystems/interrupt/gic-architecture.md",
