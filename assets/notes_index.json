@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-30T07:05:15.119Z",
+  "generated_at": "2026-05-04T06:20:27.195Z",
   "index": {
     "notes": [
       {
@@ -398,6 +398,11 @@
                 "name": "gic-architecture.md",
                 "path": "notes/subsystems/interrupt/gic-architecture.md",
                 "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/interrupt/gic-architecture.md"
+              },
+              {
+                "name": "gpio-interrupt-flow.md",
+                "path": "notes/subsystems/interrupt/gpio-interrupt-flow.md",
+                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/interrupt/gpio-interrupt-flow.md"
               },
               {
                 "name": "irq-domain-and-mapping.md",
