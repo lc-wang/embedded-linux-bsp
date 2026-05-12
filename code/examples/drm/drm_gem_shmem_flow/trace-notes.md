@@ -430,3 +430,48 @@ scanout-able GEM memory
 
 共同 reference。
 
+# 🔧 kernel skeleton 對照程式本章新增：
+
+```text
+gem_shmem_skeleton.c
+```
+
+它不是完整 display driver，而是用來觀察：
+
+```
+DRM driver
+ ↓
+GEM shmem helper
+ ↓
+mmap / PRIME / GEM object
+```
+
+
+## 🧠 這個 skeleton 的重點
+
+```
+DRM_GEM_SHMEM_DRIVER_OPS
+```
+
+這一行會幫 driver 接上 GEM shmem helper。
+
+它提供：
+
+-   GEM memory object 管理
+-   mmap 支援
+-   PRIME import/export 基礎
+-   vmap / vunmap helper
+
+----------
+
+## 🔴 對應 kernel flow
+
+```
+userspace open /dev/dri/cardX
+ ↓
+DRM fops
+ ↓
+DRM ioctl / mmap
+ ↓
+GEM shmem helper
+```
