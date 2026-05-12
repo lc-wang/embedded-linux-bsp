@@ -198,3 +198,43 @@ connector
 ↓  
 display
 ```
+
+# 🔧 userspace 對照程式  
+  
+本章新增：  
+  
+```text  
+userspace/modeset_minimal.c
+```
+它示範最小 legacy KMS 顯示流程：
+
+```
+open /dev/dri/card0
+ ↓
+drmModeGetResources()
+ ↓
+找到 connected connector
+ ↓
+取得 mode
+ ↓
+取得 encoder / crtc
+ ↓
+CREATE_DUMB
+ ↓
+mmap framebuffer memory
+ ↓
+drmModeAddFB()
+ ↓
+drmModeSetCrtc()
+```
+🧠 這段 code 對應 DRM 元件
+
+| code 行為 | DRM 觀念 |  
+|------------------------|----------------------------------|  
+| drmModeGetConnector | 找輸出端 |  
+| drmModeGetEncoder | 找 connector 後面的 encoder |  
+| encoder->crtc_id | 找目前綁定的 CRTC |  
+| CREATE_DUMB | 建立 framebuffer memory |  
+| mmap | userspace 填 pixel |  
+| drmModeAddFB | memory → framebuffer object |  
+| drmModeSetCrtc | framebuffer → CRTC scanout |
