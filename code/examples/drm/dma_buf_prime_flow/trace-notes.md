@@ -247,3 +247,86 @@ SurfaceFlinger
  ↓
 HWC / DRM
 ```
+
+# 🔧 userspace 對照程式
+```text
+userspace/prime_fd_notes.c
+```
+
+這不是完整可跑的顯示程式，而是用 code 表示 PRIME / dma-buf fd 的核心流程。
+
+----------
+
+## 🧠 dma-buf fd 從哪裡來？
+
+dma-buf fd 一定要由 producer export 出來。
+
+常見 producer：
+
+-   GPU driver
+-   Android gralloc
+-   V4L2 camera / decoder
+-   Wayland client buffer
+
+所以不能隨便 open 一個普通檔案來假裝 dma-buf。
+
+----------
+
+## 🔄 userspace PRIME import flow
+
+```
+external dma-buf fd
+ ↓
+drmPrimeFDToHandle()
+ ↓
+DRM-local GEM handle
+ ↓
+drmModeAddFB2()
+ ↓
+DRM framebuffer object
+ ↓
+atomic commit
+ ↓
+plane scanout
+```
+
+## 🧠 fd vs GEM handle
+
+
+| 名稱 | 意義 |  
+|-----------------|------|  
+| dma-buf fd | 可跨 subsystem 傳遞的 shared memory fd |  
+| GEM handle | 單一 DRM device 內部使用的 memory reference |  
+| framebuffer id | DRM display pipeline 使用的顯示物件 |
+
+
+## 🔥 最重要觀念
+
+```
+drmPrimeFDToHandle()
+不是 copy memory
+
+而是：
+把外部 dma-buf memory
+import 成目前 DRM device 可使用的 GEM handle
+```
+
+----------
+
+## 🧠 完整心智模型
+
+```
+producer memory
+ ↓
+dma-buf fd
+ ↓
+DRM import
+ ↓
+GEM handle
+ ↓
+framebuffer
+ ↓
+plane
+ ↓
+CRTC scanout
+```
