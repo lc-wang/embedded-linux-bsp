@@ -262,3 +262,117 @@ atomic commit
 ↓  
 hardware update
 ```
+
+# 🔧 userspace 對照程式  
+  
+本章新增：  
+  
+```text  
+userspace/atomic_modeset_minimal.c
+```
+這是 legacy `drmModeSetCrtc()` 的 atomic 版本。
+
+它示範：
+
+```
+open /dev/dri/card0
+ ↓
+drmSetClientCap(UNIVERSAL_PLANES)
+drmSetClientCap(ATOMIC)
+ ↓
+找 connector / CRTC / primary plane
+ ↓
+CREATE_DUMB
+ ↓
+mmap + fill framebuffer
+ ↓
+drmModeCreatePropertyBlob(mode)
+ ↓
+drmModeAtomicAddProperty()
+ ↓
+drmModeAtomicCommit()
+```
+
+----------
+
+## 🧠 atomic commit 實際設定了什麼？
+
+### connector
+
+```
+CRTC_ID = crtc_id
+```
+
+意思是：
+
+```
+這個 connector 要接到哪個 CRTC
+```
+
+----------
+
+### CRTC
+
+```
+MODE_ID = mode blob
+ACTIVE = 1
+```
+
+意思是：
+
+```
+設定顯示 timing
+並啟用 scanout
+```
+
+----------
+
+### plane
+
+```
+FB_ID = framebuffer
+CRTC_ID = crtc_id
+SRC_* = framebuffer 內的來源範圍
+CRTC_* = 螢幕上的顯示範圍
+```
+
+意思是：
+
+```
+這個 plane 要把哪張 framebuffer
+顯示到哪個 CRTC 上
+```
+
+----------
+
+## 🔴 對應 kernel flow
+
+```
+drmModeAtomicCommit()
+ ↓
+DRM_IOCTL_MODE_ATOMIC
+ ↓
+drm_mode_atomic_ioctl()
+ ↓
+drm_atomic_state_alloc()
+ ↓
+drm_atomic_check_only()
+ ↓
+drm_atomic_commit()
+ ↓
+drm_atomic_helper_commit()
+ ↓
+driver atomic callbacks
+```
+
+----------
+
+## 🧠 最重要一句話
+
+```
+atomic commit 不是單純換 framebuffer
+
+而是一次提交：
+connector state
+CRTC state
+plane state
