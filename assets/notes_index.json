@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-25T07:21:05.777Z",
+  "generated_at": "2026-05-27T08:46:56.076Z",
   "index": {
     "notes": [
       {
@@ -460,6 +460,17 @@
       }
     ],
     "cases-study": [
+      {
+        "type": "subdir",
+        "name": "linux",
+        "files": [
+          {
+            "name": "sashiko-local-review-setup.md",
+            "path": "cases-study/linux/sashiko-local-review-setup.md",
+            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/linux/sashiko-local-review-setup.md"
+          }
+        ]
+      },
       {
         "type": "subdir",
         "name": "nxp",
