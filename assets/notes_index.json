@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-03T07:00:39.763Z",
+  "generated_at": "2026-06-09T06:03:44.938Z",
   "index": {
     "notes": [
       {
@@ -617,6 +617,11 @@
             "name": "mipi_display_rotation_analysis.md",
             "path": "cases-study/rockchip/mipi_display_rotation_analysis.md",
             "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/rockchip/mipi_display_rotation_analysis.md"
+          },
+          {
+            "name": "rk3588-bt_bcm4362a2_suspend_resume_report.md",
+            "path": "cases-study/rockchip/rk3588-bt_bcm4362a2_suspend_resume_report.md",
+            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/rockchip/rk3588-bt_bcm4362a2_suspend_resume_report.md"
           },
           {
             "name": "rk3588-es8388-mic-routing-analysis.md",
