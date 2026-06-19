@@ -12,7 +12,7 @@
 
 `SCI1 (0x80005400)` 
 
-此修改用於因應客戶硬體設計，debug UART 實際連接至 **SCI1** 的情境。
+此修改用於適配特定硬體設計，debug UART 實際連接至 **SCI1** 的情境。
 
 ----------
 
@@ -208,4 +208,3 @@ dmesg | grep ttySC
 -   `/chosen { stdout-path }` 未修改
     
 -   行為仍完全正確
-

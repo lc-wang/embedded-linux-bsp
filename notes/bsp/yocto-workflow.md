@@ -88,7 +88,7 @@ devtool modify virtual/kernel
 適用：
 
 -   要進版控  
--   要交付給客戶
+-   要交付到正式部署環境
     
 關鍵點：
 
@@ -166,4 +166,3 @@ strings u-boot.bin | grep board_name
 
 > 「Yocto 的問題一定先確認 layer 與 recipe 是否真的生效，  
 > 在確定 image 內容正確之前，我不會直接懷疑 kernel code。」
-

@@ -33,7 +33,7 @@ ping www.google.com ❌ 一定失敗
 ### 網卡資訊
 
 ```bash
-eth0: 10.20.70.124/23
+eth0: 192.0.2.124/24
 ```
 
 ### Routing table（異常）
@@ -42,7 +42,7 @@ eth0: 10.20.70.124/23
 0.0.0.0 dev eth0 scope link
 
 default dev eth0 scope link        ❌
-default via 10.20.70.254 dev eth0  ✅
+default via 192.0.2.1 dev eth0  ✅
 
 169.254.0.0/16 dev eth0            ❌
 
@@ -291,8 +291,8 @@ dns=none
 ### Routing
 
 ```bash
-default via 10.20.70.254 dev eth0
-10.20.70.0/23 dev eth0
+default via 192.0.2.1 dev eth0
+192.0.2.0/24 dev eth0
 ```
 
 ### Service 狀態
@@ -308,7 +308,7 @@ Loaded: masked (/dev/null)
 ### 網路驗證
 
 ```bash
-ping 10.20.70.254   ✅
+ping 192.0.2.1     ✅
 ping 8.8.8.8        ✅
 ping www.google.com ✅
 ```
@@ -380,4 +380,3 @@ ping domain FAIL
 
 (connman ✘ avahi ✘ resolved ✘)
 ```
-

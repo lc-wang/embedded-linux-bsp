@@ -115,7 +115,7 @@ neverallow { vendor domains } default_prop:file { read write open ... }
 # ✅ 六、最終採用解法：permissive rknn_server（因無需通過 VTS）
 
 
-> **我們不需要通過 GTS/VTS，且只作為內部功能測試。**
+> **此 build 目標為 bring-up validation，不作為 GMS/VTS/GTS release build。**
 
 因此選擇：
 
@@ -190,4 +190,3 @@ HAL 之間的 binder 呼叫**預設不允許 cross-HAL 呼叫**，
 | HDMI HAL binder call denied | allow rule | ✅ 已解決 |
 | sepolicy 編譯 | 成功 | ✅ |
 | 系統功能 | rknn OK / HDMI OK |✅ |
-

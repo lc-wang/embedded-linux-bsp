@@ -14,7 +14,7 @@
 
 -   手上的 e² studio 專案名稱假設為：  
     `RZT2H_INVBLV_SPM_ENCD_FOC_E2S_V100`
--   這是原廠 FSP 產生 + 客戶 motor control 的專案。
+-   這是原廠 FSP 產生 + motor control firmware 的專案。
 -   Linux 端已經有：
     -   `remoteproc` 驅動
     -   `cr52_0` 對應的 `/sys/class/remoteproc/remoteproc0` 介面

@@ -27,7 +27,7 @@
 -   Others
     
 
-此選擇視窗在量產 image 與客戶交付情境中不可接受，必須：
+此選擇視窗在 production image 與部署情境中不可接受，必須：
 
 > 開機即自動進入 **LXQt + fluxbox**  
 > 不顯示任何 session chooser。

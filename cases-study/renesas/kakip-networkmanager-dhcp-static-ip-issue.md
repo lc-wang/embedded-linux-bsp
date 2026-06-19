@@ -1,18 +1,18 @@
 
-# 🧩 Kakip Board 網路異常除錯報告（192.168.137.x → 10.20.70.x）
+# 🧩 Kakip Board 網路異常除錯報告（static IP → DHCP network）
 
 
 ## 📌 問題摘要
 
-Kakip 開發板接上 switch 後，網路介面 `end0` 無法取得公司網段 IP：
+Kakip 開發板接上 switch 後，網路介面 `end0` 無法取得 lab network 的 DHCP IP：
 
-預期：10.20.70.X
+預期：192.0.2.X
 
-實際：192.168.137.10
+實際：198.51.100.10
 
 即使實體網路連線正常（RJ45、1000M link up），仍無法取得正確 IP，導致：
 
--   無法連公司內網
+-   無法連 lab network
     
 -   無 default route
     
@@ -48,13 +48,13 @@ Kakip 開發板接上 switch 後，網路介面 `end0` 無法取得公司網段 
 ```
 $ ifconfig end0
 
-inet 192.168.137.10 netmask 255.255.255.0
+inet 198.51.100.10 netmask 255.255.255.0
 ```
 ### Routing table
 ```
 $ ip route
 
-192.168.137.0/24 dev end0 scope link
+198.51.100.0/24 dev end0 scope link
 ```
 -   ❌ 無 `default via`
     
@@ -75,7 +75,7 @@ $ arp -n
 ```
 ### Ping gateway
 ```
-$ ping 192.168.137.1
+$ ping 198.51.100.1
 
 Destination Host Unreachable
 ```
@@ -114,7 +114,7 @@ $ nmcli connection show "有線接続 1"
 ```
 ipv4.method: manual
 
-ipv4.addresses: 192.168.137.10/24
+ipv4.addresses: 198.51.100.10/24
 ```
 ----------
 
@@ -127,11 +127,11 @@ ipv4.addresses: 192.168.137.10/24
 
 | 現象                     | 原因說明                           |
 |--------------------------|------------------------------------|
-| 永遠是 192.168.137.10    | Static IP 設定殘留                 |
+| 永遠是 198.51.100.10     | Static IP 設定殘留                 |
 | 無 default route         | 未取得 DHCP gateway                |
 | ARP 表為空               | IP 不屬於實際 L2 網段              |
 | ping 失敗                | 與實際 Switch / VLAN 不相符        |
-| 無法取得 10.20.70.x      | DHCP client 根本未執行             |
+| 無法取得 192.0.2.x       | DHCP client 根本未執行             |
 
 
 ## 🔧 解決方式
@@ -162,13 +162,13 @@ sudo nmcli connection up "有線接続 1"
 ```
 $ ip addr show end0
 
-inet 10.20.70.XX/24
+inet 192.0.2.XX/24
 ```
   
 ```
 $ ip route
 
-default via 10.20.70.1 dev end0
+default via 192.0.2.1 dev end0
 ```
 ✅ 成功取得 DHCP IP
 
@@ -180,7 +180,7 @@ default via 10.20.70.1 dev end0
     
 -   DHCP DISCOVER / OFFER 正常
     
--   IP 正確取得 `10.20.70.X`
+-   IP 正確取得 `192.0.2.X`
     
 -   Gateway、ARP、routing table 全部正常
     
