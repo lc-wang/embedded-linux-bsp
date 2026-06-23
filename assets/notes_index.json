@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-19T12:48:37.609Z",
+  "generated_at": "2026-06-23T06:43:16.550Z",
   "index": {
     "notes": [
       {
@@ -475,6 +475,11 @@
         "type": "subdir",
         "name": "nxp",
         "files": [
+          {
+            "name": "imx93-m33-zephyr-ssd1680-lpspi-transfer-bug-analysis.md",
+            "path": "cases-study/nxp/imx93-m33-zephyr-ssd1680-lpspi-transfer-bug-analysis.md",
+            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/nxp/imx93-m33-zephyr-ssd1680-lpspi-transfer-bug-analysis.md"
+          },
           {
             "name": "imx95-yocto-bitbake-timeout-io-stall-analysis.md",
             "path": "cases-study/nxp/imx95-yocto-bitbake-timeout-io-stall-analysis.md",
