@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-08T09:50:42.906Z",
+  "generated_at": "2026-07-14T06:31:53.331Z",
   "index": {
     "notes": [
       {
@@ -475,6 +475,11 @@
         "type": "subdir",
         "name": "nxp",
         "files": [
+          {
+            "name": "imx8mp-brcmfmac-bcm43752-sdio-crc-f2-blocksize-analysis.md",
+            "path": "cases-study/nxp/imx8mp-brcmfmac-bcm43752-sdio-crc-f2-blocksize-analysis.md",
+            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/nxp/imx8mp-brcmfmac-bcm43752-sdio-crc-f2-blocksize-analysis.md"
+          },
           {
             "name": "imx8mp-connman-tethering-iptables-crash-analysis.md",
             "path": "cases-study/nxp/imx8mp-connman-tethering-iptables-crash-analysis.md",
