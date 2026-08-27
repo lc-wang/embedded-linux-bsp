@@ -161,13 +161,13 @@ grep -r "WIFI_HIDL_FEATURE_DUAL_INTERFACE" out/soong/.intermediates/hardware/int
 
 3️⃣ 確認 build.prop 內容
 ``` bash
-grep wifi out/target/product/rk3588_b675/system/build.prop
-grep wifi out/target/product/rk3588_b675/vendor/build.prop
+grep wifi out/target/product/rk3588_board/system/build.prop
+grep wifi out/target/product/rk3588_board/vendor/build.prop
 ```
 若需追蹤中介檔：
 
 ``` bash
-grep wifi out/target/product/rk3588_b675/obj/PACKAGING/*_build.prop_intermediates/build.prop
+grep wifi out/target/product/rk3588_board/obj/PACKAGING/*_build.prop_intermediates/build.prop
 ```
 
 4️⃣ Runtime 層驗證
@@ -192,7 +192,7 @@ STA + AP  Concurrency Supported: true
 若仍未生效，可執行：
 
 ``` bash
-rm -f out/soong/soong.rk3588_b675*.variables
+rm -f out/soong/soong.rk3588_board*.variables
 m android.hardware.wifi-service -j
 ```
 
@@ -237,7 +237,7 @@ SOONG_CONFIG_wifi_hidl_feature_aware := true
 清除 Soong Cache：
 
 ``` bash
-rm -f out/soong/soong.rk3588_b675*.variables
+rm -f out/soong/soong.rk3588_board*.variables
 ```
 
 重建 Wi-Fi HAL：
@@ -257,10 +257,10 @@ dumpsys wifi | grep Concurrency
 
 | 目的 | 指令 | 預期結果 |
 |------|-------|-----------|
-| **Soong 變數檢查** | `grep -A5 wifi out/soong/soong.rk3588_b675.variables` | 出現 `"hidl_feature_dual_interface": true` |
+| **Soong 變數檢查** | `grep -A5 wifi out/soong/soong.rk3588_board.variables` | 出現 `"hidl_feature_dual_interface": true` |
 | **HAL 編譯旗標確認** | `grep -r "WIFI_HIDL_FEATURE_DUAL_INTERFACE" out/soong/.intermediates/hardware/interfaces/wifi/aidl/default/` | 有 `-D` 宏出現 |
-| **build.prop 檢查** | `grep wifi out/target/product/rk3588_b675/vendor/build.prop` | Wi-Fi 屬性列出 |
+| **build.prop 檢查** | `grep wifi out/target/product/rk3588_board/vendor/build.prop` | Wi-Fi 屬性列出 |
 | **runtime 驗證** | `adb shell getprop | grep wifi` | 顯示實際生效的 Wi-Fi 相關屬性 |
 | **HAL 狀態驗證** | `dumpsys wifi | grep Concurrency` | 顯示 `STA + AP  Concurrency Supported: true` |
-| **快速清 cache 重建** | `rm -f out/soong/soong.rk3588_b675*.variables && m android.hardware.wifi-service -j` | 重新生成 Soong 設定並重新編譯 Wi-Fi HAL |
+| **快速清 cache 重建** | `rm -f out/soong/soong.rk3588_board*.variables && m android.hardware.wifi-service -j` | 重新生成 Soong 設定並重新編譯 Wi-Fi HAL |
 

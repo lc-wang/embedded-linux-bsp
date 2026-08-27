@@ -99,7 +99,7 @@ ERROR: Immediately halt since the disk space monitor action is "HALT"!
 
 重新定位 Build 目錄：
 ```bash
-/mnt/yocto-nvme/iei-imx-yocto-walnascar/
+/mnt/yocto-nvme/imx-yocto-walnascar/
 ```
 清掉舊 TMPDIR：
 ```bash

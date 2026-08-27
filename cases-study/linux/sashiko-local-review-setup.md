@@ -28,10 +28,10 @@ git branch
 
 ```text
 Sashiko source:
-  /media/lcwang/76623810-90ce-4337-bfcc-1ab3b859a0e41/sashiko
+  /home/<user>/work/sashiko
 
 Linux kernel tree:
-  /media/lcwang/76623810-90ce-4337-bfcc-1ab3b859a0e41/linux_kernel_lc/linux
+  /home/<user>/work/linux
 ```
 
 Rust / Cargo 版本需要夠新。若 Cargo 太舊，可能會出現：

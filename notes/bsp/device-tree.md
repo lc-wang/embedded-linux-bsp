@@ -40,7 +40,7 @@ U-Boot / Bootloader
 ```dts
 / {
     compatible = "rockchip,rk3588", "arm64";
-    model = "IEI Board B675";
+    model = "Vendor RK3588 Board";
 
     memory@0 {
         device_type = "memory";
@@ -126,7 +126,7 @@ module_platform_driver(myled_driver);
 -   共用設定放在 `.dtsi`，供多個板子引用。
 ```dts    
 #include "rk3588.dtsi"
-#include "rk3588-b675.dtsi"
+#include "rk3588-board.dtsi"
 ```    
     
 
