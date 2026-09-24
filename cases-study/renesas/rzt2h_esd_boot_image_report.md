@@ -72,7 +72,7 @@ K --> L["Boot Completed"]
 #### Yocto `.wic` 檢查
 
 ```nginx
-fdisk -l core-image*.wic` 
+fdisk -l core-image*.wic
 ```
 
 → Start=4096、44536 
