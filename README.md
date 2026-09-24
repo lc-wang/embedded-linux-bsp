@@ -2,8 +2,6 @@
 
 > Structured notes and case studies for Embedded Linux, Android BSP, and kernel subsystems.
 
-----------
-
 ## Overview
 
 This repository contains:
@@ -13,8 +11,6 @@ This repository contains:
 -   Android system notes
 -   Driver examples with trace notes
 -   Real-world debugging case studies
-
-----------
 
 ## Contents
 
@@ -35,8 +31,6 @@ This repository contains:
     -   [`networking/`](notes/subsystems/networking/) – [Ethernet](notes/subsystems/networking/ethernet/) and [switch / DSA](notes/subsystems/networking/switch-dsa/)
     -   [`security/`](notes/subsystems/security/platform-security/) – TrustZone, OP-TEE, secure boot, TPM
 
-----------
-
 ### Case Studies
 
 [`cases-study/`](cases-study/) contains debugging and analysis records, including:
@@ -53,8 +47,6 @@ Platforms include:
 -   [Rockchip](cases-study/rockchip/)
 -   [Raspberry Pi](cases-study/raspberry-pi/)
 -   [Generic Linux](cases-study/linux/)
-
-----------
 
 ### Code Examples
 
@@ -76,21 +68,15 @@ Each example includes:
 
 [`drm_fence_sync_flow`](code/examples/drm/drm_fence_sync_flow/) is notes only (no source code).
 
-----------
-
 ### Driver Notes
 
 -   [`bcmdhd/`](bcmdhd/) – Broadcom WiFi driver notes
 -   [`bluetooth/`](bluetooth/) – Bluetooth stack and transport notes
 -   [`mt76/`](mt76/) – MT76 driver analysis
 
-----------
-
 ### Tools
 
 -   [`tools/generate_index.js`](tools/generate_index.js) – generates [`assets/notes_index.json`](assets/notes_index.json) (run by CI on push)
-
-----------
 
 ## Purpose
 
@@ -100,7 +86,9 @@ This repository is used to:
 -   Record debugging experience
 -   Keep trace notes for kernel and drivers
 
-----------
+## Contributing
+
+Formatting rules for all documents are in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Author
 
