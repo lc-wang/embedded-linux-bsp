@@ -1,10 +1,10 @@
 # Sashiko 本機 Review 架設與復現紀錄
 
+## 1. 目標（背景）
+
 本文記錄如何在本機架設並執行 `sashiko`，用來重跑 Linux kernel patch 的 AI review。
 
 主要目標是：在重新送 upstream patch 之前，可以先在 localhost 針對同一個 kernel commit 跑一次 Sashiko review，確認原本被指出的問題是否已經修正。
-
-## 1. 背景
 
 在將 Linux kernel patch 送到 upstream 後，收到 Sashiko 產生的 review 回覆。為了確認修正後是否還會被指出同樣問題，因此嘗試在本機復現 Sashiko review 流程。
 
@@ -22,7 +22,7 @@ git branch
 #   master
 ```
 
-## 2. 測試環境
+## 2. 環境與前置條件（測試環境）
 
 本次使用的路徑範例：
 
@@ -525,7 +525,30 @@ drm_client_setup()
 
 不建議一開始就大改成 worker 架構，除非 reviewer 明確要求，或已確認 commit/update path blocking 是實際問題。
 
-## 13. 常用指令整理
+## 13. 常見問題與排查（注意事項）
+
+本機復現結果不一定會和 upstream Sashiko 回覆完全一樣。
+
+可能差異來源：
+
+```text
+Sashiko 版本
+AI provider / model
+prompt 版本
+kernel base commit
+mailing-list thread context
+model output randomness
+```
+
+local reproduction 的目標不是得到一模一樣的文字，而是確認：
+
+```text
+修正後，原本被指出的同類問題是否還會出現。
+```
+
+## 附錄
+
+### A. 常用指令整理
 
 Build Sashiko：
 
@@ -570,25 +593,4 @@ copilot --model gpt-5-mini --output-format json -s --no-custom-instructions
 
 ```bash
 echo Settings.toml >> .git/info/exclude
-```
-
-## 14. 注意事項
-
-本機復現結果不一定會和 upstream Sashiko 回覆完全一樣。
-
-可能差異來源：
-
-```text
-Sashiko 版本
-AI provider / model
-prompt 版本
-kernel base commit
-mailing-list thread context
-model output randomness
-```
-
-local reproduction 的目標不是得到一模一樣的文字，而是確認：
-
-```text
-修正後，原本被指出的同類問題是否還會出現。
 ```

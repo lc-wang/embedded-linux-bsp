@@ -1,32 +1,6 @@
-
 # RK3588 MIPI Panel 背光 PWM 只能 ON/OFF 之除錯報告
 
-## 1. 問題背景
-
--   平台：**Rockchip RK3588**
-    
--   顯示介面：**MIPI DSI**
-    
--   Panel：**TQ101AJ02**
-    
--   背光 IC：**TPS61165**
-    
--   背光控制方式：
-    
-    -   `BL_EN`：背光電源開關
-        
-    -   `PWM (CTRL)`：亮度調光
-        
--   Linux driver：
-    
-    -   DRM
-        
-    -   `pwm-backlight`
-        
-
-----------
-
-## 2. 問題現象（Symptom）
+## 1. 問題概述（Symptom）
 
 在其中一片 RK3588 板子上出現以下狀況：
 
@@ -51,7 +25,34 @@
 
 ----------
 
-## 3. 初步假設與排除方向
+## 2. 系統環境
+
+-   平台：**Rockchip RK3588**
+    
+-   顯示介面：**MIPI DSI**
+    
+-   Panel：**TQ101AJ02**
+    
+-   背光 IC：**TPS61165**
+    
+-   背光控制方式：
+    
+    -   `BL_EN`：背光電源開關
+        
+    -   `PWM (CTRL)`：亮度調光
+        
+-   Linux driver：
+    
+    -   DRM
+        
+    -   `pwm-backlight`
+        
+
+----------
+
+## 3. 除錯過程
+
+### 3.1 初步假設與排除方向
 
 曾懷疑但最終排除的項目：
 
@@ -71,9 +72,9 @@
 
 ----------
 
-## 4. 實際除錯流程
+### 3.2 實際除錯流程
 
-### 4.1 Backlight sysfs 確認
+#### 3.2.1 Backlight sysfs 確認
 ```
 ls /sys/class/backlight/
 ls /sys/class/backlight/backlight/
@@ -99,7 +100,7 @@ cat /sys/class/backlight/backlight/actual_brightness
 
 ----------
 
-### 4.2 PWM framework 狀態確認（debugfs）
+#### 3.2.2 PWM framework 狀態確認（debugfs）
 
 確保 debugfs 已掛載：
 
@@ -132,7 +133,7 @@ cat /sys/kernel/debug/pwm | sed -n '/backlight *):/,+0p'
 
 ----------
 
-### 4.3 PWM 是否已被 driver 佔用（export 測試）
+#### 3.2.3 PWM 是否已被 driver 佔用（export 測試）
 ```
 ls /sys/class/pwm/
 ls /sys/class/pwm/pwmchip0/
@@ -148,7 +149,7 @@ echo 0 > /sys/class/pwm/pwmchip0/export
 
 ----------
 
-### 4.4 Device Tree 路徑確認
+#### 3.2.4 Device Tree 路徑確認
 
 確認 DT 內有 backlight 與 panel node：
 ```
@@ -157,7 +158,7 @@ grep -R panel /proc/device-tree -n
 ```
 ----------
 
-### 4.5 PWM pinmux 驗證
+#### 3.2.5 PWM pinmux 驗證
 
 `grep -R "pwm13" -n /sys/kernel/debug/pinctrl/* 2>/dev/null | head -n 120` 
 
@@ -178,7 +179,7 @@ grep -R panel /proc/device-tree -n
 
 ----------
 
-### 4.6 低頻 PWM 驗證（100Hz Flicker Test）
+#### 3.2.6 低頻 PWM 驗證（100Hz Flicker Test）
 
 為了肉眼觀察 PWM 是否真正影響背光，暫時將 PWM 設為低頻：
 
@@ -199,7 +200,7 @@ grep -R panel /proc/device-tree -n
 
 ----------
 
-## 5. 關鍵實驗：更換板子
+### 3.3 關鍵實驗：更換板子
 
 在以下條件完全相同的情況下：
 
@@ -221,7 +222,7 @@ grep -R panel /proc/device-tree -n
 
 ----------
 
-## 6. 最終結論
+## 4. Root Cause 分析
 
 > **此問題並非 Linux driver、DTS、PWM 設定或 pinmux 問題。**
 > 
@@ -243,21 +244,21 @@ grep -R panel /proc/device-tree -n
 
 ----------
 
-## 7. 經驗與教訓
+## 5. 結論與建議（經驗與教訓）
 
-### 7.1 `debug/pwm` 正常 ≠ 實體腳位真的在 PWM
+### 5.1 `debug/pwm` 正常 ≠ 實體腳位真的在 PWM
 
 PWM controller 狀態正確，不代表訊號一定到達背光 IC。
 
-### 7.2 pinmux 驗證是必做步驟
+### 5.2 pinmux 驗證是必做步驟
 
 `/sys/kernel/debug/pinctrl/*/pinmux-pins` 
 
-### 7.3 100Hz PWM 是最快的硬體 sanity check
+### 5.3 100Hz PWM 是最快的硬體 sanity check
 
 比反覆修改 driver / DTS 更有效率。
 
-### 7.4 當出現以下組合時，應優先懷疑硬體
+### 5.4 當出現以下組合時，應優先懷疑硬體
 
 -   PWM duty 有變
     
@@ -272,7 +273,9 @@ PWM controller 狀態正確，不代表訊號一定到達背光 IC。
 
 ----------
 
-## 8. 快速 Debug Checklist（TL;DR）
+## 附錄
+
+### A. 快速 Debug Checklist（TL;DR）
 ```
 brightness sysfs OK？
 → cat /sys/kernel/debug/pwm | sed -n '/backlight *):/,+0p'

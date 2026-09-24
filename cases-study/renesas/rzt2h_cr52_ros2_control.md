@@ -1,28 +1,12 @@
+# RZ/T2H CR52 RemoteProc × ROS2 控制整合 — 技術文件
 
-# **RZ/T2H CR52 RemoteProc × ROS2 控制整合 — 技術文件**
+## 1. 目標
 
 本文記錄 RZT2H (Ubuntu 24.04) 上透過 **ROS2 ** 控制 CR52 remoteproc 的完整流程，並整理實作與 debug 過程，方便未來維護與其他人參考。
 
 ----------
 
-# 目錄
-
-1.  系統環境
-2.  安裝 ROS2 Jazzy
-3.  建立 ROS2 Workspace
-4.  `rzt2h_remoteproc` 套件建立流程
-5.  CR52 RemoteProc Service Node 程式
-6.  Build 與執行  
-7.  Host PC 使用 rqt 操作 CR52  
-8.  多機 ROS2 通訊設定（Network Discovery）
-9.  CR52 沒有啟動的原因分析（權限問題） 
-10.  最終採用的解法（setuid root）
-11.  建議的進階改善方向
-    
-
-----------
-
-# 1. 系統環境
+## 2. 環境與前置條件（系統環境）
 
 RZT2H SBC 上運行：
 ```yaml
@@ -36,11 +20,11 @@ Host PC 也運行 ROS2，用 rqt 操作。
 
 ----------
 
-# 2. 安裝 ROS2
+## 3. 安裝 ROS2
 參考官方文件即可
 https://docs.ros.org/en/rolling/Installation/Ubuntu-Install-Debs.html
-##  2.1安裝 colcon
-### 安裝 colcon 基本環境：
+### 3.1 安裝 colcon
+#### 安裝 colcon 基本環境：
 ```bash
 sudo apt install -y python3-colcon-common-extensions
 ```
@@ -51,7 +35,7 @@ sudo apt install -y python3-colcon-common-extensions
 -   常用的 Python extensions
 -   amment build 整套工具鏈
     
-### 確認 colcon 是否正常：
+#### 確認 colcon 是否正常：
 ```bash
 colcon --version
 ```
@@ -63,13 +47,13 @@ colcon version 0.16.x
 
 ----------
 
-# 3. 建立 ROS2 Workspace
+## 4. 建立 ROS2 Workspace
 ```yaml
 mkdir -p ~/ros2_ws/src cd ~/ros2_ws 
 ```
 ----------
 
-# 4. `rzt2h_remoteproc` 套件建立流程
+## 5. `rzt2h_remoteproc` 套件建立流程
 
 建立 package：
 ```yaml
@@ -88,7 +72,7 @@ rzt2h_remoteproc/
 ```
 ----------
 
-## 修正後的 setup.py（包含 `glob` 與正確 entry point）
+### 5.1 修正後的 setup.py（包含 `glob` 與正確 entry point）
 ```python
 from setuptools import setup
 import os
@@ -121,14 +105,14 @@ setup(
 ```
 ----------
 
-# 5. CR52 RemoteProc Service Node 程式
+## 6. CR52 RemoteProc Service Node 程式
 
 使用 ROS2 Service（std_srvs/Trigger）控制：
 -   `/cr52/start`
 -   `/cr52/stop`
 ----------
 
-# 6. Build 與執行
+## 7. Build 與執行
 
 編譯：
 ```bash
@@ -147,7 +131,7 @@ ros2 run rzt2h_remoteproc cr52_remoteproc_service
 ```
 ----------
 
-# 7. Host PC 使用 rqt 操作 CR52
+## 8. Host PC 使用 rqt 操作 CR52
 
 在 Host PC：
 ```yaml
@@ -165,20 +149,20 @@ Plugins → Services → Service Caller
 
 ----------
 
-# 8. 多機 ROS2 通訊設定（Network Discovery）
+## 9. 多機 ROS2 通訊設定（Network Discovery）
 
 兩台機器需要相同：
 
-### 1. ROS_DOMAIN_ID
+### 9.1 ROS_DOMAIN_ID
 ```bash
 export ROS_DOMAIN_ID=55
 echo "export ROS_DOMAIN_ID=55" >> ~/.bashrc
 ```
-### 2. 防火牆關閉
+### 9.2 防火牆關閉
 
 `sudo ufw disable` 
 
-### 3. multicast 測試
+### 9.3 multicast 測試
 
 Host：
 ```bash
@@ -192,7 +176,9 @@ ros2 multicast send
 
 ----------
 
-# 9. CR52 沒有啟動的原因分析（權限問題）
+## 10. 常見問題與排查
+
+### 10.1 CR52 沒有啟動的原因分析（權限問題）
 
 原始觀察：
 
@@ -211,7 +197,7 @@ ROS2 Node 以一般使用者執行 → echo 寫入失敗 → service 看起來�
 
 ----------
 
-# 10. 最終採用的解法（setuid root）
+### 10.2 最終採用的解法（setuid root）
 
 你選擇了最簡單直接可用的方法：
 ```bash
@@ -238,8 +224,9 @@ running
 ```
 ----------
 
+## 附錄
 
-### 11. 建議的進階改善方向
+### A. 建議的進階改善方向
 
 | 項目 | 說明 |
 |------|------|

@@ -80,6 +80,27 @@ echo sound-alc5672 > /sys/bus/platform/drivers/fsl-asoc-card/bind
 
 → 音效卡**立刻註冊成功**。這證明 driver 邏輯與硬體都對，唯一的問題是**開機當下 machine driver 比 SAI 早 probe**。
 
+### 3.5 額外調查:兩個「假缺陷」
+
+音訊測試過程中另外冒出兩個看似缺陷、實則是 bring-up 治具造成的假象，記錄於此以免後人重踩。
+
+#### 3.5.1 media 音訊「跑去 HDMI、內建喇叭沒聲」
+
+- 現象:框架播放（app）無聲，但 `tinyplay` 有聲。
+- 佐證:`dumpsys media.audio_flinger` 顯示 **HDMI 輸出 thread `Frames written` > 0 / `Standby: no`**、SPEAKER thread `Standby: yes`；`cmd audio get-current-output-device` = HDMI。
+- 根因:bring-up 接的是一台**外接桌面螢幕**（有內建喇叭），其 EDID CTA 宣告 **Basic audio = true**。Android 預設 policy engine 對 `media` strategy 把有音訊能力的 HDMI 排在內建喇叭之前 → 正確地送去 HDMI。
+- **非回歸、非 bug**:同片板子燒 a15，media 一樣落在 HDMI 輸出 thread（`Standby: no`），a15/a16 行為相同；兩版 `audio_policy_configuration.xml` 逐字一致。
+- Production（內建面板、無 HDMI 音訊 sink）→ media 自然走內建喇叭。若要在接 HDMI 時仍強制走喇叭:a16+ 可 `cmd audio set-preferred-output-device BUILTIN_SPEAKER`（runtime、非持久;Java `setForceUse(FOR_MEDIA,…)` 被 AudioService 擋掉，故無乾淨的烤進 image 旋鈕，除非改用 configurable engine / product-strategies）。
+
+#### 3.5.2 耳機「左右聲道對調」
+
+- 現象:左右分離測試音（前 4 秒左聲道、後 4 秒右聲道），戴耳機聽成「先右後左」。
+- 誤判過程:一度以為是板子 HP 走線反接，並在 `Stereo DAC MIXL/MIXR` 做 L/R 對調補償（`tinymix` live 測試「修好」了）。
+- 翻案:換**第二支標準耳機**、用**原始未改** codec 路由重測 → 前 4 秒（左聲道）進**左耳**，完全正常。
+- 定論:codec 內部路由本就正常（`DAC L1 → Stereo DAC MIXL → HPOVOL MIXL → HPOL`）。codec 端的 L/R swap 位於 **jack 之前**，會對任何耳機一律翻轉;兩支耳機在同一設定下結果**相反** → 必然是**其中一支耳機反接**，不是板子。第一支測試耳麥 L/R 內部接反才是元兇。修改已還原，config 維持原狀。
+
+**教訓:懷疑周邊缺陷時，先對 production 硬體、並用「已知正常」的周邊驗證;bring-up 治具（外接螢幕、備用耳機）會製造假缺陷。**
+
 ## 4. Root Cause 分析
 
 ### 4.1 背景與術語
@@ -167,34 +188,13 @@ if (!cpu_pdev) {
 
 喇叭放音、wav/mp3 播放、麥克風（AMIC）收音三項功能皆通過驗證。
 
-## 6. 額外調查:兩個「假缺陷」
-
-音訊測試過程中另外冒出兩個看似缺陷、實則是 bring-up 治具造成的假象，記錄於此以免後人重踩。
-
-### 6.1 media 音訊「跑去 HDMI、內建喇叭沒聲」
-
-- 現象:框架播放（app）無聲，但 `tinyplay` 有聲。
-- 佐證:`dumpsys media.audio_flinger` 顯示 **HDMI 輸出 thread `Frames written` > 0 / `Standby: no`**、SPEAKER thread `Standby: yes`；`cmd audio get-current-output-device` = HDMI。
-- 根因:bring-up 接的是一台**外接桌面螢幕**（有內建喇叭），其 EDID CTA 宣告 **Basic audio = true**。Android 預設 policy engine 對 `media` strategy 把有音訊能力的 HDMI 排在內建喇叭之前 → 正確地送去 HDMI。
-- **非回歸、非 bug**:同片板子燒 a15，media 一樣落在 HDMI 輸出 thread（`Standby: no`），a15/a16 行為相同；兩版 `audio_policy_configuration.xml` 逐字一致。
-- Production（內建面板、無 HDMI 音訊 sink）→ media 自然走內建喇叭。若要在接 HDMI 時仍強制走喇叭:a16+ 可 `cmd audio set-preferred-output-device BUILTIN_SPEAKER`（runtime、非持久;Java `setForceUse(FOR_MEDIA,…)` 被 AudioService 擋掉，故無乾淨的烤進 image 旋鈕，除非改用 configurable engine / product-strategies）。
-
-### 6.2 耳機「左右聲道對調」
-
-- 現象:左右分離測試音（前 4 秒左聲道、後 4 秒右聲道），戴耳機聽成「先右後左」。
-- 誤判過程:一度以為是板子 HP 走線反接，並在 `Stereo DAC MIXL/MIXR` 做 L/R 對調補償（`tinymix` live 測試「修好」了）。
-- 翻案:換**第二支標準耳機**、用**原始未改** codec 路由重測 → 前 4 秒（左聲道）進**左耳**，完全正常。
-- 定論:codec 內部路由本就正常（`DAC L1 → Stereo DAC MIXL → HPOVOL MIXL → HPOL`）。codec 端的 L/R swap 位於 **jack 之前**，會對任何耳機一律翻轉;兩支耳機在同一設定下結果**相反** → 必然是**其中一支耳機反接**，不是板子。第一支測試耳麥 L/R 內部接反才是元兇。修改已還原，config 維持原狀。
-
-**教訓:懷疑周邊缺陷時，先對 production 硬體、並用「已知正常」的周邊驗證;bring-up 治具（外接螢幕、備用耳機）會製造假缺陷。**
-
-## 7. 上游狀態
+## 6. 上游狀態
 
 - 主修正 patch（CPU DAI defer）已送 mainline linux-sound。
   - `Fixes: 708b4351f08c ("ASoC: fsl: Add Freescale Generic ASoC Sound Card with ASRC support")`
   - 前例:`e396dec46c56 ("ASoC: fsl-asoc-card: Defer probe when fail to find codec device")`（codec 分支，Shengjiu Wang, 2020）。
 
-## 8. 結論與建議
+## 7. 結論與建議
 
 1. **built-in driver 遇到「相依尚未 populate」時，應回 `-EPROBE_DEFER`（`dev_err_probe`），不要硬回 `-EINVAL`。** `of_platform_populate` 的順序非框架保證且跨版本會變，任何 `of_find_device_by_node()` 找不到就放棄的 probe 都是潛在的版本相依 bug。此類問題常在 kernel 升版（如 6.6→6.18）後才浮現。
 2. **單體式 Android 不要用 `=m` 迴避 probe 問題** —— 相依鏈漏一個 `.ko` 即 `InitFatalReboot`。用 source 端 defer。

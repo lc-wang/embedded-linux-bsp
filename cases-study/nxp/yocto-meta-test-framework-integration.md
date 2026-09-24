@@ -1,8 +1,6 @@
+# i.MX95 Yocto devtool × bitbake-layers × test-framework 整合技術報告
 
-# **Yocto devtool × bitbake-layers × test-framework 整合技術報告**
-
-
-# 1. 背景說明
+## 1. 目標（背景說明）
 
 本份報告記錄如何使用：
 -   **bitbake-layers**
@@ -10,9 +8,7 @@
 -   **custom meta-layer**
 -   **image recipe**
 
-----------
-
-# 2. Yocto Layer 架構整合流程總覽
+### 1.1 Yocto Layer 架構整合流程總覽
 
 整合 test-framework 的完整流程如下：
 
@@ -37,9 +33,8 @@ meta-test-framework/
 │   └── images/
 │       └── core-image-testfw.bb 
 ```
-----------
 
-# 3. bitbake-layers 建立 meta layer
+## 2. bitbake-layers 建立 meta layer
 
 建立獨立 layer：
 ```sh
@@ -54,11 +49,10 @@ bitbake-layers add-layer ../meta-test-framework
 ```sh
 bitbake-layers  show-layers
 ```
-----------
 
-# 4. devtool 使用流程與注意事項
+## 3. devtool 使用流程與注意事項
 
-## 4.1 devtool add 步驟
+### 3.1 devtool add 步驟
 ```sh
 devtool add test-framework https://github.com/lc-wang/test-framework.git --version main
 ``` 
@@ -69,43 +63,43 @@ workspace/
 ├── recipes/test-framework/test-framework_git.bb
 ├── sources/test-framework/
 ```
-----------
 
-## 4.2 devtool 常見問題：branch=main 仍找 master
+### 3.2 devtool 常見問題：branch=main 仍找 master
 
-### 症狀
+#### 症狀
 ```sh
 Unable to resolve 'master' in upstream git repository` 
 ```
-### 根本原因
+
+#### 根本原因
 ```sh
 Yocto 的 git fetcher 在部分版本會強制 fallback 至 master。
 ```
-### 解法
+
+#### 解法
 
 在 GitHub 建立一個 master branch。
 
-----------
-
-## 4.3 devtool workspace 殘留問題
+### 3.3 devtool workspace 殘留問題
 
 若執行 devtool add 後想重建 recipe：
 
-### 錯誤症狀：
+#### 錯誤症狀
 ```sh
 recipe test-framework is already in your workspace
 ```
-### 解法 1（推薦）：清空 workspace
+
+#### 解法 1（推薦）：清空 workspace
 ```sh
 rm -rf workspace 
 ```
-### 解法 2：reset 單一 recipe
+
+#### 解法 2：reset 單一 recipe
 ```sh
 devtool reset test-framework
 ```
-----------
 
-## 4.4 devtool add 後 recipe 缺少 do_install
+### 3.4 devtool add 後 recipe 缺少 do_install
 
 devtool 不會自動產生 do_install：
 ```sh
@@ -113,9 +107,7 @@ Package  'test-framework' has no installation candidate
 ```
 需手動補上（見後續完整 recipe）。
 
-----------
-
-# 5. test-framework_git.bb — 最終可用版
+## 4. test-framework_git.bb — 最終可用版
 ```sh
 meta-test-framework/recipes-test-framework/test-framework/test-framework_git.bb
 ```
@@ -152,9 +144,8 @@ EOF
 FILES:${PN} += "/opt/test-framework"
 FILES:${PN} += "${bindir}/testfw"
 ```
-----------
 
-# 6. 自訂 image recipe：core-image-testfw
+## 5. 自訂 image recipe：core-image-testfw
 ```sh
 meta-test-framework/recipes-core/images/core-image-testfw.bb
 ```
@@ -167,9 +158,8 @@ inherit testfw-image
 
 IMAGE_INSTALL:append = " test-framework"
 ```
-----------
 
-# 7. testfw 可執行啟動器
+## 6. testfw 可執行啟動器
 
 路徑：
 ```sh
@@ -185,10 +175,8 @@ exec ./menu.sh "$@"
 ```sh
 core/libs/logging_utils.sh:  No  such  file  or  directory
 ```
-----------
 
-
-# 8. 重要錯誤排查紀錄
+## 7. 常見問題與排查（重要錯誤排查紀錄）
 
 | 問題 | 錯誤訊息 | 根因 | 解法 |
 |------|-----------|--------|-------|
@@ -198,4 +186,3 @@ core/libs/logging_utils.sh:  No  such  file  or  directory
 | do_install 缺失 | No installation candidate | devtool 不產生 do_install | 手動撰寫 |
 | libs not found | logging_utils.sh: No such file | launcher 沒切工作目錄 | `cd /opt/.../core` |
 | QA fail | requires /bin/bash | 啟動器使用 bash | 改成 `/bin/sh` |
-

@@ -1,27 +1,6 @@
+# RK3588 Android 15 MIPI Display Rotation Technical Report
 
-# **Android 15 MIPI Display Rotation Technical Report**
-
-# # **目錄（Table of Contents）**
-
-1.  **背景與問題描述**
-2.  **Android 15 顯示架構變動**
-3.  **研究方法與實驗流程**
-4.  **為何 `wm user-rotation -d 2` 是唯一有效的？**
-5.  **Root Cause 分析**
-6.  **init.rc 嘗試與為何失敗**
-7.  **Rockchip 原廠 Rotation Patch（A14 vs A15）比較**
-8.  **SurfaceFlinger / DisplayManager / WMS Rotation 流程解析**
-9.  **dumpsys SurfaceFlinger 深度分析（DisplayId=2）**
-10.  **正式解法：Framework 層手動呼叫 setUserRotation**
-11.  **不推薦的錯誤方向（告誡）**
-12.  **結論**  
-13.  **未來可維護性設計建議**
-14.  **附錄：所有指令、log、patch**
-    
-
-----------
-
-# # **1. 背景與問題描述**
+## 1. 問題概述（背景與問題描述）
 
 RK3588 平台使用 MIPI 訊號驅動第二顆外接顯示器（DisplayId=2）。
 
@@ -40,8 +19,9 @@ RK3588 平台使用 MIPI 訊號驅動第二顆外接顯示器（DisplayId=2）�
 -   LogicalDisplay 修改各種 hack → 還是少一整列 icon 
 ----------
 
+## 2. 除錯過程
 
-# 2. Android 15 顯示架構變動
+### 2.1 Android 15 顯示架構變動
 
 Android 15 對 multi-display 的變動相當大，以下為與 Android 14 的差異比較：
 
@@ -57,7 +37,7 @@ Android 15 對 multi-display 的變動相當大，以下為與 Android 14 的差
 
 ----------
 
-# # **3. 研究方法與實驗流程**
+### 2.2 研究方法與實驗流程
 
 1.  **比對 A14 / A15 Rockchip BSP patch**
 2.  逐檔案分析：
@@ -72,7 +52,7 @@ Android 15 對 multi-display 的變動相當大，以下為與 Android 14 的差
 
 ----------
 
-# # **4. 為何 `wm user-rotation -d 2 lock 1` 是唯一有效的？**
+### 2.3 為何 `wm user-rotation -d 2 lock 1` 是唯一有效的？
 
 因為它完整觸發了 Android 正常旋轉流程：
 
@@ -95,28 +75,7 @@ wm → cmd window → WindowManagerService.setUserRotation
 
 ----------
 
-# # **5. Root Cause 分析**
-
-displayId=2 出現：
--   **右側少一整列 icon**
--   **畫面向左下偏移**
--   **SurfaceFlinger 計算的投影矩陣與預期不一致**
-其根因是：
-
-### **Android 15 的多顯示器旋轉邏輯完全倚賴 WMS + DisplayRotation 的 notification chain**
-
-如果在 SF / LogicalDisplay 直接 override：
-## 後果
-
-- Insets 不會同步更新  
-- layout stack 與 display stack 不一致  
-- WindowManager 認為尚未旋轉，但 SurfaceFlinger 已旋轉（兩者不同步）  
-- SurfaceControl Transaction 中 Matrix 計算異常  
-- **最終畫面一定裁切、方向錯誤**  
-
-----------
-
-# # **6. init.rc 嘗試與為何失敗**
+### 2.4 init.rc 嘗試與為何失敗
 
 嘗試：
 
@@ -131,18 +90,17 @@ exit 127
 neverallow
 system_server_service denied
 ``` 
-### 原因 1：wm 需要 shell PATH，init 沒有
-### 原因 2：wm 需要 binder IPC，init 執行時 system_server 還沒 ready
-### 原因 3：exec 對象被 SELinux 阻擋
-### 原因 4：Android 15 WMS 更嚴格，不接受 early rotation call
-### 結論：
+#### 原因 1：wm 需要 shell PATH，init 沒有
+#### 原因 2：wm 需要 binder IPC，init 執行時 system_server 還沒 ready
+#### 原因 3：exec 對象被 SELinux 阻擋
+#### 原因 4：Android 15 WMS 更嚴格，不接受 early rotation call
+#### 結論：
 **init.rc 無法做 per-display rotation。**  
 唯一方法：**進 framework。**
 
 ----------
 
-
-## 7. Rockchip 原廠 Patch（A14 vs A15）比較
+### 2.5 Rockchip 原廠 Patch（A14 vs A15）比較
 
 | 功能 | Android 14 | Android 15 |
 |--------|------------|------------|
@@ -154,13 +112,13 @@ system_server_service denied
 
 結論：
 
-### Rockchip A14 patch 無法直接移植到 A15
+#### Rockchip A14 patch 無法直接移植到 A15
 
 因為抽象層全部重新設計。
 
 ----------
 
-# # **8. Android 15 真正的 rotation 流程**
+### 2.6 Android 15 真正的 rotation 流程
 
 對外接顯示器：
 ```scss
@@ -179,7 +137,7 @@ WindowManagerService
 -   同步 system bar inset
 ----------
 
-# # **9. dumpsys SurfaceFlinger 深度分析（DisplayId=2）**
+### 2.7 dumpsys SurfaceFlinger 深度分析（DisplayId=2）
 dumpsys 證實：
 
 -   mOrientedDisplaySpace 是正確的   
@@ -187,7 +145,7 @@ dumpsys 證實：
 -   **DisplayViewport 與 DisplayFrame 不一致**  
 右側裁切的原因：
 
-### **計算 inset 前後發生 race condition**
+#### 計算 inset 前後發生 race condition
 
 LogicalDisplay 設定的 geometry 被 InputFlinger / InsetsPolicy 覆蓋。
 
@@ -197,11 +155,32 @@ LogicalDisplay 設定的 geometry 被 InputFlinger / InsetsPolicy 覆蓋。
 
 ----------
 
-# # **10. 正式解法：加入 framework-level「開機後旋轉」**
+## 3. Root Cause 分析
+
+displayId=2 出現：
+-   **右側少一整列 icon**
+-   **畫面向左下偏移**
+-   **SurfaceFlinger 計算的投影矩陣與預期不一致**
+其根因是：
+
+### 3.1 Android 15 的多顯示器旋轉邏輯完全倚賴 WMS + DisplayRotation 的 notification chain
+
+如果在 SF / LogicalDisplay 直接 override：
+#### 後果
+
+- Insets 不會同步更新  
+- layout stack 與 display stack 不一致  
+- WindowManager 認為尚未旋轉，但 SurfaceFlinger 已旋轉（兩者不同步）  
+- SurfaceControl Transaction 中 Matrix 計算異常  
+- **最終畫面一定裁切、方向錯誤**  
+
+----------
+
+## 4. 解決方案（正式解法：加入 framework-level「開機後旋轉」）
 
 後來成功的方案：
 
-### **在 WindowManagerService.systemReady 呼叫：**
+### 4.1 在 WindowManagerService.systemReady 呼叫：
 
 `setUserRotation(displayId, USER_ROTATION_LOCKED, rotation);` 
 
@@ -218,8 +197,9 @@ LogicalDisplay 設定的 geometry 被 InputFlinger / InsetsPolicy 覆蓋。
 
 ----------
 
+## 5. 結論與建議
 
-# **11. 不推薦的錯誤方向**
+### 5.1 不推薦的錯誤方向
 
 | 方法 | 為何不能用 |
 |-------|-------------|
@@ -231,7 +211,7 @@ LogicalDisplay 設定的 geometry 被 InputFlinger / InsetsPolicy 覆蓋。
 
 ----------
 
-# # **12. 結論**
+### 5.2 結論
 
 ✓ Android 15 的外接顯示器 rotation 必須走 **WindowManagerService 正規流程**  
 ✓ init.rc 無法設定 per-display rotation  
@@ -249,7 +229,7 @@ LogicalDisplay 設定的 geometry 被 InputFlinger / InsetsPolicy 覆蓋。
 
 ----------
 
-# # **13. 未來可維護性建議**
+### 5.3 未來可維護性建議
 
 -   建一個 **RotationService**，集中處理外接顯示設定 
 -   改用 **system_ext overlay property** 控制 per-display rotation
@@ -258,7 +238,9 @@ LogicalDisplay 設定的 geometry 被 InputFlinger / InsetsPolicy 覆蓋。
 
 ----------
 
-# # **14. 附錄：指令**
+## 附錄
+
+### A. 指令
 ```sql
 adb shell wm user-rotation -d 2 free
 adb shell wm user-rotation -d 2 lock 1

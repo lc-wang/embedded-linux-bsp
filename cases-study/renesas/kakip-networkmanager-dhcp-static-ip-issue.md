@@ -1,8 +1,8 @@
-
 # Kakip Board 網路異常除錯報告（static IP → DHCP network）
 
+## 1. 問題概述
 
-## 問題摘要
+### 1.1 問題摘要
 
 Kakip 開發板接上 switch 後，網路介面 `end0` 無法取得 lab network 的 DHCP IP：
 
@@ -21,7 +21,46 @@ Kakip 開發板接上 switch 後，網路介面 `end0` 無法取得 lab network 
 
 ----------
 
-## 系統環境
+### 1.2 問題現象
+
+#### 1.2.1 IP 狀態
+```
+$ ifconfig end0
+
+inet 198.51.100.10 netmask 255.255.255.0
+```
+#### 1.2.2 Routing table
+```
+$ ip route
+
+198.51.100.0/24 dev end0 scope link
+```
+-   ✗ 無 `default via`
+    
+-   ✗ 無 gateway
+    
+
+#### 1.2.3 ARP / Neighbor
+```
+$ ip neigh
+
+(empty)
+```
+  
+```
+$ arp -n
+
+(empty)
+```
+#### 1.2.4 Ping gateway
+```
+$ ping 198.51.100.1
+
+Destination Host Unreachable
+```
+----------
+
+## 2. 系統環境
 
 -   Board：Kakip
     
@@ -42,46 +81,9 @@ Kakip 開發板接上 switch 後，網路介面 `end0` 無法取得 lab network 
 
 ----------
 
-## 問題現象
+## 3. 除錯過程
 
-### IP 狀態
-```
-$ ifconfig end0
-
-inet 198.51.100.10 netmask 255.255.255.0
-```
-### Routing table
-```
-$ ip route
-
-198.51.100.0/24 dev end0 scope link
-```
--   ✗ 無 `default via`
-    
--   ✗ 無 gateway
-    
-
-### ARP / Neighbor
-```
-$ ip neigh
-
-(empty)
-```
-  
-```
-$ arp -n
-
-(empty)
-```
-### Ping gateway
-```
-$ ping 198.51.100.1
-
-Destination Host Unreachable
-```
-----------
-
-## 實體網路確認
+### 3.1 實體網路確認
 ```
 $ ethtool end0
 
@@ -102,9 +104,9 @@ TX packets: normal
 
 ----------
 
-## 問題分析
+### 3.2 問題分析
 
-### 關鍵線索
+#### 3.2.1 關鍵線索
 
 使用 NetworkManager 查詢 connection profile：
 ```
@@ -118,7 +120,7 @@ ipv4.addresses: 198.51.100.10/24
 ```
 ----------
 
-## 根本原因（Root Cause）
+## 4. Root Cause 分析（根本原因）
 
 > **NetworkManager 被設定為 Static IP（manual），導致 DHCP 完全沒有啟動。**
 
@@ -134,9 +136,11 @@ ipv4.addresses: 198.51.100.10/24
 | 無法取得 192.0.2.x       | DHCP client 根本未執行             |
 
 
-## 解決方式
+----------
 
-### 1. 將 IPv4 改回 DHCP
+## 5. 解決方案
+
+### 5.1 將 IPv4 改回 DHCP
 ```
 sudo nmcli connection modify "有線接続 1" \
 
@@ -150,7 +154,7 @@ ipv4.dns ""
 ```
 ----------
 
-### 2. 重新啟用連線
+### 5.2 重新啟用連線
 ```
 sudo nmcli connection down "有線接続 1"
 
@@ -158,7 +162,7 @@ sudo nmcli connection up "有線接続 1"
 ```
 ----------
 
-### 3. 驗證結果
+### 5.3 驗證結果
 ```
 $ ip addr show end0
 
@@ -174,7 +178,9 @@ default via 192.0.2.1 dev end0
 
 ----------
 
-## 最終狀態
+## 6. 結論與建議
+
+### 6.1 最終狀態
 
 -   end0 正常由 NetworkManager 管理
     
@@ -187,9 +193,9 @@ default via 192.0.2.1 dev end0
 
 ----------
 
-## 問題總結
+### 6.2 問題總結
 
-### 不是以下問題：
+#### 不是以下問題：
 
 -   ✗ 非 switch 問題
     
@@ -202,6 +208,6 @@ default via 192.0.2.1 dev end0
 -   ✗ 非 DHCP server 故障
     
 
-### 真正原因：
+#### 真正原因：
 
 > **NetworkManager connection profile 被設定為 static IP（manual）。**

@@ -1,11 +1,10 @@
+# RZ/T2H SD 卡初始化失敗技術分析報告
 
-# **RZ/T2HSD 卡初始化失敗技術分析報告**
+## 1. 問題概述
 
 **Issue：U-Boot SD card init timeout (`-110: Card did not respond to voltage select`)**
 
-----------
-
-# 1. 背景說明
+### 1.1 背景說明
 
 在 RZ/T2H（R9A09G077M）平台上使用 U-Boot 2021.10（Renesas BSP 分支）進行 SD 卡啟動時，觀察到：
 ```bash
@@ -32,10 +31,9 @@ Card did not respond to voltage select! : -110
 
 ----------
 
+### 1.2 現象與可重現流程
 
-# 2. 現象與可重現流程
-
-## 2.1 不同容量 SD 卡的差異行為
+#### 1.2.1 不同容量 SD 卡的差異行為
 
 | 容量 | 卡種 | 行為 |
 |------|------|------|
@@ -47,7 +45,7 @@ Card did not respond to voltage select! : -110
 
 ----------
 
-## 2.2 mmc 指令測試結果
+#### 1.2.2 mmc 指令測試結果
 
 在 U-Boot shell 中：
 ```bash
@@ -68,15 +66,15 @@ Card did not respond to voltage select! : -110
 
 ----------
 
-# 3. Debug 流程
+## 2. 除錯過程
 
 本問題的 Debug 非常不直覺，歷經下列階段。
 
 ----------
 
-## 3.1 DTS 層面驗證
+### 2.1 DTS 層面驗證
 
-### 檢查內容：
+#### 2.1.1 檢查內容：
 
 -   `sdhi0` / `sdhi1` node    
 -   clock 設定是否正確
@@ -84,7 +82,7 @@ Card did not respond to voltage select! : -110
 -   alias (`mmc0`, `mmc1`)
 -   pinctrl 是否存在
 
-### 結果：
+#### 2.1.2 結果：
 
 -   DTS 實際內容是 **正確、有定義、有 clocks、有 interrupt**
 -   Board DTS 也有開啟 `sdhi0` / `sdhi1` (`status = "okay"`)
@@ -94,7 +92,7 @@ Card did not respond to voltage select! : -110
 
 ----------
 
-## 3.2 mmc OCR、HCS 測試
+### 2.2 mmc OCR、HCS 測試
 
 我們曾修改這行：
 ```c
@@ -110,7 +108,7 @@ mmc->ocr &= ~(OCR_HCS | OCR_S18R);
 
 ----------
 
-## 3.3 硬體端（pinmux/power）測試
+### 2.3 硬體端（pinmux/power）測試
 
 加入：
 ```dts
@@ -126,7 +124,9 @@ vqmmc-supply = <&reg_3p3v>;
 
 ----------
 
-# 4. **真正的 Root Cause：錯誤的 SDHI power-cycle 程序（U-Boot 私增 patch）**
+## 3. Root Cause 分析
+
+### 3.1 真正的 Root Cause：錯誤的 SDHI power-cycle 程序（U-Boot 私增 patch）
 
 最終根因確認於：
 
@@ -150,22 +150,20 @@ ed302f38a8e28604fc13e9af5e8fd9eecc3101a6  "mmc: sh_sdhi: Fix fail to boot sd car
 1.  SD_PWEN OFF
 2.  mdelay(6)
 3.  SD_PWEN ON
-    
 
 ----------
 
-## 4.1 為什麼這會造成 -110？
+### 3.2 為什麼這會造成 -110？
 
-### ✓ 16GB 疑似「舊版 SDHC」不接受這種強制 power-cycle
+#### 3.2.1 16GB 疑似「舊版 SDHC」不接受這種強制 power-cycle
 
 會導致其：
 
 -   上電初始化序列被打斷 
 -   state machine 進入不一致狀態
 -   無法回應 ACMD41
-    
 
-### ✓ U-Boot 在 power-cycle **之後**立刻發 CMD1/ACMD41
+#### 3.2.2 U-Boot 在 power-cycle 之後立刻發 CMD1/ACMD41
 
 對於部分卡：
 
@@ -176,13 +174,16 @@ ed302f38a8e28604fc13e9af5e8fd9eecc3101a6  "mmc: sh_sdhi: Fix fail to boot sd car
 ```bash
 Card did not respond to voltage select : -110
 ```
-### ✓ 更改 mdelay() 6 → 20ms 無效
+
+#### 3.2.3 更改 mdelay() 6 → 20ms 無效
 
 證明卡本身對此強制 power-cycle 不兼容，而不是單純 timing 不足。
 
 ----------
 
-# 5. 解法：Revert 整個 commit
+## 4. 解決方案
+
+### 4.1 解法：Revert 整個 commit
 
 解法：
 ```bash
@@ -190,15 +191,17 @@ git revert ed302f38a8e28604fc13e9af5e8fd9eecc3101a6
 ```
 並且也 revert 掉 SDHI_SD_STATUS register 操作。
 
-### revert 後：
+#### 4.1.1 revert 後：
 
 -   16GB SDHC 正常讀取
 -   32GB 正常
 -   所有容量都可正常 boot
 -   `mmc dev 0` / `mmc dev 1` 均正常進入 25MHz legacy mode
+
 ----------
 
-# 6. 實際修復 commit（摘要）
+### 4.2 實際修復 commit（摘要）
+
 ```bash
 Revert "mmc: sh_sdhi: Fix fail to boot sd card"
 
@@ -212,10 +215,11 @@ Revert 部分包含：
 -   移除 SDHI_SD_STATUS 暫存器定義    
 -   移除 `SD_STATUS_SD_PWEN` bit 操作
 -   移除強制 power-cycle
-    
+
 ----------
 
-# 7. 最終驗證（成功）
+### 4.3 最終驗證（成功）
+
 ```bash
 `=> mmc dev 0
 mmc0: SDHC, 25 MHz
@@ -229,4 +233,3 @@ Device: mmc@92080000
 reading  Image  reading  uInitrd  reading  boot.scr  Booting  Linux... 
 ```
 系統正常啟動。
-

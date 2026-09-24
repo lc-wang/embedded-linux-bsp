@@ -1,8 +1,6 @@
-
 # RZ/T2H USB Debug Console 分析
 
-
-## 1. 問題背景
+## 1. 問題概述
 
 在 RZ/T2H Evaluation Board 上，需要確認並建立穩定可用的 **Debug Console**，同時釐清：
 
@@ -12,9 +10,12 @@
 
 ----------
 
-## 2. Linux Console 軟體設定確認
+## 2. 分析過程
 
-### 2.1 Device Tree 設定
+### 2.1 Linux Console 軟體設定確認
+
+#### 2.1.1 Device Tree 設定
+
 ```dts
 /chosen {
     stdout-path = "serial0:115200n8";
@@ -27,7 +28,8 @@ sci0_pins: sci0 {
              <RZT2H_PORT_PINMUX(27, 4, 0x14)>; /* SCI0_RXD */
 };
 ```
-### 2.2 Runtime 驗證
+
+#### 2.1.2 Runtime 驗證
 
 `dmesg | grep tty` 
 
@@ -44,9 +46,9 @@ Linux kernel console 使用 **SCI0 / ttySC0**。
 
 ----------
 
-## 3. CN34（FT2232）Debug Console 分析
+### 2.2 CN34（FT2232）Debug Console 分析
 
-### 3.1 Windows 端枚舉結果
+#### 2.2.1 Windows 端枚舉結果
 
 Windows 裝置管理員顯示：
 
@@ -54,15 +56,14 @@ Windows 裝置管理員顯示：
 
 → 對應 **FTDI FT2232 系列**
 
-### 3.2 Schematic 對應關係
+#### 2.2.2 Schematic 對應關係
 
 電路圖 net name：
 
 -   `P27_5_FT2232_TXD0`
 -   `P27_4_FT2232_RXD0`
-    
 
-### 3.3 證據鏈總結
+#### 2.2.3 證據鏈總結
 
 | 層級      | 證據內容                               |
 |-----------|----------------------------------------|
@@ -77,9 +78,10 @@ Windows 裝置管理員顯示：
 
 ----------
 
-## 4. USB Gadget（g_serial）軟體能力驗證
+### 2.3 USB Gadget（g_serial）軟體能力驗證
 
-### 4.1 Kernel 能力確認
+#### 2.3.1 Kernel 能力確認
+
 ```bash
 ls /sys/class/udc # 92041000.usb
 ```
@@ -89,7 +91,9 @@ CONFIG_USB_GADGET=y
 CONFIG_USB_G_SERIAL=m
 CONFIG_USB_F_ACM=m
 ```
-### 4.2 啟用 gadget serial
+
+#### 2.3.2 啟用 gadget serial
+
 ```bash
 modprobe g_serial
 
@@ -105,15 +109,15 @@ Linux USB gadget serial 功能正常
 
 ----------
 
-## 5. CN33（USB OTG）為何無法枚舉？
+### 2.4 CN33（USB OTG）為何無法枚舉？
 
-### 5.1 現象
+#### 2.4.1 現象
 
 -   Linux 端：`g_serial ready`
 -   Windows 端：**完全無 USB 裝置出現**
 -   無 `VBUS` / `USB connect` log
 
-### 5.2 Schematic 硬體分析
+#### 2.4.2 Schematic 硬體分析
 
 CN33 為 **USB OTG port**，關鍵硬體條件：
 
@@ -124,8 +128,8 @@ CN33 為 **USB OTG port**，關鍵硬體條件：
     -   ID 浮接 = Device mode
 2.  **E8 / E9（Jumper_Trace_Cut）**
     -   可能切斷 D+/D− 路徑
-        
-### 5.3 推論
+
+#### 2.4.3 推論
 
 在目前板子設定下：
 
@@ -139,15 +143,16 @@ CN33 在目前硬體設定下 **不適合作為 debug console**
 
 ----------
 
-## 6. CN79（USB Device）實測結果
+### 2.5 CN79（USB Device）實測結果
 
-### 6.1 行為
+#### 2.5.1 行為
 
 -   CN79 插上 Windows
 -   **立即出現 COM port**
 -   無需調整 ID / jumper
 
-### 6.2 Gadget Console 驗證
+#### 2.5.2 Gadget Console 驗證
+
 ```bash
 modprobe g_serial
 setsid getty -L ttyGS0 115200 vt100 
@@ -163,7 +168,9 @@ Windows PuTTY / TeraTerm：
 
 ----------
 
-## 7. 最終建議配置（Best Practice）
+## 3. 結論與建議
+
+### 3.1 最終建議配置（Best Practice）
 
 | Interface        | 用途                              | Linux TTY |
 |------------------|-----------------------------------|-----------|
@@ -171,18 +178,21 @@ Windows PuTTY / TeraTerm：
 | CN79 (USB Device)| 第二 console / runtime debug      | ttyGS0   |
 | CN33 (USB OTG)   | 需調整 ID / trace                 | 不建議   |
 
-
 ----------
 
-## 8. CN79 Debug Console 指令整理
+## 附錄
 
-### 啟用
+### A. CN79 Debug Console 指令整理
+
+#### 啟用
+
 ```bash
 modprobe g_serial
 systemctl enable serial-getty@ttyGS0.service
 systemctl start  serial-getty@ttyGS0.service
 ```
-### Windows
+
+#### Windows
 
 -   新出現 COM port
 -   115200 / Serial

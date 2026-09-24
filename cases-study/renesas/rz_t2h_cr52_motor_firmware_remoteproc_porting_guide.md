@@ -1,5 +1,6 @@
-
 # RZ/T2H CR52 Motor Firmware 改造為 Linux Remoteproc 版本操作手冊
+
+## 1. 目標
 
 **平台**：Renesas RZ/T2H + Linux (A55) + CR52 Motor Firmware  
 **工具**：e² studio（Windows）、Arm GCC、Renesas FSP  
@@ -10,7 +11,7 @@
 -   不破壞 Linux（避免 MMC -84 / EXT4 error / 卡死）
 ----------
 
-## 0. 前置條件與專案說明
+## 2. 環境與前置條件（專案說明）
 
 -   手上的 e² studio 專案名稱假設為：  
     `RZT2H_INVBLV_SPM_ENCD_FOC_E2S_V100`
@@ -22,7 +23,7 @@
     
 ----------
 
-## 1. 用 e² studio 建立「Remoteproc 版」專案
+## 3. 用 e² studio 建立「Remoteproc 版」專案
 
 1.  在 e² studio 專案視窗中：
     
@@ -34,9 +35,9 @@
 
 ----------
 
-## 2. 修改 Linker Script：改成 CR52 SRAM + remoteproc 入口
+## 4. 修改 Linker Script：改成 CR52 SRAM + remoteproc 入口
 
-### 2.1 新增檔案
+### 4.1 新增檔案
 
 在新專案底下建立：
 -   路徑建議：`script/rzt2h_cr52_remoteproc.ld`
@@ -120,7 +121,7 @@ SECTIONS
 ```
 > 註：remoteproc 可以接受「沒有 resource table」的 firmware。
 
-### 2.2 在 e² studio 指定 Linker Script
+### 4.2 在 e² studio 指定 Linker Script
 
 1.  專案右鍵 → **Properties** 
 2.  左側選單：  
@@ -134,9 +135,9 @@ SECTIONS
     
 ----------
 
-## 3. 移除「自帶 reset / clock 設定」的啟動碼
+## 5. 移除「自帶 reset / clock 設定」的啟動碼
 
-### 3.1 停用 startup / crt 檔案
+### 5.1 停用 startup / crt 檔案
 
 remoteproc 會：
 
@@ -162,9 +163,9 @@ remoteproc 會：
 
 
 
-## 4. 修改 hal_entry.c：接管 main 流程給 remoteproc
+## 6. 修改 hal_entry.c：接管 main 流程給 remoteproc
 
-### 4.1 原始結構（簡化）
+### 6.1 原始結構（簡化）
 
 原本 hal_entry 大概長這樣：
 ```c
@@ -184,7 +185,7 @@ void  hal_entry(void)
 ```
 → **這段一定會讓 Linux 掛掉**，因為改了 PRCR / MSTP（由 Linux 控制）。
 
-### 4.2 Remoteproc-safe 寫法
+### 6.2 Remoteproc-safe 寫法
 
 請改成：
 ```c
@@ -193,8 +194,8 @@ void hal_entry(void)
     /* Remoteproc 模式：不再操作 PRCR/MSTP/clock，避免干擾 Linux */
 
     /* 初始化 motor 系統（remoteproc-safe 版本） */
-    R_Systeminit();               // 第 5 章會說明
-    m_startup_remoteproc_safe();  // 第 6 章會說明
+    R_Systeminit();               // 第 7 章會說明
+    m_startup_remoteproc_safe();  // 第 8 章會說明
 
     /* 主控制迴圈：保留原本 motor 控制邏輯 */
     while (1)
@@ -212,9 +213,9 @@ void hal_entry(void)
 
 ----------
 
-## 5. 修改 R_Systeminit()：保留 Motor、避免 Linux Crash
+## 7. 修改 R_Systeminit()：保留 Motor、避免 Linux Crash
 
-### 5.1 原始版本會做的事
+### 7.1 原始版本會做的事
 
 原版 `R_Systeminit()` 一般會包含：
 -   `R_IOPORT_Open()` → 改 pinmux（會影響 MMC / UART / OSPI）
@@ -226,7 +227,7 @@ void hal_entry(void)
 
 這些對於「Linux 早就初始化好的 SoC」來說，**都是高風險操作**。
 
-### 5.2 Remoteproc-safe 版
+### 7.2 Remoteproc-safe 版
 
 將 `R_Systeminit()` 改為下列內容：
 ```c
@@ -313,9 +314,9 @@ void R_Systeminit(void)
 
 ----------
 
-## 6. 修改 m_rzt.c：m_startup_remoteproc_safe()
+## 8. 修改 m_rzt.c：m_startup_remoteproc_safe()
 
-### 6.1 目的
+### 8.1 目的
 
 -   原本 `m_startup()` 會做很多初始化，同時可能改到系統狀態。
 -   建立 `m_startup_remoteproc_safe()`：
@@ -324,7 +325,7 @@ void R_Systeminit(void)
     -   呼叫 `setup_motor()`、`setup_encoder()`
         
 
-### 6.2 建議實作骨架
+### 8.2 建議實作骨架
 
 在 `m_rzt.c` 裡增加：
 ```c
@@ -391,7 +392,7 @@ void m_startup_remoteproc_safe(void)
 
 ----------
 
-## 7. Build 專案並輸出 ELF
+## 9. Build 專案並輸出 ELF
 
 1.  在 e² studio 選擇新專案 `*_remoteproc`   
 2.  右鍵 → **Build Project**
@@ -402,9 +403,9 @@ void m_startup_remoteproc_safe(void)
 
 ----------
 
-## 8. Linux 端操作 remoteproc + 驗證
+## 10. 驗證（Linux 端操作 remoteproc）
 
-### 8.1 啟動 CR52 韌體
+### 10.1 啟動 CR52 韌體
 ```sh
 echo RZT2H_INVBLV_SPM_ENCD_FOC_E2S_V100_remoteproc.elf \
   > /sys/class/remoteproc/remoteproc0/firmware
@@ -416,7 +417,7 @@ echo start > /sys/class/remoteproc/remoteproc0/state
 cat /sys/class/remoteproc/remoteproc0/state
 # 應該看到 "running"
 ```
-### 8.2 確認 CR52 主迴圈有在跑
+### 10.2 確認 CR52 主迴圈有在跑
 
 在 `m_heartbeat()` 中有：
 ```sh
@@ -438,9 +439,9 @@ sudo devmem2 0x10070020
 ```
 ----------
 
-## 9. 常見問題與排查
+## 11. 常見問題與排查
 
-### 9.1 啟動後 MMC 出現 -84 / I/O error / EXT4 error
+### 11.1 啟動後 MMC 出現 -84 / I/O error / EXT4 error
 
 檢查以下幾點：
 

@@ -1,10 +1,9 @@
-
-# Android SEPolicy 問題分析與修正報告
+# RK3588 Android SEPolicy 問題分析與修正報告
 
 
 _(Rockchip RK3588 rknn_server + HAL binder denied)_
 
-## 一、背景說明
+## 1. 問題概述（背景說明）
 
 在 Rockchip RK3588 Android BSP 開發過程中，  
 遇到兩類 SELinux 權限拒絕 (AVC denied) 問題：
@@ -27,9 +26,11 @@ _(Rockchip RK3588 rknn_server + HAL binder denied)_
 
 ----------
 
-# 二、問題 1：rknn_server 讀取 default_prop 被全域 neverallow 擋住
+## 2. 除錯過程
 
-## 現象 (AVC Log)
+### 2.1 問題 1：rknn_server 讀取 default_prop 被全域 neverallow 擋住
+
+#### 2.1.1 現象 (AVC Log)
 
 ```bash
 type=1400 audit: avc: denied { read } for comm="listener"  scontext=u:r:rknn_server:s0 tcontext=u:object_r:default_prop:s0 tclass=file
@@ -40,7 +41,7 @@ __這表示 rknn_server 嘗試讀取系統屬性（ro._ / persist._），但無�
 
 ----------
 
-## 編譯期錯誤 (secilc neverallow violation)
+#### 2.1.2 編譯期錯誤 (secilc neverallow violation)
 
 ```bash
 neverallow check failed: neverallow base_typeattr_223 default_prop  (file (read open ...)) violated by allow rknn_server default_prop  (file (read open));
@@ -48,13 +49,26 @@ neverallow check failed: neverallow base_typeattr_223 default_prop  (file (read 
 
 ----------
 
-# 三、Root Cause（問題根本原因）
+### 2.2 問題 2：HDMI HAL → Camera HAL Binder call denied
 
-## 1. rknn_server 是 vendor domain
+#### 2.2.1 Log
+```bash
+avc: denied  { call } for scontext=u:r:hal_hdmi_default:s0
+tcontext=u:r:hal_camera_default:s0
+tclass=binder
+``` 
+
+----------
+
+## 3. Root Cause 分析
+
+### 3.1 問題 1：rknn_server 讀取 default_prop
+
+#### 3.1.1 rknn_server 是 vendor domain
 
 → 基於 Treble 安全模型，**vendor domain 禁止讀取 default_prop**（system property namespace）。
 
-## 2. AOSP 定義永不可覆寫的 neverallow
+#### 3.1.2 AOSP 定義永不可覆寫的 neverallow
 
 位置於：
 
@@ -70,13 +84,13 @@ neverallow { vendor domains } default_prop:file { read write open ... }
 
 **任何 allow rule 都會被擋住（無條件 fail）。**
 
-## 3. rknn_server 是 closed-source
+#### 3.1.3 rknn_server 是 closed-source
 
 → 你無法修改它讓它讀 `ro.vendor.rknn.*` 這類合法的 vendor namespace 屬性。
 
 ----------
 
-# 四、為何「正規 allow rule」無法解決？
+#### 3.1.4 為何「正規 allow rule」無法解決？
 
 因為 **AOSP neverallow 是硬限制（强制不可繞過）**：
 
@@ -97,7 +111,18 @@ neverallow { vendor domains } default_prop:file { read write open ... }
 
 ----------
 
-# 五、可行的解法選項（分析）
+### 3.2 問題 2：HDMI HAL → Camera HAL Binder call
+
+HAL 之間的 binder 呼叫**預設不允許 cross-HAL 呼叫**，  
+必須顯示定義 allow。
+
+----------
+
+## 4. 解決方案
+
+### 4.1 問題 1：rknn_server 讀取 default_prop
+
+#### 4.1.1 可行的解法選項（分析）
 
 
 | 解法 | 可行？ | 優點 | 缺點 |
@@ -112,14 +137,14 @@ neverallow { vendor domains } default_prop:file { read write open ... }
 
 ----------
 
-# 六、最終採用解法：permissive rknn_server（因無需通過 VTS）
+#### 4.1.2 最終採用解法：permissive rknn_server（因無需通過 VTS）
 
 
 > **此 build 目標為 bring-up validation，不作為 GMS/VTS/GTS release build。**
 
 因此選擇：
 
-### 設定 rknn_server 為 permissive domain
+##### 設定 rknn_server 為 permissive domain
 
 **修改：`rknn_server.te`**
 
@@ -138,35 +163,7 @@ neverallow { vendor domains } default_prop:file { read write open ... }
 
 ----------
 
-# 七、風險與建議
-
-
-| 項目 | 說明 |
-|------|------|
-| 安全性 | rknn_server domain 內所有 denied 都會被允許（permissive），SELinux 對該 domain 等同失效 |
-| 適用場景 | internal BSP / bring-up / demo / non-GMS build |
-| 不適用場景 | 量產、商用產品、GMS 認證、需通過 VTS/GTS 的版本 |
-| 建議 | 若未來要進入生產或正式商用 → 改用 propshim（LD_PRELOAD key rewrite）以符合正規 sepolicy 要求 |
-
-
-
-----------
-
-# 八、問題 2：HDMI HAL → Camera HAL Binder call denied
-
-## Log
-```bash
-avc: denied  { call } for scontext=u:r:hal_hdmi_default:s0
-tcontext=u:r:hal_camera_default:s0
-tclass=binder
-``` 
-
-## 原因
-
-HAL 之間的 binder 呼叫**預設不允許 cross-HAL 呼叫**，  
-必須顯示定義 allow。
-
-## 正規修正（最小必要權限）
+### 4.2 問題 2：HDMI HAL → Camera HAL Binder call 正規修正（最小必要權限）
 
 **修改：`hal_hdmi_default.te`**
 
@@ -181,7 +178,9 @@ HAL 之間的 binder 呼叫**預設不允許 cross-HAL 呼叫**，
 
 ----------
 
-# 九、最終整合結果
+## 5. 結論與建議
+
+### 5.1 最終整合結果
 
 
 | 項目 | 採用修正 | 狀態 |
@@ -190,3 +189,16 @@ HAL 之間的 binder 呼叫**預設不允許 cross-HAL 呼叫**，
 | HDMI HAL binder call denied | allow rule | ✓ 已解決 |
 | sepolicy 編譯 | 成功 | ✓ |
 | 系統功能 | rknn OK / HDMI OK |✓ |
+
+### 5.2 風險與建議
+
+
+| 項目 | 說明 |
+|------|------|
+| 安全性 | rknn_server domain 內所有 denied 都會被允許（permissive），SELinux 對該 domain 等同失效 |
+| 適用場景 | internal BSP / bring-up / demo / non-GMS build |
+| 不適用場景 | 量產、商用產品、GMS 認證、需通過 VTS/GTS 的版本 |
+| 建議 | 若未來要進入生產或正式商用 → 改用 propshim（LD_PRELOAD key rewrite）以符合正規 sepolicy 要求 |
+
+
+

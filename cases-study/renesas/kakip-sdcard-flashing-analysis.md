@@ -1,7 +1,8 @@
+# Kakip Image 燒錄問題技術分析報告
 
-# Kakip  Image 燒錄問題技術分析報告
+## 1. 問題概述
 
-# 1. 背景
+### 1.1 背景
 
 Kakip OS 提供完整的 SD card 映像檔，需要以 dd 寫入 SD card 作為啟動介質。
 
@@ -25,7 +26,7 @@ Kakip OS 提供完整的 SD card 映像檔，需要以 dd 寫入 SD card 作為�
 
 ----------
 
-# 2. 問題描述
+### 1.2 問題描述
 
 以下指令燒錄後無法從 SD card 開機：
 
@@ -37,7 +38,76 @@ Kakip OS 提供完整的 SD card 映像檔，需要以 dd 寫入 SD card 作為�
 
 ----------
 
-# 3. 問題根因摘要
+## 2. 分析過程（技術分析）
+
+### 2.1 dd 預設使用 Linux page cache
+
+一般 dd 寫入流程為：
+
+1.  資料寫入 page cache
+2.  Linux 標示為已寫入
+3.  實際裝置寫入延後進行，順序不可控
+4.  `sync` 後才強制 flush
+    
+
+此行為對 boot sector 造成風險：
+
+-   寫入順序可能錯亂
+-   未對齊寫入會破壞 SPL 或 GPT header
+-   cache 未即時 flush 時，前 1MB 可能為舊資料或部分未寫入
+
+----------
+
+### 2.2 Direct I/O（oflag=direct）避免對齊與 flush 問題
+
+Direct I/O 特性：
+
+-   不使用 cache
+-   寫入順序維持一致
+-   寫入立即落盤
+-   block 大小與 offset 直接與底層裝置對齊
+    
+
+因此：
+
+-   MBR/GPT header
+-   SPL
+-   U-Boot image header
+    
+
+都能被完整寫入正確位置。
+
+----------
+
+### 2.3 讀卡機差異造成的不一致性
+
+不同 USB SD 讀卡器的 firmware 流程差異很大，有些會：
+
+-   做 4K cache
+-   使用非同步寫入
+-   延遲 flush
+-   做內部 sector re-map
+    
+
+因此，有些環境即使沒有 direct I/O 也可正常啟動，但部分裝置必須使用 direct I/O 才能保證寫入正確。
+
+----------
+
+### 2.4 實測與驗證
+
+可以比對 SD 卡與原始映像檔的前 1MB：
+
+`sudo hexdump -C /dev/sde | head hexdump -C kakip_os_image_v7.4.img | head` 
+
+若未使用 `oflag=direct`，可能看到：
+-   開頭 sector 不一致
+-   前幾個 block 若為 `00 00`，表示未寫入成功
+-   SPL header 損壞
+    
+
+----------
+
+## 3. Root Cause 分析（問題根因摘要）
 
 不加 `oflag=direct` 時，Linux 會使用 page cache 寫入 SD card，可能導致：
 
@@ -60,76 +130,9 @@ Kakip（RZ/V2H）啟動流程強依賴 SD 開頭區段：
 
 ----------
 
-# 4. 技術分析
+## 4. 解決方案
 
-## 4.1 dd 預設使用 Linux page cache
-
-一般 dd 寫入流程為：
-
-1.  資料寫入 page cache
-2.  Linux 標示為已寫入
-3.  實際裝置寫入延後進行，順序不可控
-4.  `sync` 後才強制 flush
-    
-
-此行為對 boot sector 造成風險：
-
--   寫入順序可能錯亂
--   未對齊寫入會破壞 SPL 或 GPT header
--   cache 未即時 flush 時，前 1MB 可能為舊資料或部分未寫入
-
-----------
-
-## 4.2 Direct I/O（oflag=direct）避免對齊與 flush 問題
-
-Direct I/O 特性：
-
--   不使用 cache
--   寫入順序維持一致
--   寫入立即落盤
--   block 大小與 offset 直接與底層裝置對齊
-    
-
-因此：
-
--   MBR/GPT header
--   SPL
--   U-Boot image header
-    
-
-都能被完整寫入正確位置。
-
-----------
-
-## 4.3 讀卡機差異造成的不一致性
-
-不同 USB SD 讀卡器的 firmware 流程差異很大，有些會：
-
--   做 4K cache
--   使用非同步寫入
--   延遲 flush
--   做內部 sector re-map
-    
-
-因此，有些環境即使沒有 direct I/O 也可正常啟動，但部分裝置必須使用 direct I/O 才能保證寫入正確。
-
-----------
-
-# 5. 實測與驗證
-
-可以比對 SD 卡與原始映像檔的前 1MB：
-
-`sudo hexdump -C /dev/sde | head hexdump -C kakip_os_image_v7.4.img | head` 
-
-若未使用 `oflag=direct`，可能看到：
--   開頭 sector 不一致
--   前幾個 block 若為 `00 00`，表示未寫入成功
--   SPL header 損壞
-    
-
-----------
-
-# 6. 最佳化燒錄指令
+### 4.1 最佳化燒錄指令
 
 以下為最穩定建議：
 
@@ -144,24 +147,25 @@ Direct I/O 特性：
 
 ----------
 
-# 7. 建議的完整燒錄流程
+### 4.2 建議的完整燒錄流程
 
-## 步驟一：清除舊 GPT/MBR（避免分割表殘留）
+#### 步驟一：清除舊 GPT/MBR（避免分割表殘留）
 
 `sudo sgdisk --zap-all /dev/sde` 
 
-## 步驟二：燒錄映像檔
+#### 步驟二：燒錄映像檔
 
 `sudo dd  if=kakip_os_image_v7.4.img of=/dev/sde bs=4M status=progress oflag=direct,sync` 
 
-## 步驟三：強制完成寫入
+#### 步驟三：強制完成寫入
 
 `sync` 
 
-## 步驟四：重新插拔 SD 卡
+#### 步驟四：重新插拔 SD 卡
 
+----------
 
-# 8. 結論
+## 5. 結論與建議
 
 Kakip v7.4 映像檔在燒錄 SD card 時，若未使用 `oflag=direct`，Linux page cache 有機會造成：
 -   部分 boot sector 未寫入

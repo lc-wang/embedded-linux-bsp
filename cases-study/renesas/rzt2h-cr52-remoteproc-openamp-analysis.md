@@ -1,8 +1,6 @@
+# RZ/T2H — Linux Remoteproc 無法啟動 CR52
 
-# **RZ/T2H — Linux Remoteproc 無法啟動 CR52**
-
-
-# **1. 前言：Linux 想要透過 remoteproc 啟動 CR52**
+## 1. 問題概述（Linux 想要透過 remoteproc 啟動 CR52）
 
 在 RZ/T2H 系統中：
 -   Cortex-A55 執行 Linux
@@ -21,7 +19,7 @@ echo start        > /sys/class/remoteproc/remoteproc0/state
 
 ----------
 
-# **2. 觀察到的行為**
+## 2. 除錯過程（觀察到的行為）
 
 在 Linux 上執行：
 ```bash
@@ -35,13 +33,13 @@ rz_rproc_start+0x1d0
 ```
 這表示：
 
-### Linux remoteproc 正在 `ioremap()` CR52 firmware / vring / resource_table 區域
+### 2.1 Linux remoteproc 正在 `ioremap()` CR52 firmware / vring / resource_table 區域
 
 但該記憶體區域對 Linux **不可存取（Secure only / 未 map）**。
 
 ----------
 
-# **3. 根本原因**
+## 3. Root Cause 分析
 
 分析 CR52 firmware 的 ELF：
 ```bash
@@ -73,7 +71,9 @@ ioremap(0xE0000000)
 
 ----------
 
-# **4. 修正方法：擴充 TF-A 記憶體 mapping 讓 Linux 能存取 CR52 firmware 區域**
+## 4. 解決方案
+
+### 4.1 修正方法：擴充 TF-A 記憶體 mapping 讓 Linux 能存取 CR52 firmware 區域
 
 要讓 Linux 能 read/write：
 -   CR52 firmware 程式碼  
@@ -82,7 +82,8 @@ ioremap(0xE0000000)
     
 就必須在 TF-A（BL31）加入 memory mapping。
 
-### 你的修正：在 BL31 中新增 mapping
+#### 4.1.1 你的修正：在 BL31 中新增 mapping
+
 ``` c
 MAP_REGION_FLAT(0x10000000, 0x200000, MT_MEMORY | MT_RW | MT_SECURE),
 MAP_REGION_FLAT(0xE0000000, 0x9000000, MT_MEMORY | MT_RW | MT_SECURE),
@@ -91,9 +92,10 @@ MAP_REGION_FLAT(0xE0000000, 0x9000000, MT_MEMORY | MT_RW | MT_SECURE),
 -   為 SYSRAM 建立 translation table
 -   將 OpenAMP 共享記憶體區域納入 mapping
 -   供 Linux ioremap ()
+
 ----------
 
-# **5. 修正方法：增加 translation table 數量**
+### 4.2 修正方法：增加 translation table 數量
 
 新增這些 mapping 後 TF-A 原本的：
 ```c
@@ -109,9 +111,10 @@ MAX_MMAP_REGIONS 7
 -   Page table 不足
 -   TF-A 在 early boot 失敗
 -   Linux 無法存取 CR52 區域
+
 ----------
 
-# **6. 修正方法：放寬 R52 TCM / SYSRAM 權限**
+### 4.3 修正方法：放寬 R52 TCM / SYSRAM 權限
 
 OpenAMP 要求：
 -   resource_table
@@ -134,7 +137,7 @@ OpenAMP 要求：
 
 ----------
 
-# **7. 修正後結果：remoteproc 成功啟動 CR52**
+### 4.4 修正後結果：remoteproc 成功啟動 CR52
 
 修正後：
 ``` bash
@@ -147,9 +150,11 @@ echo start > /sys/class/remoteproc/remoteproc0/state
 -   resource_table 交換成功 
 -   vring 建立
 -   rpmsg 通道可以生成
+
 ----------
 
-# **8. 最終系統架構**
+## 5. 結論與建議（最終系統架構）
+
 ```pgsql
 +---------------------------+
 |       Linux (A55)         |
@@ -179,7 +184,10 @@ echo start > /sys/class/remoteproc/remoteproc0/state
 +---------------------------+
 
 ```
-# **9. 系統整體架構圖**
+
+## 附錄
+
+### A. 系統整體架構圖
 
 ```mermaid
 flowchart TB
@@ -230,7 +238,8 @@ TFA --> RESET --> CR52
 CR52 --> SHMEM
 A55 <-- "rpmsg virtio" --> CR52
 ```
-# **10. Remoteproc Boot Flow圖**
+
+### B. Remoteproc Boot Flow圖
 
 ```mermaid
 sequenceDiagram
@@ -260,7 +269,9 @@ R->>L: resource_table handshake
 R->>L: vring → rpmsg channel ready
 L-->>U: remoteproc started successfully
 ```
-# **11Remoteproc Memory Layout**
+
+### C. Remoteproc Memory Layout
+
 ```mermaid
 flowchart  LR
 

@@ -1,7 +1,8 @@
-
 # RZ/V2H USB2 相機導致內部匯流排效能降級除錯報告
 
-## 問題摘要
+## 1. 問題概述
+
+### 1.1 問題摘要
 
 在 Kakip（RZ/V2H）開發板上接上 USB2 相機後，xHCI host controller 出現以下 kernel 警告：
 
@@ -17,25 +18,15 @@ xhci-hcd 15860000.usb: WARN: HC couldn't access mem fast enough for slot 1 ep 2
 
 ---
 
-## 系統環境
+### 1.2 問題現象
 
-- Board：Kakip
-- SoC：Renesas RZ/V2H
-- Firmware：Trusted Firmware-A（TF-A）
-- 記憶體類型：LPDDR4
-- 受影響介面：USB2（xhci-hcd @ 15860000.usb）
-
----
-
-## 問題現象
-
-### Kernel 警告訊息
+#### 1.2.1 Kernel 警告訊息
 
 ```
 xhci-hcd 15860000.usb: WARN: HC couldn't access mem fast enough for slot 1 ep 2
 ```
 
-### 症狀描述
+#### 1.2.2 症狀描述
 
 | 現象 | 說明 |
 |------|------|
@@ -45,7 +36,19 @@ xhci-hcd 15860000.usb: WARN: HC couldn't access mem fast enough for slot 1 ep 2
 
 ---
 
-## 硬體確認
+## 2. 系統環境
+
+- Board：Kakip
+- SoC：Renesas RZ/V2H
+- Firmware：Trusted Firmware-A（TF-A）
+- 記憶體類型：LPDDR4
+- 受影響介面：USB2（xhci-hcd @ 15860000.usb）
+
+---
+
+## 3. 除錯過程
+
+### 3.1 硬體確認
 
 ✓ USB2 實體連線正常
 ✓ 相機裝置可被識別（`lsusb` 可見）
@@ -54,9 +57,9 @@ xhci-hcd 15860000.usb: WARN: HC couldn't access mem fast enough for slot 1 ep 2
 
 ---
 
-## 問題分析
+### 3.2 問題分析
 
-### 關鍵線索
+#### 3.2.1 關鍵線索
 
 檢查 DDR 記憶體控制器參數設定檔：
 
@@ -79,7 +82,7 @@ plat/renesas/rz/soc/v2h/drivers/ddr/ddr_param_def_lpddr4.c
 
 ---
 
-## 根本原因（Root Cause）
+## 4. Root Cause 分析（根本原因）
 
 > **LPDDR4 記憶體控制器（MC）的 timing 與 scheduling 參數設定不當，導致記憶體頻寬不足以支援 USB2 DMA 傳輸，進而造成 xHCI controller stall。**
 
@@ -94,15 +97,15 @@ plat/renesas/rz/soc/v2h/drivers/ddr/ddr_param_def_lpddr4.c
 
 ---
 
-## 解決方式
+## 5. 解決方案
 
-### 修改檔案
+### 5.1 修改檔案
 
 ```
 plat/renesas/rz/soc/v2h/drivers/ddr/ddr_param_def_lpddr4.c
 ```
 
-### 修正的 Register 對照表
+### 5.2 修正的 Register 對照表
 
 | Register | 舊值         | 新值         | 說明                     |
 |----------|-------------|-------------|--------------------------|
@@ -115,9 +118,7 @@ plat/renesas/rz/soc/v2h/drivers/ddr/ddr_param_def_lpddr4.c
 | `0x02cf` | `0x01010064` | `0x0301000a` | 延遲與匯流排吞吐量修正    |
 | `0x02d0` | `0x01010101` | `0x01010102` | 延遲與匯流排吞吐量修正    |
 
-
-
-## 驗證結果
+### 5.3 驗證結果
 
 套用 patch 後，以下問題應已解決：
 
@@ -127,7 +128,9 @@ plat/renesas/rz/soc/v2h/drivers/ddr/ddr_param_def_lpddr4.c
 
 ---
 
-## 最終狀態
+## 6. 結論與建議
+
+### 6.1 最終狀態
 
 - LPDDR4 記憶體控制器 timing 參數已修正
 - USB2 DMA 傳輸可正常取得足夠記憶體頻寬
@@ -135,9 +138,9 @@ plat/renesas/rz/soc/v2h/drivers/ddr/ddr_param_def_lpddr4.c
 
 ---
 
-## 問題總結
+### 6.2 問題總結
 
-### 不是以下問題：
+#### 不是以下問題：
 
 - ✗ 非 USB2 cable 問題
 - ✗ 非 USB2 相機硬體故障
@@ -145,6 +148,6 @@ plat/renesas/rz/soc/v2h/drivers/ddr/ddr_param_def_lpddr4.c
 - ✗ 非 USB hub / switch 問題
 - ✗ 非 PHY / 實體層問題
 
-### 真正原因：
+#### 真正原因：
 
 > **`param_setup_mc[]` 中的 LPDDR4 記憶體控制器參數設定不當，導致 USB2 DMA 傳輸時記憶體頻寬不足，引發 xHCI controller stall。**

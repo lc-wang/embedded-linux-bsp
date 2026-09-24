@@ -1,7 +1,6 @@
-
 # Rockchip Boot Logo 問題分析與修正報告
 
-## 一、問題背景
+## 1. 問題概述（問題背景）
 
 在不同 SoC 平台上，開機 Logo 的顯示機制並不一致。
 
@@ -18,7 +17,9 @@
 ----------
 
 
-## 二、NXP 與 Rockchip 顯示機制差異
+## 2. 分析過程
+
+### 2.1 NXP 與 Rockchip 顯示機制差異
 
 | 項目 | NXP (Framebuffer) | Rockchip (DRM) |
 |------|--------------------|----------------|
@@ -33,7 +34,7 @@
 ----------
 
 
-## 三、原始現象與分析流程
+### 2.2 原始現象與分析流程
 
 | 步驟 | 驗證項目 | 結果 |
 |------|-----------|------|
@@ -46,7 +47,7 @@
 
 ----------
 
-## 四、DRM Logo 顯示架構說明
+### 2.3 DRM Logo 顯示架構說明
 
 Rockchip 自定義的 early boot logo 顯示路徑如下：
 
@@ -77,7 +78,7 @@ route_hdmi1: route-hdmi1 {
 
 ----------
 
-## 五、問題本質
+## 3. Root Cause 分析（問題本質）
 
 -   **Framebuffer 機制** 的 `logo_linux_clut224.ppm` 無法在 Rockchip 顯示，因未啟用 `CONFIG_FB`。
     
@@ -89,7 +90,9 @@ route_hdmi1: route-hdmi1 {
 ----------
 
 
-## 六、解法評估
+## 4. 解決方案
+
+### 4.1 解法評估
 
 | 方案 | 說明 | 優點 | 缺點 |
 |------|------|------|------|
@@ -101,9 +104,9 @@ route_hdmi1: route-hdmi1 {
 
 ----------
 
-## 七、採用方案：轉換 Linux Logo 為 BMP
+### 4.2 採用方案：轉換 Linux Logo 為 BMP
 
-### 1. 轉換步驟
+#### 4.2.1 轉換步驟
 
 從 kernel 原始檔取得 Linux 企鵝圖：
 ```bash
@@ -118,7 +121,7 @@ convert logo_linux_clut224.ppm -background white -alpha remove -alpha off BMP3:l
 ```
 ----------
 
-### 2. 檔案放置
+#### 4.2.2 檔案放置
 
 將產生的檔案放入：
 
@@ -126,7 +129,7 @@ convert logo_linux_clut224.ppm -background white -alpha remove -alpha off BMP3:l
 
 ----------
 
-### 3. Device Tree 修改
+#### 4.2.3 Device Tree 修改
 
 ```dts
 route_hdmi1: route-hdmi1 {
@@ -140,7 +143,7 @@ route_hdmi1: route-hdmi1 {
 
 ----------
 
-### 4. 驗證開機結果
+#### 4.2.4 驗證開機結果
 
 `dmesg` 輸出應包含：
 
@@ -150,7 +153,7 @@ route_hdmi1: route-hdmi1 {
 
 ----------
 
-## 八、進階應用
+### 4.3 進階應用
 
 可於多輸出裝置啟用相同設定：
 ```dts
@@ -164,7 +167,7 @@ route_dp1: route-dp1 {
 ----------
 
 
-## 九、驗證與結果
+### 4.4 驗證與結果
 
 | 測試項目 | 結果 |
 |-----------|------|
@@ -177,7 +180,19 @@ route_dp1: route-dp1 {
 ----------
 
 
-## 十、最終建議
+## 5. 結論與建議
+
+### 5.1 結論
+
+> Rockchip 平台的開機 Logo 顯示完全基於 **DRM early logo 機制**，  
+> 而非傳統的 framebuffer。
+> 
+> 若想顯示 Linux 企鵝圖，**不需修改 kernel 架構**，  
+> 只需將原本的 PPM 檔轉成 BMP 並在 Device Tree 指定，即可讓 DRM 正常載入。
+> 
+> 這是 **最簡潔、最穩定、完全不違背現有 Rockchip 架構** 的方法。
+
+### 5.2 最終建議
 
 | 使用場景 | 建議做法 |
 |-----------|-----------|
@@ -189,7 +204,9 @@ route_dp1: route-dp1 {
 
 ----------
 
-## 十一、附錄：相關設定摘要
+## 附錄
+
+### A. 相關設定摘要
 
 ```bash
 # defconfig 若要啟用 framebuffer logo（僅測試用途）
@@ -208,14 +225,3 @@ route_hdmi1: route-hdmi1 {
     connect = <&vp1_out_hdmi1>;
 };
 ```
-----------
-
-## 十二、結論
-
-> Rockchip 平台的開機 Logo 顯示完全基於 **DRM early logo 機制**，  
-> 而非傳統的 framebuffer。
-> 
-> 若想顯示 Linux 企鵝圖，**不需修改 kernel 架構**，  
-> 只需將原本的 PPM 檔轉成 BMP 並在 Device Tree 指定，即可讓 DRM 正常載入。
-> 
-> 這是 **最簡潔、最穩定、完全不違背現有 Rockchip 架構** 的方法。

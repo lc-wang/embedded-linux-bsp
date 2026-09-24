@@ -1,7 +1,6 @@
-
 # RZ/V2H SPI Timeout 問題分析與修正
 
-## 1. 問題背景
+## 1. 問題概述（問題背景）
 
 在 Kakip 平台（Renesas RZ/V2H）上進行 SPI 通訊時，系統偶爾會出現 SPI timeout 的錯誤。
 
@@ -22,7 +21,7 @@ spidev spi0.0: SPI transfer failed: -110
 
 ----------
 
-# 2. 測試平台
+## 2. 系統環境（測試平台）
 
 
 | 項目 | 說明 |  
@@ -36,9 +35,11 @@ spidev spi0.0: SPI transfer failed: -110
 
 ----------
 
-# 3. 問題重現
+## 3. 除錯過程
 
-## 3.1 spidev_test
+### 3.1 問題重現
+
+#### 3.1.1 spidev_test
 
 使用 Linux SPI 測試工具即可重現此問題。
 ```
@@ -53,7 +54,7 @@ SPI transfer failed: -110
 
 ----------
 
-## 3.2 SPI Device 測試（Pixpaper）
+#### 3.1.2 SPI Device 測試（Pixpaper）
 
 在 Pixpaper 電子紙測試程式中，也可以觀察到相同問題。
 
@@ -70,7 +71,7 @@ spidev spi0.0: SPI transfer failed: -110
 
 ----------
 
-# 4. SPI Driver 架構
+### 3.2 SPI Driver 架構
 
 RZ/V2H 使用 Linux kernel 中的 **RSPI driver**。
 
@@ -101,7 +102,7 @@ Driver 主要透過以下資訊判斷傳輸是否完成：
 
 ----------
 
-# 5. Root Cause 分析
+## 4. Root Cause 分析
 
 問題的根本原因在於 **RSPI driver 對傳輸完成事件的處理不完整**。
 
@@ -131,7 +132,9 @@ Driver 主要透過以下資訊判斷傳輸是否完成：
 
 ----------
 
-# 6. Patch 分析
+## 5. 解決方案
+
+### 5.1 Patch 分析
 
 此問題是透過 **Renesas 提供的 SPI driver patch** 進行修正。
 
@@ -146,7 +149,7 @@ Driver 主要透過以下資訊判斷傳輸是否完成：
 
 主要改動包括：
 
-### 6.1 SPI communication end detection
+#### 5.1.1 SPI communication end detection
 
 Driver 新增對 **SPI communication-end event** 的處理。
 
@@ -154,7 +157,7 @@ Driver 新增對 **SPI communication-end event** 的處理。
 
 ----------
 
-### 6.2 Interrupt handling 修正
+#### 5.1.2 Interrupt handling 修正
 
 Patch 修正了 SPI interrupt 的設定與處理流程。
 
@@ -167,7 +170,7 @@ Patch 修正了 SPI interrupt 的設定與處理流程。
 
 ----------
 
-### 6.3 FIFO handling 改善
+#### 5.1.3 FIFO handling 改善
 
 SPI 傳輸流程改為更符合 controller FIFO 行為的設計。
 
@@ -182,11 +185,11 @@ SPI 傳輸流程改為更符合 controller FIFO 行為的設計。
 
 ----------
 
-# 7. 修正後驗證
+### 5.2 修正後驗證
 
 套用 patch 後再次測試 SPI。
 
-## spidev_test
+#### 5.2.1 spidev_test
 
 傳輸結果：
 ```
@@ -197,7 +200,7 @@ SPI 傳輸正常完成，不再出現 timeout。
 
 ----------
 
-## SPI Device 測試
+#### 5.2.2 SPI Device 測試
 
 Pixpaper 電子紙更新正常。
 
@@ -205,7 +208,7 @@ Pixpaper 電子紙更新正常。
 
 ----------
 
-# 8. 長時間壓力測試
+### 5.3 長時間壓力測試
 
 為了驗證 SPI driver 穩定性，進行 **16 小時連續測試**。
 

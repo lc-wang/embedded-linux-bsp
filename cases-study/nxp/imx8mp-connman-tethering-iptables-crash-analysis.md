@@ -199,15 +199,13 @@ SRC_URI += "file://0001-iptables-Fix-crash-with-iptables-1.8.11.patch"
 2. `Message recipient disconnected from message bus without replying` 這類 D-Bus 錯誤應優先懷疑 **daemon 崩潰**，用 PID 變化（audit log / `systemctl status`）快速確認，再用前景 debug 模式抓 backtrace。
 3. Library 升版改變**記憶體所有權語義**（誰 malloc、誰 free）時，呼叫端傳入靜態/棧上記憶體的舊慣例就會變成地雷；套件升版驗證應涵蓋這類跨元件互動路徑（connman 的 CI 顯然沒測到 tethering × 新版 iptables 的組合）。
 
----
-
-# 附錄：背景機制深入解析
+## 附錄（背景機制深入解析）
 
 以下補充理解這個 bug 所需的底層機制，依「為什麼會 abort → 選項表的設計 → 上游為什麼改 → 元件之間怎麼載入」的順序展開。
 
-## A. 為什麼 free() 非 heap 記憶體會直接 abort
+### A. 為什麼 free() 非 heap 記憶體會直接 abort
 
-### A.1 程式的記憶體分區
+#### A.1 程式的記憶體分區
 
 ```
 高位址
@@ -225,7 +223,7 @@ SRC_URI += "file://0001-iptables-Fix-crash-with-iptables-1.8.11.patch"
 
 connman 的 `static struct option iptables_opts[]` 住在 **.data 區**，從程式啟動活到結束，不需要也不能被「釋放」。
 
-### A.2 free() 憑什麼知道要釋放多少 —— heap 的隱藏帳本
+#### A.2 free() 憑什麼知道要釋放多少 —— heap 的隱藏帳本
 
 `malloc(100)` 實際配置的不只 100 bytes，它在**回傳指標的前面**塞了一塊 metadata（chunk header），記錄大小與狀態：
 
@@ -238,7 +236,7 @@ heap:   │ chunk header │   你的 100 bytes    │
 
 `free(p)` 第一件事就是往 `p` 前面讀 header，照帳本歸還。
 
-### A.3 把靜態陣列丟給 free() 的下場
+#### A.3 把靜態陣列丟給 free() 的下場
 
 `free(iptables_opts)` 時 glibc 一樣往前讀「header」——但那裡是 .data 區的其他全域變數，讀出的大小、旗標全是垃圾值。現代 glibc 對 heap 完整性做了大量檢查（heap corruption 是資安漏洞溫床），發現位址不在 heap 管轄範圍、header 不合法，便主動呼叫 `abort()`：
 
@@ -249,9 +247,9 @@ Aborting (signal 6)
 
 注意這**不是 segfault**，是 glibc 寧可讓程式立刻死、也不帶著損壞的 heap 繼續跑。backtrace 中 `#1~#6 libc.so.6` 那幾層就是 glibc 的檢查與 abort 流程。
 
-## B. libxtables 選項表機制：orig_opts、opts 與 merge
+### B. libxtables 選項表機制：orig_opts、opts 與 merge
 
-### B.1 為什麼需要兩個指標
+#### B.1 為什麼需要兩個指標
 
 iptables 的命令列選項**不是固定的**：
 
@@ -269,7 +267,7 @@ extension 是解析到 `-m`/`-j` 時才 dlopen 載入，選項表必須**在解�
 
 每條規則解析完要把工作表重設（下一條規則的 extension 組合不同），這正是 connman `reset_xtables()` 做的事，也是 bug 案發現場。
 
-### B.2 xtables_merge_options() 逐段解析
+#### B.2 xtables_merge_options() 逐段解析
 
 `struct option` 是 `getopt_long()` 的表項（`name` = 選項名、`val` = 命中時的回傳代號），陣列以全零 entry 作結尾哨兵。
 
@@ -317,7 +315,7 @@ return merge;
  母版複本（每次重抄）           第二次 merge 進場（+512）   第一次 merge 進場（+256）
 ```
 
-### B.3 option_offset 的編碼與解碼
+#### B.3 option_offset 的編碼與解碼
 
 每個 extension 的選項 `val` 都從 1、2、3 自編，合併會撞號，所以進場時平移到專屬區段（第一個 +256、第二個 +512…），offset 存進該 extension 的 `xt_t->option_offset`。解析時反向使用：
 
@@ -337,9 +335,9 @@ xtables_option_mpcall(c, argv, invert, m, &fw);   /* 內部以 c - offset 還原
 
 一個 offset 去程當平移量、回程當路由鍵＋還原鍵。
 
-## C. iptables 1.8.11 為什麼拿掉「靜態陣列檢查」
+### C. iptables 1.8.11 為什麼拿掉「靜態陣列檢查」
 
-### C.1 舊版為什麼有檢查
+#### C.1 舊版為什麼有檢查
 
 舊版 iptables 自己也把 `opts` 初始化成靜態的 `original_opts`，所以 `xtables_free_opts()` 必須防呆：
 
@@ -348,7 +346,7 @@ if (opts != xt_params->orig_opts)   /* 指向靜態母版時不能 free */
         free(opts);
 ```
 
-### C.2 新版的新不變量
+#### C.2 新版的新不變量
 
 1.8.11 開發週期在清理 memory leak（每次 merge 產生新陣列，舊的無人釋放）。修法是重構所有權規則，看 1.8.11 自己的初始化（`iptables/iptables.c:90`）：
 
@@ -361,7 +359,7 @@ struct xtables_globals iptables_globals = {
 
 新不變量：**`opts` 只能是 NULL 或 heap 上的合併結果，靜態陣列永遠只放 `orig_opts`**。merge 的基底本來就直接從參數 `orig_opts` 取（B.2 步驟 3），不依賴 `opts` 保存母版；需要唯讀用表時以 `opts ?: orig_opts` fallback（getopt 只讀不 free，安全）。在此不變量下防呆檢查是死碼，`xtables_free_opts()` 遂改為無條件 `free(xt_params->opts)`，且所有 in-tree 使用者（iptables/ip6tables/arptables）在同一系列 commit 同步改寫。
 
-### C.3 為什麼災難無聲無息地落在 connman 頭上
+#### C.3 為什麼災難無聲無息地落在 connman 頭上
 
 - libxtables 本質是 iptables 專案的**內部函式庫**，這套使用規則從未文件化；connman 是照抄 iptables **舊版**內部慣用法的 tree 外使用者
 - 函式簽名全都沒變 → **ABI 不變、soname 仍是 libxtables.so.12** → 重新編譯、連結、打包全部綠燈
@@ -375,9 +373,9 @@ struct xtables_globals iptables_globals = {
 | iptables 1.8.11 | NULL（用時 `?: orig_opts` 借讀） | free(NULL) 合法 |
 | 本文的 connman patch | 母版的 heap 複本 | free(heap) 合法，**新舊 libxtables 通吃** |
 
-## D. connmand、libxtables 與 extension 的載入關係
+### D. connmand、libxtables 與 extension 的載入關係
 
-### D.1 沒有東西被「覆蓋」——程序是拼裝出來的
+#### D.1 沒有東西被「覆蓋」——程序是拼裝出來的
 
 connman 的 `src/iptables.c` 與 iptables 專案的 `iptables/iptables.c` 只是撞名，前者編進 connmand 本體，後者屬於 `/usr/sbin/iptables` 指令、與 connmand 程序無關。執行期的位址空間：
 
@@ -396,7 +394,7 @@ connmand 程序
 
 崩潰即是一次跨界呼叫：connmand 自己的程式碼把「不可 free 的位址」交給同程序內新版 libxtables 的函式。
 
-### D.2 NEEDED（隱式連結）vs dlopen（顯式載入）
+#### D.2 NEEDED（隱式連結）vs dlopen（顯式載入）
 
 `#include <xtables.h>` 只提供編譯期型別資訊，與依賴無關。依賴鏈是：
 
@@ -416,7 +414,7 @@ ld-linux（每次啟動）   → 按 NEEDED 載入 .so、解析符號，全部�
 
 extension 有幾十個、用到哪個不可預知，全寫進 NEEDED 等於每次啟動全載，故走 dlopen。
 
-### D.3 extension 的路徑怎麼組出來
+#### D.3 extension 的路徑怎麼組出來
 
 libxtables `load_extension()` 自己拼路徑（`libxtables/xtables.c`）：
 
@@ -430,7 +428,7 @@ snprintf(path, sizeof(path), "%.*s/%s%s.so", dir, *prefix, name);
 
 `-j MASQUERADE` → 試 `libipt_MASQUERADE.so`（不存在）→ `libxt_MASQUERADE.so` → `dlopen(path, RTLD_NOW)`。
 
-### D.4 constructor 自我註冊：dlopen 之後不用 dlsym
+#### D.4 constructor 自我註冊：dlopen 之後不用 dlsym
 
 dlopen 後 libxtables 沒有挖符號，而是回頭再查一次自己的註冊清單。玄機在 extension 的 constructor：
 
@@ -455,7 +453,7 @@ dlopen(...)
 
 所以 dlopen 回傳時註冊已完成，下一行就能從清單查到剛載入的 target。extension 報到時交出的資料結構，正包含選項表（`x6_options`）與 B.3 的 `option_offset` 欄位——至此 dlopen、merge、平移、範圍比對整條鏈閉合。程式啟動時 NEEDED 函式庫的初始化（C++ 全域物件建構等）也是同一機制，且依賴者的 constructor 保證晚於被依賴者執行。
 
-## E. Patch 的記憶體生命週期：每次 reset 都 malloc，為什麼不會 leak？
+### E. Patch 的記憶體生命週期：每次 reset 都 malloc，為什麼不會 leak？
 
 `dup_orig_opts()` 每次 reset 都配置新複本，乍看沒有對應的 free——其實 free 分散在**兩個回收點**，先回看 patch 完整的樣子：
 
@@ -471,7 +469,7 @@ static void reset_xtables(void)
 }
 ```
 
-### E.1 兩條路徑，各有人負責 free
+#### E.1 兩條路徑，各有人負責 free
 
 **路徑 A：這輪有載入 extension（有 merge 發生）**
 
@@ -493,11 +491,11 @@ reset:  opts(dup₁) != orig → g_free → dup₁ 回收 ✓   opts = dup₂ �
 
 dup₁ 由下一次 reset 開頭的 g_free 回收。這個 `if` 原本只負責回收 merge 結果，patch 後連 dup 一起管——dup 永遠不等於 `orig_opts` 本尊，必進此 if。
 
-### E.2 為什麼這不構成 leak
+#### E.2 為什麼這不構成 leak
 
 Memory leak 的定義是**無主記憶體隨時間累積**。此設計下任何時刻每個 address family 的 `opts` 恰好持有一塊存活配置（dup 或 merge 結果），每次換新前舊的必被回收，屬「一個蘿蔔一個坑」的穩態，長時間運行記憶體佔用不增長。程序結束時手上的最後一塊未顯式釋放（valgrind 列為 *still reachable* 而非 *definitely lost*），由 OS 於程序退出時回收，為 daemon 類程式慣例。
 
-### E.3 Corner cases
+#### E.3 Corner cases
 
 - **merge 失敗回傳 NULL**：connman 錯誤路徑使 `opts = NULL`，下次 reset 的 `g_free(NULL)` 合法無事，隨後配新 dup，狀態自我修復。
 - **跑在舊版 iptables（≤ 1.8.10）**：舊版 free 帶防呆檢查 `opts != orig_opts`，dup 同樣滿足條件、照樣被回收，新舊版本皆不漏。

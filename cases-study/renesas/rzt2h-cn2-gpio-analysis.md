@@ -1,8 +1,6 @@
-
 # RZ/T2H CN2 GPIO / PFC / Pinmux 分析報告
 
-
-## 1. 問題背景
+## 1. 問題概述
 
 在 RZ/T2H Evaluation Board 上，**CN2 header（pin 11–14）** 對應到 SoC 的 **P03_x 腳位**。這組腳位在硬體文件與 firmware enum 中，顯示其具備多種 peripheral 功能（ENCIF / GPT / MTU / I2C / IRQ…）。
 
@@ -21,9 +19,11 @@
 
 ----------
 
-## 2. RZ/T2H 腳位控制架構
+## 2. 分析過程
 
-### 2.1 兩層控制模型
+### 2.1 RZ/T2H 腳位控制架構
+
+#### 2.1.1 兩層控制模型
 
 RZ/T2H（以及多數 Renesas Linux SoC）的腳位控制可分為兩層：
 
@@ -42,7 +42,7 @@ Peripheral block 負責功能邏輯（例如 encoder、timer、I2C），而 **PF
 
 ----------
 
-### 2.2 關鍵暫存器角色
+#### 2.1.2 關鍵暫存器角色
 
 | Register | 功能說明                                              |
 |----------|-------------------------------------------------------|
@@ -54,9 +54,9 @@ Peripheral block 負責功能邏輯（例如 encoder、timer、I2C），而 **PF
 
 ----------
 
-## 3. 為什麼 TRM / firmware enum 沒有 GPIO？
+### 2.2 為什麼 TRM / firmware enum 沒有 GPIO？
 
-### 3.1 firmware enum 的實際意義
+#### 2.2.1 firmware enum 的實際意義
 
 以 P03_3 為例，firmware 中可看到類似以下定義：
 
@@ -73,7 +73,7 @@ IOPORT_PIN_P033_PFC_22_ENCIFCK02
 
 ----------
 
-### 3.2 GPIO 為什麼不在 enum 裡？
+#### 2.2.2 GPIO 為什麼不在 enum 裡？
 
 在 Renesas 架構中：
 
@@ -93,9 +93,9 @@ IOPORT_PIN_P033_PFC_22_ENCIFCK02
 
 ----------
 
-## 4. Linux DTS 為什麼可以寫 `function = "gpio"`？
+### 2.3 Linux DTS 為什麼可以寫 `function = "gpio"`？
 
-### 4.1 Renesas pinctrl binding 定義
+#### 2.3.1 Renesas pinctrl binding 定義
 
 在 `Documentation/devicetree/bindings/pinctrl/renesas,pfc.yaml` 中，Renesas PFC binding 明確允許：
 
@@ -107,7 +107,7 @@ function = "gpio";
 
 ----------
 
-### 4.2 `function = "gpio"` 的實際語意
+#### 2.3.2 `function = "gpio"` 的實際語意
 
 在 Linux pinctrl driver 中：
 
@@ -122,43 +122,9 @@ function = "gpio"
 
 ----------
 
-## 5. CN2 腳位是否可以改成 GPIO？
+### 2.4 pull-up 與 open-drain 的正確理解
 
-### 5.1 硬體角度
-
-以 CN2 pin 11（P03_3）為例：
-
--   支援多種 peripheral（ENCIF / IIC / GPT / IRQ）    
--   GPIO 是該腳位的基本模式
--   不需要 enum、不需要 PFC
-
-**硬體上完全可行**。
-
-----------
-
-### 5.2 Linux DTS 建議寫法
-
-```dts
-&pinctrl {
-        cn2_gpio_pins: cn2-gpio-pins {
-                pins = "P03_3", "P03_4", "P03_5", "P03_6"; /* CN2 11–14 */
-                function = "gpio";
-                bias-disable;        /* 或 bias-pull-up 視需求 */
-        };
-};
-```
-
-此設定的效果為：
-
--   PMC = 0
--   清除任何 peripheral mux
--   腳位強制回到 GPIO 模式
-
-----------
-
-## 6. pull-up 與 open-drain 的正確理解
-
-### 6.1 `bias-pull-up` 的意義
+#### 2.4.1 `bias-pull-up` 的意義
 
 ```dts
 bias-pull-up;
@@ -168,7 +134,7 @@ bias-pull-up;
 
 ----------
 
-### 6.2 open-drain 的實際行為
+#### 2.4.2 open-drain 的實際行為
 
 open-drain 的本質為：
 
@@ -188,7 +154,45 @@ open-drain 的本質為：
 
 ----------
 
-## 7. 目前 DTS 狀態的結論
+## 3. 解決方案
+
+### 3.1 CN2 腳位是否可以改成 GPIO？
+
+#### 3.1.1 硬體角度
+
+以 CN2 pin 11（P03_3）為例：
+
+-   支援多種 peripheral（ENCIF / IIC / GPT / IRQ）    
+-   GPIO 是該腳位的基本模式
+-   不需要 enum、不需要 PFC
+
+**硬體上完全可行**。
+
+----------
+
+#### 3.1.2 Linux DTS 建議寫法
+
+```dts
+&pinctrl {
+        cn2_gpio_pins: cn2-gpio-pins {
+                pins = "P03_3", "P03_4", "P03_5", "P03_6"; /* CN2 11–14 */
+                function = "gpio";
+                bias-disable;        /* 或 bias-pull-up 視需求 */
+        };
+};
+```
+
+此設定的效果為：
+
+-   PMC = 0
+-   清除任何 peripheral mux
+-   腳位強制回到 GPIO 模式
+
+----------
+
+## 4. 結論與建議
+
+### 4.1 目前 DTS 狀態的結論
 
 -   現有 DTS **未明確定義 CN2 11–14 為 GPIO**
     
@@ -201,7 +205,7 @@ open-drain 的本質為：
 
 ----------
 
-## 8. 總結
+### 4.2 總結
 
 -   GPIO 不是 PFC enum 的一種 
 -   GPIO = PMC = 0

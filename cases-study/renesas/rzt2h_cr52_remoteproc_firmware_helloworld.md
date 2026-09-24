@@ -1,5 +1,6 @@
-
 # RZ/T2H CR52 + Linux remoteproc HelloWorld 教學
+
+## 1. 目標
 
 本文件說明如何在 **Renesas RZ/T2H** 平台上，使用 **e² studio** 建立一個最小化的 CR52 firmware（HelloWorld），並由 **Linux remoteproc** 在 A55 端載入與啟動。
 
@@ -10,9 +11,9 @@
 
 ---
 
-## 1. 前置條件
+## 2. 環境與前置條件
 
-### 1.1 軟體環境
+### 2.1 軟體環境
 
 - e² studio（安裝對應 RZ/T2H FSP 套件）
 - ARM GCC 工具鏈（隨 e² studio 安裝）
@@ -23,16 +24,16 @@
 - 使用者空間工具：
   - `devmem2`（可自行編譯或使用發行版套件）
 
-### 1.2 硬體環境
+### 2.2 硬體環境
 
 - RZ/T2H Evaluation Board（例如：R9A09G077M44）
 - A55 端 Linux 可正常啟動並登入 root shell
 
 ---
 
-## 2. e² studio 專案建立
+## 3. e² studio 專案建立
 
-### 2.1 建立新專案
+### 3.1 建立新專案
 
 1. 開啟 **e² studio**
 2. 選擇：
@@ -60,9 +61,8 @@
   script/
     rzt2h_cr52_remoteproc.ld  ← 稍後新增
  ```
-## 3. 新增自訂 linker script（remoteproc 專用）
 
-## 3. 新增自訂 linker script（remoteproc 專用）
+## 4. 新增自訂 linker script（remoteproc 專用）
 
 為了配合 Linux remoteproc 的啟動位址，CR52 firmware 需要對齊 DTS 中設定的 `renesas,rz-start_address`。以下示範使用：
 
@@ -71,7 +71,7 @@
 -   remoteproc start_address：`0x10061000`
     
 
-### 3.1 新增檔案
+### 4.1 新增檔案
 
 1.  在 e² studio 專案上按右鍵：
     
@@ -82,7 +82,7 @@
     -   `New` → `File` → 檔名輸入：`rzt2h_cr52_remoteproc.ld`
         
 
-### 3.2 貼上 linker script 內容
+### 4.2 貼上 linker script 內容
 
 在 `script/rzt2h_cr52_remoteproc.ld` 中貼入：
 
@@ -177,22 +177,18 @@ SECTIONS
 ```
 注意：這裡僅預留 .resource_table 區段，但本教學的 HelloWorld firmware 不實際使用 resource table。remoteproc 會顯示 no resource table found for this firmware，屬於正常現象。
 
-4. 新增 CR52 startup 檔（_start 入口）
-Linux remoteproc 會將 PC 設為 0x10061000，因此需要在該位址放入有效的向量／入口點 _start，並設置 stack pointer，然後跳轉到 C 程式。
-
-
-## 4. 新增 CR52 startup 檔（_start 入口）
+## 5. 新增 CR52 startup 檔（_start 入口）
 
 Linux remoteproc 會將 PC 設為 `0x10061000`，因此需要在該位址放入有效的向量／入口點 `_start`，並設置 stack pointer，然後跳轉到 C 程式。
 
-### 4.1 新增檔案
+### 5.1 新增檔案
 
 1.  在 `src` 目錄上按右鍵：
     
     -   `New` → `File` → 檔名：`startup_cr52.S`
         
 
-### 4.2 貼上 startup 程式碼（簡化版）
+### 5.2 貼上 startup 程式碼（簡化版）
 ```sh
     .syntax unified
     .cpu cortex-r52
@@ -220,7 +216,7 @@ _start:
     B     1b   /* main() 返回時停在這裡 */
  ```
 
-## 5. 關閉 FSP 預設 startup（如果存在）
+## 6. 關閉 FSP 預設 startup（如果存在）
 
 有些 FSP 專案會自動產生 `startup.c` / `startup_core.c` 等啟動檔，內容會自行設定向量表與 C runtime。  
 這類檔案不應與自訂 `startup_cr52.S` 同時存在。
@@ -248,11 +244,11 @@ _start:
 
 ----------
 
-## 6. 實作 HelloWorld firmware：`hal_entry.c`
+## 7. 實作 HelloWorld firmware：`hal_entry.c`
 
 目標行為：CR52 firmware 週期性向一個固定位址寫入數值，A55 端可以用 `devmem2` 看到數值不斷增長。
 
-### 6.1 修改 `src/hal_entry.c`
+### 7.1 修改 `src/hal_entry.c`
 
 將 `hal_entry.c` 改成以下內容：
 
@@ -288,7 +284,7 @@ void hal_entry(void)
 若 main.c 存在，通常 FSP 預設內容會在 main() 呼叫 hal_entry()，無需修改。
 
 
-## 7. 設定專案使用自訂 linker script
+## 8. 設定專案使用自訂 linker script
 
 1.  專案按右鍵 → `Properties`
     
@@ -310,7 +306,7 @@ void hal_entry(void)
 套用後關閉設定視窗。
 
 
-## 8. 編譯專案並產生 ELF
+## 9. 編譯專案並產生 ELF
 
 1.  在 e² studio：
     
@@ -335,7 +331,7 @@ HelloWorld.elf
 -   `_start` 是否有定義（`startup_cr52.S` 有 `global _start`）
 
 
-## 9. Linux 端：透過 remoteproc 啟動 CR52
+## 10. Linux 端：透過 remoteproc 啟動 CR52
 
 以下假設：
 
@@ -344,26 +340,26 @@ HelloWorld.elf
 -   firmware 路徑為 `/lib/firmware/HelloWorld.elf`
     
 
-### 9.1 確認 remoteproc device 存在
+### 10.1 確認 remoteproc device 存在
 ```sh
 ls /sys/class/remoteproc
 # 預期看到 remoteproc0
 ```
 如設備編號不同（例如 remoteproc1），後續請相應替換路徑。
 
-### 9.2 放置 firmware
+### 10.2 放置 firmware
 ```sh
 sudo cp HelloWorld.elf /lib/firmware/
 ```
-### 9.3 設定 firmware 名稱
+### 10.3 設定 firmware 名稱
 ```sh
 echo HelloWorld.elf | sudo tee /sys/class/remoteproc/remoteproc0/firmware
 ```
-### 9.4 啟動 CR52
+### 10.4 啟動 CR52
 ```sh
 echo start | sudo tee /sys/class/remoteproc/remoteproc0/state
 ```
-### 9.5 查看 kernel log
+### 10.5 查看 kernel log
 ```sh
 dmesg | tail -n 20
 ```
@@ -377,11 +373,11 @@ remoteproc remoteproc0: remote processor cr52_0 is now up
 `no resource table found for this firmware` 在本教學中屬正常現象，因為 HelloWorld 未使用 resource table。
 
 
-## 10. 驗證 CR52 firmware 是否在執行
+## 11. 驗證（CR52 firmware 是否在執行）
 
 使用 `devmem2` 讀取 `0x10070000`，應該會看到數值持續變化。
 
-### 10. 1 安裝 devmem2（如尚未安裝）
+### 11.1 安裝 devmem2（如尚未安裝）
 
 例如在 Debian/Ubuntu：
 
@@ -390,7 +386,7 @@ sudo apt-get install devmem2
 ```
 或自行下載原始碼編譯。
 
-### 10. 2 持續讀取測試位址
+### 11.2 持續讀取測試位址
 ```sh
 sudo devmem2 0x10070000
 sudo devmem2 0x10070000
@@ -410,21 +406,6 @@ Value at address 0x10070000 (0xffff9abcd000): 0x12341C8B
     
 -   remoteproc 已成功啟動 firmware 並讓 CR52 持續跑
 
-
-## 11. 停止 / 重新啟動 CR52
-
-如需停止 CR52：
-```sh
-`echo stop | sudo tee /sys/class/remoteproc/remoteproc0/state`
-```
-重新啟動：
-```sh
-echo start | sudo tee /sys/class/remoteproc/remoteproc0/state
-```
-若修改 firmware 後重新部署：
-```sh
-sudo cp HelloWorld.elf /lib/firmware/ echo stop  | sudo tee /sys/class/remoteproc/remoteproc0/state
-```
 
 ## 12. 常見問題與排查
 
@@ -478,3 +459,20 @@ remoteproc remoteproc0: Boot failed: -12
 -   `TEST_ADDR` 是否位於 CR52 實際可存取的記憶體範圍
     
 -   `devmem2` 使用的位址是否一致（0x10070000）
+
+## 附錄
+
+### A. 停止 / 重新啟動 CR52
+
+如需停止 CR52：
+```sh
+`echo stop | sudo tee /sys/class/remoteproc/remoteproc0/state`
+```
+重新啟動：
+```sh
+echo start | sudo tee /sys/class/remoteproc/remoteproc0/state
+```
+若修改 firmware 後重新部署：
+```sh
+sudo cp HelloWorld.elf /lib/firmware/ echo stop  | sudo tee /sys/class/remoteproc/remoteproc0/state
+```

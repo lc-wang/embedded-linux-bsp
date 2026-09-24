@@ -1,6 +1,8 @@
-# BCM4362A2 Bluetooth suspend/resume 問題分析與修正說明
+# RK3588 BCM4362A2 Bluetooth suspend/resume 問題分析與修正說明
 
-## 1. 摘要
+## 1. 問題概述
+
+### 1.1 摘要
 
 本報告整理 BCM4362A2 combo chip 在 Linux 系統 suspend/resume 後 Bluetooth 無法正常恢復的問題。
 
@@ -38,7 +40,7 @@ CONFIG_BT_HCIUART_BCM=y
 
 ---
 
-## 2. 問題現象
+### 1.2 問題現象
 
 原本的 Bluetooth 初始化流程如下：
 
@@ -85,9 +87,11 @@ rfkill block/unblock 無法恢復
 
 ---
 
-## 3. 原本流程：brcm_patchram_plus1
+## 2. 分析過程
 
-### 3.1 brcm_patchram_plus1 的定位
+### 2.1 原本流程：brcm_patchram_plus1
+
+#### 2.1.1 brcm_patchram_plus1 的定位
 
 `brcm_patchram_plus1` 並不是完全被淘汰的工具。它在許多 vendor BSP、Android bring-up、舊 kernel 或客製平台中仍然常見。
 
@@ -133,7 +137,7 @@ btattach -P bcm + hci_bcm.c：
     尤其是需要處理 suspend/resume 的情境。
 ```
 
-### 3.2 brcm_patchram_plus1 不是完全不進 kernel
+#### 2.1.2 brcm_patchram_plus1 不是完全不進 kernel
 
 需要特別釐清：`brcm_patchram_plus1` 不是完全不呼叫 kernel。
 
@@ -159,7 +163,7 @@ btattach = 會碰 kernel
 誰是 Broadcom UART Bluetooth controller lifecycle 的 owner？
 ```
 
-### 3.3 舊流程
+#### 2.1.3 舊流程
 
 原本流程可以整理成：
 
@@ -206,7 +210,7 @@ hciconfig hci0 up
 
 ---
 
-## 4. 新流程：btattach -P bcm
+### 2.2 新流程：btattach -P bcm
 
 修正後的初始化流程為：
 
@@ -228,7 +232,7 @@ exec btattach -B /dev/ttyS9 -P bcm -S 3000000
 
 `btattach` 的重點不是單純執行 `hciconfig hci0 up`，而是把 tty serial port attach 到 kernel HCI UART subsystem，並指定使用 Broadcom protocol。
 
-### 4.1 btattach 執行流程
+#### 2.2.1 btattach 執行流程
 
 簡化流程如下：
 
@@ -266,7 +270,7 @@ kernel 建立 / 註冊 hciX
 btattach 持續在 foreground 執行
 ```
 
-### 4.2 關鍵步驟：TIOCSETD -> N_HCI
+#### 2.2.2 關鍵步驟：TIOCSETD -> N_HCI
 
 ```text
 ioctl(fd, TIOCSETD, N_HCI)
@@ -283,7 +287,7 @@ ioctl(fd, TIOCSETD, N_HCI)
 
 完成後，UART 收到的資料會進入 kernel Bluetooth HCI UART line discipline，而不是一般 tty data path。
 
-### 4.3 關鍵步驟：HCIUARTSETPROTO -> HCI_UART_BCM
+#### 2.2.3 關鍵步驟：HCIUARTSETPROTO -> HCI_UART_BCM
 
 ```text
 ioctl(fd, HCIUARTSETPROTO, HCI_UART_BCM)
@@ -324,7 +328,7 @@ hci0 registered to Bluetooth HCI core
 
 ---
 
-## 5. 差異比較
+### 2.3 差異比較
 
 | 項目 | 舊流程：brcm_patchram_plus1 | 新流程：btattach -P bcm |
 |---|---|---|
@@ -339,7 +343,9 @@ hci0 registered to Bluetooth HCI core
 
 ---
 
-## 6. Root cause 修正版
+## 3. Root Cause 分析
+
+### 3.1 Root cause 修正版
 
 較精準的 root cause 如下：
 
@@ -372,7 +378,7 @@ Broadcom-specific suspend/resume path 可以參與 controller state management�
 
 ---
 
-## 7. 為什麼 rfkill cycling 不夠
+### 3.2 為什麼 rfkill cycling 不夠
 
 rfkill 主要控制 Bluetooth radio 從 Linux Bluetooth stack 角度看是 blocked 或 unblocked。它不保證能把 Broadcom combo chip reset 回乾淨的 post-boot UART firmware 狀態。
 
@@ -394,7 +400,7 @@ BCM4362A2 combo chip firmware / PM state
 
 ---
 
-## 8. 為什麼 brcm_patchram_plus1 不是完全不可行
+### 3.3 為什麼 brcm_patchram_plus1 不是完全不可行
 
 理論上，廠商可以擴充 `brcm_patchram_plus1` 或搭配 systemd sleep hook 來做 resume recovery，例如：
 
@@ -439,7 +445,9 @@ kernel driver PM lifecycle
 
 ---
 
-## 9. 為什麼 btattach -P bcm 較適合此問題
+## 4. 解決方案
+
+### 4.1 為什麼 btattach -P bcm 較適合此問題
 
 本問題不是單純 boot-time firmware download，而是 system suspend/resume 後的 controller state recovery 問題。
 
@@ -478,7 +486,7 @@ bcm_resume_device()
 
 ---
 
-## 10. systemd service 調整原因
+### 4.2 systemd service 調整原因
 
 原本 service：
 
@@ -533,7 +541,7 @@ exec btattach -B /dev/ttyS9 -P bcm -S 3000000
 
 ---
 
-## 11. kernel config 調整原因
+### 4.3 kernel config 調整原因
 
 新增：
 
@@ -543,19 +551,19 @@ CONFIG_BT_HCIUART_SERDEV=y
 CONFIG_BT_HCIUART_BCM=y
 ```
 
-### CONFIG_SERIAL_DEV_BUS
+#### CONFIG_SERIAL_DEV_BUS
 
 啟用 serial device bus infrastructure。
 
 這是 serial-attached devices 透過 kernel serial device framework 管理時需要的基礎設施。
 
-### CONFIG_BT_HCIUART_SERDEV
+#### CONFIG_BT_HCIUART_SERDEV
 
 啟用 Bluetooth HCI UART over serial device framework。
 
 這讓 Bluetooth UART devices 可以更完整地被 kernel 表示與管理。
 
-### CONFIG_BT_HCIUART_BCM
+#### CONFIG_BT_HCIUART_BCM
 
 啟用 Broadcom protocol support for HCI UART driver。
 
@@ -563,9 +571,9 @@ CONFIG_BT_HCIUART_BCM=y
 
 ---
 
-## 12. 修改內容整理
+### 4.4 修改內容整理
 
-### recipes-connectivity/bt-init-service/files/bt-init.sh
+#### recipes-connectivity/bt-init-service/files/bt-init.sh
 
 將：
 
@@ -580,7 +588,7 @@ hciconfig hci0 up
 exec btattach -B /dev/ttyS9 -P bcm -S 3000000
 ```
 
-### recipes-connectivity/bt-init-service/files/bt-init.service
+#### recipes-connectivity/bt-init-service/files/bt-init.service
 
 將 systemd service 從 oneshot mode 改成 long-running simple service：
 
@@ -592,7 +600,7 @@ StartLimitIntervalSec=60
 StartLimitBurst=5
 ```
 
-### recipes-kernel/linux/files/bt-hciuart-bcm.cfg
+#### recipes-kernel/linux/files/bt-hciuart-bcm.cfg
 
 新增 required kernel config fragment：
 
@@ -602,7 +610,7 @@ CONFIG_BT_HCIUART_SERDEV=y
 CONFIG_BT_HCIUART_BCM=y
 ```
 
-### recipes-kernel/linux/linux-rockchip_6.1%.bbappend
+#### recipes-kernel/linux/linux-rockchip_6.1%.bbappend
 
 將 config fragment 加入 `SRC_URI`：
 
@@ -612,9 +620,9 @@ SRC_URI += "file://bt-hciuart-bcm.cfg"
 
 ---
 
-## 13. 建議驗證流程
+### 4.5 建議驗證流程
 
-### 13.1 確認 kernel config
+#### 4.5.1 確認 kernel config
 
 ```sh
 zcat /proc/config.gz | grep -E 'CONFIG_SERIAL_DEV_BUS|CONFIG_BT_HCIUART_SERDEV|CONFIG_BT_HCIUART_BCM'
@@ -630,7 +638,7 @@ CONFIG_BT_HCIUART_BCM=y
 
 如果 `/proc/config.gz` 不存在，請檢查 Yocto build output 或 kernel build config。
 
-### 13.2 確認 service 狀態
+#### 4.5.2 確認 service 狀態
 
 ```sh
 systemctl status bt-init.service
@@ -651,7 +659,7 @@ main process 應該是 btattach
 不應該像 oneshot service 一樣立即 exit
 ```
 
-### 13.3 確認 HCI device
+#### 4.5.3 確認 HCI device
 
 ```sh
 hciconfig -a
@@ -670,7 +678,7 @@ bluetoothctl list
 controller 可以被 BlueZ 看見
 ```
 
-### 13.4 確認沒有舊 helper 同時執行
+#### 4.5.4 確認沒有舊 helper 同時執行
 
 ```sh
 ps aux | grep -E 'btattach|brcm_patchram|hciattach'
@@ -684,7 +692,7 @@ brcm_patchram_plus1 不應該同時管理同一個 UART
 同一時間應該只有一個 process 管理 /dev/ttyS9
 ```
 
-### 13.5 檢查 kernel log
+#### 4.5.5 檢查 kernel log
 
 ```sh
 dmesg | grep -iE 'bluetooth|hci|bcm|ttyS9|uart'
@@ -700,7 +708,7 @@ HCI UART attach 是否成功
 是否有 resume 後 HCI error
 ```
 
-### 13.6 suspend/resume 壓力測試
+#### 4.5.6 suspend/resume 壓力測試
 
 ```sh
 for i in $(seq 1 20); do
@@ -721,7 +729,7 @@ hci0 不會消失
 不需要手動 rfkill cycle 才恢復
 ```
 
-### 13.7 optional：檢查 rfkill
+#### 4.5.7 optional：檢查 rfkill
 
 ```sh
 rfkill list
@@ -736,63 +744,7 @@ resume 後 Bluetooth 不應該卡在 blocked
 
 ---
 
-## 14. 除錯建議
-
-### 14.1 btattach 立即退出
-
-確認 `/dev/ttyS9` 是否存在：
-
-```sh
-ls -l /dev/ttyS9
-```
-
-確認是否有其他 process 佔用 UART：
-
-```sh
-ps aux | grep -E 'btattach|brcm_patchram|hciattach'
-```
-
-同一個 Bluetooth UART 應該只由一個 process 管理。
-
-### 14.2 hci0 沒有出現
-
-先檢查 kernel config：
-
-```sh
-zcat /proc/config.gz | grep CONFIG_BT_HCIUART_BCM
-```
-
-再檢查 log：
-
-```sh
-journalctl -u bt-init.service -b
-dmesg | grep -iE 'bluetooth|hci|bcm|uart'
-```
-
-可能原因：
-
-```text
-kernel config 缺少 Broadcom HCI UART support
-UART node 錯誤
-baudrate 錯誤
-pinctrl/UART conflict
-firmware 或 controller reset 問題
-其他 service 和 bt-init.service race
-```
-
-### 14.3 service 一直 restart
-
-檢查 service log：
-
-```sh
-journalctl -u bt-init.service -b --no-pager
-```
-
-如果 service 一直重啟，通常代表 UART attach command 本身持續失敗，需要先確認 UART node、baudrate、kernel config、pinctrl 與是否有其他 process 佔用。
-
----
-
-## 15. 結論
+## 5. 結論與建議
 
 `brcm_patchram_plus1` 並不是完全被捨棄，也不是完全不會與 kernel 互動。它仍然常見於 vendor BSP、Android bring-up、舊平台與需要板級客製初始化的情境。
 
@@ -823,4 +775,62 @@ HCIUARTSETPROTO -> HCI_UART_BCM
 ```
 
 這樣的責任邊界較清楚，也更適合處理 suspend/resume 後的 controller state consistency 問題。
+
+---
+
+## 附錄
+
+### A. 除錯建議
+
+#### A.1 btattach 立即退出
+
+確認 `/dev/ttyS9` 是否存在：
+
+```sh
+ls -l /dev/ttyS9
+```
+
+確認是否有其他 process 佔用 UART：
+
+```sh
+ps aux | grep -E 'btattach|brcm_patchram|hciattach'
+```
+
+同一個 Bluetooth UART 應該只由一個 process 管理。
+
+#### A.2 hci0 沒有出現
+
+先檢查 kernel config：
+
+```sh
+zcat /proc/config.gz | grep CONFIG_BT_HCIUART_BCM
+```
+
+再檢查 log：
+
+```sh
+journalctl -u bt-init.service -b
+dmesg | grep -iE 'bluetooth|hci|bcm|uart'
+```
+
+可能原因：
+
+```text
+kernel config 缺少 Broadcom HCI UART support
+UART node 錯誤
+baudrate 錯誤
+pinctrl/UART conflict
+firmware 或 controller reset 問題
+其他 service 和 bt-init.service race
+```
+
+#### A.3 service 一直 restart
+
+檢查 service log：
+
+```sh
+journalctl -u bt-init.service -b --no-pager
+```
+
+如果 service 一直重啟，通常代表 UART attach command 本身持續失敗，需要先確認 UART node、baudrate、kernel config、pinctrl 與是否有其他 process 佔用。
 

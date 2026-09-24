@@ -1,9 +1,8 @@
+# RK3588 Pixpaper SPI DRM Driver 與 Weston 整合 Debug 與解決報告
 
-# Pixpaper SPI DRM Driver 與 Weston 整合 Debug 與解決報告
+## 1. 問題概述
 
-----------
-
-# 1. 目標
+### 1.1 目標
 
 將 Pixpaper SPI DRM driver 整合至 Weston，使 e-ink panel 作為 Wayland 顯示輸出。
 
@@ -13,8 +12,28 @@ Wayland → Weston → DRM → SPI → Pixpaper → e-ink display
 ```
 ----------
 
+### 1.2 問題：Weston 無法顯示於 pixpaper
 
-# 2. 系統環境
+啟動 Weston：
+```
+weston --backend=drm-backend.so --tty=1  --debug
+```
+log：
+```
+using /dev/dri/card1  
+DRM: head 'HDMI-A-1' found
+```
+觀察：
+
+Weston 選擇 card1 (GPU)，而非 pixpaper card0。
+
+結果：
+
+pixpaper 無畫面
+
+----------
+
+## 2. 系統環境
 
 Platform:
 ```
@@ -48,7 +67,9 @@ card1-HDMI-A-2
 
 ----------
 
-# 3. Driver functional verification（KMS 基本功能驗證）
+## 3. 除錯過程
+
+### 3.1 Driver functional verification（KMS 基本功能驗證）
 
 先確認 DRM pipeline 正常。
 
@@ -73,28 +94,7 @@ Pixpaper successfully displays test pattern
 
 ----------
 
-# 4. 問題：Weston 無法顯示於 pixpaper
-
-啟動 Weston：
-```
-weston --backend=drm-backend.so --tty=1  --debug
-```
-log：
-```
-using /dev/dri/card1  
-DRM: head 'HDMI-A-1' found
-```
-觀察：
-
-Weston 選擇 card1 (GPU)，而非 pixpaper card0。
-
-結果：
-
-pixpaper 無畫面
-
-----------
-
-# 5. Debug Step 1 — 確認 DRM connector 狀態
+### 3.2 Debug Step 1 — 確認 DRM connector 狀態
 
 指令：
 ```
@@ -115,7 +115,7 @@ connector 正常
 
 ----------
 
-# 6. Debug Step 2 — 確認 DRM pipeline 狀態
+### 3.3 Debug Step 2 — 確認 DRM pipeline 狀態
 
 指令：
 ```
@@ -132,7 +132,7 @@ Weston 未使用 pixpaper DRM device
 
 ----------
 
-# 7. Debug Step 3 — 強制 Weston 使用 pixpaper device（第一次嘗試）
+### 3.4 Debug Step 3 — 強制 Weston 使用 pixpaper device（第一次嘗試）
 
 嘗試：
 ```
@@ -149,7 +149,7 @@ ERROR: could not open DRM device '/dev/dri/card0'
 ```
 ----------
 
-# 8. Debug Step 4 — 使用 strace 分析 Weston
+### 3.5 Debug Step 4 — 使用 strace 分析 Weston
 
 指令：
 ```
@@ -187,7 +187,26 @@ Weston drm-device 參數需要 device name（card0）
 
 ----------
 
-# 9. Debug Step 5 — 修正 drm-device 參數
+## 4. Root Cause 分析（Root Cause Summary）
+
+問題原因：
+
+Weston 預設選擇 GPU DRM device  
+而非 pixpaper DRM device
+
+並且：
+
+drm-device 參數使用錯誤格式
+
+解法：
+```
+--drm-device=card0
+```
+----------
+
+## 5. 解決方案
+
+### 5.1 Debug Step 5 — 修正 drm-device 參數
 
 使用正確指令：
 ```
@@ -208,7 +227,7 @@ Output 'SPI-1' enabled with mode 800x480
 ```
 ----------
 
-# 10. 驗證結果
+### 5.2 驗證結果
 
 確認：
 ```
@@ -222,7 +241,7 @@ enabled
 
 ----------
 
-# 11. 為何需要 pixman renderer
+### 5.3 為何需要 pixman renderer
 
 GL renderer 會選擇 GPU：
 ```
@@ -238,7 +257,7 @@ CPU → DRM framebuffer → pixpaper
 
 ----------
 
-# 12. 最終成功指令
+### 5.4 最終成功指令
 ```
 weston \  
   --backend=drm-backend.so \  
@@ -249,7 +268,7 @@ weston \
 ```
 ----------
 
-# 13. 最終 DRM pipeline
+### 5.5 最終 DRM pipeline
 ```
 Wayland client  
  ↓  
@@ -267,24 +286,9 @@ e-ink refresh
 ```
 ----------
 
-# 14. Root Cause Summary
+## 附錄
 
-問題原因：
-
-Weston 預設選擇 GPU DRM device  
-而非 pixpaper DRM device
-
-並且：
-
-drm-device 參數使用錯誤格式
-
-解法：
-```
---drm-device=card0
-```
-----------
-
-# 15. Debug Flow Summary
+### A. Debug Flow Summary
 ```
 # 查看 DRM devices  
 ls /dev/dri/  

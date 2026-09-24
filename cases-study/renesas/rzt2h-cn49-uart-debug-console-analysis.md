@@ -1,7 +1,6 @@
+# RZ/T2H：使用 CN49（PMOD2）作為第二組 CPU UART Debug Console
 
-# RZ/T2H：使用 CN49（PMOD2）作為第二組 CPU UART Debug Console 
-
-## 1. 問題背景與目標
+## 1. 問題概述
 
 在 RZ/T2H Evaluation Board 上，官方預設僅提供 **CN34（FT2232）** 作為主要 debug console（A55 / CR52 共用），以及 **CN79（USB gadget）** 作為 USB serial。
 
@@ -14,7 +13,9 @@
 
 ----------
 
-## 2. 可用硬體介面盤點結論
+## 2. 系統環境
+
+### 2.1 可用硬體介面盤點結論
 
 經比對 schematic 與板級配置後，確認：
 
@@ -31,9 +32,9 @@
 
 ----------
 
-## 3. CN49 UART 硬體對應關係
+### 2.2 CN49 UART 硬體對應關係
 
-### 3.1 SoC 腳位對應
+#### 2.2.1 SoC 腳位對應
 
 CN49（PMOD2）對應 SoC 的 SCI1：
 
@@ -47,9 +48,33 @@ CN49（PMOD2）對應 SoC 的 SCI1：
 
 ----------
 
-## 4. Linux DTS 設定
+### 2.3 UART 實體接線方式
 
-### 4.1 啟用 SCI1 與 pinmux
+#### 2.3.1 必要接線（最小）
+
+| CN49（PMOD2） | USB-UART | 說明             |
+|----------------|----------|------------------|
+| TXD1           | RX       | 交叉接線         |
+| RXD1           | TX       | 交叉接線         |
+| GND            | GND      | 共地（必接）     |
+
+GND
+
+#### 2.3.2 注意事項
+
+-   **一定要共地（GND ↔ GND）**
+-   **USB-UART 的 VCC 不要接**
+-   電平必須是 **3.3V TTL**
+-   先不要接 RTS / CTS 
+
+----------
+
+## 3. 除錯過程
+
+### 3.1 Linux DTS 設定
+
+#### 3.1.1 啟用 SCI1 與 pinmux
+
 ```yaml
 sci1_pins: sci1 {
         pinmux = <RZT2H_PORT_PINMUX(11, 1, 0x14)>, /* SCI1_TXD */
@@ -62,7 +87,8 @@ sci1_pins: sci1 {
         status = "okay";
 };
 ```
-### 4.2 確認 Linux 端裝置節點
+
+#### 3.1.2 確認 Linux 端裝置節點
 
 `ls /dev/ttySC* # /dev/ttySC0 /dev/ttySC1 /dev/ttySC3` 
 
@@ -70,7 +96,7 @@ sci1_pins: sci1 {
 
 ----------
 
-## 5. Runtime Pinmux 驗證
+### 3.2 Runtime Pinmux 驗證
 
 使用 debugfs 確認 pinmux 實際生效狀態：
 ```yaml
@@ -87,17 +113,18 @@ pin 89 (P11_1): device 80005400.serial  function sci1 group sci1
 
 ----------
 
-## 6. 實體線路問題：DIP Switch 關鍵影響
+### 3.3 實體線路問題：DIP Switch 關鍵影響
 
-### 6.1 問題現象
+#### 3.3.1 問題現象
 
 -   板子 → PC（TX）正常   
 -   PC → 板子（RX）完全無反應
 -   TX/RX loopback 測試失敗
 -   出現亂碼、單向通訊等異常
-    
 
-### 6.2 原因分析
+----------
+
+## 4. Root Cause 分析
 
 在 EVB schematic 中可確認：
 ```yaml
@@ -107,7 +134,11 @@ P11_0_BSC_A5_LCDC_DATG0_PMOD2_RXD1
 ```
 **CN49 的 UART 腳位實際上是經過 10-pin DIP switch 才會接通**
 
-### 6.3 必要設定
+----------
+
+## 5. 解決方案
+
+### 5.1 必要設定
 
 -   **SW6-4 = ON**  
     → 連接 `P11_0 → PMOD2_RXD1`
@@ -116,45 +147,24 @@ P11_0_BSC_A5_LCDC_DATG0_PMOD2_RXD1
 同時需確保：
 
 -   其他與 P11_0 共用的功能（ESC_RESETOUT 等）**未同時打開**
-    
 
 ----------
 
-## 7. UART 實體接線方式
+### 5.2 通訊測試指令
 
-### 7.1 必要接線（最小）
+#### 5.2.1 設定 UART 參數
 
-| CN49（PMOD2） | USB-UART | 說明             |
-|----------------|----------|------------------|
-| TXD1           | RX       | 交叉接線         |
-| RXD1           | TX       | 交叉接線         |
-| GND            | GND      | 共地（必接）     |
-
-GND
-
-### 7.2 注意事項
-
--   **一定要共地（GND ↔ GND）**
--   **USB-UART 的 VCC 不要接**
--   電平必須是 **3.3V TTL**
--   先不要接 RTS / CTS 
-
-----------
-
-## 8. 通訊測試指令
-
-### 8.1 設定 UART 參數
 ```bash
 stty -F /dev/ttySC1 115200 cs8 -cstopb -parenb \
      -ixon -ixoff -crtscts -echo -icrnl -inlcr -opost
 ```
-### 8.2 板子 → PC
+
+#### 5.2.2 板子 → PC
 
 `echo  "hello CN49" > /dev/ttySC1` 
 
-### 8.3 PC → 板子
+#### 5.2.3 PC → 板子
 
 `cat -v /dev/ttySC1` 
 
 成功後可雙向收發，無亂碼。
-

@@ -1,12 +1,10 @@
 # Raspberry Pi 5 Zephyr：GPIO14/GPIO15 Debug Console Bring-up Investigation
 
+## 1. 問題概述
+
 > 目標：嘗試將 Raspberry Pi 5 上的 Zephyr console 從官方預設的 Debug UART connector 改到 40-pin header 的 GPIO14/GPIO15，並記錄調查過程、實驗結果與最終結論。
 
 本文聚焦在 **GPIO14/GPIO15 debug console bring-up**，不包含 Zephyr 安裝、SDK、west、SD card boot 等基礎流程。
-
-----------
-
-## 1. 背景
 
 Raspberry Pi 5 在 Zephyr 官方 board support 中，可以透過 `rpi_5` target build 並從 SD card boot Zephyr。
 
@@ -31,7 +29,7 @@ ACT LED blinking
 
 ----------
 
-## 2. 硬體與接線
+## 2. 系統環境（硬體與接線）
 
 GPIO14/GPIO15 是 Raspberry Pi 傳統 UART pins：
 
@@ -67,11 +65,13 @@ picocom -b 115200 /dev/ttyUSB0
 
 ----------
 
-## 3. Debian / Raspberry Pi OS 上 GPIO14/GPIO15 console 可正常使用
+## 3. 除錯過程
+
+### 3.1 Debian / Raspberry Pi OS 上 GPIO14/GPIO15 console 可正常使用
 
 在 Raspberry Pi OS / Debian 中，GPIO14/GPIO15 可透過以下設定作為 serial console。
 
-### 3.1 config.txt
+#### 3.1.1 config.txt
 
 ```ini
 [all]
@@ -80,14 +80,14 @@ dtoverlay=disable-bt
 
 ```
 
-### 3.2 cmdline.txt
+#### 3.1.2 cmdline.txt
 
 ```text
 console=serial0,115200 console=tty1 root=PARTUUID=45110d0a-02 rootfstype=ext4 fsck.repair=yes rootwait
 
 ```
 
-### 3.3 Linux 中確認 UART device
+#### 3.1.3 Linux 中確認 UART device
 
 在 Debian 中執行：
 
@@ -122,7 +122,7 @@ Debian/Linux 可正常使用 GPIO14/GPIO15 當 console
 
 ----------
 
-## 4. Linux live devicetree 確認 GPIO14/GPIO15 對應 RP1 UART0
+### 3.2 Linux live devicetree 確認 GPIO14/GPIO15 對應 RP1 UART0
 
 在 Debian 中 dump live devicetree：
 
@@ -197,7 +197,7 @@ Linux ttyAMA0
 
 ----------
 
-## 5. Zephyr rpi_5 預設 console 是 uart10
+### 3.3 Zephyr rpi_5 預設 console 是 uart10
 
 在 Zephyr source 中查詢 Raspberry Pi 5 UART node：
 
@@ -242,7 +242,7 @@ console=serial0,115200
 
 ----------
 
-## 6. 嘗試一：用 Zephyr overlay 新增 RP1 UART0 node
+### 3.4 嘗試一：用 Zephyr overlay 新增 RP1 UART0 node
 
 建立 overlay：
 
@@ -328,9 +328,9 @@ GPIO14/GPIO15 仍無 console output
 
 ----------
 
-## 7. DTS / overlay troubleshooting
+### 3.5 DTS / overlay troubleshooting
 
-### 7.1 overlay path 問題
+#### 3.5.1 overlay path 問題
 
 錯誤：
 
@@ -351,7 +351,7 @@ west build -p always -b rpi_5 samples/hello_world \
 
 ----------
 
-### 7.2 top-level node 語法錯誤
+#### 3.5.2 top-level node 語法錯誤
 
 錯誤：
 
@@ -382,7 +382,7 @@ rp1_uart0: serial@1f00030000 {
 
 ----------
 
-### 7.3 reg cells 數量錯誤
+#### 3.5.3 reg cells 數量錯誤
 
 錯誤：
 
@@ -415,7 +415,7 @@ reg = <0x1f 0x00030000 0x100>;
 
 ----------
 
-### 7.4 interrupts cells 數量錯誤
+#### 3.5.4 interrupts cells 數量錯誤
 
 錯誤：
 
@@ -441,7 +441,7 @@ interrupts = <0 123 4 0>;
 
 ----------
 
-### 7.5 Linux-only DTS properties 不被 Zephyr binding 接受
+#### 3.5.5 Linux-only DTS properties 不被 Zephyr binding 接受
 
 嘗試照抄 Linux node 時，以下 properties 不被 Zephyr `arm,pl011.yaml` 接受：
 
@@ -469,7 +469,7 @@ uart-has-rtscts;
 
 ----------
 
-## 8. 嘗試二：blinky + RP1 UART0 overlay
+### 3.6 嘗試二：blinky + RP1 UART0 overlay
 
 為了確認加入 RP1 UART0 node 後是否導致 Zephyr crash，改 build `blinky` 並套用同一份 overlay：
 
@@ -500,7 +500,7 @@ Zephyr 沒有因為 RP1 UART0 node crash
 
 ----------
 
-## 9. 嘗試三：在 Zephyr app 中手動設定 GPIO14/15 pinmux
+### 3.7 嘗試三：在 Zephyr app 中手動設定 GPIO14/15 pinmux
 
 因為 Linux 使用 `rp1_uart0_14_15` pinctrl group，所以嘗試在 Zephyr app 中直接設定 GPIO14/15 function。
 
@@ -511,7 +511,7 @@ mkdir -p myapps/rpi5_uart_gpio/src
 
 ```
 
-### 9.1 CMakeLists.txt
+#### 3.7.1 CMakeLists.txt
 
 `myapps/rpi5_uart_gpio/CMakeLists.txt`：
 
@@ -524,7 +524,7 @@ target_sources(app PRIVATE src/main.c)
 
 ```
 
-### 9.2 prj.conf
+#### 3.7.2 prj.conf
 
 `myapps/rpi5_uart_gpio/prj.conf`：
 
@@ -535,7 +535,7 @@ CONFIG_UART_CONSOLE=n
 
 ```
 
-### 9.3 GPIO14/15 pinmux test
+#### 3.7.3 GPIO14/15 pinmux test
 
 ```c
 #include <zephyr/kernel.h>
@@ -575,7 +575,7 @@ static void rp1_gpio_set_uart0(void)
 
 ----------
 
-## 10. 嘗試四：不使用 Zephyr UART driver，直接 raw write PL011
+### 3.8 嘗試四：不使用 Zephyr UART driver，直接 raw write PL011
 
 為了排除 Zephyr PL011 driver / console path 問題，改成直接寫 RP1 UART0 PL011 registers。
 
@@ -619,7 +619,7 @@ FBRD = 3
 
 ----------
 
-## 11. Debian 中讀出 Linux 成功時的 UART / GPIO register
+### 3.9 Debian 中讀出 Linux 成功時的 UART / GPIO register
 
 回 Debian，在 GPIO14/GPIO15 console 正常時讀 register：
 
@@ -660,7 +660,7 @@ UART divisor 是 IBRD=27, FBRD=8
 
 ----------
 
-## 12. 嘗試五：Zephyr raw write 模仿 Linux register 值
+### 3.10 嘗試五：Zephyr raw write 模仿 Linux register 值
 
 將 Zephyr raw write 測試改成完全模仿 Linux 成功時的 register 值：
 
@@ -754,7 +754,7 @@ sync
 
 ----------
 
-## 13. 最終結論
+## 4. 結論與建議（最終結論）
 
 經過以上測試，可以確認：
 
