@@ -20,7 +20,7 @@ I2C 在 BSP 世界中有幾個致命特性：
 -   driver 往往「probe 成功」，卻在 runtime 才壞
 
 
-👉 **多數 I2C 問題不是 driver bug，而是 BSP 整合問題。**
+**多數 I2C 問題不是 driver bug，而是 BSP 整合問題。**
 
 ----------
 
@@ -38,7 +38,7 @@ I2C 在 BSP 世界中有幾個致命特性：
 | I2C bus         | Driver model 與裝置 match    |
 | I2C interface   | SoC 腳位設定與實體硬體連接   |
 
-👉 BSP debug 時，**interface 永遠比 bus 更重要**。
+BSP debug 時，**interface 永遠比 bus 更重要**。
 
 ----------
 
@@ -111,7 +111,7 @@ I2C 在 BSP 世界中有幾個致命特性：
 -   resume 沒重新上電
 -   I2C controller clock 沒恢復
 
-👉 **I2C 是 suspend/resume 非常脆弱的介面。**
+**I2C 是 suspend/resume 非常脆弱的介面。**
 
 ----------
 

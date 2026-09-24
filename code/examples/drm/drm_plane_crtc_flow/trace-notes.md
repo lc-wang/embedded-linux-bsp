@@ -1,6 +1,6 @@
 # Kernel trace notes — drm_plane_crtc_flow
 
-# 🟢 Level 1：用人話理解
+# Level 1：用人話理解
 
 假設：
 
@@ -15,7 +15,7 @@ framebuffer = 一張圖片
 
 ----------
 
-# 🟢 plane 是什麼？
+# plane 是什麼？
 
 plane 的工作：
 
@@ -31,7 +31,7 @@ plane 的工作：
 
 ----------
 
-# 🟢 CRTC 是什麼？
+# CRTC 是什麼？
 
 CRTC 的工作：
 
@@ -54,7 +54,7 @@ CRTC 的工作：
 
 ----------
 
-# 🟡 Level 2：流程理解
+# Level 2：流程理解
 
 ## atomic commit 在做什麼？
 
@@ -82,7 +82,7 @@ plane framebuffer 改了
 
 ----------
 
-# 🔥 真正重要的地方
+# 真正重要的地方
 
 driver 最終通常會做：
 
@@ -98,7 +98,7 @@ driver 最終通常會做：
 
 ----------
 
-# 🔴 Level 3：kernel trace
+# Level 3：kernel trace
 
 ## userspace commit
 
@@ -138,7 +138,7 @@ driver 在這裡：
 
 ----------
 
-# 🧠 plane vs framebuffer
+# plane vs framebuffer
 
 | 元件 | 本質 |  
 |-------------|----------------|  
@@ -148,7 +148,7 @@ driver 在這裡：
 
 ----------
 
-# 🔥 scanout 是什麼？
+# scanout 是什麼？
 
 scanout：
 
@@ -170,7 +170,7 @@ pixel 2
 
 ----------
 
-# 🧠 為什麼叫 CRTC？
+# 為什麼叫 CRTC？
 
 歷史名稱：
 
@@ -182,7 +182,7 @@ Cathode Ray Tube Controller
 
 但名稱保留下來。
 
-# 🧠 最後收斂
+# 最後收斂
 ```
 memory  
 ↓  
@@ -199,7 +199,7 @@ connector
 display
 ```
 
-# 🔧 userspace 對照程式  
+# userspace 對照程式  
   
 本章新增：  
   
@@ -227,7 +227,7 @@ drmModeAddFB()
  ↓
 drmModeSetCrtc()
 ```
-🧠 這段 code 對應 DRM 元件
+這段 code 對應 DRM 元件
 
 | code 行為 | DRM 觀念 |  
 |------------------------|----------------------------------|  

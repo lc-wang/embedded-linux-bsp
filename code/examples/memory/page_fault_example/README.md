@@ -9,7 +9,7 @@ Linux kernel page fault + mmap + vm_ops 最小範例。
 
 ---
 
-## 🎯 本章的目的
+## 本章的目的
 
 理解：
 
@@ -20,7 +20,7 @@ Linux kernel page fault + mmap + vm_ops 最小範例。
 
 ---
 
-## 🧠 核心概念
+## 核心概念
 E2 (remap_pfn_range)  
 = 一次性 mapping
 
@@ -30,7 +30,7 @@ E3 (this chapter)
   
 ---  
   
-## 🔄 流程  
+## 流程  
 ```
 userspace access memory  
 ↓  
@@ -49,7 +49,7 @@ mapping 建立
   
 ---  
   
-## 🧩 Kernel 原始碼對照  
+## Kernel 原始碼對照  
 ```
 mm/memory.c  
 mm/mmap.c  

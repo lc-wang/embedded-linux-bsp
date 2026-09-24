@@ -10,7 +10,7 @@
   
 ---  
   
-## 🎯 本章的目的  
+## 本章的目的  
   
 理解以下問題：  
   
@@ -21,7 +21,7 @@
 
 ----------
 
-## 🧩 最核心的顯示路徑
+## 最核心的顯示路徑
 
 ```
 userspace buffer
@@ -39,7 +39,7 @@ display device / panel
 
 ----------
 
-## 🧠 `drm_simple_display_pipe` 是什麼？
+## `drm_simple_display_pipe` 是什麼？
 
 它是一個簡化版的顯示 pipeline helper。
 
@@ -58,7 +58,7 @@ display device / panel
 
 ----------
 
-## 🔧 本範例做什麼？
+## 本範例做什麼？
 
 本範例提供：
 
@@ -81,7 +81,7 @@ driver callback
 
 ----------
 
-## 🧩 Kernel 原始碼對照
+## Kernel 原始碼對照
 
 ```
 drivers/gpu/drm/drm_simple_kms_helper.c

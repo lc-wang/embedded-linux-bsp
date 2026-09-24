@@ -13,7 +13,7 @@
 - AP mode 能起來，但 throughput 極低
 - 不同板子用同一顆晶片，行為卻完全不同
 
-👉 **這些問題有極高比例不是 driver bug，而是 firmware / NVRAM / regulatory mismatch。**
+**這些問題有極高比例不是 driver bug，而是 firmware / NVRAM / regulatory mismatch。**
 
 ---
 
@@ -80,7 +80,7 @@ Firmware 負責：
 -   Power save / WOWLAN
     
 
-👉 **Firmware 定義「Wi-Fi 怎麼運作」**
+**Firmware 定義「Wi-Fi 怎麼運作」**
 
 ----------
 
@@ -99,7 +99,7 @@ Firmware 負責：
     -   較快，但 reset 成本高
         
 
-📌 **常見失敗點**
+**常見失敗點**
 
 -   firmware 與 driver 版本不匹配
     
@@ -125,7 +125,7 @@ Firmware 負責：
 -   Regulatory hint
     
 
-👉 **NVRAM ≈ 板級硬體描述（但不是 device tree）**
+**NVRAM ≈ 板級硬體描述（但不是 device tree）**
 
 ----------
 
@@ -140,7 +140,7 @@ Firmware 負責：
 | regrev     | 區域法規限制         |
 
 
-📌 **錯一個值，Wi-Fi 不一定掛，但行為會「很怪」**
+**錯一個值，Wi-Fi 不一定掛，但行為會「很怪」**
 
 ----------
 
@@ -168,7 +168,7 @@ Firmware 負責：
 -   DFS 行為
     
 
-👉 **全部由 firmware 決定**
+**全部由 firmware 決定**
 
 Linux cfg80211 只能「被告知結果」。
 
@@ -211,7 +211,7 @@ Linux cfg80211 只能「被告知結果」。
 -   `frameburst`
     
 
-📌 **這些指令會「覆蓋 firmware 預設行為」**
+**這些指令會「覆蓋 firmware 預設行為」**
 
 ----------
 
@@ -224,7 +224,7 @@ Linux cfg80211 只能「被告知結果」。
 -   roam 設定不一致 → 連線不穩
     
 
-👉 **順序錯誤 ≈ 行為錯誤**
+**順序錯誤 ≈ 行為錯誤**
 
 ----------
 
@@ -287,17 +287,17 @@ Linux cfg80211 只能「被告知結果」。
 -   用最小化 NVRAM 測試行為變化
     
 
-📌 **NVRAM debug 是「比較法」，不是「單點修正」**
+**NVRAM debug 是「比較法」，不是「單點修正」**
 
 ----------
 
 ## 9. 常見誤解澄清
 
--   ❌「Wi-Fi 掛了就是 driver bug」
+-   ✗「Wi-Fi 掛了就是 driver bug」
     
--   ❌「同一顆晶片，用同一份 NVRAM 應該沒問題」
+-   ✗「同一顆晶片，用同一份 NVRAM 應該沒問題」
     
--   ❌「country code 設定成功就代表 regulatory 正確」
+-   ✗「country code 設定成功就代表 regulatory 正確」
     
 
-👉 **bcmdhd 的 bring-up 是 firmware + NVRAM + bus 的整體工程**
+**bcmdhd 的 bring-up 是 firmware + NVRAM + bus 的整體工程**

@@ -1,9 +1,9 @@
 
-# 🧩 Renesas RZ/T2H Trusted Firmware-A
+# Renesas RZ/T2H Trusted Firmware-A
 
 ## Console 從 SCI0 切換至 SCI1 技術紀錄
 
-## 📌 背景說明
+## 背景說明
 
 在 **Renesas RZ/T2H** 平台中，官方提供的 **Trusted Firmware-A（TF-A）** 預設序列主控台（console）設定為：
 
@@ -29,7 +29,7 @@
 
 ----------
 
-## 🎯 修改目標
+## 修改目標
 
 
 | 項目           | SCI0（預設）     | SCI1（目標）     |
@@ -41,11 +41,11 @@
 
 ----------
 
-## 🔍 初期嘗試與問題
+## 初期嘗試與問題
 
 一開始僅修改以下兩個部分：
 
-### 1️⃣ 修改 SCIF base address
+### 1. 修改 SCIF base address
 ```
 - #define RZT2H_SCIF_BASE  0x80005000
 + #define RZT2H_SCIF_BASE  0x80005400
@@ -53,7 +53,7 @@
 
 ----------
 
-### 2️⃣ 修改 pinmux 為 SCI1
+### 2. 修改 pinmux 為 SCI1
 ```
 {11, 1, 20, ...}, /* TXD1 */
 {11, 0, 20, ...}, /* RXD1 */
@@ -61,13 +61,13 @@
 
 ----------
 
-### ❌ 結果
+### 結果
 
 系統 **完全沒有任何 UART 輸出**。
 
 ----------
 
-## 🧠 問題根因分析
+## 問題根因分析
 
 雖然：
 
@@ -106,7 +106,7 @@ BL2 / BL31
 
 ----------
 
-## ❌ 原始程式限制
+## 原始程式限制
 
 在原始 TF-A 程式碼中：
 
@@ -131,9 +131,9 @@ BL2 / BL31
 
 ----------
 
-## ✅ 最終修正內容
+## 最終修正內容
 
-## 1️⃣ 修改 SCIF base address
+## 1. 修改 SCIF base address
 
 **檔案：**
 
@@ -143,7 +143,7 @@ BL2 / BL31
 
 ----------
 
-## 2️⃣ 修改 pinmux 為 SCI1
+## 2. 修改 pinmux 為 SCI1
 
 **檔案：**
 
@@ -156,7 +156,7 @@ static const PORT_SETTINGS sci_pins[] = {
 ```
 ----------
 
-## 3️⃣ 新增 SCI1 的 Module-Stop 定義
+## 3. 新增 SCI1 的 Module-Stop 定義
 
 **檔案：**
 
@@ -171,7 +171,7 @@ static const PORT_SETTINGS sci_pins[] = {
 ```
 ----------
 
-## 4️⃣ 解除 SCI1 module stop
+## 4. 解除 SCI1 module stop
 
 **檔案：**
 
@@ -194,7 +194,7 @@ static void cpg_mstop_scif(void)
 ```
 ----------
 
-## ✅ 修改結果
+## 修改結果
 
 成功於 SCI1 看到 TF-A console：
 ```
@@ -206,9 +206,9 @@ NOTICE:  BL31: Built : 10:39:59, Jan 23 2026
 ```
 ----------
 
-## 🧠 重點整理
+## 重點整理
 
-### ✅ 僅修改 UART base 與 pinmux 並不足夠
+### 僅修改 UART base 與 pinmux 並不足夠
 
 TF-A 尚需：
 
@@ -221,7 +221,7 @@ TF-A 尚需：
 
 ----------
 
-### ✅ Renesas TF-A console 為「固定 instance 設計」
+### Renesas TF-A console 為「固定 instance 設計」
 
 -   原始程式僅支援 SCI0
     

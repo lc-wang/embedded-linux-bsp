@@ -2,7 +2,7 @@
 # Kernel trace notes — page_fault_example  
 
   
-# 🟢 Level 1
+# Level 1
   
 你在 userspace 做這件事：  
 ```
@@ -11,7 +11,7 @@ p[0] = 'A';
   
 但這塊 memory：  
   
-👉 **其實還沒有真的存在**  
+**其實還沒有真的存在**  
   
 所以 CPU 會觸發：  
 ```
@@ -29,7 +29,7 @@ page fault
   
 ---  
   
-# 🟡 Level 2
+# Level 2
 ```
 userspace 存取 memory  
 ↓  
@@ -46,7 +46,7 @@ mapping 建立完成
   
 ---  
   
-## 🧠 這一章做的事  
+## 這一章做的事  
   
 在 `.mmap()`：  
 
@@ -60,7 +60,7 @@ alloc_page → 回傳給 kernel
   
 ---  
   
-# 🔴 Level 3
+# Level 3
 ```
 do_page_fault()  
 └─ handle_mm_fault()  
@@ -73,7 +73,7 @@ do_page_fault()
   
 ---  
   
-# 🔑 fault handler 在做什麼？  
+# fault handler 在做什麼？  
   
 ```
 get_page(page);  
@@ -86,7 +86,7 @@ vmf->page = page;
 
 ----------
 
-# 🔥 與 mmap 的差別
+# 與 mmap 的差別
 
 
 ### mmap vs page fault
@@ -100,14 +100,14 @@ vmf->page = page;
 
 ----------
 
-# 🧠 最重要結論
+# 最重要結論
 
 mmap ≠ 拿到記憶體  
 page fault = 真正拿到 page
 
 ----------
 
-# 🔧 Debug 建議
+# Debug 建議
 
 ### 看 fault 觸發
 ```
@@ -120,7 +120,7 @@ pr_info("myfault: page fault triggered\n");
 
 ----------
 
-# 🧠 心智模型
+# 心智模型
 
 memory mapping  
 只是「承諾」  

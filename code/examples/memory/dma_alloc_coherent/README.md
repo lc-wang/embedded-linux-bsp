@@ -9,7 +9,7 @@ Linux kernel 中「裝置 DMA buffer」的最小實作範例。
 
 ---
 
-## 🎯 本章的目的
+## 本章的目的
 
 理解以下問題：
 
@@ -20,7 +20,7 @@ Linux kernel 中「裝置 DMA buffer」的最小實作範例。
 
 ---
 
-## 🧠 一句話結論
+## 一句話結論
 
 dma_alloc_coherent
 = 給硬體用的記憶體
@@ -34,7 +34,7 @@ dma_alloc_coherent
 
 ---
 
-## 🧩 Kernel 原始碼對照
+## Kernel 原始碼對照
 ```
 kernel/dma/mapping.c
 drivers/base/dma-mapping.c
@@ -43,8 +43,8 @@ include/linux/dma-mapping.h
 
 ---
 
-## 🚫 常見錯誤
+## 常見錯誤
 
-❌ 用 kmalloc buffer 直接給硬體  
-❌ 用 vmalloc buffer 做 DMA  
-❌ 自己處理 cache flush
+✗ 用 kmalloc buffer 直接給硬體  
+✗ 用 vmalloc buffer 做 DMA  
+✗ 自己處理 cache flush

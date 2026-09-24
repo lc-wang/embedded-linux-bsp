@@ -29,7 +29,7 @@
 - Linux **不判斷 scan / assoc / roam 成敗**
 - Linux **不執行連線策略**
 
-👉 Host 的角色只有三個：
+Host 的角色只有三個：
 1. **送指令**
 2. **收事件**
 3. **轉譯成 cfg80211 語意**
@@ -100,7 +100,7 @@ dhd_wl_ioctl(dhd_pub, cmd, buf, len, set);
 | AP        | bss, up                 |
 
 
-📌 重要事實
+重要事實
 
 iovar 的「語意與行為」完全定義在 firmware 裡
 driver 只是把 name + payload 送出去
@@ -138,7 +138,7 @@ cfg80211_connect()
       └─ wldev_iovar_setbuf("join")
  ```
 
-📌 **重點**
+**重點**
 
 -   Linux 不等待「結果」
     
@@ -195,7 +195,7 @@ dhd_prot_ioctl()
 -   但事件沒回來
     
 
-👉 **等同於什麼都沒發生**
+**等同於什麼都沒發生**
 
 ----------
 
@@ -232,7 +232,7 @@ dhd_rx_frame()
 | WLC_E_ROAM            | Firmware 觸發漫遊     |
 
 
-📌 **關鍵觀念**
+**關鍵觀念**
 
 > cfg80211 的狀態完全取決於 event  
 > 不是取決於你「送了什麼指令」

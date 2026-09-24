@@ -5,7 +5,7 @@
 
 ----------
 
-# 1️⃣ 先建立整體視角
+# 1. 先建立整體視角
 
 在 SoC 音訊世界中：
 ```
@@ -23,7 +23,7 @@ ASoC 的任務就是：
 
 ----------
 
-# 2️⃣ DAI 是什麼？
+# 2. DAI 是什麼？
 
 DAI = Digital Audio Interface
 
@@ -59,7 +59,7 @@ wm8960.c         → 註冊 Codec DAI
 ```
 ----------
 
-# 3️⃣ snd_soc_dai_link
+# 3. snd_soc_dai_link
 
 這是 ASoC 的「連線定義」。
 ```
@@ -97,13 +97,13 @@ struct snd_soc_dai_link {
 
 ----------
 
-# 4️⃣ Machine Driver 是什麼？
+# 4. Machine Driver 是什麼？
 
 Machine driver 是：
 
 > 板級 glue layer
 
-📁 常見位置：
+常見位置：
 ```
 sound/soc/rockchip/
 sound/soc/fsl/
@@ -126,7 +126,7 @@ sound/soc/renesas/
 
 ----------
 
-# 5️⃣ 實際註冊流程
+# 5. 實際註冊流程
 
 當系統 boot 時：
 ```
@@ -169,7 +169,7 @@ static  struct  snd_soc_card  my_card = {
 
 ----------
 
-# 6️⃣ Probe call flow
+# 6. Probe call flow
 
 當 machine driver 呼叫：
 
@@ -186,7 +186,7 @@ snd_soc_bind_card()
 ```
 ----------
 
-# 7️⃣ snd_soc_pcm_runtime 是什麼？
+# 7. snd_soc_pcm_runtime 是什麼？
 ```
 struct snd_soc_pcm_runtime {
     struct snd_soc_dai *cpu_dai;
@@ -210,7 +210,7 @@ codec_dai->ops
 ```
 ----------
 
-# 8️⃣ DTS 如何影響 Machine Driver
+# 8. DTS 如何影響 Machine Driver
 
 在 modern kernel，
 
@@ -245,7 +245,7 @@ simple-audio-card driver 會：
 
 ----------
 
-# 9️⃣ ASoC 真正運作流程
+# 9. ASoC 真正運作流程
 
 播放時完整流程：
 ```
@@ -266,7 +266,7 @@ DAC 輸出聲音
 ```
 ----------
 
-# 🔟 BSP Debug 時你真正要檢查什麼？
+# 10. BSP Debug 時你真正要檢查什麼？
 
 如果沒有聲音：
 
@@ -283,9 +283,9 @@ DAC 輸出聲音
 
 ----------
 
-# 1️⃣1️⃣ 常見錯誤案例
+# 11. 常見錯誤案例
 
-### ❌ cpu_dai_name 不匹配
+### cpu_dai_name 不匹配
 
 dmesg：
 
@@ -293,12 +293,12 @@ dmesg：
 
 ----------
 
-### ❌ codec_name 錯
+### codec_name 錯
 
 `ASoC: CODEC not registered` 
 
 ----------
 
-### ❌ dai_fmt 不對
+### dai_fmt 不對
 
 聲音是雜音或完全沒聲音。

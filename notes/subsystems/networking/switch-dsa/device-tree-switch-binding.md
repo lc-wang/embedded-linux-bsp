@@ -1,5 +1,5 @@
 
-## 🧠 DSA Device Tree
+## DSA Device Tree
 
 本章節重點：
 
@@ -9,7 +9,7 @@
 
 ----------
 
-# 🧩 1. 基本 DSA DTS 架構
+# 1. 基本 DSA DTS 架構
 
 ```
 switch@0 {
@@ -39,36 +39,36 @@ switch@0 {
 ```
 
 
-# 🔌 2. Port 類型
+# 2. Port 類型
 
 
-## 🔹 CPU port
+## CPU port
 
 ```
 port@0 {
     reg = <0>;
     label = "cpu";
 
-    ethernet = <&eth0>;   // 🔥 關鍵
+    ethernet = <&eth0>;   // 關鍵
     phy-mode = "rgmii";
 };
 ```
 
 
-### 📌 重點
+### 重點
 
 ```
 ethernet = <&eth0>
 ```
 
-👉 代表：
+代表：
 
 ```
 這個 port 連到 MAC（CPU）
 ```
 
 
-## 🔹 User port
+## User port
 
 ```
 port@1 {
@@ -81,7 +81,7 @@ port@1 {
 
 ----------
 
-👉 代表：
+代表：
 
 ```
 這個 port 對應外部 PHY
@@ -89,9 +89,9 @@ port@1 {
 
 ----------
 
-# 🧠 3. PHY 定義
+# 3. PHY 定義
 
-## 🔹 外部 PHY
+## 外部 PHY
 
 ```
 mdio {
@@ -103,21 +103,21 @@ mdio {
 
 ----------
 
-👉 user port：
+user port：
 
 ```
 phy-handle = <&phy1>;
 ```
 
-## 🔹 內建 PHY（switch 內）
+## 內建 PHY（switch 內）
 
-👉 有些 switch 不需要外部 PHY node
+有些 switch 不需要外部 PHY node
 
 ----------
 
-# 🔗 4. fixed-link
+# 4. fixed-link
 
-## 🔥 CPU port 常見寫法
+## CPU port 常見寫法
 
 ```
 port@0 {
@@ -135,7 +135,7 @@ port@0 {
 
 ----------
 
-### 📌 為什麼用 fixed-link？
+### 為什麼用 fixed-link？
 
 ```
 CPU ↔ Switch 不做 auto-negotiation
@@ -143,7 +143,7 @@ CPU ↔ Switch 不做 auto-negotiation
 
 ----------
 
-👉 否則：
+否則：
 
 ```
 link 不穩 / negotiation 卡住
@@ -151,7 +151,7 @@ link 不穩 / negotiation 卡住
 
 ----------
 
-# ⚠️ 5. phy-mode
+# 5. phy-mode
 
 ```
 phy-mode = "rgmii-id";
@@ -159,7 +159,7 @@ phy-mode = "rgmii-id";
 
 ----------
 
-👉 這會直接影響：
+這會直接影響：
 
 ```
 CPU port timing（所有 lanX 都靠這條）
@@ -167,7 +167,7 @@ CPU port timing（所有 lanX 都靠這條）
 
 ----------
 
-## ❗ 超重要
+## 超重要
 
 ```
 CPU port timing 錯 = 所有 lan port 壞
@@ -175,7 +175,7 @@ CPU port timing 錯 = 所有 lan port 壞
 
 ----------
 
-# 🧪 6. 完整範例
+# 6. 完整範例
 
 ```
 &eth0 {
@@ -215,12 +215,12 @@ switch@0 {
 
 ----------
 
-# ❗ 7. 錯誤
+# 7. 錯誤
 
 
-## 🚨 Case 1：沒有 lan1~lan4
+## Case 1：沒有 lan1~lan4
 
-👉 原因：
+原因：
 
 ```
 ports node 錯
@@ -229,25 +229,25 @@ DSA 沒 parse 到
 ```
 
 
-## 🚨 Case 2：lan link up 但不通
+## Case 2：lan link up 但不通
 
-👉 90%：
+90%：
 
 ```
 CPU port phy-mode / RGMII delay 錯
 ```
 
-## 🚨 Case 3：eth0 OK，但 lanX 不通
+## Case 3：eth0 OK，但 lanX 不通
 
-👉 檢查：
+檢查：
 
 ```
 CPU port DTS（fixed-link / phy-mode）
 ```
 
-## 🚨 Case 4：完全沒 link
+## Case 4：完全沒 link
 
-👉 檢查：
+檢查：
 
 ```
 phy-handle
@@ -256,9 +256,9 @@ reset
 ```
 
 
-## 🚨 Case 5：intermittent
+## Case 5：intermittent
 
-👉 通常：
+通常：
 
 ```
 clock / delay / reset timing
@@ -266,9 +266,9 @@ clock / delay / reset timing
 
 ----------
 
-# 🔍 8. Debug 
+# 8. Debug 
 
-## ✔ port 有沒有出現
+## port 有沒有出現
 
 ```
 ip link
@@ -276,7 +276,7 @@ ip link
 
 ----------
 
-## ✔ link 狀態
+## link 狀態
 
 ```
 ethtool lan1
@@ -284,7 +284,7 @@ ethtool lan1
 
 ----------
 
-## ✔ CPU port
+## CPU port
 
 ```
 ethtool eth0
@@ -292,7 +292,7 @@ ethtool eth0
 
 ----------
 
-## ✔ dmesg
+## dmesg
 
 ```
 dmesg | grep dsa
@@ -300,7 +300,7 @@ dmesg | grep dsa
 
 ----------
 
-# 🧠 9. Debug Flow
+# 9. Debug Flow
 
 ```
 eth0 OK？
@@ -314,10 +314,10 @@ lan1 不通？
 
 ----------
 
-# 🔥 10. 觀念
+# 10. 觀念
 
 
-## ✔ Rule 1
+## Rule 1
 
 ```
 CPU port = 所有 port 的出口
@@ -325,7 +325,7 @@ CPU port = 所有 port 的出口
 
 ----------
 
-## ✔ Rule 2
+## Rule 2
 
 ```
 CPU port timing 錯 = 全滅
@@ -333,7 +333,7 @@ CPU port timing 錯 = 全滅
 
 ----------
 
-## ✔ Rule 3
+## Rule 3
 
 ```
 fixed-link 很常是必要的

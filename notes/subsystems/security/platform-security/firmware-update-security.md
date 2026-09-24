@@ -1,7 +1,7 @@
 
-# 🧠 Firmware Update
+# Firmware Update
 
-## 🎯 本章目的
+## 本章目的
 
 本章要把 firmware update 中常見的安全元件串起來：
 
@@ -27,11 +27,11 @@ firmware update 怎麼納入 Chain of Trust？
 為什麼 recovery / factory update path 也要保護？
 ```
 
-👉 Firmware update 是很多產品安全破口的來源。
+Firmware update 是很多產品安全破口的來源。
 
 ----------
 
-## 🧭 一張圖先看懂
+## 一張圖先看懂
 
 ```
 [Update Package]
@@ -63,7 +63,7 @@ Firmware update security = 簽章驗證 + 版本檢查 + 寫入保護 + 開機�
 
 ----------
 
-## 1️⃣ 為什麼 Firmware Update 需要安全設計？
+## 1. 為什麼 Firmware Update 需要安全設計？
 
 Secure Boot 可以保護 boot path，但 firmware update 是另一條寫入系統的路徑。
 
@@ -99,7 +99,7 @@ recovery / factory path 有沒有同樣保護？
 
 ----------
 
-## 2️⃣ Firmware Update 在 Chain of Trust 的位置
+## 2. Firmware Update 在 Chain of Trust 的位置
 
 Boot chain 是：
 
@@ -151,7 +151,7 @@ Update path 寫入了不該被允許的 image
 
 ----------
 
-## 3️⃣ Firmware Update 基本安全流程
+## 3. Firmware Update 基本安全流程
 
 建議把 update flow 拆成幾個 step：
 
@@ -186,7 +186,7 @@ Step 8: Commit or rollback
 
 ----------
 
-## 4️⃣ Update Package 應該保護什麼？
+## 4. Update Package 應該保護什麼？
 
 Update package 不應該只是壓縮檔。
 
@@ -234,7 +234,7 @@ manifest 應該保護每個 image hash。
 
 ----------
 
-## 5️⃣ Signature Verification
+## 5. Signature Verification
 
 Update package 必須做簽章驗證。
 
@@ -272,7 +272,7 @@ Update flow：
 
 ----------
 
-## 6️⃣ Image Hash Verification
+## 6. Image Hash Verification
 
 只驗證 package signature 還不夠。
 
@@ -301,7 +301,7 @@ mismatch → reject
 
 ----------
 
-## 7️⃣ Version Check / Rollback Check
+## 7. Version Check / Rollback Check
 
 Firmware update 必須檢查版本。
 
@@ -345,7 +345,7 @@ bootloader metadata
 
 ----------
 
-## 8️⃣ Rollback Protection 與 Firmware Update 的關係
+## 8. Rollback Protection 與 Firmware Update 的關係
 
 Rollback protection 通常有兩個時間點：
 
@@ -375,7 +375,7 @@ bootloader 也要檢查
 
 ----------
 
-## 9️⃣ A/B Update 是什麼？
+## 9. A/B Update 是什麼？
 
 A/B update 是常見安全更新設計。
 
@@ -417,7 +417,7 @@ bootloader fallback to slot A
 
 ----------
 
-## 🔟 A/B Update Flow
+## 10. A/B Update Flow
 
 ```
 [Running Slot A]
@@ -454,7 +454,7 @@ bootloader fallback to slot A
 
 ----------
 
-## 1️⃣1️⃣ Recovery Path 也要保護
+## 11. Recovery Path 也要保護
 
 很多產品有 recovery mode，例如：
 
@@ -491,7 +491,7 @@ debug unlock state
 
 ----------
 
-## 1️⃣2️⃣ Factory Update vs Field Update
+## 12. Factory Update vs Field Update
 
 Firmware update 可以分成：
 
@@ -509,7 +509,7 @@ Firmware update 可以分成：
 
 ----------
 
-## 1️⃣3️⃣ Update Key Management
+## 13. Update Key Management
 
 Firmware update 需要 signing key。
 
@@ -544,7 +544,7 @@ release image 必須可追蹤使用哪把 key 簽章
 
 ----------
 
-## 1️⃣4️⃣ Key Rotation / Key Revocation
+## 14. Key Rotation / Key Revocation
 
 如果 signing key 外洩，就需要撤銷舊 key。
 
@@ -576,7 +576,7 @@ bootloader trusted key list
 
 ----------
 
-## 1️⃣5️⃣ Update Metadata
+## 15. Update Metadata
 
 Update metadata 很重要。
 
@@ -620,7 +620,7 @@ bootloader 選錯 slot
 
 ----------
 
-## 1️⃣6️⃣ Power Loss / Interrupted Update
+## 16. Power Loss / Interrupted Update
 
 Firmware update 必須考慮斷電。
 
@@ -655,7 +655,7 @@ eFuse / rollback counter 更新
 
 ----------
 
-## 1️⃣7️⃣ RootFS Verification
+## 17. RootFS Verification
 
 Firmware update 寫入 rootfs 後，boot 時仍然需要驗證。
 
@@ -694,7 +694,7 @@ RootFS verification 代表：
 
 ----------
 
-## 1️⃣8️⃣ Debug / Development Mode
+## 18. Debug / Development Mode
 
 開發階段常見需求：
 
@@ -728,7 +728,7 @@ recovery 可以 sideload unsigned package
 
 ----------
 
-## 1️⃣9️⃣ BSP Debug：Update Security 檢查方向
+## 19. BSP Debug：Update Security 檢查方向
 
 ### Step 1：確認 update package 是否驗證
 
@@ -788,9 +788,9 @@ UART download mode
 
 ----------
 
-## 2️⃣0️⃣ 常見錯誤
+## 20. 常見錯誤
 
-### ❌ 只有 OTA 驗證，Recovery 不驗證
+### 只有 OTA 驗證，Recovery 不驗證
 
 ```
 OTA package must be signed
@@ -805,7 +805,7 @@ Recovery accepts unsigned image
 
 ----------
 
-### ❌ 只檢查 version string
+### 只檢查 version string
 
 例如：
 
@@ -833,7 +833,7 @@ anti-rollback counter
 
 ----------
 
-### ❌ 更新 rollback counter 太早
+### 更新 rollback counter 太早
 
 如果先更新 rollback counter，再寫 image，斷電可能造成：
 
@@ -851,7 +851,7 @@ device brick
 
 ----------
 
-### ❌ A/B slot 成功判斷太早
+### A/B slot 成功判斷太早
 
 如果剛 boot 起來就 mark successful，但 service 還沒正常啟動，可能導致：
 
@@ -864,7 +864,7 @@ fallback 失效
 
 ----------
 
-### ❌ Factory tool 可以刷任何 image
+### Factory tool 可以刷任何 image
 
 工廠工具常有高權限。
 
@@ -881,7 +881,7 @@ production 前要特別檢查 factory flow。
 
 ----------
 
-## 2️⃣1️⃣ Firmware Update Security Checklist
+## 21. Firmware Update Security Checklist
 
 ```
 [ ] Update package has signature

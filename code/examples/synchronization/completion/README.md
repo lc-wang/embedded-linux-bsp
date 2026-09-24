@@ -10,7 +10,7 @@ Linux kernel 中的「一次性事件同步機制」。
 
 ---
 
-## 🎯 本章的目的
+## 本章的目的
 
 理解：
 
@@ -21,21 +21,21 @@ Linux kernel 中的「一次性事件同步機制」。
 
 ---
 
-## 🧠 一句話先記住
+## 一句話先記住
 
 ```
 completion
 = 一個 thread 等另一個 thread 說「好了」
 ```
 
-## 🔧 本範例做什麼？
+## 本範例做什麼？
 
 -   userspace write → 模擬「開始一個工作」
 -   kernel 啟動一個 delayed work（延遲 2 秒）
 -   userspace read → 等待 completion
 -   work 完成後呼叫 complete()
 
-👉 模擬：
+模擬：
 
 -   firmware load 完成
 -   DMA 傳輸完成

@@ -1,7 +1,7 @@
 
 # Kernel trace notes — drm_atomic_commit_flow
 
-# 🟢 Level 1：用人話理解以前 legacy KMS：
+# Level 1：用人話理解以前 legacy KMS：
 ```text
 一步一步改 display
 ```
@@ -22,7 +22,7 @@
 
 ----------
 
-# 🟢 atomic commit 的世界
+# atomic commit 的世界
 
 modern DRM：
 
@@ -36,7 +36,7 @@ modern DRM：
 
 ----------
 
-# 🟡 Level 2：display state 是什麼？
+# Level 2：display state 是什麼？
 
 atomic state 包含：
 
@@ -83,7 +83,7 @@ scanout 狀態
 
 ----------
 
-# 🔥 atomic commit 真正做的事情
+# atomic commit 真正做的事情
 
 ```
 建立「下一個 display 世界」
@@ -97,7 +97,7 @@ scanout 狀態
 
 ----------
 
-# 🔴 Level 3：kernel trace（真正發生什麼）
+# Level 3：kernel trace（真正發生什麼）
 
 ## userspace
 
@@ -146,7 +146,7 @@ crtc->atomic_check()
 
 ----------
 
-# 🧠 check 在檢查什麼？
+# check 在檢查什麼？
 
 例如：
 
@@ -204,7 +204,7 @@ driver 在這裡：
 
 ----------
 
-# 🔥 page flip 是什麼？
+# page flip 是什麼？
 
 page flip：
 
@@ -220,7 +220,7 @@ plane state 的 FB_ID 改變
 
 ----------
 
-# 🧠 為什麼 atomic 很重要？
+# 為什麼 atomic 很重要？
 
 因為 modern display：
 
@@ -239,7 +239,7 @@ plane state 的 FB_ID 改變
 
 ----------
 
-# 🧠 最重要一句話
+# 最重要一句話
 
 ```
 atomic commit
@@ -248,7 +248,7 @@ atomic commit
 
 ```
 ```
-# 🧠 最後總結（modern DRM mental model）
+# 最後總結（modern DRM mental model）
 ```
 framebuffer  
 ↓  
@@ -263,7 +263,7 @@ atomic commit
 hardware update
 ```
 
-# 🔧 userspace 對照程式  
+# userspace 對照程式  
   
 本章新增：  
   
@@ -295,7 +295,7 @@ drmModeAtomicCommit()
 
 ----------
 
-## 🧠 atomic commit 實際設定了什麼？
+## atomic commit 實際設定了什麼？
 
 ### connector
 
@@ -345,7 +345,7 @@ CRTC_* = 螢幕上的顯示範圍
 
 ----------
 
-## 🔴 對應 kernel flow
+## 對應 kernel flow
 
 ```
 drmModeAtomicCommit()
@@ -367,7 +367,7 @@ driver atomic callbacks
 
 ----------
 
-## 🧠 最重要一句話
+## 最重要一句話
 
 ```
 atomic commit 不是單純換 framebuffer

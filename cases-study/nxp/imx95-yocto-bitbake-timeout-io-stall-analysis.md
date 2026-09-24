@@ -2,7 +2,7 @@
 # **i.MX95 Yocto BitBake Timeout 與 I/O Stall 問題分析報告**
 
 
-## 🔍 **1. 問題概要**
+## **1. 問題概要**
 
 在進行 **NXP i.MX95 Yocto（fsl-imx-wayland 6.12-walnascar）** 建置時，多次遇到：
 
@@ -25,22 +25,22 @@ Timeout while waiting for a reply from the bitbake server
 ```
 ### **最後成功的關鍵修正**
 
-✔ 將 BitBake 的執行緒數量從預設降到：
+✓ 將 BitBake 的執行緒數量從預設降到：
 ```bash
 BB_NUMBER_THREADS = "2"
 PARALLEL_MAKE = "-j 2"
 ```
-✔ 建置隨即 **穩定完成 Build**。
+✓ 建置隨即 **穩定完成 Build**。
 
 ----------
 
-## 🧠 **2. 問題背後根因分析**
+## **2. 問題背後根因分析**
 
 本次問題可分成 **三大類原因**：
 
 ----------
 
-## 🧩 **2.1 I/O 競爭與外接硬碟反應延遲**
+## **2.1 I/O 競爭與外接硬碟反應延遲**
 
 原本專案位於外接 NVMe/SSD（透過 USB bridge）。  
 Yocto 建置時：
@@ -54,7 +54,7 @@ Yocto 建置時：
 
 ----------
 
-## 🧩 **2.2 Yocto TMPDIR / SSTATE_DIR 大量 I/O**
+## **2.2 Yocto TMPDIR / SSTATE_DIR 大量 I/O**
 
 Yocto 需要：
 
@@ -70,7 +70,7 @@ Yocto 需要：
 
 ----------
 
-## 🧩 **2.3 Disk Monitor 啟動強制 HALT**
+## **2.3 Disk Monitor 啟動強制 HALT**
 
 遇到的訊息：
 ```bash
@@ -86,16 +86,16 @@ ERROR: Immediately halt since the disk space monitor action is "HALT"!
 
 ----------
 
-## 🧠 **核心結論（最關鍵一點）**
+## **核心結論（最關鍵一點）**
 
 > **BitBake 並不是壞掉，而是 I/O 無法支撐 8 thread 以上的高並發。**  
 > 調整為 **2 threads** 後，所有 timeout 問題自然消失。
 
 ----------
 
-# ⚙️ **3. 解決過程與設定調整**
+# **3. 解決過程與設定調整**
 
-## ✔ **3.1 將 Yocto 項目搬到 NVMe 并重建 TMPDIR**
+## **3.1 將 Yocto 項目搬到 NVMe 并重建 TMPDIR**
 
 重新定位 Build 目錄：
 ```bash
@@ -109,7 +109,7 @@ Yocto 自動更新了 bblayers.conf，成功啟動 Build。
 
 ----------
 
-## ✔ **3.2 降低 BitBake Threads（成功關鍵）**
+## **3.2 降低 BitBake Threads（成功關鍵）**
 
 修改 local.conf：
 ```bash
@@ -123,7 +123,7 @@ PARALLEL_MAKE = "-j 2"
 
 ----------
 
-## ✔ **3.3 調整 TMPDIR / SSTATE_DIR**
+## **3.3 調整 TMPDIR / SSTATE_DIR**
 
 使用更快的 NVMe 儲存：
 ```bash
@@ -135,7 +135,7 @@ SSTATE_DIR ?= "/mnt/yocto-nvme/sstate-imx95"
 ----------
 
 
-# 📊 4. 系統環境分析
+# 4. 系統環境分析
 
 | 項目 | 狀態 |
 |------|-------|
@@ -150,24 +150,24 @@ SSTATE_DIR ?= "/mnt/yocto-nvme/sstate-imx95"
 ----------
 
 
-# 🧪 5. 實驗結果
+# 5. 實驗結果
 
 | Threads | Build 結果 | 問題 |
 |---------|-------------|--------|
-| 8 | ❌ bitbake server timeout | I/O stall |
-| 6 | ❌ 偶發 timeout | I/O 不穩定 |
-| 4 | ⭕ 部分任務可跑，但仍 timeout | not stable |
-| 2 | ✔ 100% 完成 Build | 最佳設定 |
+| 8 | ✗ bitbake server timeout | I/O stall |
+| 6 | ✗ 偶發 timeout | I/O 不穩定 |
+| 4 | 部分任務可跑，但仍 timeout | not stable |
+| 2 | ✓ 100% 完成 Build | 最佳設定 |
 
 
 ----------
 
-# 📘 **6. 最終建議**
+# **6. 最終建議**
 
-### ✔ Yocto 放 NVMe
-### ✔ TMPDIR / SSTATE_DIR 放 NVMe
-### ✔ 外接磁碟僅用於 source 勿用於 tmp/sstate
-### ✔ thread 設為
+### Yocto 放 NVMe
+### TMPDIR / SSTATE_DIR 放 NVMe
+### 外接磁碟僅用於 source 勿用於 tmp/sstate
+### thread 設為
 ```bash
 BB_NUMBER_THREADS = "2"
 PARALLEL_MAKE = "-j 2"

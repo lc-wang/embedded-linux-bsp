@@ -6,7 +6,7 @@
 
 ---
 
-## 🧑‍💻 Userspace 入口
+## Userspace 入口
 
 執行指令：
 ```
@@ -20,7 +20,7 @@ finit_module(fd, "", 0)
 
 ---
 
-## 🧠 Kernel 入口點
+## Kernel 入口點
 
 定義於：
 ```
@@ -34,7 +34,7 @@ SYSCALL_DEFINE3(finit_module)
 
 ---
 
-## 🔍 主要呼叫流程
+## 主要呼叫流程
 ```
 finit_module()
 └─ load_module()
@@ -50,7 +50,7 @@ finit_module()
 
 ---
 
-## 🔑 為什麼所有 driver 都長一樣？
+## 為什麼所有 driver 都長一樣？
 
 因為：
 
@@ -74,7 +74,7 @@ do_one_initcall()
 ```
 統一執行。
 
-🔎 重要觀念
+重要觀念
 ```
 module_init()
 = driver 被載入
@@ -84,14 +84,14 @@ probe()
 ```
 兩者意義完全不同。
 
-🛠 常用除錯指令
+常用除錯指令
 ```
 lsmod
 cat /proc/modules
 modinfo hello_module.ko
 dmesg | tail
 ```
-🔬 Trace 建議方式
+Trace 建議方式
 function tracer
 ```
 echo function > /sys/kernel/debug/tracing/current_tracer
@@ -102,7 +102,7 @@ echo do_init_module > /sys/kernel/debug/tracing/set_ftrace_filter
 ```
 trace-cmd record -p function do_init_module
 ```
-🧠 建議心智模型
+建議心智模型
 ```
 insmod
   ↓

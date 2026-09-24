@@ -37,7 +37,7 @@ Android userspace
 ```
 
 
-📌 **任一層狀態不同步，都可能導致 Wi-Fi 行為異常**
+**任一層狀態不同步，都可能導致 Wi-Fi 行為異常**
 
 ---
 
@@ -47,7 +47,7 @@ Android userspace
 - Linux **不能強制 firmware 醒來**
 - Linux 只能「請求」與「配合」
 
-👉 **PM 是協調問題，不是單一模組問題**
+**PM 是協調問題，不是單一模組問題**
 
 ---
 
@@ -71,7 +71,7 @@ Android userspace
 - 有 TX/RX → firmware wake up
 - Linux driver 僅追蹤「是否活躍」
 
-📌 **問題關鍵**  
+**問題關鍵**  
 > firmware 已 sleep，但 Linux 仍嘗試送 control / data
 
 ---
@@ -106,7 +106,7 @@ system resume
      ├─ restore control state
      └─ resume TX/RX
 ```
-📌 **resume 的順序極其重要**
+**resume 的順序極其重要**
 
 ----------
 
@@ -119,7 +119,7 @@ system resume
 -   flow control / ring state 未重建
     
 
-👉 **症狀通常是「已連線但沒流量」**
+**症狀通常是「已連線但沒流量」**
 
 ----------
 
@@ -156,7 +156,7 @@ WOWLAN 允許：
 -   resume 後需完整重新初始化 control state
     
 
-📌 **WOWLAN 是 PM 複雜度放大器**
+**WOWLAN 是 PM 複雜度放大器**
 
 ----------
 
@@ -182,7 +182,7 @@ Android 透過：
 -   suspend 條件
     
 
-👉 **Linux driver 並不知道「為什麼」狀態被改**
+**Linux driver 並不知道「為什麼」狀態被改**
 
 ----------
 
@@ -234,7 +234,7 @@ Android 透過：
 -   RX event 永遠不回
     
 
-📌 **PM 問題經常「假裝成 data path bug」**
+**PM 問題經常「假裝成 data path bug」**
 
 ----------
 

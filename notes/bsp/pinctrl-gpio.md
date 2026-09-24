@@ -19,7 +19,7 @@
 -   不同狀態下需要不同 pin 設定（boot / runtime / suspend）
 -   問題常表現為「完全沒反應」，而不是明確錯誤
 
-👉 **pinctrl 問題通常不會讓 probe 失敗，但會讓功能失效。**
+**pinctrl 問題通常不會讓 probe 失敗，但會讓功能失效。**
 
 ----------
 
@@ -47,7 +47,7 @@ GPIO 負責：
 
 > pin 已經被正確設定成 GPIO 功能。
 
-👉 **GPIO API 正確，不代表 pinctrl 設定正確。**
+**GPIO API 正確，不代表 pinctrl 設定正確。**
 
 ----------
 

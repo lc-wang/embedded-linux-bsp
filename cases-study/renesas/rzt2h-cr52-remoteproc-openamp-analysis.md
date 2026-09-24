@@ -1,5 +1,5 @@
 
-# 📘 **RZ/T2H — Linux Remoteproc 無法啟動 CR52**
+# **RZ/T2H — Linux Remoteproc 無法啟動 CR52**
 
 
 # **1. 前言：Linux 想要透過 remoteproc 啟動 CR52**
@@ -35,7 +35,7 @@ rz_rproc_start+0x1d0
 ```
 這表示：
 
-### ⚠ Linux remoteproc 正在 `ioremap()` CR52 firmware / vring / resource_table 區域
+### Linux remoteproc 正在 `ioremap()` CR52 firmware / vring / resource_table 區域
 
 但該記憶體區域對 Linux **不可存取（Secure only / 未 map）**。
 
@@ -82,7 +82,7 @@ ioremap(0xE0000000)
     
 就必須在 TF-A（BL31）加入 memory mapping。
 
-### ✔ 你的修正：在 BL31 中新增 mapping
+### 你的修正：在 BL31 中新增 mapping
 ``` c
 MAP_REGION_FLAT(0x10000000, 0x200000, MT_MEMORY | MT_RW | MT_SECURE),
 MAP_REGION_FLAT(0xE0000000, 0x9000000, MT_MEMORY | MT_RW | MT_SECURE),

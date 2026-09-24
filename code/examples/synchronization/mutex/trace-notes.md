@@ -3,7 +3,7 @@
 
 ---
 
-# 🟢 Level 1
+# Level 1
 
 如果兩個 thread 同時改同一個變數：
 
@@ -19,7 +19,7 @@ mutex 的作用就是：
 
 ----------
 
-# 🟡 Level 2
+# Level 2
 
 本範例中：
 
@@ -46,7 +46,7 @@ mutex_unlock()
 ```
 ----------
 
-# 🔴 Level 3
+# Level 3
 ```
 mutex_lock()  
  └─ __mutex_lock()  
@@ -63,7 +63,7 @@ mutex_unlock()
 
 ----------
 
-# 🧠 為什麼 mutex 不能在 IRQ 用？
+# 為什麼 mutex 不能在 IRQ 用？
 
 因為 mutex 的本質是：
 
@@ -90,7 +90,7 @@ mutex_unlock()
 
 ----------
 
-# 🧠 心智模型
+# 心智模型
 
 mutex 適合保護「會睡眠的共享狀態」  
 spinlock 適合保護「不能睡眠的短臨界區」

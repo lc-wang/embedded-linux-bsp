@@ -1,4 +1,4 @@
-## 🧠 Linux DSA Framework
+## Linux DSA Framework
 
 本章節重點：
 
@@ -9,7 +9,7 @@
 
 ----------
 
-## 🧩 1. DSA 在 Linux 的位置
+## 1. DSA 在 Linux 的位置
 
 ```
 User space
@@ -26,9 +26,9 @@ Switch chip
 ```
 
 
-## 🔗 2. 核心資料結構
+## 2. 核心資料結構
 
-## 🔹 `dsa_switch`
+## `dsa_switch`
 
 ```
 struct dsa_switch {
@@ -38,13 +38,13 @@ struct dsa_switch {
 };
 ```
 
-👉 代表：
+代表：
 
 ```
 一顆 switch 晶片
 ```
 
-## 🔹 `dsa_port`
+## `dsa_port`
 
 ```
 struct dsa_port {
@@ -54,13 +54,13 @@ struct dsa_port {
 };
 ```
 
-👉 代表：
+代表：
 
 ```
 switch 上的一個 port
 ```
 
-## 🔹 port 類型
+## port 類型
 
 ```
 CPU port
@@ -70,7 +70,7 @@ DSA port（cascade）
 
 ----------
 
-### 📌 kernel 定義
+### kernel 定義
 
 ```
 DSA_PORT_TYPE_CPU
@@ -79,9 +79,9 @@ DSA_PORT_TYPE_USER
 
 ----------
 
-# 🔌 3. net_device mapping
+# 3. net_device mapping
 
-## ✔ 每個 user port → 一個 netdev
+## 每個 user port → 一個 netdev
 
 ```
 ip link
@@ -95,7 +95,7 @@ lan3
 
 ----------
 
-👉 kernel：
+kernel：
 
 ```
 dsa_port → net_device
@@ -103,7 +103,7 @@ dsa_port → net_device
 
 ----------
 
-## ✔ CPU port 不一定 exposed
+## CPU port 不一定 exposed
 
 ```
 通常是 eth0
@@ -111,9 +111,9 @@ dsa_port → net_device
 
 ----------
 
-# 🔁 4. Packet Flow（核心）
+# 4. Packet Flow（核心）
 
-## 📤 TX（CPU → LAN）
+## TX（CPU → LAN）
 
 ```
 lan1 netdev
@@ -133,7 +133,7 @@ forward 到 LAN1
 
 ----------
 
-## 📥 RX（LAN → CPU）
+## RX（LAN → CPU）
 
 ```
 Wire
@@ -155,7 +155,7 @@ DSA core
 lan1 netdev
 ```
 
-## ⚠️ 重點
+## 重點
 
 ```
 CPU 與 switch 溝通 = 一定要 tag
@@ -163,9 +163,9 @@ CPU 與 switch 溝通 = 一定要 tag
 
 ----------
 
-# 🧩 5. tagging protocol
+# 5. tagging protocol
 
-👉 每個 switch vendor 都不同：
+每個 switch vendor 都不同：
 
 ```
 Broadcom tag
@@ -186,13 +186,13 @@ struct dsa_device_ops {
 
 ----------
 
-👉 driver 負責：
+driver 負責：
 
 ```
 加 tag / 拆 tag
 ```
 
-# 🔧 6. Switch driver model
+# 6. Switch driver model
 
 ## driver 要實作：
 
@@ -221,7 +221,7 @@ create netdev
 
 ----------
 
-# 🔗 7. 與 PHY 的關係
+# 7. 與 PHY 的關係
 
 ```
 switch
@@ -232,16 +232,16 @@ switch
 
 ----------
 
-👉 kernel：
+kernel：
 
 ```
 每個 port 可能有 phydev
 ```
 
 
-# 🧪 8. Bring-up Debug
+# 8. Bring-up Debug
 
-## ✔ DSA 是否啟動
+## DSA 是否啟動
 
 ```
 dmesg | grep dsa
@@ -249,7 +249,7 @@ dmesg | grep dsa
 
 ----------
 
-## ✔ port 是否建立
+## port 是否建立
 
 ```
 ip link
@@ -257,7 +257,7 @@ ip link
 
 ----------
 
-## ✔ CPU port 正常嗎？
+## CPU port 正常嗎？
 
 ```
 ethtool eth0
@@ -265,7 +265,7 @@ ethtool eth0
 
 ----------
 
-## ✔ user port
+## user port
 
 ```
 ethtool lan1
@@ -273,12 +273,12 @@ ethtool lan1
 
 ----------
 
-# ❗ 9. 常見錯誤
+# 9. 常見錯誤
 
 
-## ❌ 沒有 lan1~lan4
+## 沒有 lan1~lan4
 
-👉 原因：
+原因：
 
 ```
 DSA DTS 沒設好
@@ -286,18 +286,18 @@ switch driver 沒起來
 ```
 
 
-## ❌ lan1 link up 但不通
+## lan1 link up 但不通
 
-👉 可能：
+可能：
 
 ```
 CPU port timing（RGMII）
 tagging 錯
 ```
 
-## ❌ 封包收不到
+## 封包收不到
 
-👉 檢查：
+檢查：
 
 ```
 tagging
@@ -306,16 +306,16 @@ DSA core
 
 ----------
 
-# 🧠 10. Debug 思維
+# 10. Debug 思維
 
 ```
 eth0 OK → CPU port OK
 lan1 不通 → switch / tagging / PHY
 ```
 
-# 🔍 11. Trace
+# 11. Trace
 
-## ✔ trace TX
+## trace TX
 
 ```
 echo net_dev_xmit > /sys/kernel/debug/tracing/set_event
@@ -323,7 +323,7 @@ echo net_dev_xmit > /sys/kernel/debug/tracing/set_event
 
 ----------
 
-## ✔ driver log
+## driver log
 
 ```
 pr_info("DSA xmit port=%d\n", port);
@@ -331,7 +331,7 @@ pr_info("DSA xmit port=%d\n", port);
 
 ----------
 
-# 🧠 12. 總結
+# 12. 總結
 
 ```
 DSA = 用 Linux netdev 抽象 switch 的每個 port

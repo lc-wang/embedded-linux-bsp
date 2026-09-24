@@ -1,6 +1,6 @@
 # Trace notes — hash_chain_minimal  
   
-## 🟢 Level 1：用人話理解  
+## Level 1：用人話理解  
   
 hash 可以想成：  
   
@@ -26,7 +26,7 @@ kernel hash
 
 ----------
 
-## 🧠 hash chain 是什麼？
+## hash chain 是什麼？
 
 hash chain 是把每一步的 hash 串起來：
 
@@ -46,7 +46,7 @@ final chain digest 也會改變
 
 ----------
 
-## 🟡 Level 2：流程理解
+## Level 2：流程理解
 
 本範例輸入多個 component：
 
@@ -80,7 +80,7 @@ final chain digest
 
 ----------
 
-## 🔥 為什麼這對 Root of Trust 重要？
+## 為什麼這對 Root of Trust 重要？
 
 Boot flow 不是單一檔案。
 
@@ -108,7 +108,7 @@ hash chain 可以把整個 boot sequence 壓成一個 digest。
 
 ----------
 
-## 🔴 Level 3：對應真實系統
+## Level 3：對應真實系統
 
 ### Measured Boot
 
@@ -161,9 +161,9 @@ trusted public key
 
 ----------
 
-## 🚫 常見誤解
+## 常見誤解
 
-### ❌ hash 一樣就代表可信
+### hash 一樣就代表可信
 
 不完全對。
 
@@ -183,7 +183,7 @@ hash 一樣只能表示：
 
 ----------
 
-### ❌ hash chain 等於 Secure Boot
+### hash chain 等於 Secure Boot
 
 不對。
 
@@ -199,7 +199,7 @@ enforcement policy
 
 ----------
 
-## 🧠 最重要一句話
+## 最重要一句話
 
 ```
 hash chain 可以描述「開機流程變了沒有」

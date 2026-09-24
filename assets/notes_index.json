@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-18T08:44:01.715Z",
+  "generated_at": "2026-09-24T02:26:36.178Z",
   "index": {
     "notes": [
       {
@@ -8,62 +8,62 @@
           {
             "name": "activity-manager.md",
             "path": "notes/android/activity-manager.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/android/activity-manager.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/android/activity-manager.md"
           },
           {
             "name": "binder-ipc.md",
             "path": "notes/android/binder-ipc.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/android/binder-ipc.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/android/binder-ipc.md"
           },
           {
             "name": "boot-flow.md",
             "path": "notes/android/boot-flow.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/android/boot-flow.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/android/boot-flow.md"
           },
           {
             "name": "boot-optimizations.md",
             "path": "notes/android/boot-optimizations.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/android/boot-optimizations.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/android/boot-optimizations.md"
           },
           {
             "name": "cgroup-ucolor.md",
             "path": "notes/android/cgroup-ucolor.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/android/cgroup-ucolor.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/android/cgroup-ucolor.md"
           },
           {
             "name": "graphics-display.md",
             "path": "notes/android/graphics-display.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/android/graphics-display.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/android/graphics-display.md"
           },
           {
             "name": "hidl-aidl.md",
             "path": "notes/android/hidl-aidl.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/android/hidl-aidl.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/android/hidl-aidl.md"
           },
           {
             "name": "input-system.md",
             "path": "notes/android/input-system.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/android/input-system.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/android/input-system.md"
           },
           {
             "name": "media-stack.md",
             "path": "notes/android/media-stack.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/android/media-stack.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/android/media-stack.md"
           },
           {
             "name": "process-runtime-model",
             "path": "notes/android/process-runtime-model",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/android/process-runtime-model"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/android/process-runtime-model"
           },
           {
             "name": "system-services.md",
             "path": "notes/android/system-services.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/android/system-services.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/android/system-services.md"
           },
           {
             "name": "window-manager.md",
             "path": "notes/android/window-manager.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/android/window-manager.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/android/window-manager.md"
           }
         ],
         "subfolders": []
@@ -74,92 +74,92 @@
           {
             "name": "boot-sequence.md",
             "path": "notes/bsp/boot-sequence.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/bsp/boot-sequence.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/bsp/boot-sequence.md"
           },
           {
             "name": "bootloader-handoff.md",
             "path": "notes/bsp/bootloader-handoff.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/bsp/bootloader-handoff.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/bsp/bootloader-handoff.md"
           },
           {
             "name": "bring-up-debug-playbook.md",
             "path": "notes/bsp/bring-up-debug-playbook.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/bsp/bring-up-debug-playbook.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/bsp/bring-up-debug-playbook.md"
           },
           {
             "name": "clock-reset-power.md",
             "path": "notes/bsp/clock-reset-power.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/bsp/clock-reset-power.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/bsp/clock-reset-power.md"
           },
           {
             "name": "debug-toolbox.md",
             "path": "notes/bsp/debug-toolbox.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/bsp/debug-toolbox.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/bsp/debug-toolbox.md"
           },
           {
             "name": "device-tree.md",
             "path": "notes/bsp/device-tree.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/bsp/device-tree.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/bsp/device-tree.md"
           },
           {
             "name": "firmware-loading.md",
             "path": "notes/bsp/firmware-loading.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/bsp/firmware-loading.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/bsp/firmware-loading.md"
           },
           {
             "name": "i2c-interface.md",
             "path": "notes/bsp/i2c-interface.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/bsp/i2c-interface.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/bsp/i2c-interface.md"
           },
           {
             "name": "i2s-audio-interface.md",
             "path": "notes/bsp/i2s-audio-interface.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/bsp/i2s-audio-interface.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/bsp/i2s-audio-interface.md"
           },
           {
             "name": "pinctrl-gpio.md",
             "path": "notes/bsp/pinctrl-gpio.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/bsp/pinctrl-gpio.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/bsp/pinctrl-gpio.md"
           },
           {
             "name": "power-domains.md",
             "path": "notes/bsp/power-domains.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/bsp/power-domains.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/bsp/power-domains.md"
           },
           {
             "name": "spi-interface.md",
             "path": "notes/bsp/spi-interface.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/bsp/spi-interface.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/bsp/spi-interface.md"
           },
           {
             "name": "storage-filesystem.md",
             "path": "notes/bsp/storage-filesystem.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/bsp/storage-filesystem.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/bsp/storage-filesystem.md"
           },
           {
             "name": "suspend-resume.md",
             "path": "notes/bsp/suspend-resume.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/bsp/suspend-resume.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/bsp/suspend-resume.md"
           },
           {
             "name": "uboot.md",
             "path": "notes/bsp/uboot.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/bsp/uboot.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/bsp/uboot.md"
           },
           {
             "name": "ubuntu-debian.md",
             "path": "notes/bsp/ubuntu-debian.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/bsp/ubuntu-debian.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/bsp/ubuntu-debian.md"
           },
           {
             "name": "yocto-workflow.md",
             "path": "notes/bsp/yocto-workflow.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/bsp/yocto-workflow.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/bsp/yocto-workflow.md"
           },
           {
             "name": "yocto.md",
             "path": "notes/bsp/yocto.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/bsp/yocto.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/bsp/yocto.md"
           }
         ],
         "subfolders": []
@@ -174,27 +174,27 @@
               {
                 "name": "bl2-image-loading-flow.md",
                 "path": "notes/firmware/trusted-firmware-a/bl2-image-loading-flow.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/firmware/trusted-firmware-a/bl2-image-loading-flow.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/firmware/trusted-firmware-a/bl2-image-loading-flow.md"
               },
               {
                 "name": "bl31-runtime-services.md",
                 "path": "notes/firmware/trusted-firmware-a/bl31-runtime-services.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/firmware/trusted-firmware-a/bl31-runtime-services.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/firmware/trusted-firmware-a/bl31-runtime-services.md"
               },
               {
                 "name": "debug-console-architecture-and-boot-flow.md",
                 "path": "notes/firmware/trusted-firmware-a/debug-console-architecture-and-boot-flow.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/firmware/trusted-firmware-a/debug-console-architecture-and-boot-flow.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/firmware/trusted-firmware-a/debug-console-architecture-and-boot-flow.md"
               },
               {
                 "name": "memory-layout-and-mmu.md",
                 "path": "notes/firmware/trusted-firmware-a/memory-layout-and-mmu.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/firmware/trusted-firmware-a/memory-layout-and-mmu.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/firmware/trusted-firmware-a/memory-layout-and-mmu.md"
               },
               {
                 "name": "psci-power-flow.md",
                 "path": "notes/firmware/trusted-firmware-a/psci-power-flow.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/firmware/trusted-firmware-a/psci-power-flow.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/firmware/trusted-firmware-a/psci-power-flow.md"
               }
             ]
           }
@@ -206,32 +206,32 @@
           {
             "name": "debug-tools.md",
             "path": "notes/kernel/debug-tools.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/kernel/debug-tools.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/kernel/debug-tools.md"
           },
           {
             "name": "driver-basic.md",
             "path": "notes/kernel/driver-basic.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/kernel/driver-basic.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/kernel/driver-basic.md"
           },
           {
             "name": "interrupts.md",
             "path": "notes/kernel/interrupts.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/kernel/interrupts.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/kernel/interrupts.md"
           },
           {
             "name": "memory-management.md",
             "path": "notes/kernel/memory-management.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/kernel/memory-management.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/kernel/memory-management.md"
           },
           {
             "name": "power-management.md",
             "path": "notes/kernel/power-management.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/kernel/power-management.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/kernel/power-management.md"
           },
           {
             "name": "synchronization.md",
             "path": "notes/kernel/synchronization.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/kernel/synchronization.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/kernel/synchronization.md"
           }
         ],
         "subfolders": []
@@ -242,87 +242,87 @@
           {
             "name": "bus-subsystems.md",
             "path": "notes/linux/bus-subsystems.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/linux/bus-subsystems.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/linux/bus-subsystems.md"
           },
           {
             "name": "cgroup-and-resource-control.md",
             "path": "notes/linux/cgroup-and-resource-control.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/linux/cgroup-and-resource-control.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/linux/cgroup-and-resource-control.md"
           },
           {
             "name": "device-driver-model.md",
             "path": "notes/linux/device-driver-model.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/linux/device-driver-model.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/linux/device-driver-model.md"
           },
           {
             "name": "drm-kms.md",
             "path": "notes/linux/drm-kms.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/linux/drm-kms.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/linux/drm-kms.md"
           },
           {
             "name": "io-subsystem.md",
             "path": "notes/linux/io-subsystem.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/linux/io-subsystem.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/linux/io-subsystem.md"
           },
           {
             "name": "irq-subsystem.md",
             "path": "notes/linux/irq-subsystem.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/linux/irq-subsystem.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/linux/irq-subsystem.md"
           },
           {
             "name": "locking.md",
             "path": "notes/linux/locking.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/linux/locking.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/linux/locking.md"
           },
           {
             "name": "memory-model.md",
             "path": "notes/linux/memory-model.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/linux/memory-model.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/linux/memory-model.md"
           },
           {
             "name": "networking-stack.md",
             "path": "notes/linux/networking-stack.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/linux/networking-stack.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/linux/networking-stack.md"
           },
           {
             "name": "rpmsg-remoteproc.md",
             "path": "notes/linux/rpmsg-remoteproc.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/linux/rpmsg-remoteproc.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/linux/rpmsg-remoteproc.md"
           },
           {
             "name": "scheduler.md",
             "path": "notes/linux/scheduler.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/linux/scheduler.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/linux/scheduler.md"
           },
           {
             "name": "thermal-cpufreq.md",
             "path": "notes/linux/thermal-cpufreq.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/linux/thermal-cpufreq.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/linux/thermal-cpufreq.md"
           },
           {
             "name": "tracing-debug-toolchain.md",
             "path": "notes/linux/tracing-debug-toolchain.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/linux/tracing-debug-toolchain.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/linux/tracing-debug-toolchain.md"
           },
           {
             "name": "tracing-playbook.md",
             "path": "notes/linux/tracing-playbook.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/linux/tracing-playbook.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/linux/tracing-playbook.md"
           },
           {
             "name": "vfs-filesystem.md",
             "path": "notes/linux/vfs-filesystem.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/linux/vfs-filesystem.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/linux/vfs-filesystem.md"
           },
           {
             "name": "wifi-stack.md",
             "path": "notes/linux/wifi-stack.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/linux/wifi-stack.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/linux/wifi-stack.md"
           },
           {
             "name": "workqueue-tasklet.md",
             "path": "notes/linux/workqueue-tasklet.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/linux/workqueue-tasklet.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/linux/workqueue-tasklet.md"
           }
         ],
         "subfolders": []
@@ -337,27 +337,27 @@
               {
                 "name": "alsa-core-vs-asoc.md",
                 "path": "notes/subsystems/alsa/alsa-core-vs-asoc.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/alsa/alsa-core-vs-asoc.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/alsa/alsa-core-vs-asoc.md"
               },
               {
                 "name": "dai-link-and-machine-driver.md",
                 "path": "notes/subsystems/alsa/dai-link-and-machine-driver.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/alsa/dai-link-and-machine-driver.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/alsa/dai-link-and-machine-driver.md"
               },
               {
                 "name": "dapm-routing.md",
                 "path": "notes/subsystems/alsa/dapm-routing.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/alsa/dapm-routing.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/alsa/dapm-routing.md"
               },
               {
                 "name": "debug-playbook.md",
                 "path": "notes/subsystems/alsa/debug-playbook.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/alsa/debug-playbook.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/alsa/debug-playbook.md"
               },
               {
                 "name": "i2s-codec-driver.md",
                 "path": "notes/subsystems/alsa/i2s-codec-driver.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/alsa/i2s-codec-driver.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/alsa/i2s-codec-driver.md"
               }
             ]
           },
@@ -367,27 +367,27 @@
               {
                 "name": "debug-playbook.md",
                 "path": "notes/subsystems/gpio/debug-playbook.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/gpio/debug-playbook.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/gpio/debug-playbook.md"
               },
               {
                 "name": "device-tree-gpio-binding.md",
                 "path": "notes/subsystems/gpio/device-tree-gpio-binding.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/gpio/device-tree-gpio-binding.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/gpio/device-tree-gpio-binding.md"
               },
               {
                 "name": "gpio-kernel-architecture.md",
                 "path": "notes/subsystems/gpio/gpio-kernel-architecture.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/gpio/gpio-kernel-architecture.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/gpio/gpio-kernel-architecture.md"
               },
               {
                 "name": "gpiolib-and-character-device.md",
                 "path": "notes/subsystems/gpio/gpiolib-and-character-device.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/gpio/gpiolib-and-character-device.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/gpio/gpiolib-and-character-device.md"
               },
               {
                 "name": "libgpiod-userspace-flow.md",
                 "path": "notes/subsystems/gpio/libgpiod-userspace-flow.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/gpio/libgpiod-userspace-flow.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/gpio/libgpiod-userspace-flow.md"
               }
             ]
           },
@@ -397,22 +397,22 @@
               {
                 "name": "debug-playbook.md",
                 "path": "notes/subsystems/interrupt/debug-playbook.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/interrupt/debug-playbook.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/interrupt/debug-playbook.md"
               },
               {
                 "name": "gic-architecture.md",
                 "path": "notes/subsystems/interrupt/gic-architecture.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/interrupt/gic-architecture.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/interrupt/gic-architecture.md"
               },
               {
                 "name": "gpio-interrupt-flow.md",
                 "path": "notes/subsystems/interrupt/gpio-interrupt-flow.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/interrupt/gpio-interrupt-flow.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/interrupt/gpio-interrupt-flow.md"
               },
               {
                 "name": "irq-domain-and-mapping.md",
                 "path": "notes/subsystems/interrupt/irq-domain-and-mapping.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/interrupt/irq-domain-and-mapping.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/interrupt/irq-domain-and-mapping.md"
               }
             ]
           },
@@ -422,37 +422,37 @@
               {
                 "name": "debug-playbook.md",
                 "path": "notes/subsystems/multimedia/debug-playbook.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/multimedia/debug-playbook.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/multimedia/debug-playbook.md"
               },
               {
                 "name": "drm-waylandsink-flow.md",
                 "path": "notes/subsystems/multimedia/drm-waylandsink-flow.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/multimedia/drm-waylandsink-flow.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/multimedia/drm-waylandsink-flow.md"
               },
               {
                 "name": "gstreamer-architecture.md",
                 "path": "notes/subsystems/multimedia/gstreamer-architecture.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/multimedia/gstreamer-architecture.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/multimedia/gstreamer-architecture.md"
               },
               {
                 "name": "gstreamer-plugin-model.md",
                 "path": "notes/subsystems/multimedia/gstreamer-plugin-model.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/multimedia/gstreamer-plugin-model.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/multimedia/gstreamer-plugin-model.md"
               },
               {
                 "name": "multimedia-stack-overview.md",
                 "path": "notes/subsystems/multimedia/multimedia-stack-overview.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/multimedia/multimedia-stack-overview.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/multimedia/multimedia-stack-overview.md"
               },
               {
                 "name": "v4l2src-flow.md",
                 "path": "notes/subsystems/multimedia/v4l2src-flow.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/multimedia/v4l2src-flow.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/multimedia/v4l2src-flow.md"
               },
               {
                 "name": "zero-copy-dmabuf.md",
                 "path": "notes/subsystems/multimedia/zero-copy-dmabuf.md",
-                "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/notes/subsystems/multimedia/zero-copy-dmabuf.md"
+                "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/notes/subsystems/multimedia/zero-copy-dmabuf.md"
               }
             ]
           }
@@ -467,7 +467,7 @@
           {
             "name": "sashiko-local-review-setup.md",
             "path": "cases-study/linux/sashiko-local-review-setup.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/linux/sashiko-local-review-setup.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/linux/sashiko-local-review-setup.md"
           }
         ]
       },
@@ -478,47 +478,47 @@
           {
             "name": "imx8mp-brcmfmac-bcm43752-sdio-crc-f2-blocksize-analysis.md",
             "path": "cases-study/nxp/imx8mp-brcmfmac-bcm43752-sdio-crc-f2-blocksize-analysis.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/nxp/imx8mp-brcmfmac-bcm43752-sdio-crc-f2-blocksize-analysis.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/nxp/imx8mp-brcmfmac-bcm43752-sdio-crc-f2-blocksize-analysis.md"
           },
           {
             "name": "imx8mp-brcmfmac-p2p-client-phase2-reconnect-linkdown-analysis.md",
             "path": "cases-study/nxp/imx8mp-brcmfmac-p2p-client-phase2-reconnect-linkdown-analysis.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/nxp/imx8mp-brcmfmac-p2p-client-phase2-reconnect-linkdown-analysis.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/nxp/imx8mp-brcmfmac-p2p-client-phase2-reconnect-linkdown-analysis.md"
           },
           {
             "name": "imx8mp-brcmfmac-p2p-wifi-direct-bringup-analysis.md",
             "path": "cases-study/nxp/imx8mp-brcmfmac-p2p-wifi-direct-bringup-analysis.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/nxp/imx8mp-brcmfmac-p2p-wifi-direct-bringup-analysis.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/nxp/imx8mp-brcmfmac-p2p-wifi-direct-bringup-analysis.md"
           },
           {
             "name": "imx8mp-connman-tethering-iptables-crash-analysis.md",
             "path": "cases-study/nxp/imx8mp-connman-tethering-iptables-crash-analysis.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/nxp/imx8mp-connman-tethering-iptables-crash-analysis.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/nxp/imx8mp-connman-tethering-iptables-crash-analysis.md"
           },
           {
             "name": "imx8mp-em7590-lte-data-minradio-qmi-bringup-analysis.md",
             "path": "cases-study/nxp/imx8mp-em7590-lte-data-minradio-qmi-bringup-analysis.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/nxp/imx8mp-em7590-lte-data-minradio-qmi-bringup-analysis.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/nxp/imx8mp-em7590-lte-data-minradio-qmi-bringup-analysis.md"
           },
           {
             "name": "imx8mp-fsl-asoc-card-cpu-dai-probe-defer-analysis.md",
             "path": "cases-study/nxp/imx8mp-fsl-asoc-card-cpu-dai-probe-defer-analysis.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/nxp/imx8mp-fsl-asoc-card-cpu-dai-probe-defer-analysis.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/nxp/imx8mp-fsl-asoc-card-cpu-dai-probe-defer-analysis.md"
           },
           {
             "name": "imx93-m33-zephyr-ssd1680-lpspi-transfer-bug-analysis.md",
             "path": "cases-study/nxp/imx93-m33-zephyr-ssd1680-lpspi-transfer-bug-analysis.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/nxp/imx93-m33-zephyr-ssd1680-lpspi-transfer-bug-analysis.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/nxp/imx93-m33-zephyr-ssd1680-lpspi-transfer-bug-analysis.md"
           },
           {
             "name": "imx95-yocto-bitbake-timeout-io-stall-analysis.md",
             "path": "cases-study/nxp/imx95-yocto-bitbake-timeout-io-stall-analysis.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/nxp/imx95-yocto-bitbake-timeout-io-stall-analysis.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/nxp/imx95-yocto-bitbake-timeout-io-stall-analysis.md"
           },
           {
             "name": "yocto-meta-test-framework-integration.md",
             "path": "cases-study/nxp/yocto-meta-test-framework-integration.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/nxp/yocto-meta-test-framework-integration.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/nxp/yocto-meta-test-framework-integration.md"
           }
         ]
       },
@@ -529,12 +529,12 @@
           {
             "name": "rpi5-zephyr-get-build-install-troubleshooting.md",
             "path": "cases-study/raspberry-pi/rpi5-zephyr-get-build-install-troubleshooting.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/raspberry-pi/rpi5-zephyr-get-build-install-troubleshooting.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/raspberry-pi/rpi5-zephyr-get-build-install-troubleshooting.md"
           },
           {
             "name": "rpi5-zephyr-gpio14-gpio15-debug-console-investigation.md",
             "path": "cases-study/raspberry-pi/rpi5-zephyr-gpio14-gpio15-debug-console-investigation.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/raspberry-pi/rpi5-zephyr-gpio14-gpio15-debug-console-investigation.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/raspberry-pi/rpi5-zephyr-gpio14-gpio15-debug-console-investigation.md"
           }
         ]
       },
@@ -545,97 +545,97 @@
           {
             "name": "kakip-networkmanager-dhcp-static-ip-issue.md",
             "path": "cases-study/renesas/kakip-networkmanager-dhcp-static-ip-issue.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/renesas/kakip-networkmanager-dhcp-static-ip-issue.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/renesas/kakip-networkmanager-dhcp-static-ip-issue.md"
           },
           {
             "name": "kakip-rzv2h-spi-timeout-root-cause-analysis.md",
             "path": "cases-study/renesas/kakip-rzv2h-spi-timeout-root-cause-analysis.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/renesas/kakip-rzv2h-spi-timeout-root-cause-analysis.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/renesas/kakip-rzv2h-spi-timeout-root-cause-analysis.md"
           },
           {
             "name": "kakip-sdcard-flashing-analysis.md",
             "path": "cases-study/renesas/kakip-sdcard-flashing-analysis.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/renesas/kakip-sdcard-flashing-analysis.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/renesas/kakip-sdcard-flashing-analysis.md"
           },
           {
             "name": "rz_t2h_cr52_motor_firmware_remoteproc_porting_guide.md",
             "path": "cases-study/renesas/rz_t2h_cr52_motor_firmware_remoteproc_porting_guide.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/renesas/rz_t2h_cr52_motor_firmware_remoteproc_porting_guide.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/renesas/rz_t2h_cr52_motor_firmware_remoteproc_porting_guide.md"
           },
           {
             "name": "rzt2h-cn2-gpio-analysis.md",
             "path": "cases-study/renesas/rzt2h-cn2-gpio-analysis.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/renesas/rzt2h-cn2-gpio-analysis.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/renesas/rzt2h-cn2-gpio-analysis.md"
           },
           {
             "name": "rzt2h-cn49-uart-debug-console-analysis.md",
             "path": "cases-study/renesas/rzt2h-cn49-uart-debug-console-analysis.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/renesas/rzt2h-cn49-uart-debug-console-analysis.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/renesas/rzt2h-cn49-uart-debug-console-analysis.md"
           },
           {
             "name": "rzt2h-cr52-remoteproc-firmware-compatibility.md",
             "path": "cases-study/renesas/rzt2h-cr52-remoteproc-firmware-compatibility.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/renesas/rzt2h-cr52-remoteproc-firmware-compatibility.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/renesas/rzt2h-cr52-remoteproc-firmware-compatibility.md"
           },
           {
             "name": "rzt2h-cr52-remoteproc-openamp-analysis.md",
             "path": "cases-study/renesas/rzt2h-cr52-remoteproc-openamp-analysis.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/renesas/rzt2h-cr52-remoteproc-openamp-analysis.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/renesas/rzt2h-cr52-remoteproc-openamp-analysis.md"
           },
           {
             "name": "rzt2h-kernel-console-sci1.md",
             "path": "cases-study/renesas/rzt2h-kernel-console-sci1.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/renesas/rzt2h-kernel-console-sci1.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/renesas/rzt2h-kernel-console-sci1.md"
           },
           {
             "name": "rzt2h-lxqt-force-fluxbox-default.md",
             "path": "cases-study/renesas/rzt2h-lxqt-force-fluxbox-default.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/renesas/rzt2h-lxqt-force-fluxbox-default.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/renesas/rzt2h-lxqt-force-fluxbox-default.md"
           },
           {
             "name": "rzt2h-sdhi-uboot-sdcard-init-debug-report.md",
             "path": "cases-study/renesas/rzt2h-sdhi-uboot-sdcard-init-debug-report.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/renesas/rzt2h-sdhi-uboot-sdcard-init-debug-report.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/renesas/rzt2h-sdhi-uboot-sdcard-init-debug-report.md"
           },
           {
             "name": "rzt2h-tf-a-console-switch-sci1.md",
             "path": "cases-study/renesas/rzt2h-tf-a-console-switch-sci1.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/renesas/rzt2h-tf-a-console-switch-sci1.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/renesas/rzt2h-tf-a-console-switch-sci1.md"
           },
           {
             "name": "rzt2h-uboot-console-switch-sci1.md",
             "path": "cases-study/renesas/rzt2h-uboot-console-switch-sci1.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/renesas/rzt2h-uboot-console-switch-sci1.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/renesas/rzt2h-uboot-console-switch-sci1.md"
           },
           {
             "name": "rzt2h-ubuntu-embedded-networking-debug.md",
             "path": "cases-study/renesas/rzt2h-ubuntu-embedded-networking-debug.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/renesas/rzt2h-ubuntu-embedded-networking-debug.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/renesas/rzt2h-ubuntu-embedded-networking-debug.md"
           },
           {
             "name": "rzt2h-usb-debug-console-analysis.md",
             "path": "cases-study/renesas/rzt2h-usb-debug-console-analysis.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/renesas/rzt2h-usb-debug-console-analysis.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/renesas/rzt2h-usb-debug-console-analysis.md"
           },
           {
             "name": "rzt2h_cr52_remoteproc_firmware_helloworld.md",
             "path": "cases-study/renesas/rzt2h_cr52_remoteproc_firmware_helloworld.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/renesas/rzt2h_cr52_remoteproc_firmware_helloworld.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/renesas/rzt2h_cr52_remoteproc_firmware_helloworld.md"
           },
           {
             "name": "rzt2h_cr52_ros2_control.md",
             "path": "cases-study/renesas/rzt2h_cr52_ros2_control.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/renesas/rzt2h_cr52_ros2_control.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/renesas/rzt2h_cr52_ros2_control.md"
           },
           {
             "name": "rzt2h_esd_boot_image_report.md",
             "path": "cases-study/renesas/rzt2h_esd_boot_image_report.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/renesas/rzt2h_esd_boot_image_report.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/renesas/rzt2h_esd_boot_image_report.md"
           },
           {
             "name": "rzv2h-fix-ddr-mc-params-usb2-xhci-warn.md",
             "path": "cases-study/renesas/rzv2h-fix-ddr-mc-params-usb2-xhci-warn.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/renesas/rzv2h-fix-ddr-mc-params-usb2-xhci-warn.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/renesas/rzv2h-fix-ddr-mc-params-usb2-xhci-warn.md"
           }
         ]
       },
@@ -646,52 +646,52 @@
           {
             "name": "android15-wifi-dual-interface.md",
             "path": "cases-study/rockchip/android15-wifi-dual-interface.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/rockchip/android15-wifi-dual-interface.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/rockchip/android15-wifi-dual-interface.md"
           },
           {
             "name": "mipi_display_rotation_analysis.md",
             "path": "cases-study/rockchip/mipi_display_rotation_analysis.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/rockchip/mipi_display_rotation_analysis.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/rockchip/mipi_display_rotation_analysis.md"
           },
           {
             "name": "rk3588-bt_bcm4362a2_suspend_resume_report.md",
             "path": "cases-study/rockchip/rk3588-bt_bcm4362a2_suspend_resume_report.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/rockchip/rk3588-bt_bcm4362a2_suspend_resume_report.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/rockchip/rk3588-bt_bcm4362a2_suspend_resume_report.md"
           },
           {
             "name": "rk3588-es8388-mic-routing-analysis.md",
             "path": "cases-study/rockchip/rk3588-es8388-mic-routing-analysis.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/rockchip/rk3588-es8388-mic-routing-analysis.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/rockchip/rk3588-es8388-mic-routing-analysis.md"
           },
           {
             "name": "rk3588-mipi-backlight-debug.md",
             "path": "cases-study/rockchip/rk3588-mipi-backlight-debug.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/rockchip/rk3588-mipi-backlight-debug.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/rockchip/rk3588-mipi-backlight-debug.md"
           },
           {
             "name": "rk3588-rk806-poweroff-callflow-and-debug-analysis.md",
             "path": "cases-study/rockchip/rk3588-rk806-poweroff-callflow-and-debug-analysis.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/rockchip/rk3588-rk806-poweroff-callflow-and-debug-analysis.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/rockchip/rk3588-rk806-poweroff-callflow-and-debug-analysis.md"
           },
           {
             "name": "rk3588-yocto-weston-pixpaper-integration-debug-report.md",
             "path": "cases-study/rockchip/rk3588-yocto-weston-pixpaper-integration-debug-report.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/rockchip/rk3588-yocto-weston-pixpaper-integration-debug-report.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/rockchip/rk3588-yocto-weston-pixpaper-integration-debug-report.md"
           },
           {
             "name": "rk3588_Weston_Kiosk_GStreamer_Color_Aspect_Analysis.md",
             "path": "cases-study/rockchip/rk3588_Weston_Kiosk_GStreamer_Color_Aspect_Analysis.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/rockchip/rk3588_Weston_Kiosk_GStreamer_Color_Aspect_Analysis.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/rockchip/rk3588_Weston_Kiosk_GStreamer_Color_Aspect_Analysis.md"
           },
           {
             "name": "rk3588_sepolicy_rknn_and_hal_denials_analysis_report.md",
             "path": "cases-study/rockchip/rk3588_sepolicy_rknn_and_hal_denials_analysis_report.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/rockchip/rk3588_sepolicy_rknn_and_hal_denials_analysis_report.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/rockchip/rk3588_sepolicy_rknn_and_hal_denials_analysis_report.md"
           },
           {
             "name": "rk_drm_boot_logo_migration_report.md",
             "path": "cases-study/rockchip/rk_drm_boot_logo_migration_report.md",
-            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/rockchip/rk_drm_boot_logo_migration_report.md"
+            "raw_url": "https://raw.githubusercontent.com/undefined/undefined/main/cases-study/rockchip/rk_drm_boot_logo_migration_report.md"
           }
         ]
       }

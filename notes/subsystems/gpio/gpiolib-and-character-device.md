@@ -1,9 +1,9 @@
 
-# 🔌 gpiolib 與 GPIO Character Device 深入解析
+# gpiolib 與 GPIO Character Device 深入解析
 
 ----------
 
-# 1️⃣ 為什麼 sysfs 被淘汰？
+# 1. 為什麼 sysfs 被淘汰？
 
 舊機制：
 ```
@@ -30,7 +30,7 @@
 
 ----------
 
-# 2️⃣ GPIO Character Device 架構
+# 2. GPIO Character Device 架構
 
 建立位置：
 
@@ -54,7 +54,7 @@ gpiolib 註冊 character device
 ```
 ----------
 
-# 3️⃣ gpiolib 內部結構
+# 3. gpiolib 內部結構
 
 核心檔案：
 ```
@@ -79,11 +79,11 @@ struct gpio_device {
     dev_t devt;
 };
 ```
-👉 這就是 char device 的根源
+這就是 char device 的根源
 
 ----------
 
-# 4️⃣ file_operations
+# 4. file_operations
 
 gpiolib 會註冊：
 ```
@@ -94,13 +94,13 @@ static const struct file_operations gpio_fileops = {
     .unlocked_ioctl = gpio_chrdev_ioctl,
 };
 ```
-👉 所有 user space 操作最後都會進入：
+所有 user space 操作最後都會進入：
 
 `gpio_chrdev_ioctl()` 
 
 ----------
 
-# 5️⃣ IOCTL 架構
+# 5. IOCTL 架構
 
 主要命令：
 
@@ -117,22 +117,22 @@ GPIO_V2_LINE_GET_VALUES_IOCTL
 ```
 ----------
 
-# 6️⃣ 使用流程
+# 6. 使用流程
 
-## Step 1️⃣ 開啟 gpiochip
+## Step 1 開啟 gpiochip
 
 `fd = open("/dev/gpiochip0", O_RDONLY);` 
 
 ----------
 
-## Step 2️⃣ 取得 line handle
+## Step 2 取得 line handle
 ```
 struct gpio_v2_line_request req;
 ioctl(fd, GPIO_V2_GET_LINE_IOCTL, &req);
 ```
 ----------
 
-## Step 3️⃣ 設定方向
+## Step 3 設定方向
 
 在 request 中指定：
 
@@ -140,14 +140,14 @@ ioctl(fd, GPIO_V2_GET_LINE_IOCTL, &req);
 
 ----------
 
-## Step 4️⃣ 設定電平
+## Step 4 設定電平
 ```
 struct gpio_v2_line_values vals;
 ioctl(line_fd, GPIO_V2_LINE_SET_VALUES_IOCTL, &vals);
 ```
 ----------
 
-# 7️⃣ 為什麼 v2 API 更好？
+# 7. 為什麼 v2 API 更好？
 
 v2 改善：
 
@@ -175,7 +175,7 @@ v2 改善：
 
 ----------
 
-# 8️⃣ Edge Event 機制
+# 8. Edge Event 機制
 
 如果設定：
 ```
@@ -192,11 +192,11 @@ wake up file descriptor
    ↓
 user space read()
 ```
-👉 這就是 libgpiod 的 event 模型
+這就是 libgpiod 的 event 模型
 
 ----------
 
-# 9️⃣ 與 Descriptor API 的關係
+# 9. 與 Descriptor API 的關係
 
 Kernel driver 使用：
 
@@ -214,7 +214,7 @@ User space 使用：
 
 ----------
 
-# 🔟 BSP bring-up 會遇到的問題
+# 10. BSP bring-up 會遇到的問題
 
 ### 情境 1：reset pin 拉不起來
 
@@ -242,7 +242,7 @@ User space 使用：
 
 ----------
 
-# 1️⃣1️⃣ gpio hog
+# 11. gpio hog
 
 DT 可設定：
 ```
@@ -262,7 +262,7 @@ output-high;
 
 ----------
 
-# 1️⃣2️⃣ Debug 建議
+# 12. Debug 建議
 ```
 ls -l /dev/gpiochip*
 ```

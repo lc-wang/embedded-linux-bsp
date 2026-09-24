@@ -1,7 +1,7 @@
 
-# 🧠 ARM TrustZone Overview
+# ARM TrustZone Overview
 
-## 🎯 本章目的
+## 本章目的
 
 本章要把以下幾個概念串起來：
 
@@ -26,7 +26,7 @@ Normal World 要怎麼呼叫 Secure World？
 
 ----------
 
-## 🧭 一張圖先看懂
+## 一張圖先看懂
 
 ```
 +------------------------------------------------+
@@ -67,7 +67,7 @@ OP-TEE 在 Secure World。
 
 ----------
 
-## 1️⃣ TrustZone 是什麼？
+## 1. TrustZone 是什麼？
 
 ARM TrustZone 是 ARM SoC 提供的硬體隔離機制。
 
@@ -88,7 +88,7 @@ Normal World 不能直接讀取 Secure World 的 memory 或 secure peripheral。
 
 ----------
 
-## 2️⃣ 為什麼 BSP 工程師需要懂？
+## 2. 為什麼 BSP 工程師需要懂？
 
 因為在 ARM BSP / Android BSP 中，你會常看到：
 
@@ -117,7 +117,7 @@ secure storage
 
 ----------
 
-## 3️⃣ ARM Exception Level 對應
+## 3. ARM Exception Level 對應
 
 ARMv8-A 常見 Exception Level：
 
@@ -141,7 +141,7 @@ TF-A BL31 跑在 EL3。
 
 ----------
 
-## 4️⃣ Boot Flow 裡 TrustZone 的位置
+## 4. Boot Flow 裡 TrustZone 的位置
 
 典型 ARM secure boot flow：
 
@@ -183,7 +183,7 @@ Linux / Android:
 
 ----------
 
-## 5️⃣ SMC 是什麼？
+## 5. SMC 是什麼？
 
 SMC 是：
 
@@ -215,7 +215,7 @@ Normal World 呼叫 Secure World 的入口。
 
 ----------
 
-## 6️⃣ Linux 呼叫 OP-TEE 的流程
+## 6. Linux 呼叫 OP-TEE 的流程
 
 以 Linux 使用 OP-TEE service 為例：
 
@@ -264,7 +264,7 @@ Trusted Application
 
 ----------
 
-## 7️⃣ Secure Memory 是什麼？
+## 7. Secure Memory 是什麼？
 
 TrustZone 不只隔離 CPU 執行狀態，也常搭配 memory protection。
 
@@ -295,7 +295,7 @@ no-map 代表 Linux 不應該把這段 memory map 起來使用。
 
 ----------
 
-## 8️⃣ Secure Peripheral 是什麼？
+## 8. Secure Peripheral 是什麼？
 
 有些 SoC peripheral 可以設定成：
 
@@ -327,7 +327,7 @@ system hang
 
 ----------
 
-## 9️⃣ OP-TEE 在 TrustZone 裡的角色
+## 9. OP-TEE 在 TrustZone 裡的角色
 
 OP-TEE 是 Secure World 裡的 TEE OS。
 
@@ -353,7 +353,7 @@ OP-TEE 是跑在 Secure World 的軟體。
 
 ----------
 
-## 🔟 Android BSP 常見關聯
+## 10. Android BSP 常見關聯
 
 在 Android BSP 中，TrustZone 常出現在：
 
@@ -393,7 +393,7 @@ Normal World 只是要求 Secure World 幫忙做 crypto operation。
 
 ----------
 
-## 1️⃣1️⃣ BSP Debug：怎麼確認 OP-TEE / TrustZone 有起來？
+## 11. BSP Debug：怎麼確認 OP-TEE / TrustZone 有起來？
 
 ### 看 kernel log
 
@@ -455,9 +455,9 @@ CONFIG_OPTEE=y
 
 ----------
 
-## 1️⃣2️⃣ 常見錯誤
+## 12. 常見錯誤
 
-### ❌ 沒載入 OP-TEE image
+### 沒載入 OP-TEE image
 
 Boot flow 少載入 tee.bin / tee.elf：
 
@@ -474,7 +474,7 @@ Android KeyMint / Gatekeeper 可能失敗。
 
 ----------
 
-### ❌ reserved-memory 設錯
+### reserved-memory 設錯
 
 secure memory 沒有保留，Linux 把 OP-TEE memory 拿去用。
 
@@ -489,7 +489,7 @@ kernel boot unstable
 
 ----------
 
-### ❌ SMC conduit 不一致
+### SMC conduit 不一致
 
 Linux 與 firmware 對 SMC / HVC conduit 認知不同。
 
@@ -502,7 +502,7 @@ optee: probing for conduit method failed
 
 ----------
 
-### ❌ secure peripheral 被 Linux driver 直接操作
+### secure peripheral 被 Linux driver 直接操作
 
 某些 register 被設成 secure access only。
 
@@ -516,7 +516,7 @@ hang
 
 ----------
 
-### ❌ Android HAL 找不到 TEE backend
+### Android HAL 找不到 TEE backend
 
 Android userspace HAL 啟動，但底層 TEE service 不存在。
 

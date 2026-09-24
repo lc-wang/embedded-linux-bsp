@@ -381,7 +381,7 @@ remoteproc remoteproc0: remote processor cr52_0 is now up
 
 使用 `devmem2` 讀取 `0x10070000`，應該會看到數值持續變化。
 
-### 10.1 安裝 devmem2（如尚未安裝）
+### 10. 1 安裝 devmem2（如尚未安裝）
 
 例如在 Debian/Ubuntu：
 
@@ -390,7 +390,7 @@ sudo apt-get install devmem2
 ```
 或自行下載原始碼編譯。
 
-### 10.2 持續讀取測試位址
+### 10. 2 持續讀取測試位址
 ```sh
 sudo devmem2 0x10070000
 sudo devmem2 0x10070000

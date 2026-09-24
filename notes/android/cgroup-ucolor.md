@@ -32,8 +32,8 @@
 | SoC 功耗直接影響 UX                 | Scheduler 不能只追求效能，需平衡功耗與體驗     不能只追求效能
 
 
-👉 **Android 不能只靠 scheduler heuristic**  
-👉 必須有 **系統層主動介入 scheduler 決策**
+**Android 不能只靠 scheduler heuristic**  
+必須有 **系統層主動介入 scheduler 決策**
 
 這正是：
 
@@ -252,7 +252,7 @@ CONFIG_FAIR_GROUP_SCHED=y
 -   cpufreq governor 邏輯錯 → 還是慢
     
 
-👉 **uclamp 不是萬能**
+**uclamp 不是萬能**
 
 ### 7.3 vendor kernel 魔改 scheduler
 

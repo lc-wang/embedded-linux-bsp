@@ -1,5 +1,5 @@
 
-# 📘 **RZ/T2H CR52 RemoteProc × ROS2 控制整合 — 技術文件**
+# **RZ/T2H CR52 RemoteProc × ROS2 控制整合 — 技術文件**
 
 本文記錄 RZT2H (Ubuntu 24.04) 上透過 **ROS2 ** 控制 CR52 remoteproc 的完整流程，並整理實作與 debug 過程，方便未來維護與其他人參考。
 
@@ -40,7 +40,7 @@ Host PC 也運行 ROS2，用 rqt 操作。
 參考官方文件即可
 https://docs.ros.org/en/rolling/Installation/Ubuntu-Install-Debs.html
 ##  2.1安裝 colcon
-### ✔ 安裝 colcon 基本環境：
+### 安裝 colcon 基本環境：
 ```bash
 sudo apt install -y python3-colcon-common-extensions
 ```
@@ -51,7 +51,7 @@ sudo apt install -y python3-colcon-common-extensions
 -   常用的 Python extensions
 -   amment build 整套工具鏈
     
-### ✔ 確認 colcon 是否正常：
+### 確認 colcon 是否正常：
 ```bash
 colcon --version
 ```
@@ -88,7 +88,7 @@ rzt2h_remoteproc/
 ```
 ----------
 
-## ✔ 修正後的 setup.py（包含 `glob` 與正確 entry point）
+## 修正後的 setup.py（包含 `glob` 與正確 entry point）
 ```python
 from setuptools import setup
 import os
@@ -243,7 +243,7 @@ running
 
 | 項目 | 說明 |
 |------|------|
-| 🟦 使用 udev rule | 讓 sysfs 變成 0666，node 不需 root |
-| 🟩 增加 /cr52/status service | 讓 rqt 顯示 LifeCycle |
-| 🟥 寫一個 rqt plugin | 做成 Start/Stop CR52 GUI 按鈕 |
-| 🟨 加上 RPMsg → ROS2 bridge | 將 CR52 firmware 資料轉成 ROS topics |
+| 使用 udev rule | 讓 sysfs 變成 0666，node 不需 root |
+| 增加 /cr52/status service | 讓 rqt 顯示 LifeCycle |
+| 寫一個 rqt plugin | 做成 Start/Stop CR52 GUI 按鈕 |
+| 加上 RPMsg → ROS2 bridge | 將 CR52 firmware 資料轉成 ROS topics |

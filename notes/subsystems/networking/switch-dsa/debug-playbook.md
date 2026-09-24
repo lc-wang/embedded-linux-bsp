@@ -1,5 +1,5 @@
 
-## 🧠 DSA Debug Playbook
+## DSA Debug Playbook
 
 本章節目標：
 
@@ -9,7 +9,7 @@
 
 ----------
 
-# 🧭 1. DSA Debug
+# 1. DSA Debug
 
 ```
 DSA 問題 = 分 4 層看
@@ -20,11 +20,11 @@ DSA 問題 = 分 4 層看
 4. VLAN / bridge
 ```
 
-👉 一定要「分層」，不要亂試
+一定要「分層」，不要亂試
 
 ----------
 
-# 🚀 2. 定位流程
+# 2. 定位流程
 
 ## Step 1：有沒有 lanX？
 
@@ -34,9 +34,9 @@ ip link
 
 ----------
 
-### ❌ 沒有 lan1 / lan2
+### 沒有 lan1 / lan2
 
-👉 問題在：
+問題在：
 
 ```
 DSA 沒起來
@@ -52,9 +52,9 @@ ethtool eth0
 
 ----------
 
-### ❌ link down
+### link down
 
-👉 問題在：
+問題在：
 
 ```
 MAC / PHY / RGMII（CPU port）
@@ -62,9 +62,9 @@ MAC / PHY / RGMII（CPU port）
 
 ----------
 
-### ✔ link up
+### link up
 
-👉 進下一步
+進下一步
 
 
 ## Step 3：lanX link 狀態
@@ -75,9 +75,9 @@ ethtool lan1
 
 ----------
 
-### ❌ link down
+### link down
 
-👉 問題在：
+問題在：
 
 ```
 PHY / 線 / switch port
@@ -85,9 +85,9 @@ PHY / 線 / switch port
 
 ----------
 
-### ✔ link up
+### link up
 
-👉 進下一步
+進下一步
 
 
 ## Step 4：有沒有封包？
@@ -98,9 +98,9 @@ tcpdump -i lan1
 
 ----------
 
-### ❌ 沒封包
+### 沒封包
 
-👉 問題在：
+問題在：
 
 ```
 tagging / forwarding / VLAN
@@ -115,7 +115,7 @@ bridge vlan show
 ```
 
 
-# 🔁 3. Debug Decision Tree
+# 3. Debug Decision Tree
 
 ```
 沒有 lanX?
@@ -133,9 +133,9 @@ bridge 不通?
 
 ----------
 
-# 🧪 4. 指令 Sheet
+# 4. 指令 Sheet
 
-## ✔ interface
+## interface
 
 ```
 ip link
@@ -143,7 +143,7 @@ ip link
 
 ----------
 
-## ✔ CPU port
+## CPU port
 
 ```
 ethtool eth0
@@ -151,7 +151,7 @@ ethtool eth0
 
 ----------
 
-## ✔ port
+## port
 
 ```
 ethtool lan1
@@ -159,7 +159,7 @@ ethtool lan1
 
 ----------
 
-## ✔ bridge
+## bridge
 
 ```
 bridge link
@@ -168,7 +168,7 @@ bridge fdb show
 
 ----------
 
-## ✔ VLAN
+## VLAN
 
 ```
 bridge vlan show
@@ -176,7 +176,7 @@ bridge vlan show
 
 ----------
 
-## ✔ 封包
+## 封包
 
 ```
 tcpdump -i lan1
@@ -185,7 +185,7 @@ tcpdump -i eth0
 
 ----------
 
-## ✔ DSA log
+## DSA log
 
 ```
 dmesg | grep dsa
@@ -193,21 +193,21 @@ dmesg | grep dsa
 
 ----------
 
-# ❗ 5. 錯誤（DSA）
+# 5. 錯誤（DSA）
 
 
-## 🚨 Case 1：eth0 OK，但 lanX 全壞（🔥）
+## Case 1：eth0 OK，但 lanX 全壞（）
 
-👉 90%：
+90%：
 
 ```
 CPU port RGMII delay 錯
 ```
 
 
-## 🚨 Case 2：lan1 link up 但 ping 不通
+## Case 2：lan1 link up 但 ping 不通
 
-👉 可能：
+可能：
 
 ```
 tagging 錯
@@ -215,46 +215,46 @@ CPU port timing
 ```
 
 
-## 🚨 Case 3：lan1 ↔ lan2 不通
+## Case 3：lan1 ↔ lan2 不通
 
-👉 檢查：
+檢查：
 
 ```
 bridge link
 ```
 
-👉 原因：
+原因：
 
 ```
 沒有 bridge
 ```
 
-## 🚨 Case 4：bridge 有設但不通
+## Case 4：bridge 有設但不通
 
-👉 檢查：
+檢查：
 
 ```
 bridge vlan show
 ```
 
-👉 原因：
+原因：
 
 ```
 VLAN mismatch
 ```
 
-## 🚨 Case 5：CPU 收到封包，但 lanX 沒有
+## Case 5：CPU 收到封包，但 lanX 沒有
 
-👉 原因：
+原因：
 
 ```
 tag parsing 錯
 DSA driver bug
 ```
 
-## 🚨 Case 6：intermittent
+## Case 6：intermittent
 
-👉 通常：
+通常：
 
 ```
 clock / reset / RGMII skew
@@ -262,35 +262,35 @@ clock / reset / RGMII skew
 
 ----------
 
-# 🔍 6. 進階 Debug
+# 6. 進階 Debug
 
 ----------
 
-## ✔ 看 CPU port 流量
+## 看 CPU port 流量
 
 ```
 tcpdump -i eth0
 ```
 
-👉 如果看到：
+如果看到：
 
 ```
 有 packet，但 lanX 沒有
 ```
 
-👉 問題在：
+問題在：
 
 ```
 DSA tagging / demux
 ```
 
-## ✔ 看 lanX 流量
+## 看 lanX 流量
 
 ```
 tcpdump -i lan1
 ```
 
-## ✔ FDB
+## FDB
 
 ```
 bridge fdb show
@@ -298,25 +298,25 @@ bridge fdb show
 
 ----------
 
-👉 看：
+看：
 
 ```
 MAC → port mapping
 ```
 
-## ✔ 強制 speed
+## 強制 speed
 
 ```
 ethtool -s eth0 speed 1000 duplex full autoneg off
 ```
 
-👉 排除 negotiation 問題
+排除 negotiation 問題
 
 
-# 🧠 7. Debug 觀念
+# 7. Debug 觀念
 
 
-## ✔ Rule 1
+## Rule 1
 
 ```
 eth0 = CPU port（唯一出口）
@@ -324,7 +324,7 @@ eth0 = CPU port（唯一出口）
 
 ----------
 
-## ✔ Rule 2
+## Rule 2
 
 ```
 lanX 不是真正送封包
@@ -332,7 +332,7 @@ lanX 不是真正送封包
 
 ----------
 
-## ✔ Rule 3
+## Rule 3
 
 ```
 tagging 錯 = 全部壞
@@ -340,7 +340,7 @@ tagging 錯 = 全部壞
 
 ----------
 
-## ✔ Rule 4
+## Rule 4
 
 ```
 CPU port timing 錯 = 全滅
@@ -348,7 +348,7 @@ CPU port timing 錯 = 全滅
 
 ----------
 
-## ✔ Rule 5
+## Rule 5
 
 ```
 bridge / VLAN 錯 = 封包消失
@@ -356,42 +356,42 @@ bridge / VLAN 錯 = 封包消失
 
 ----------
 
-# 🔥 8. Debug 範例
+# 8. Debug 範例
 
 ## Case：link up 但完全不通
 
-👉 debug：
+debug：
 
 ```
 ethtool eth0
 ethtool lan1
 ```
 
-👉 發現：
+發現：
 
 ```
 全部 link up
 ```
 
-👉 下一步：
+下一步：
 
 ```
 tcpdump -i eth0
 ```
 
-👉 有 packet
+有 packet
 
-👉 再看：
+再看：
 
 ```
 tcpdump -i lan1
 ```
 
-👉 沒有
+沒有
 
 ----------
 
-👉 結論：
+結論：
 
 ```
 DSA tagging / CPU port timing 問題

@@ -1,7 +1,7 @@
 # Kernel trace notes — drm_gem_shmem_flow
 
 
-# 🟢 Level 1：用人話理解
+# Level 1：用人話理解
 
 framebuffer 看起來像：
 
@@ -23,7 +23,7 @@ framebuffer 本身其實沒有真正的像素資料
 
 ----------
 
-# 🟢 GEM object 是什麼？
+# GEM object 是什麼？
 
 你可以把 GEM object 想成：
 
@@ -40,7 +40,7 @@ DRM 專用的 memory container
 
 ----------
 
-# 🟡 Level 2：流程理解
+# Level 2：流程理解
 
 ## dumb buffer flow
 
@@ -72,7 +72,7 @@ reference GEM object
 
 ----------
 
-# 🔥 最重要觀念
+# 最重要觀念
 
 ```
 framebuffer
@@ -84,7 +84,7 @@ GEM object
 
 ----------
 
-# 🟡 mmap flow
+# mmap flow
 
 ```
 userspace mmap
@@ -100,7 +100,7 @@ shmem page
 
 
 
-# 🔴 Level 3：kernel trace
+# Level 3：kernel trace
 
 
 ## 1. userspace 建立 dumb buffer  
@@ -121,7 +121,7 @@ driver->dumb_create()
 drm_gem_shmem_create()
 ```
 
-## 🧠 drm_gem_shmem_create 做了什麼？
+## drm_gem_shmem_create 做了什麼？
 
 它會：
 
@@ -178,7 +178,7 @@ drm_gem_shmem_fault()
 
 ----------
 
-## 🧠 drm_gem_shmem_fault 做了什麼？
+## drm_gem_shmem_fault 做了什麼？
 
 它會：
 
@@ -191,7 +191,7 @@ drm_gem_shmem_fault()
 
 ----------
 
-## 🔥 所以真正流程其實是
+## 所以真正流程其實是
 
 ```
 userspace mmap
@@ -211,7 +211,7 @@ userspace 真正拿到 memory
 
 ----------
 
-## 🧠 最重要理解
+## 最重要理解
 
 ```
 mmap()
@@ -223,7 +223,7 @@ page fault
 
 ----------
 
-# 🧠 GEM vs framebuffer
+# GEM vs framebuffer
 
 
 | 元件 | 本質 |  
@@ -235,7 +235,7 @@ page fault
 
 ----------
 
-# 🧠為什麼同一塊 GEM memory 可以共用？
+# 為什麼同一塊 GEM memory 可以共用？
 
 想成：
 
@@ -259,13 +259,13 @@ page fault
 
 ----------
 
-# 🔥 不是 copy！
+# 不是 copy！
 
 這很重要：
 
-❌ GPU render 一份  
-❌ compositor copy 一份  
-❌ DRM 再 copy 一份
+✗ GPU render 一份  
+✗ compositor copy 一份  
+✗ DRM 再 copy 一份
 
 ----------
 
@@ -278,9 +278,9 @@ page fault
 
 ----------
 
-# 🟡 真實流程
+# 真實流程
 
-## 1️⃣ GPU render
+## 1. GPU render
 
 GPU：
 
@@ -296,7 +296,7 @@ OpenGL render target
 
 ----------
 
-## 2️⃣ Wayland compositor
+## 2. Wayland compositor
 
 Wayland：
 
@@ -312,7 +312,7 @@ Wayland：
 
 ----------
 
-## 3️⃣ DRM scanout
+## 3. DRM scanout
 
 最後：
 
@@ -328,7 +328,7 @@ CRTC：
 
 ----------
 
-# 🔥 所以真正發生的是
+# 所以真正發生的是
 
 ```
 同一塊 memory：
@@ -342,7 +342,7 @@ DRM 顯示
 
 ----------
 
-# 🧠 為什麼這很重要？
+# 為什麼這很重要？
 
 因為：
 
@@ -366,7 +366,7 @@ copy framebuffer 超貴
 
 ----------
 
-# 🔴 kernel 世界
+# kernel 世界
 
 這通常透過：
 
@@ -416,7 +416,7 @@ scanout-able GEM memory
 
 ----------
 
-# 🧠 所以真正的是
+# 所以真正的是
 
 ```
 同一塊 physical memory
@@ -430,7 +430,7 @@ scanout-able GEM memory
 
 共同 reference。
 
-# 🔧 kernel skeleton 對照程式本章新增：
+# kernel skeleton 對照程式本章新增：
 
 ```text
 gem_shmem_skeleton.c
@@ -447,7 +447,7 @@ mmap / PRIME / GEM object
 ```
 
 
-## 🧠 這個 skeleton 的重點
+## 這個 skeleton 的重點
 
 ```
 DRM_GEM_SHMEM_DRIVER_OPS
@@ -464,7 +464,7 @@ DRM_GEM_SHMEM_DRIVER_OPS
 
 ----------
 
-## 🔴 對應 kernel flow
+## 對應 kernel flow
 
 ```
 userspace open /dev/dri/cardX

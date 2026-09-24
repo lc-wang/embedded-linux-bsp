@@ -9,7 +9,7 @@ DRM GEM / shmem framebuffer memory flow 心智模型。
 
 ---
 
-## 🎯 本章的目的
+## 本章的目的
 
 理解：
 
@@ -21,7 +21,7 @@ DRM GEM / shmem framebuffer memory flow 心智模型。
 
 ---
 
-## 🧠 一句話先記住
+## 一句話先記住
 
 ```text
 framebuffer 不擁有 memory
@@ -30,7 +30,7 @@ framebuffer 不擁有 memory
 通常是 GEM object
 ```
 
-## 🔄 DRM memory stack
+## DRM memory stack
 
 ```
 userspace mmap
@@ -46,7 +46,7 @@ physical pages
 
 ----------
 
-## 🧠 GEM 是什麼？
+## GEM 是什麼？
 
 GEM：
 
@@ -62,7 +62,7 @@ DRM 的 memory object 管理系統
 
 ----------
 
-## 🧠 shmem GEM 是什麼？
+## shmem GEM 是什麼？
 
 shmem GEM：
 
@@ -78,7 +78,7 @@ memory 由 kernel shmem subsystem 提供
 
 ----------
 
-## 🔥 為什麼 tiny/simple DRM driver 很常用 shmem？
+## 為什麼 tiny/simple DRM driver 很常用 shmem？
 
 因為：
 
@@ -91,7 +91,7 @@ helper 完整
 
 ----------
 
-## 🧩 Kernel 原始碼對照
+## Kernel 原始碼對照
 
 ```
 drivers/gpu/drm/drm_gem.c

@@ -30,7 +30,7 @@ static ssize_t my_read(struct file *file, char __user *buf,
 	if (count < len)
 		return -EINVAL;
 
-	/* ⚠ 注意：copy_to_user 在鎖外 */
+	/* 注意：copy_to_user 在鎖外 */
 	if (copy_to_user(buf, tmp, len))
 		return -EFAULT;
 

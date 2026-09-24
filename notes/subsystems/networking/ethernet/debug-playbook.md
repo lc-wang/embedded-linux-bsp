@@ -1,5 +1,5 @@
 
-## 🧠 Ethernet Debug Playbook
+## Ethernet Debug Playbook
 
 本章節目標：
 
@@ -9,7 +9,7 @@
 
 ----------
 
-# 🧭 1. Debug 思維
+# 1. Debug 思維
 
 ```
 Ethernet 問題永遠分層看：Driver → MDIO → PHY → Link → Packet
@@ -17,7 +17,7 @@ Ethernet 問題永遠分層看：Driver → MDIO → PHY → Link → Packet
 
 ----------
 
-# 🚀 2. 快速定位流程
+# 2. 快速定位流程
 
 ## Step 1：有沒有 interface？
 
@@ -25,9 +25,9 @@ Ethernet 問題永遠分層看：Driver → MDIO → PHY → Link → Packet
 ip link
 ```
 
-### ❌ 沒有 eth0
+### 沒有 eth0
 
-👉 問題在：
+問題在：
 
 ```
 Driver / probe / DTS
@@ -41,7 +41,7 @@ Driver / probe / DTS
 ethtool -i eth0
 ```
 
-👉 確認：
+確認：
 
 -   stmmac / fec / eqos
 
@@ -55,15 +55,15 @@ ethtool eth0
 
 ----------
 
-### ❌ Link detected: no
+### Link detected: no
 
-👉 看 PHY / 線 / switch
+看 PHY / 線 / switch
 
 ----------
 
-### ✔ Link detected: yes
+### Link detected: yes
 
-👉 進下一步
+進下一步
 
 ----------
 
@@ -76,9 +76,9 @@ tcpdump -i eth0
 
 ----------
 
-### ❌ 沒封包
+### 沒封包
 
-👉 問題在：
+問題在：
 
 ```
 MAC / RGMII / DMA
@@ -86,10 +86,10 @@ MAC / RGMII / DMA
 
 ----------
 
-# 🧪 3. 指令 Cheat Sheet
+# 3. 指令 Cheat Sheet
 
 
-## 🔹 基本狀態
+## 基本狀態
 
 ```
 ip link
@@ -98,7 +98,7 @@ ip addr
 
 ----------
 
-## 🔹 driver
+## driver
 
 ```
 ethtool -i eth0
@@ -106,7 +106,7 @@ ethtool -i eth0
 
 ----------
 
-## 🔹 link
+## link
 
 ```
 ethtool eth0
@@ -114,7 +114,7 @@ ethtool eth0
 
 ----------
 
-## 🔹 statistics
+## statistics
 
 ```
 cat /proc/net/dev
@@ -123,7 +123,7 @@ ethtool -S eth0
 
 ----------
 
-## 🔹 PHY（MDIO）
+## PHY（MDIO）
 
 ```
 mdio-tool dump eth0 1
@@ -131,7 +131,7 @@ mdio-tool dump eth0 1
 
 ----------
 
-## 🔹 封包
+## 封包
 
 ```
 tcpdump -i eth0
@@ -139,7 +139,7 @@ tcpdump -i eth0
 
 ----------
 
-## 🔹 carrier
+## carrier
 
 ```
 cat /sys/class/net/eth0/carrier
@@ -147,11 +147,11 @@ cat /sys/class/net/eth0/carrier
 
 ----------
 
-# ❗ 4. 問題整理
+# 4. 問題整理
 
 ----------
 
-## 🚨 Case 1：沒有 eth0
+## Case 1：沒有 eth0
 
 ### 現象
 
@@ -174,7 +174,7 @@ dmesg | grep eth
 
 ----------
 
-## 🚨 Case 2：No PHY found
+## Case 2：No PHY found
 
 ### 現象
 
@@ -197,7 +197,7 @@ dmesg | grep mdio
 
 ----------
 
-## 🚨 Case 3：link down
+## Case 3：link down
 
 ### 現象
 
@@ -215,7 +215,7 @@ Link detected: no
 
 ----------
 
-## 🚨 Case 4：link up 但 ping 不通
+## Case 4：link up 但 ping 不通
 
 ### 現象
 
@@ -224,7 +224,7 @@ Link detected: yes
 但 ping timeout
 ```
 
-### 👉 90% 原因
+### 90% 原因
 
 ```
 RGMII delay 錯（phy-mode）
@@ -246,7 +246,7 @@ rx_errors
 ```
 
 
-## 🚨 Case 5：TX OK，RX 沒有
+## Case 5：TX OK，RX 沒有
 
 ### 現象
 
@@ -262,7 +262,7 @@ IRQ / NAPI / DMA 問題
 ```
 
 
-## 🚨 Case 6：RX OK，TX 卡住
+## Case 6：RX OK，TX 卡住
 
 ### 原因
 
@@ -271,7 +271,7 @@ queue stop
 ndo_start_xmit 沒跑
 ```
 
-## 🚨 Case 7：intermittent
+## Case 7：intermittent
 
 ### 現象
 
@@ -288,10 +288,10 @@ clock / reset / RGMII skew
 
 ----------
 
-# 🔍 5. 進階 Debug
+# 5. 進階 Debug
 
 
-## ✔ 強制 speed（排除 negotiation）
+## 強制 speed（排除 negotiation）
 
 ```
 ethtool -s eth0 speed 100 duplex full autoneg off
@@ -299,7 +299,7 @@ ethtool -s eth0 speed 100 duplex full autoneg off
 
 ----------
 
-## ✔ 檢查 queue
+## 檢查 queue
 
 ```
 tc qdisc show dev eth0
@@ -307,7 +307,7 @@ tc qdisc show dev eth0
 
 ----------
 
-## ✔ ftrace
+## ftrace
 
 ```
 echo net_dev_xmit > /sys/kernel/debug/tracing/set_event
@@ -315,7 +315,7 @@ echo net_dev_xmit > /sys/kernel/debug/tracing/set_event
 
 ----------
 
-## ✔ interrupt
+## interrupt
 
 ```
 cat /proc/interrupts
@@ -323,7 +323,7 @@ cat /proc/interrupts
 
 ----------
 
-# 🧠 6. Debug Decision Tree（
+# 6. Debug Decision Tree（
 
 ```
 沒 eth0?

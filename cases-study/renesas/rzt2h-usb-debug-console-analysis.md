@@ -73,7 +73,7 @@ Windows 裝置管理員顯示：
 
 
 **結論**  
-👉 **CN34 = 主 UART Debug Console（Early boot 可用）**
+**CN34 = 主 UART Debug Console（Early boot 可用）**
 
 ----------
 
@@ -101,7 +101,7 @@ ls /dev/ttyGS0
 -   `g_serial ready`
     
 **結論**  
-👉 Linux USB gadget serial 功能正常
+Linux USB gadget serial 功能正常
 
 ----------
 
@@ -135,7 +135,7 @@ CN33 為 **USB OTG port**，關鍵硬體條件：
     
 
 **結論**  
-👉 CN33 在目前硬體設定下 **不適合作為 debug console**
+CN33 在目前硬體設定下 **不適合作為 debug console**
 
 ----------
 
@@ -159,7 +159,7 @@ Windows PuTTY / TeraTerm：
 成功登入。
 
 **結論**  
-👉 **CN79 = 可用 USB Device Debug Console（Linux runtime）**
+**CN79 = 可用 USB Device Debug Console（Linux runtime）**
 
 ----------
 

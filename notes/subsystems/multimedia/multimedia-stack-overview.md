@@ -6,7 +6,7 @@
 
 ----------
 
-# 1️⃣ 為什麼需要理解整個 Multimedia Stack？
+# 1. 為什麼需要理解整個 Multimedia Stack？
 
 在 Embedded BSP 開發中，常見問題：
 
@@ -25,11 +25,11 @@
 
 這些問題的本質：
 
-👉 **沒有完整理解 userspace → kernel → hardware 的資料流**
+**沒有完整理解 userspace → kernel → hardware 的資料流**
 
 ----------
 
-# 2️⃣ 整體 Multimedia Stack 架構圖
+# 2. 整體 Multimedia Stack 架構圖
 ```
 ┌──────────────────────────────────┐  
 │            Application            │  
@@ -76,11 +76,11 @@
 ```
 ----------
 
-# 3️⃣ 各層角色解析
+# 3. 各層角色解析
 
 ----------
 
-## 🟢 Application Layer
+## Application Layer
 
 例如：
 
@@ -104,7 +104,7 @@
 
 ----------
 
-## 🟢 GStreamer Layer
+## GStreamer Layer
 
 核心負責：
 
@@ -123,7 +123,7 @@ gst-launch-1.0 v4l2src ! videoconvert ! waylandsink
 
 ----------
 
-## 🟢 Plugin Layer（實際對接 kernel）
+## Plugin Layer（實際對接 kernel）
 
 
 ### v4l2src
@@ -152,13 +152,13 @@ wayland compositor → DRM
 ```
 ----------
 
-## 🟢 Kernel Layer
+## Kernel Layer
 
 三大 subsystem：
 
 ----------
 
-### 1️⃣ V4L2
+### 1. V4L2
 
 用途：
 
@@ -175,7 +175,7 @@ drivers/media/
 ```
 ----------
 
-### 2️⃣ DRM
+### 2. DRM
 
 用途：
 
@@ -194,7 +194,7 @@ drivers/gpu/drm/
 ```
 ----------
 
-### 3️⃣ DMA-BUF
+### 3. DMA-BUF
 
 用途：
 
@@ -209,7 +209,7 @@ drivers/dma-buf/
 ```
 ----------
 
-# 4️⃣ 真實資料流範例（Camera → Display）
+# 4. 真實資料流範例（Camera → Display）
 
 以下是一個真實 RK / i.MX pipeline：
 ```
@@ -238,13 +238,13 @@ Panel
 ```
 重點：
 
-✔ 沒有 CPU copy  
-✔ 使用 dmabuf  
-✔ 直接 scanout
+✓ 沒有 CPU copy  
+✓ 使用 dmabuf  
+✓ 直接 scanout
 
 ----------
 
-# 5️⃣ 為什麼 工程師一定要理解這層？
+# 5. 為什麼 工程師一定要理解這層？
 
 因為你 debug 的不是：
 
@@ -265,11 +265,11 @@ Panel
 
 ----------
 
-# 6️⃣ Multimedia Stack 的三種典型 Pipeline
+# 6. Multimedia Stack 的三種典型 Pipeline
 
 ----------
 
-## 1️⃣ Capture → Display
+## 1. Capture → Display
 ```
 v4l2src ! kmssink
 ```
@@ -282,7 +282,7 @@ v4l2src ! kmssink
 
 ----------
 
-## 2️⃣ Decode → Display
+## 2. Decode → Display
 ```
 filesrc ! h264parse ! v4l2h264dec ! kmssink
 ```
@@ -295,7 +295,7 @@ filesrc ! h264parse ! v4l2h264dec ! kmssink
 
 ----------
 
-## 3️⃣ Encode Pipeline
+## 3. Encode Pipeline
 ```
 v4l2src ! v4l2h264enc ! filesink
 ```
@@ -308,7 +308,7 @@ v4l2src ! v4l2h264enc ! filesink
 
 ----------
 
-# 7️⃣ Mental Model
+# 7. Mental Model
 
 腦中要有這張圖：
 ```

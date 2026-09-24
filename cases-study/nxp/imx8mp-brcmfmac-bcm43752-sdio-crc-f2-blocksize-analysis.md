@@ -96,11 +96,11 @@ mmc0: new ultra high speed SDR104 SDIO card at address 0001
 
 | # | 配置 | SG/glom | F2 blksz | 結果 |
 |---|---|---|---|---|
-| 1 | brcmfmac 預設 | 開 | 512 | ❌ 1–4 秒致命崩潰（CMD53 **write** -84 → backplane halt） |
-| 2 | `brcmfmac.txglomsz=1`（module param，TX 不用 SG） | RX glom 仍開 | 512 | ⚠️ 跑完不 halt，但 **CMD53 sg *read* failed -84** 約 14 筆/分（可恢復） |
-| 3 | `sg_support = false`（SG 全關） | 關 | 512 | ❌ 乾淨跑 3 分鐘後硬掛：`mmc0` ADMA Err → `RXHEADER FAILED: -110` → **晶片韌體 `PSM's watchdog has fired!`** |
-| 4 | `sg_support = false` + blksz **256** | 關 | 256 | ✅ 雙向 10 分鐘 **0 錯誤**（= bcmdhd 傳輸剖面），但 TX 僅 142 Mbps |
-| 5 | **只改 blksz 256**（SG/glom 全開） | 開 | 256 | ✅ **雙向 10 分鐘 0 錯誤，RX 265 / TX 273 Mbps** |
+| 1 | brcmfmac 預設 | 開 | 512 | ✗ 1–4 秒致命崩潰（CMD53 **write** -84 → backplane halt） |
+| 2 | `brcmfmac.txglomsz=1`（module param，TX 不用 SG） | RX glom 仍開 | 512 | 注意：跑完不 halt，但 **CMD53 sg *read* failed -84** 約 14 筆/分（可恢復） |
+| 3 | `sg_support = false`（SG 全關） | 關 | 512 | ✗ 乾淨跑 3 分鐘後硬掛：`mmc0` ADMA Err → `RXHEADER FAILED: -110` → **晶片韌體 `PSM's watchdog has fired!`** |
+| 4 | `sg_support = false` + blksz **256** | 關 | 256 | ✓ 雙向 10 分鐘 **0 錯誤**（= bcmdhd 傳輸剖面），但 TX 僅 142 Mbps |
+| 5 | **只改 blksz 256**（SG/glom 全開） | 開 | 256 | ✓ **雙向 10 分鐘 0 錯誤，RX 265 / TX 273 Mbps** |
 
 實驗 #2 vs #3 的對比說明 SG 只是放大器而非根因（SG 全關反而換一種方式掛）；
 實驗 #5 證明 **blocksize 才是唯一必要的修正**。
@@ -249,10 +249,10 @@ meta-<layer>/recipes-kernel/linux/
 
 | 測試 | 修正前（blksz 512） | 修正後（blksz 256） |
 |---|---|---|
-| `iperf -P4 -t60` 壓測 | 1–4 秒崩潰，WLAN halt | ✔ 跑滿，穩定 |
-| 板子 RX 5 分鐘 soak | 無法完成 | ✔ **265 Mbps**（9.24 GB），0 錯誤 |
-| 板子 TX 5 分鐘 soak | 無法完成 | ✔ **273 Mbps**（9.53 GB），0 錯誤 |
-| dmesg SDIO/韌體錯誤 | CRC 風暴 → halt / PSM watchdog | ✔ **0** |
+| `iperf -P4 -t60` 壓測 | 1–4 秒崩潰，WLAN halt | ✓ 跑滿，穩定 |
+| 板子 RX 5 分鐘 soak | 無法完成 | ✓ **265 Mbps**（9.24 GB），0 錯誤 |
+| 板子 TX 5 分鐘 soak | 無法完成 | ✓ **273 Mbps**（9.53 GB），0 錯誤 |
+| dmesg SDIO/韌體錯誤 | CRC 風暴 → halt / PSM watchdog | ✓ **0** |
 | 對照組 bcmdhd（284 Mbps） | — | 吞吐量差距 <5% |
 
 （絕對數值受 Windows 熱點對端限制，重點為修正前後與 bcmdhd 對照組的相對比較。）

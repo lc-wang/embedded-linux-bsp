@@ -63,11 +63,11 @@ btmgmt info
 
 高機率問題層級：
 
--   ❌ transport driver 沒 attach
+-   ✗ transport driver 沒 attach
     
--   ❌ UART / USB 硬體未 ready
+-   ✗ UART / USB 硬體未 ready
     
--   ❌ DT / ACPI / power / clock 問題
+-   ✗ DT / ACPI / power / clock 問題
     
 
 優先查看：
@@ -98,7 +98,7 @@ btmgmt power on
 -   hci_dev state 不正確
     
 
-👉 檢查：
+檢查：
 
 -   `net/bluetooth/mgmt.c`
     
@@ -113,7 +113,7 @@ btmon：
 
 `> HCI Command: Reset (no event)` 
 
-👉 **100% 是 transport / firmware / UART 問題**
+**100% 是 transport / firmware / UART 問題**
 
 -   UART：baud / RTS/CTS / framing
     
@@ -199,18 +199,18 @@ systemctl stop bluetooth
 btmon &
 btmgmt power on
 ```
-👉 **只要 Reset 沒 event = UART 問題**
+**只要 Reset 沒 event = UART 問題**
 
 ----------
 
 ## 10. Step 6：USB 專屬除錯流程
 
-### 10.1 USB enumeration
+### 10. 1 USB enumeration
 
 `lsusb
 lsusb -t` 
 
-### 10.2 btusb log
+### 10. 2 btusb log
 
 `dmesg | grep -i btusb` 
 
@@ -276,4 +276,4 @@ btmon 中是否看到：
 -   UART 異常
     
 
-👉 **請立刻停止懷疑 firmware**
+**請立刻停止懷疑 firmware**

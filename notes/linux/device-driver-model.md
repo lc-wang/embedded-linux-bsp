@@ -24,7 +24,7 @@
 如果每個 driver 自己決定初始化時機，  
 系統將變得不可預期。
 
-👉 **Device Driver Model 的目的不是方便寫 driver，  
+**Device Driver Model 的目的不是方便寫 driver，  
 而是讓整個系統能被「組織起來」。**
 
 ----------
@@ -56,7 +56,7 @@ struct bus_type
 -   DMA / resource 關聯
     
 
-👉 **device 是「系統資源管理的單位」。**
+**device 是「系統資源管理的單位」。**
 
 ----------
 
@@ -72,7 +72,7 @@ driver 定義：
 -   suspend() / resume()
     
 
-👉 driver 本身不擁有裝置，只是「被配對」。
+driver 本身不擁有裝置，只是「被配對」。
 
 ----------
 
@@ -90,7 +90,7 @@ bus 負責：
 -   i2c / spi
     
 
-👉 **bus 是 driver model 的核心調度者。**
+**bus 是 driver model 的核心調度者。**
 
 ----------
 
@@ -137,7 +137,7 @@ return -EPROBE_DEFER;
 
 Linux 會在資源到齊後重新嘗試。
 
-👉 **很多 BSP 問題其實是 probe defer 沒處理好。**
+**很多 BSP 問題其實是 probe defer 沒處理好。**
 
 ----------
 
@@ -164,7 +164,7 @@ Linux 會在資源到齊後重新嘗試。
 -   firmware 尚未可用
     
 
-👉 **這不是 DTS 錯，而是 Driver Model 的時序問題。**
+**這不是 DTS 錯，而是 Driver Model 的時序問題。**
 
 ----------
 
@@ -192,7 +192,7 @@ Runtime PM 讓 driver：
 -   在不用時關閉裝置
 -   在需要時重新啟動 
 
-👉 **這完全建立在 driver model 之上。**
+**這完全建立在 driver model 之上。**
 
 ----------
 
@@ -232,4 +232,4 @@ probe fail 可能代表：
 -   config 錯誤
     
 
-👉 **Driver Model 讓這些失敗變得可控。**
+**Driver Model 讓這些失敗變得可控。**

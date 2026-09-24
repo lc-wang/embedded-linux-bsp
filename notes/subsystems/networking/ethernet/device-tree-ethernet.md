@@ -1,5 +1,5 @@
 
-## 🧠 Ethernet Device Tree（DTS）關鍵設定
+## Ethernet Device Tree（DTS）關鍵設定
 
 本章節重點：
 
@@ -11,7 +11,7 @@
 
 ----------
 
-## 🧩 1. 基本 DTS 架構
+## 1. 基本 DTS 架構
 
 ```
 ethernet@... {
@@ -30,7 +30,7 @@ ethernet@... {
 
 ----------
 
-## 🔗 2. MAC ↔ PHY 關係
+## 2. MAC ↔ PHY 關係
 
 ```
 MAC driver
@@ -40,7 +40,7 @@ phy-handle
 PHY node（MDIO）
 ```
 
-👉 重點：
+重點：
 
 ```
 phy-handle = <&phy0>;
@@ -48,7 +48,7 @@ phy-handle = <&phy0>;
 
 ----------
 
-## 🔌 3. MDIO bus 描述
+## 3. MDIO bus 描述
 
 ```
 mdio {
@@ -63,13 +63,13 @@ mdio {
 
 ----------
 
-### 📌 關鍵
+### 關鍵
 
 ```
 reg = <1>  → PHY address（硬體 strap）
 ```
 
-👉 如果錯：
+如果錯：
 
 ```
 No PHY found
@@ -77,7 +77,7 @@ No PHY found
 
 ----------
 
-## 🧠 4. phy-mode
+## 4. phy-mode
 
 ```
 phy-mode = "rgmii";
@@ -99,7 +99,7 @@ sgmii
 
 ----------
 
-## ⚠️ 5. RGMII delay
+## 5. RGMII delay
 
 ### 問題本質：
 
@@ -109,18 +109,18 @@ clock 與 data 必須有 timing skew（約 2ns）
 
 ----------
 
-## 🔥 RGMII mode 差異（一定要記） 
+## RGMII mode 差異（一定要記） 
   
 | mode | TX delay | RX delay |  
 |-------------|----------|----------|  
-| rgmii | ❌ | ❌ |  
-| rgmii-id | ✅ | ✅ |  
-| rgmii-txid | ✅ | ❌ |  
-| rgmii-rxid | ❌ | ✅ |
+| rgmii | ✗ | ✗ |  
+| rgmii-id | ✓ | ✓ |  
+| rgmii-txid | ✓ | ✗ |  
+| rgmii-rxid | ✗ | ✓ |
 
 ----------
 
-## 🧠 誰負責 delay？
+## 誰負責 delay？
 
 ```
 MAC？
@@ -128,7 +128,7 @@ PHY？
 PCB？
 ```
 
-👉 三種可能：
+三種可能：
 
 
 | 情境 | 誰做 delay | 建議 mode |  
@@ -139,29 +139,29 @@ PCB？
 
 ----------
 
-## ❗ 最常見錯誤
+## 最常見錯誤
 
 
-### ❌ link up 但 ping 不通
-
-```
-👉 RGMII delay 錯
-```
-
-----------
-
-### ❌ intermittent packet loss
+### link up 但 ping 不通
 
 ```
-👉 skew 不穩
+RGMII delay 錯
 ```
 
 ----------
 
-## 🧪 6. 實戰 DTS 範例
+### intermittent packet loss
+
+```
+skew 不穩
+```
+
+----------
+
+## 6. 實戰 DTS 範例
 
 
-### ✔ stmmac（常見）
+### stmmac（常見）
 
 ```
 ethernet@... {
@@ -180,7 +180,7 @@ ethernet@... {
 
 ----------
 
-### ✔ fec（NXP）
+### fec（NXP）
 
 ```
 fec@... {
@@ -190,7 +190,7 @@ fec@... {
 };
 ```
 
-👉 FEC 常常：
+FEC 常常：
 
 ```
 delay 在 MAC
@@ -198,7 +198,7 @@ delay 在 MAC
 
 ----------
 
-## 🔧 7. reset / power / clock
+## 7. reset / power / clock
 
 
 ### PHY reset
@@ -219,10 +219,10 @@ clocks = <&clk ...>;
 
 ----------
 
-## 🧪 8. Debug Flow
+## 8. Debug Flow
 
 
-### ✔ Step 1：interface 有沒有？
+### Step 1：interface 有沒有？
 
 ```
 ip link
@@ -230,7 +230,7 @@ ip link
 
 ----------
 
-### ✔ Step 2：PHY 有沒有？
+### Step 2：PHY 有沒有？
 
 ```
 dmesg | grep phy
@@ -238,7 +238,7 @@ dmesg | grep phy
 
 ----------
 
-### ✔ Step 3：link 狀態
+### Step 3：link 狀態
 
 ```
 ethtool eth0
@@ -246,7 +246,7 @@ ethtool eth0
 
 ----------
 
-### ✔ Step 4：MDIO
+### Step 4：MDIO
 
 ```
 mdio-tool dump eth0 1
@@ -254,7 +254,7 @@ mdio-tool dump eth0 1
 
 ----------
 
-### ✔ Step 5：封包
+### Step 5：封包
 
 ```
 pingtcpdump -i eth0
@@ -262,11 +262,11 @@ pingtcpdump -i eth0
 
 ----------
 
-## ❗ 9. 常見錯誤
+## 9. 常見錯誤
 
 ----------
 
-### ❌ PHY address 錯
+### PHY address 錯
 
 ```
 No PHY found
@@ -274,7 +274,7 @@ No PHY found
 
 ----------
 
-### ❌ phy-mode 錯
+### phy-mode 錯
 
 ```
 link up but no traffic
@@ -282,7 +282,7 @@ link up but no traffic
 
 ----------
 
-### ❌ RGMII delay 錯
+### RGMII delay 錯
 
 ```
 packet drop / CRC error
@@ -290,7 +290,7 @@ packet drop / CRC error
 
 ----------
 
-### ❌ reset 沒設
+### reset 沒設
 
 ```
 PHY 不穩 / 抓不到
@@ -298,7 +298,7 @@ PHY 不穩 / 抓不到
 
 ----------
 
-### ❌ clock 沒開
+### clock 沒開
 
 ```
 MDIO timeout
@@ -306,7 +306,7 @@ MDIO timeout
 
 ----------
 
-## 🧠 10. BSP Debug 思維
+## 10. BSP Debug 思維
 
 你要分層：
 

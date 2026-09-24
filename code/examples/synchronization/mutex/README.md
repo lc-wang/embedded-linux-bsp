@@ -10,7 +10,7 @@ Linux kernel 中最基本的睡眠型鎖（sleeping lock）範例。
 
 ---
 
-## 🎯 本章的目的
+## 本章的目的
 
 理解以下問題：
 
@@ -21,7 +21,7 @@ Linux kernel 中最基本的睡眠型鎖（sleeping lock）範例。
 
 ---
 
-## 🧠 一句話先記住
+## 一句話先記住
 
 ```
 mutex
@@ -30,7 +30,7 @@ mutex
 = 不適合 IRQ / atomic context
 ```
 
-## 🔧 本範例做什麼？
+## 本範例做什麼？
 
 此範例建立一個共享計數器 `shared_counter`：
 
@@ -44,7 +44,7 @@ mutex
 
 ----------
 
-## 🧩 Kernel 原始碼對照
+## Kernel 原始碼對照
 ```
 kernel/locking/mutex.c  
 include/linux/mutex.h  
@@ -52,7 +52,7 @@ fs/read_write.c
 ```
 ----------
 
-## 🧠 何時該用 mutex？
+## 何時該用 mutex？
 
 適合以下情境：
 
@@ -63,7 +63,7 @@ fs/read_write.c
 
 ----------
 
-## 🚫 何時不能用 mutex？
+## 何時不能用 mutex？
 
 不能在以下 context 使用：
 

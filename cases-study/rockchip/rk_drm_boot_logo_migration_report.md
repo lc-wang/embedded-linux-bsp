@@ -1,7 +1,7 @@
 
 # Rockchip Boot Logo 問題分析與修正報告
 
-## 📘 一、問題背景
+## 一、問題背景
 
 在不同 SoC 平台上，開機 Logo 的顯示機制並不一致。
 
@@ -18,7 +18,7 @@
 ----------
 
 
-## 🧩 二、NXP 與 Rockchip 顯示機制差異
+## 二、NXP 與 Rockchip 顯示機制差異
 
 | 項目 | NXP (Framebuffer) | Rockchip (DRM) |
 |------|--------------------|----------------|
@@ -33,7 +33,7 @@
 ----------
 
 
-## 🔍 三、原始現象與分析流程
+## 三、原始現象與分析流程
 
 | 步驟 | 驗證項目 | 結果 |
 |------|-----------|------|
@@ -46,7 +46,7 @@
 
 ----------
 
-## 🧠 四、DRM Logo 顯示架構說明
+## 四、DRM Logo 顯示架構說明
 
 Rockchip 自定義的 early boot logo 顯示路徑如下：
 
@@ -72,12 +72,12 @@ route_hdmi1: route-hdmi1 {
 4.  在 framebuffer plane 上顯示 logo（覆蓋後續 console 輸出）。
     
 
-> 📎 此流程完全繞過 `drivers/video/logo`，  
+> 此流程完全繞過 `drivers/video/logo`，  
 > 因此 `CONFIG_LOGO_ROCKCHIP_CLUT224`、`CONFIG_LOGO_LINUX_CLUT224` 等設定皆不影響顯示。
 
 ----------
 
-## 🧾 五、問題本質
+## 五、問題本質
 
 -   **Framebuffer 機制** 的 `logo_linux_clut224.ppm` 無法在 Rockchip 顯示，因未啟用 `CONFIG_FB`。
     
@@ -89,19 +89,19 @@ route_hdmi1: route-hdmi1 {
 ----------
 
 
-## 🧰 六、解法評估
+## 六、解法評估
 
 | 方案 | 說明 | 優點 | 缺點 |
 |------|------|------|------|
 | **A. 啟用 framebuffer logo** | 修改 kernel config 啟用 `CONFIG_FB` + `CONFIG_LOGO_LINUX_CLUT224` | 顯示 Linux 企鵝 | 與 DRM 流程重疊，架構不建議 |
 | **B. 停用 DRM logo (DTS)** | 移除 `logo,kernel`、`logo,uboot` | fallback 至 console 顯示 | 無法早期顯示 splash |
-| ✅ **C. 保留 DRM 架構，轉換 PPM 為 BMP** | 將 Linux logo 轉成 BMP，直接由 Rockchip DRM 顯示 | 架構簡潔、行為一致 | 需一次性轉檔 |
+| ✓ **C. 保留 DRM 架構，轉換 PPM 為 BMP** | 將 Linux logo 轉成 BMP，直接由 Rockchip DRM 顯示 | 架構簡潔、行為一致 | 需一次性轉檔 |
 
 
 
 ----------
 
-## 🧩 七、採用方案：轉換 Linux Logo 為 BMP
+## 七、採用方案：轉換 Linux Logo 為 BMP
 
 ### 1. 轉換步驟
 
@@ -150,7 +150,7 @@ route_hdmi1: route-hdmi1 {
 
 ----------
 
-## ⚙️ 八、進階應用
+## 八、進階應用
 
 可於多輸出裝置啟用相同設定：
 ```dts
@@ -164,24 +164,24 @@ route_dp1: route-dp1 {
 ----------
 
 
-## ✅ 九、驗證與結果
+## 九、驗證與結果
 
 | 測試項目 | 結果 |
 |-----------|------|
-| DTS 無自家 logo 設定 | ✅ 已移除 Rockchip 預設 logo 檔 |
-| DRM 載入 BMP 成功 | ✅ 顯示企鵝圖 |
-| Kernel 無 framebuffer 依賴 | ✅ 維持原 DRM 架構 |
-| 整體架構相容性 | ✅ 可與 U-Boot logo 串接顯示 |
+| DTS 無自家 logo 設定 | ✓ 已移除 Rockchip 預設 logo 檔 |
+| DRM 載入 BMP 成功 | ✓ 顯示企鵝圖 |
+| Kernel 無 framebuffer 依賴 | ✓ 維持原 DRM 架構 |
+| 整體架構相容性 | ✓ 可與 U-Boot logo 串接顯示 |
 
 
 ----------
 
 
-## 📘 十、最終建議
+## 十、最終建議
 
 | 使用場景 | 建議做法 |
 |-----------|-----------|
-| 只想換成 Linux logo | ✅ 採方案 C（轉檔 BMP） |
+| 只想換成 Linux logo | ✓ 採方案 C（轉檔 BMP） |
 | 想統一所有平台架構 | 可考慮 Framebuffer 機制，但需重啟 console pipeline |
 | 臨時測試 | DTS 可直接指定其他 BMP 測試檔 |
 
@@ -189,7 +189,7 @@ route_dp1: route-dp1 {
 
 ----------
 
-## 🧱 十一、附錄：相關設定摘要
+## 十一、附錄：相關設定摘要
 
 ```bash
 # defconfig 若要啟用 framebuffer logo（僅測試用途）
@@ -210,7 +210,7 @@ route_hdmi1: route-hdmi1 {
 ```
 ----------
 
-## 🧾 十二、結論
+## 十二、結論
 
 > Rockchip 平台的開機 Logo 顯示完全基於 **DRM early logo 機制**，  
 > 而非傳統的 framebuffer。

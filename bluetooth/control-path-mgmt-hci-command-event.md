@@ -16,7 +16,7 @@
 -   BlueZ 顯示 power on，但 controller 實際沒動作
     
 
-👉 這一章只做一件事：  
+這一章只做一件事：  
 **把「mgmt → HCI command → HCI event → completion」這條路完整拆解**
 
 ----------
@@ -81,7 +81,7 @@ mgmt.c / bluetoothd
     -   user space 只送「意圖」
         
 
-👉 **mgmt 就是「意圖層（intent layer）」**
+**mgmt 就是「意圖層（intent layer）」**
 
 ----------
 
@@ -118,7 +118,7 @@ mgmt.c / bluetoothd
 | MGMT_OP_SET_LE            | 啟用 Low Energy  |
 
 
-👉 **btmgmt** 工具就是直接在打這些 mgmt command  
+**btmgmt** 工具就是直接在打這些 mgmt command  
 完全不經過 bluetoothd
 
 ----------
@@ -161,7 +161,7 @@ mgmt_set_powered()
     -   LE setup（如果支援）
         
 
-📌 **如果這裡任何一個 command 沒完成 → power on 卡住**
+**如果這裡任何一個 command 沒完成 → power on 卡住**
 
 ----------
 
@@ -207,7 +207,7 @@ struct hci_dev {
 4.  在 event handler 中被喚醒
     
 
-👉 **timeout 的本質**
+**timeout 的本質**
 
 > command 有送，但對應的 event 沒回來
 
@@ -282,7 +282,7 @@ struct hci_dev {
 
 `> HCI Command: Reset (no event)` 
 
-👉 **這一刻就可以直接斷定：不是 BlueZ 的問題**
+**這一刻就可以直接斷定：不是 BlueZ 的問題**
 
 ----------
 
@@ -353,4 +353,4 @@ drivers/bluetooth/btusb.c`
 5.  再決定要不要看 BlueZ
     
 
-👉 **不要一開始就怪 BlueZ**
+**不要一開始就怪 BlueZ**

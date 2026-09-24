@@ -1,5 +1,5 @@
 
-# 📘 LXQt 預設使用 Fluxbox 視窗管理員設定報告
+# LXQt 預設使用 Fluxbox 視窗管理員設定報告
 
 ## 1. 問題背景
 
@@ -53,11 +53,11 @@ EOF
 ```
 ### 效果
 
--   ✅ 第一次開機不再跳出 WM chooser
+-   ✓ 第一次開機不再跳出 WM chooser
     
--   ✅ LXQt 直接使用 fluxbox
+-   ✓ LXQt 直接使用 fluxbox
     
--   ✅ 對所有使用者生效（system default）
+-   ✓ 對所有使用者生效（system default）
     
 
 ----------

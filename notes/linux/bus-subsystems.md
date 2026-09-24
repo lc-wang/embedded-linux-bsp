@@ -44,7 +44,7 @@ Bus 的責任不是資料傳輸細節，而是：
 -   probe / remove 的時機
 -   裝置生命週期的邊界
 
-👉 **Bus 是 driver model 的調度層。**
+**Bus 是 driver model 的調度層。**
 
 ----------
 
@@ -72,7 +72,7 @@ Bus 的責任不是資料傳輸細節，而是：
 -   大量依賴 clock / reset / regulator
 -   probe defer 非常常見    
 
-👉 **大多數 BSP 問題都發生在 platform bus。**
+**大多數 BSP 問題都發生在 platform bus。**
 
 ----------
 
@@ -93,7 +93,7 @@ Bus 的責任不是資料傳輸細節，而是：
 -   熱插拔支援良好
     
 
-👉 **PCI 問題多半不是 DTS，而是 driver 或 firmware。**
+**PCI 問題多半不是 DTS，而是 driver 或 firmware。**
 
 ----------
 
@@ -132,7 +132,7 @@ Bus 的責任不是資料傳輸細節，而是：
 -   pinctrl 設定不完整
 -   bus frequency 不符硬體需求
 
-👉 **裝置不起來，多半是 bus 描述問題。**
+**裝置不起來，多半是 bus 描述問題。**
 
 ----------
 

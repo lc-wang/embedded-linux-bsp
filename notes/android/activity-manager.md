@@ -21,7 +21,7 @@
 -   system-services：system_server 有哪些服務
     
 
-👉 **AMS 則負責決定：哪些 App / Process 值得被系統「活著對待」**。
+**AMS 則負責決定：哪些 App / Process 值得被系統「活著對待」**。
 
 核心觀念：
 
@@ -125,7 +125,7 @@ AMS 會將 process 分類，例如：
 | Kernel | 最終負責實際的記憶體回收與釋放        |
 
 
-👉 **如果 App 被殺，不代表 App 有 bug**，可能只是系統做了正確選擇。
+**如果 App 被殺，不代表 App 有 bug**，可能只是系統做了正確選擇。
 
 ----------
 
@@ -163,7 +163,7 @@ AMS 監控多種類型的 ANR：
 -   但真正慢的是系統路徑
     
 
-👉 **ANR 是系統健康指標，不只是 App 錯誤。**
+**ANR 是系統健康指標，不只是 App 錯誤。**
 
 ----------
 ## 5. AMS 與 WMS 的核心連結：Task 作為共同抽象
@@ -276,7 +276,7 @@ AMS：更新 OOM adj、前景 / 背景狀態
 -   **AMS**：
     -   根據 Task 是否可見，判斷其 process 是否重要
 
-👉 Task 是 Input / Graphics / AMS 之間的共同交集。
+Task 是 Input / Graphics / AMS 之間的共同交集。
 
 ----------
 ## 6. Task、Process 與系統資源的責任邊界（AMS / LMKD / Kernel）
@@ -337,7 +337,7 @@ AMS 降低 Task importance
 
 對應 process 進入 cached / background
 ```
-👉 **Task 是 process importance 的主要來源之一。**
+**Task 是 process importance 的主要來源之一。**
 
 ----------
 
@@ -441,4 +441,4 @@ dumpsys activity services
 | ANR        | Scheduler 延遲或 I/O 壓力累積       |
 
 
-👉 **先看系統狀態，再怪 App。**
+**先看系統狀態，再怪 App。**

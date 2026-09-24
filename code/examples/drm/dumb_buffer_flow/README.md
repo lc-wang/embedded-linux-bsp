@@ -7,7 +7,7 @@
   
 ---  
   
-## 🎯 本章的目的  
+## 本章的目的  
   
 理解：  
   
@@ -19,7 +19,7 @@
   
 ---  
   
-## 🧠 一句話先記住  
+## 一句話先記住  
   
 ```text  
 dumb buffer
@@ -28,7 +28,7 @@ dumb buffer
 
 ----------
 
-## 🔄 完整流程
+## 完整流程
 
 ```
 open(/dev/dri/card0)
@@ -54,7 +54,7 @@ driver update()
 
 ----------
 
-## 🧠 為什麼叫 dumb？
+## 為什麼叫 dumb？
 
 因為它：
 
@@ -68,7 +68,7 @@ driver update()
 ```
 「一塊最普通的 linear framebuffer」
 ```
-## 🧩 Kernel 原始碼對照
+## Kernel 原始碼對照
 
 ```
 drivers/gpu/drm/drm_dumb_buffers.c

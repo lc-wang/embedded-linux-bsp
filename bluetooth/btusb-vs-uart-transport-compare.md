@@ -10,9 +10,9 @@
 
 這句話 **一半正確，一半危險**。
 
--   ✔ USB Bluetooth 的確比較「好起來」
+-   ✓ USB Bluetooth 的確比較「好起來」
     
--   ✘ 但它不是「免費解法」，而是 **系統架構選擇**
+-   ✗ 但它不是「免費解法」，而是 **系統架構選擇**
     
 
 本章會從 **kernel / transport / firmware / debug** 四個角度，  
@@ -35,7 +35,7 @@ USB 的特性：
 -   Host controller 管理 flow control
     
 
-👉 Bluetooth over USB 幾乎不需要關心 framing
+Bluetooth over USB 幾乎不需要關心 framing
 
 ----------
 
@@ -52,7 +52,7 @@ UART 的特性：
 -   所有 framing / flow control 由軟體處理
     
 
-👉 Bluetooth over UART **任何 byte 錯誤都會擴散成災難**
+Bluetooth over UART **任何 byte 錯誤都會擴散成災難**
 
 ----------
 
@@ -172,7 +172,7 @@ UART controller
 -   不受系統 load 影響
     
 
-👉 **USB BT 的穩定度幾乎與 CPU load 無關**
+**USB BT 的穩定度幾乎與 CPU load 無關**
 
 ----------
 
@@ -187,7 +187,7 @@ UART controller
 -   系統 load / interrupt latency 會影響接收
     
 
-👉 **UART BT 對「系統品質」非常敏感**
+**UART BT 對「系統品質」非常敏感**
 
 ----------
 
@@ -213,7 +213,7 @@ UART controller
 -   HCI protocol 問題
     
 
-👉 **問題通常集中在一層**
+**問題通常集中在一層**
 
 ----------
 
@@ -243,7 +243,7 @@ UART controller
 -   kernel race
     
 
-👉 **debug 成本是 USB 的數倍**
+**debug 成本是 USB 的數倍**
 
 ----------
 
@@ -260,7 +260,7 @@ UART controller
 -   量產 / 商用產品
     
 
-👉 **首選 USB**
+**首選 USB**
 
 ----------
 
@@ -275,7 +275,7 @@ UART controller
 -   BOM 極度受限
     
 
-👉 **選 UART 但要付出整合成本**
+**選 UART 但要付出整合成本**
 
 ----------
 
@@ -294,7 +294,7 @@ UART controller
     -   100% 不是 firmware bug
         
 
-👉 **USB 是非常好的「對照組」**
+**USB 是非常好的「對照組」**
 
 ----------
 

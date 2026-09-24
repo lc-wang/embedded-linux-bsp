@@ -1,7 +1,7 @@
 
 # RK3588 Android 15 – WIFI_HIDL_FEATURE_DUAL_INTERFACE 啟用問題分析報告
 
-## 📋 背景說明
+## 背景說明
 
 在 Rockchip RK3588 Android 15 BSP 中，希望啟用 Wi-Fi 的 **STA + AP 併行（Dual Interface）模式**，  
 藉由在 `BoardConfig.mk` 中設定：
@@ -23,7 +23,7 @@ STA + AP  Concurrency Supported: false
 
 顯示 HAL 層並未啟用 dual interface。
 
-🧩 問題現象
+問題現象
 即使在 BoardConfig.mk 或 device.mk 中設置：
 
 ```makefile
@@ -38,8 +38,8 @@ grep -r "WIFI_HIDL_FEATURE_DUAL_INTERFACE" out/soong/.intermediates/hardware/int
 
 代表 Soong 未正確傳遞該變數。
 
-🔍 分析過程
-1️⃣ 檢查 Soong 定義
+分析過程
+1. 檢查 Soong 定義
 在 `hardware/interfaces/wifi/aidl/default/Android.bp` 可見：
 
 ```bp
@@ -69,7 +69,7 @@ soong_config_variables: {
 SOONG_CONFIG_wifi_hidl_feature_dual_interface := true
 ```
 
-2️⃣ BoardConfig.mk 傳遞設定
+2. BoardConfig.mk 傳遞設定
 原本的設定：
 
 ``` makefile
@@ -89,7 +89,7 @@ SOONG_CONFIG_wifi_hidl_feature_dual_interface := true
 SOONG_CONFIG_wifi_hidl_feature_aware := true
 ```
 
-3️⃣ 驗證 Soong Cache 是否更新
+3. 驗證 Soong Cache 是否更新
 Android 15 不再使用 soong.variables，
 改為 per-product 格式：
 
@@ -114,7 +114,7 @@ grep -A5 wifi out/soong/soong.rk3588.variables
 
 若沒有出現，代表 Soong cache 尚未更新。
 
-4️⃣ 清除舊 cache 並重建
+4. 清除舊 cache 並重建
 為了讓 Soong 重新解析 config：
 
 ``` bash
@@ -131,7 +131,7 @@ m android.hardware.wifi-service -j
 
 代表宏已成功帶入。
 
-5️⃣ 驗證結果
+5. 驗證結果
 重新刷機後：
 
 ``` bash
@@ -142,24 +142,24 @@ STA + AP  Concurrency Supported: true
 
 Dual Interface 功能已成功啟用。
 
-🧪 Debug 驗證流程
-1️⃣ 驗證 Soong 變數生成
+Debug 驗證流程
+1. 驗證 Soong 變數生成
 ``` bash
 grep -A5 wifi out/soong/soong.rk3588.variables
 ```
 
-✅ 若出現 "hidl_feature_dual_interface": true → 設定正確
+✓ 若出現 "hidl_feature_dual_interface": true → 設定正確
 
-❌ 若無該段 → Soong 尚未更新 cache
+✗ 若無該段 → Soong 尚未更新 cache
 
-2️⃣ 檢查 HAL 編譯旗標
+2. 檢查 HAL 編譯旗標
 ``` bash
 grep -r "WIFI_HIDL_FEATURE_DUAL_INTERFACE" out/soong/.intermediates/hardware/interfaces/wifi/aidl/default/
 ```
 
 應看到` -DWIFI_HIDL_FEATURE_DUAL_INTERFACE` 出現在 build 命令列。
 
-3️⃣ 確認 build.prop 內容
+3. 確認 build.prop 內容
 ``` bash
 grep wifi out/target/product/rk3588_board/system/build.prop
 grep wifi out/target/product/rk3588_board/vendor/build.prop
@@ -170,7 +170,7 @@ grep wifi out/target/product/rk3588_board/vendor/build.prop
 grep wifi out/target/product/rk3588_board/obj/PACKAGING/*_build.prop_intermediates/build.prop
 ```
 
-4️⃣ Runtime 層驗證
+4. Runtime 層驗證
 ``` bash
 adb shell getprop | grep wifi
 adb shell getprop | grep vendor.wifi
@@ -178,7 +178,7 @@ adb shell getprop | grep ro.vendor.wifi
 ```
 確認實際生效的 Wi-Fi 相關屬性。
 
-5️⃣ HAL 狀態驗證
+5. HAL 狀態驗證
 ``` bash
 adb shell dumpsys wifi | grep Concurrency
 ```
@@ -188,7 +188,7 @@ adb shell dumpsys wifi | grep Concurrency
 STA + STA Concurrency Supported: false
 STA + AP  Concurrency Supported: true
 ```
-6️⃣ 快速重新生成 Soong 變數
+6. 快速重新生成 Soong 變數
 若仍未生效，可執行：
 
 ``` bash
@@ -198,7 +198,7 @@ m android.hardware.wifi-service -j
 
 無需全系統重建，即可讓 HAL 重吃設定。
 
-⚙️ 相關輔助資訊
+相關輔助資訊
 若直接在 `wifi_feature_flags.cpp` 中強制：
 
 ``` cpp
@@ -215,16 +215,16 @@ Android 15 中仍維持以下條件控制：
 #endif
 ```
 
-✅ 結論與建議
+✓ 結論與建議
 | 項目 | Android 14 | Android 15 |
 |------|-------------|-------------|
 | **WIFI_HIDL_FEATURE_DUAL_INTERFACE 傳遞方式** | 自動生效 | 必須透過 Soong config 顯式設定 |
 | **Soong 變數名稱** | N/A | `SOONG_CONFIG_wifi_hidl_feature_dual_interface` |
-| **問題來源** | 舊 cache 未更新 | ✅ 修正後正常 |
+| **問題來源** | 舊 cache 未更新 | ✓ 修正後正常 |
 | **驗證結果** | STA+AP 無效 | STA+AP 支援成功 |
 
 
-📄 最終建議流程
+最終建議流程
 在 BoardConfig.mk 中加入：
 
 ``` makefile
@@ -253,7 +253,7 @@ dumpsys wifi | grep Concurrency
 ```
 
 
-## 📘 附錄：快速驗證指令摘要
+## 附錄：快速驗證指令摘要
 
 | 目的 | 指令 | 預期結果 |
 |------|-------|-----------|

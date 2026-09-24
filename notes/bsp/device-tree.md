@@ -204,7 +204,7 @@ aliases {
 | 無法解析中斷 | `interrupts-extended` 或 parent 定義錯誤 | 檢查 GIC node、interrupt parent 是否設正確。 |
 | 節點被忽略 | `status = "disabled"` | 將節點狀態改為 `"okay"` 重新編譯並載入。 |
 | 反編譯後節點缺失 | DTB 被壓縮或簽章保護 | 檢查 boot 流程是否載入了正確的 DTB。 |
-📘 **小技巧：**
+**小技巧：**
 ```bash
 #驗證 DTS 結構與 binding 格式
 make dt_binding_check
@@ -224,7 +224,7 @@ dtc -I dtb -O dts -o running.dts /sys/firmware/fdt
 
 ----------
 
-📘 **延伸閱讀**
+**延伸閱讀**
 
 -   `Documentation/devicetree/usage-model.rst`
 -   `Documentation/devicetree/bindings/`

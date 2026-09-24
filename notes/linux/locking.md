@@ -39,16 +39,16 @@ CPU1: x = x + 1
 
 | 類型 | 可睡眠？ | 適用場景 |
 |------|---------|-----------|
-| **spinlock** | ❌ 不可睡眠 | interrupt context、短臨界區 |
-| **mutex** | ✔ 可睡眠 | 長臨界區、不能在 IRQ 使用 |
-| **rwlock** | ❌ | 多讀少寫 |
-| **semaphore** | ✔ | 舊 API，現在多用 mutex |
-| **rwsem** | ✔ | VFS / mm subsystem 常用 |
-| **atomic operations** | ❌ | 單變數快速同步 |
-| **completion** | ✔ | 等待某事件完成 |
-| **waitqueue** | ✔ | block/unblock thread |
-| **seqlock** | ❌ | 多讀多寫，讀者不鎖但需 retry |
-| **RCU** | ❌ | 高速讀取、延後釋放 |
+| **spinlock** | ✗ 不可睡眠 | interrupt context、短臨界區 |
+| **mutex** | ✓ 可睡眠 | 長臨界區、不能在 IRQ 使用 |
+| **rwlock** | ✗ | 多讀少寫 |
+| **semaphore** | ✓ | 舊 API，現在多用 mutex |
+| **rwsem** | ✓ | VFS / mm subsystem 常用 |
+| **atomic operations** | ✗ | 單變數快速同步 |
+| **completion** | ✓ | 等待某事件完成 |
+| **waitqueue** | ✓ | block/unblock thread |
+| **seqlock** | ✗ | 多讀多寫，讀者不鎖但需 retry |
+| **RCU** | ✗ | 高速讀取、延後釋放 |
 
 ---
 
@@ -238,13 +238,13 @@ synchronize_rcu()
 
 | 鎖類型 | IRQ context 可用？ |
 |--------|---------------------|
-| spinlock | ✔（需 irqsave） |
-| mutex | ❌ |
-| semaphore | ❌ |
-| rwsem | ❌ |
-| atomic | ✔ |
-| seqlock | ✔ |
-| RCU | ✔（讀取） |
+| spinlock | ✓（需 irqsave） |
+| mutex | ✗ |
+| semaphore | ✗ |
+| rwsem | ✗ |
+| atomic | ✓ |
+| seqlock | ✓ |
+| RCU | ✓（讀取） |
 
 
 
@@ -253,14 +253,14 @@ synchronize_rcu()
 > IRQ context 只能用 non-sleeping primitives。
 
 # 14. 如何選擇正確的鎖？
-✔ 如果在 interrupt context → 用 spinlock
-✔ 如果臨界區很短 → 用 spinlock
-✔ 如果臨界區會睡眠 → 用 mutex
-✔ 多讀少寫 + 可睡眠 → 用 rwsem
-✔ 多讀少寫 + 高速 + 不可睡眠 → 用 rwlock
-✔ 共享整數 → atomic
-✔ 多 reader、writer 少 → 用 RCU
-✔ 讀者不加鎖 + 容忍 retry → seqlock
+✓ 如果在 interrupt context → 用 spinlock
+✓ 如果臨界區很短 → 用 spinlock
+✓ 如果臨界區會睡眠 → 用 mutex
+✓ 多讀少寫 + 可睡眠 → 用 rwsem
+✓ 多讀少寫 + 高速 + 不可睡眠 → 用 rwlock
+✓ 共享整數 → atomic
+✓ 多 reader、writer 少 → 用 RCU
+✓ 讀者不加鎖 + 容忍 retry → seqlock
 # 15. Deadlock 常見原因
 
 | 問題 | 說明 |

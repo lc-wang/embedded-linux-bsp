@@ -12,7 +12,7 @@ miscdevice 是 character device 的簡化封裝，
 
 ---
 
-## 🎯 本章的目的
+## 本章的目的
 
 本章用來理解：
 
@@ -23,7 +23,7 @@ miscdevice 是 character device 的簡化封裝，
 
 ---
 
-## 🧠 miscdevice 的設計理念
+## miscdevice 的設計理念
 
 我要一個 /dev 節點
 我不想管 major / minor
@@ -34,7 +34,7 @@ miscdevice 是 character device 的簡化封裝，
 
 ---
 
-## 🧩 Kernel 原始碼對照
+## Kernel 原始碼對照
 ```
 drivers/char/misc.c
 fs/char_dev.c
@@ -43,7 +43,7 @@ drivers/base/core.c
 
 ---
 
-## 🔄 使用流程總覽
+## 使用流程總覽
 ```
 module_init()
 └─ misc_register()
@@ -55,15 +55,15 @@ module_init()
 
 ---
 
-## 🧠 與 char_device 的關係
+## 與 char_device 的關係
 
 | char_device | miscdevice |
 |------------|-----------|
-| alloc_chrdev_region | ❌ |
-| cdev_init | ❌ |
-| class_create | ❌ |
-| device_create | ❌ |
-| file_operations | ✅ |
-| ioctl / read / write | ✅ |
+| alloc_chrdev_region | ✗ |
+| cdev_init | ✗ |
+| class_create | ✗ |
+| device_create | ✗ |
+| file_operations | ✓ |
+| ioctl / read / write | ✓ |
 
 miscdevice 幫你包掉前面一大段 boilerplate。

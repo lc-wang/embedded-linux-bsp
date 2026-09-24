@@ -236,7 +236,7 @@ SurfaceFlinger → HWC → DRM → Panel
 -   確保 frame 能在 vsync deadline 前完成
     
 
-👉 這是 Android 能避免「首幀慢、動畫卡」的關鍵。
+這是 Android 能避免「首幀慢、動畫卡」的關鍵。
 
 ----------
 
@@ -265,15 +265,15 @@ SurfaceFlinger → HWC → DRM → Panel
 
 ### 11.4 實戰 Debug：Graphics jank 從哪裡查
 
-#### 1️⃣ 確認 thread 所屬 cgroup
+#### 1. 確認 thread 所屬 cgroup
 ```sh
 ps -e -o pid,tid,comm,cgroup | grep surfaceflinger
 ```
-#### 2️⃣ 檢查 uclamp 設定
+#### 2. 檢查 uclamp 設定
 ```sh
 cat /sys/fs/cgroup/top-app/uclamp.min cat /sys/fs/cgroup/top-app/uclamp.max
 ```
-#### 3️⃣ 對照 scheduler trace 與 vsync
+#### 3. 對照 scheduler trace 與 vsync
 
 -   `atrace sched gfx hwcomposer`   
 -   比對：

@@ -209,7 +209,7 @@ for (size_t i = 0; i < sizeof(framebuf); i++)
 
 ### 3.1 根因更正:原生驅動失敗 = 同一個 LPSPI 大傳輸 bug(非幾何)
 
-> **⚠️ 機制已再次修正(以 §2.5 為準)**:本節下方把主因歸為「FIFO underrun / CS refill 邊界」、
+> **注意：機制已再次修正(以 §2.5 為準)**:本節下方把主因歸為「FIFO underrun / CS refill 邊界」、
 > 並提出「降頻」「eDMA 根治」—— 這些**後來都被面板實測推翻**。實測:連 16-byte 單次填滿
 > FIFO(零補料、零 underrun)都已壞;分界是**固定第 11 個 word**、與時脈無關、與 CONT/CONTC/
 > watermark/RX 排空皆無關(見 §2.5)。underrun/降頻/eDMA 段保留作排查紀錄,**結論不採用**。
@@ -297,7 +297,7 @@ edma2 節點的 `nxp,version=4` 自動帶起 `CONFIG_DMA_MCUX_EDMA_V4`。build .
   ```
 - 流程:`epd_init()` → 清成全白(去殘影)→ 顯示影像 → idle(電子紙斷電保留)。
 
-**結果**:畫面正常顯示 test.png。✅
+**結果**:畫面正常顯示 test.png。✓
 
 ---
 
@@ -336,11 +336,11 @@ M33 現在獨佔的硬體,Linux 端**不能同時驅動**,否則兩核搶同一�
 
 | 資源 | Linux frdm DT 狀態 | 結論 |
 |------|------|------|
-| `lpspi3`（spi@42550000） | base dtsi `disabled`,frdm/evk 都未打開 | ✅ 不衝突 |
-| `lpuart2` | 未被任何 board dts 引用(維持 disabled) | ✅ 不衝突 |
-| GPIO_IO00 / IO05（DC/RST） | Linux 完全未引用 | ✅ 不衝突 |
-| GPIO_IO08~11（LPSPI3 pad） | Linux 完全未引用 | ✅ 不衝突 |
-| GPIO_IO26（BUSY） | 僅出現在 `pinctrl_sai3` / `pinctrl_sai3_sleep`,而 frdm.dts 已 `&sai3 { status="disabled"; }` → pinctrl 不會被套用 | ✅ 不衝突 |
+| `lpspi3`（spi@42550000） | base dtsi `disabled`,frdm/evk 都未打開 | ✓ 不衝突 |
+| `lpuart2` | 未被任何 board dts 引用(維持 disabled) | ✓ 不衝突 |
+| GPIO_IO00 / IO05（DC/RST） | Linux 完全未引用 | ✓ 不衝突 |
+| GPIO_IO08~11（LPSPI3 pad） | Linux 完全未引用 | ✓ 不衝突 |
+| GPIO_IO26（BUSY） | 僅出現在 `pinctrl_sai3` / `pinctrl_sai3_sleep`,而 frdm.dts 已 `&sai3 { status="disabled"; }` → pinctrl 不會被套用 | ✓ 不衝突 |
 
 **重要注意事項**:
 - 跑 user-space 參考程式時用的是 `/dev/spidev0.0` + gpiochip,那需要另一份「**有打開

@@ -10,7 +10,7 @@ userspace ↔ kernel driver ioctl 最小對照範例。
 
 ---
 
-## 🎯 本章的目的
+## 本章的目的
 
 此範例示範：
 
@@ -29,7 +29,7 @@ userspace ↔ kernel driver ioctl 最小對照範例。
 
 ---
 
-## 🔗 與 kernel/char_device 的關係
+## 與 kernel/char_device 的關係
 
 本章 userspace 程式會直接操作：
 
@@ -43,7 +43,7 @@ file_operations.unlocked_ioctl()
 
 ---
 
-## 🧠 ioctl 的本質
+## ioctl 的本質
 
 ioctl = control path
 

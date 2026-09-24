@@ -1,5 +1,5 @@
 
-# 📘 **RZ/T2H — CR52 Firmware 與 Linux RemoteProc 相容性技術分析報告**
+# **RZ/T2H — CR52 Firmware 與 Linux RemoteProc 相容性技術分析報告**
 
 ## **1. 前言**
 
@@ -220,6 +220,6 @@ Linux 與 CR52 使用：
 
 | Firmware 類型 | 適用 remoteproc？ | 說明 |
 |------------------------------|----------------|--------|
-| OpenAMP / RPMsg demo firmware | ✔ 是 | 完整包含 resource_table、vring、SYSRAM 布局、OpenAMP 初始化 |
-| 一般 Motor-Control Firmware (FOC/ENC/PWM) | ❌ 否 | 無 resource_table、無 OpenAMP、記憶體布局不符、無 IPC |
+| OpenAMP / RPMsg demo firmware | ✓ 是 | 完整包含 resource_table、vring、SYSRAM 布局、OpenAMP 初始化 |
+| 一般 Motor-Control Firmware (FOC/ENC/PWM) | ✗ 否 | 無 resource_table、無 OpenAMP、記憶體布局不符、無 IPC |
 

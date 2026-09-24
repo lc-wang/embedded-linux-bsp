@@ -36,7 +36,7 @@ bcmdhd 不是單一執行緒模型，實際同時存在：
 | Workqueue | event / deferred work |
 | Timer | watchdog |
 
-📌 **任何共享狀態，幾乎都可能被多個 context 同時碰觸**
+**任何共享狀態，幾乎都可能被多個 context 同時碰觸**
 
 ---
 
@@ -61,7 +61,7 @@ bcmdhd 不是單一執行緒模型，實際同時存在：
 - completion
 - wait queue
 
-📌 **鎖粒度不小，且跨層使用**
+**鎖粒度不小，且跨層使用**
 
 ---
 
@@ -118,7 +118,7 @@ Watchdog 並不是效能優化工具，而是：
 - firmware heartbeat
 - bus state 是否異常
 
-📌 **Watchdog 只能看到「症狀」，不知道「原因」**
+**Watchdog 只能看到「症狀」，不知道「原因」**
 
 ---
 
@@ -237,4 +237,4 @@ watchdog detect stall
 -   標記 firmware reset 的開始與結束
     
 
-📌 **沒有完整 timeline，很難 debug concurrency 問題**
+**沒有完整 timeline，很難 debug concurrency 問題**

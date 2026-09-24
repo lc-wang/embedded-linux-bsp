@@ -3,7 +3,7 @@
 
 ----------
 
-# 1️⃣ 為什麼需要 libgpiod？
+# 1. 為什麼需要 libgpiod？
 
 GPIO char device 提供的是：
 ```
@@ -22,7 +22,7 @@ read()
 -   不利於快速 debug
     
 
-👉 **libgpiod 是官方 user space 封裝庫**
+**libgpiod 是官方 user space 封裝庫**
 
 提供：
 
@@ -37,7 +37,7 @@ read()
 
 ----------
 
-# 2️⃣ libgpiod 整體架構
+# 2. libgpiod 整體架構
 ```
 Application  
  │  
@@ -52,7 +52,7 @@ gpiolib (kernel)
 ```
 ----------
 
-# 3️⃣ 常用 CLI 工具
+# 3. 常用 CLI 工具
 
 安裝：
 ```
@@ -71,11 +71,11 @@ sudo apt install gpiod
 
 ----------
 
-# 4️⃣ BSP Bring-up 流程
+# 4. BSP Bring-up 流程
 
 ----------
 
-## Step 1️⃣ 確認 controller
+## Step 1 確認 controller
 ```
 gpiodetect
 ```
@@ -86,7 +86,7 @@ gpiochip1 [rockchip-gpio] (32 lines)
 ```
 ----------
 
-## Step 2️⃣ 查看 line 使用狀態
+## Step 2 查看 line 使用狀態
 ```
 gpioinfo gpiochip0
 ```
@@ -107,7 +107,7 @@ line 5: "reset" output active-low [used]
 
 ----------
 
-## Step 3️⃣ 手動控制 GPIO
+## Step 3 手動控制 GPIO
 ```
 gpioset gpiochip0 5=1
 ```
@@ -120,7 +120,7 @@ gpioset gpiochip0 5=1
 
 ----------
 
-## Step 4️⃣ 監聽中斷
+## Step 4 監聽中斷
 ```
 gpiomon gpiochip0 12
 ```
@@ -130,7 +130,7 @@ event: RISING EDGE
 ```
 ----------
 
-# 5️⃣ libgpiod C API Flow
+# 5. libgpiod C API Flow
 
 ----------
 
@@ -168,7 +168,7 @@ gpiod_line_event_read(line, &event);
 ```
 ----------
 
-# 6️⃣ Edge Event 完整流程
+# 6. Edge Event 完整流程
 ```
 Hardware interrupt  
  ↓  
@@ -185,11 +185,11 @@ gpiod_line_event_read()
 
 ----------
 
-# 7️⃣ 常見錯誤案例
+# 7. 常見錯誤案例
 
 ----------
 
-## ❌ gpioset 無效果
+## gpioset 無效果
 
 可能原因：
 
@@ -204,7 +204,7 @@ gpiod_line_event_read()
 
 ----------
 
-## ❌ gpiomon 沒事件
+## gpiomon 沒事件
 
 可能原因：
 
@@ -219,7 +219,7 @@ gpiod_line_event_read()
 
 ----------
 
-# 8️⃣ Active-Low 問題
+# 8. Active-Low 問題
 
 DT：
 ```
@@ -238,7 +238,7 @@ active-low
 
 ----------
 
-# 9️⃣ Multi-line Atomic Control
+# 9. Multi-line Atomic Control
 
 v2 支援：
 ```
@@ -259,7 +259,7 @@ gpioset gpiochip0 5=1 6=0
 
 ----------
 
-# 🔟與 sysfs 差異
+# 10. 與 sysfs 差異
 
 
 | 特性 | sysfs | libgpiod |  

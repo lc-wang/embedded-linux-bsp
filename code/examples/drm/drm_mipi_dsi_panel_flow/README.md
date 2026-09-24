@@ -9,7 +9,7 @@ DRM MIPI DSI panel driver 最小範例。
   
 ---  
   
-## 🎯 本章的目的  
+## 本章的目的  
   
 理解：  
   
@@ -21,7 +21,7 @@ DRM MIPI DSI panel driver 最小範例。
   
 ---  
   
-## 🧠 一句話先記住  
+## 一句話先記住  
   
 ```text  
 MIPI DSI panel driver  
@@ -30,7 +30,7 @@ MIPI DSI panel driver
 
 ----------
 
-## 🔄 基本架構
+## 基本架構
 
 ```
 DRM encoder / bridge
@@ -46,7 +46,7 @@ LCD panel
 
 ----------
 
-## 🧠 panel driver 負責什麼？
+## panel driver 負責什麼？
 
 panel driver 通常負責：
 

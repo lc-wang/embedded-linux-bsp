@@ -1,5 +1,5 @@
 
-## 🧠 Ethernet Bring-up Flow
+## Ethernet Bring-up Flow
 
 本章節重點：
 
@@ -9,7 +9,7 @@
 
 ----------
 
-## 🧭 1. 整體時間軸
+## 1. 整體時間軸
 
 ```
 Boot
@@ -37,10 +37,10 @@ Ping OK
 
 ----------
 
-# 🔍 2. Step-by-step
+# 2. Step-by-step
 
 
-## 🧩 Step 1：Driver probe
+## Step 1：Driver probe
 
 ```
 kernel boot
@@ -48,7 +48,7 @@ kernel boot
 platform_driver → probe()
 ```
 
-### ✔ 應該發生
+### 應該發生
 
 -   MAC register mapping
 -   DMA init
@@ -56,7 +56,7 @@ platform_driver → probe()
 
 ----------
 
-### 🔍 檢查
+### 檢查
 
 ```
 dmesg | grep -i eth
@@ -64,14 +64,14 @@ dmesg | grep -i eth
 
 ----------
 
-### ❌ 常見問題
+### 常見問題
 
 -   driver 沒 bind
 -   clock / reset 沒開
 
 ----------
 
-## 🧩 Step 2：MDIO bus 初始化
+## Step 2：MDIO bus 初始化
 
 ```
 MAC driver
@@ -81,14 +81,14 @@ mdiobus_register()
 
 ----------
 
-### ✔ 應該發生
+### 應該發生
 
 -   掃描 PHY address
 -   建立 MDIO bus
 
 ----------
 
-### 🔍 檢查
+### 檢查
 
 ```
 dmesg | grep -i mdio
@@ -96,21 +96,21 @@ dmesg | grep -i mdio
 
 ----------
 
-### ❌ 問題
+### 問題
 
 ```
 MDIO timeout
 No PHY found
 ```
 
-👉 通常：
+通常：
 
 -   DTS 錯
 -   clock 問題
 
 ----------
 
-## 🧩 Step 3：PHY attach
+## Step 3：PHY attach
 
 ```
 phy_connect()
@@ -120,14 +120,14 @@ of_phy_connect()
 
 ----------
 
-### ✔ 應該發生
+### 應該發生
 
 -   找到 PHY
 -   建立 phy_device
 
 ----------
 
-### 🔍 檢查
+### 檢查
 
 ```
 dmesg | grep -i phy
@@ -135,14 +135,14 @@ dmesg | grep -i phy
 
 ----------
 
-### ❌ 問題
+### 問題
 
 -   phy-handle 錯
 -   address 錯
 
 ----------
 
-## 🧩 Step 4：register_netdev
+## Step 4：register_netdev
 
 ```
 register_netdev(dev);
@@ -150,7 +150,7 @@ register_netdev(dev);
 
 ----------
 
-### ✔ 應該發生
+### 應該發生
 
 ```
 ip link
@@ -164,13 +164,13 @@ eth0
 
 ----------
 
-### ❌ 問題
+### 問題
 
 -   沒有 eth0 → driver 問題
 
 ----------
 
-## 🧩 Step 5：ip link up
+## Step 5：ip link up
 
 ```
 ip link set eth0 up
@@ -188,7 +188,7 @@ ndo_open()
 
 ----------
 
-### ✔ driver 應該做
+### driver 應該做
 
 -   enable IRQ
 -   start DMA
@@ -196,7 +196,7 @@ ndo_open()
 
 ----------
 
-### 🔍 檢查
+### 檢查
 
 ```
 dmesg
@@ -204,7 +204,7 @@ dmesg
 
 ----------
 
-## 🧩 Step 6：PHY auto-negotiation
+## Step 6：PHY auto-negotiation
 
 ```
 PHY
@@ -216,7 +216,7 @@ PHY
 
 ----------
 
-### 🔍 檢查
+### 檢查
 
 ```
 ethtool eth0
@@ -224,7 +224,7 @@ ethtool eth0
 
 ----------
 
-### ✔ 正常
+### 正常
 
 ```
 Link detected: yes
@@ -233,7 +233,7 @@ Speed: 1000Mb/s
 
 ----------
 
-### ❌ 問題
+### 問題
 
 | 現象 | 原因 |  
 |--------------|-------------|  
@@ -242,7 +242,7 @@ Speed: 1000Mb/s
 
 ----------
 
-## 🧩 Step 7：Link Up → MAC enable
+## Step 7：Link Up → MAC enable
 
 ```
 PHY → callback
@@ -262,10 +262,10 @@ eth0: Link is Up - 1000Mbps/Full
 
 ----------
 
-## 🧩 Step 8：封包測試
+## Step 8：封包測試
 
 
-### ✔ 基本測試
+### 基本測試
 
 ```
 ping 8.8.8.8
@@ -273,7 +273,7 @@ ping 8.8.8.8
 
 ----------
 
-### ✔ deeper debug
+### deeper debug
 
 ```
 tcpdump -i eth0
@@ -281,7 +281,7 @@ tcpdump -i eth0
 
 ----------
 
-### ✔ statistics
+### statistics
 
 ```
 ethtool -S eth0
@@ -289,11 +289,11 @@ ethtool -S eth0
 
 ----------
 
-# 🧪 3. Debug Checklist
+# 3. Debug Checklist
 
-## 🚨 情境 1：沒有 eth0
+## 情境 1：沒有 eth0
 
-👉 檢查：
+檢查：
 
 ```
 dmesg | grep eth
@@ -301,9 +301,9 @@ dmesg | grep eth
 
 ----------
 
-## 🚨 情境 2：No PHY found
+## 情境 2：No PHY found
 
-👉 檢查：
+檢查：
 
 -   DTS phy-handle
 -   MDIO bus
@@ -311,9 +311,9 @@ dmesg | grep eth
 
 ----------
 
-## 🚨 情境 3：link down
+## 情境 3：link down
 
-👉 檢查：
+檢查：
 
 ```
 ethtool eth0
@@ -321,9 +321,9 @@ ethtool eth0
 
 ----------
 
-## 🚨 情境 4：link up 但不通
+## 情境 4：link up 但不通
 
-👉 90%：
+90%：
 
 ```
 RGMII delay 問題
@@ -331,9 +331,9 @@ RGMII delay 問題
 
 ----------
 
-## 🚨 情境 5：RX 沒有封包
+## 情境 5：RX 沒有封包
 
-👉 檢查：
+檢查：
 
 -   IRQ
 -   NAPI
@@ -341,9 +341,9 @@ RGMII delay 問題
 
 ----------
 
-## 🚨 情境 6：TX 卡住
+## 情境 6：TX 卡住
 
-👉 檢查：
+檢查：
 
 ```
 ndo_start_xmit 是否被呼叫
@@ -352,7 +352,7 @@ queue 是否 stop
 
 ----------
 
-# 🔧 4. Debug 指令整理
+# 4. Debug 指令整理
 
 
 ## 基本
@@ -397,7 +397,7 @@ tcpdump -i eth0
 
 ----------
 
-# 🧠 5. BSP Debug 思維
+# 5. BSP Debug 思維
 
 這個 flow：
 
@@ -419,20 +419,20 @@ Driver → MDIO → PHY → Link → Packet
 
 ----------
 
-# 🔥 6. 實戰技巧
+# 6. 實戰技巧
 
 
-## ✔ 強制 speed
+## 強制 speed
 
 ```
 ethtool -s eth0 speed 100 duplex full autoneg off
 ```
 
-👉 排除 negotiation 問題
+排除 negotiation 問題
 
 ----------
 
-## ✔ 查看 carrier
+## 查看 carrier
 
 ```
 cat /sys/class/net/eth0/carrier
@@ -440,7 +440,7 @@ cat /sys/class/net/eth0/carrier
 
 ----------
 
-## ✔ 查看 state
+## 查看 state
 
 ```
 cat /sys/class/net/eth0/operstate

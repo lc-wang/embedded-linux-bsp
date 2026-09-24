@@ -121,7 +121,7 @@ ServiceManager
 | **Binder Driver** | IPC 層 | `/dev/binder` |
 | **ServiceManager** | 註冊中心 | `IServiceManager` |
 
-💡 **補充說明**
+**補充說明**
 
 -   `ActivityManager` 是 client 端的代理（Proxy），透過 Binder IPC 呼叫系統服務。
 -   `ActivityManagerService` 是 server 端，執行實際的程序與活動管理邏輯。
@@ -162,7 +162,7 @@ ServiceManager
 5.  使用 `strace` 或 `perf trace -e binder:*` 觀察 SystemServer 與 Binder 驅動互動。
 
 
-📘 **延伸閱讀**
+**延伸閱讀**
 -   AOSP: `frameworks/base/services/java/com/android/server/SystemServer.java`   
 -   AOSP: `frameworks/native/libs/binder/`  
 -   Android Developers – System Services

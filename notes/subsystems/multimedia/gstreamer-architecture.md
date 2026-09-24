@@ -21,7 +21,7 @@ userspace multimedia control layer
 
 ----------
 
-# 1️⃣ GStreamer 核心概念
+# 1. GStreamer 核心概念
 
 GStreamer 由以下核心概念組成：
   
@@ -36,7 +36,7 @@ GStreamer 由以下核心概念組成：
 
 ----------
 
-# 2️⃣ GStreamer Pipeline
+# 2. GStreamer Pipeline
 
 GStreamer 使用 **pipeline 模型**來處理 multimedia data。
 
@@ -66,7 +66,7 @@ Display
 ```
 ----------
 
-# 3️⃣ Pipeline 架構
+# 3. Pipeline 架構
 ```
 Application  
  │  
@@ -89,7 +89,7 @@ Application
 
 ----------
 
-# 4️⃣ Element
+# 4. Element
 
 Element 是 GStreamer 的基本處理單位。
 
@@ -161,7 +161,7 @@ autovideosink
 ```
 ----------
 
-# 5️⃣ Pad
+# 5. Pad
 
 Pad 是 element 的 **連接點**。
 
@@ -194,7 +194,7 @@ sink pad
 ```
 ----------
 
-# 6️⃣ Caps（Capabilities）
+# 6. Caps（Capabilities）
 
 Caps 描述 buffer 的 **格式資訊**。
 
@@ -221,7 +221,7 @@ element A → element B
 
 ----------
 
-# 7️⃣ Buffer
+# 7. Buffer
 
 Buffer 是 pipeline 中傳遞的資料。
 
@@ -244,7 +244,7 @@ next element
 ```
 ----------
 
-# 8️⃣ Memory 管理
+# 8. Memory 管理
 
 Buffer 內部包含 memory object：
 
@@ -268,7 +268,7 @@ DMABUF
 
 ----------
 
-# 9️⃣ Pipeline 狀態機（State Machine）
+# 9. Pipeline 狀態機（State Machine）
 
 每個 pipeline 有四種狀態：
   
@@ -296,7 +296,7 @@ PLAYING
 ```
 ----------
 
-# 🔟 Data Flow（Push Model）
+# 10. Data Flow（Push Model）
 
 GStreamer 預設使用 **push model**：
 ```
@@ -317,7 +317,7 @@ sink
 ```
 ----------
 
-# 11️⃣ 與 Kernel Subsystem 的關係
+# 11. 與 Kernel Subsystem 的關係
 
 常見 plugin 與 kernel mapping：
 
@@ -330,7 +330,7 @@ sink
 
 ----------
 
-# 12️⃣ Embedded Linux 常見 Pipeline
+# 12. Embedded Linux 常見 Pipeline
 
 ----------
 
@@ -358,7 +358,7 @@ gst-launch-1.0 filesrc ! h264parse ! v4l2h264dec ! kmssink
 ```
 ----------
 
-# 13️⃣ BSP Debug 時常見問題
+# 13. BSP Debug 時常見問題
 
 GStreamer 問題通常不是 GStreamer 本身。
 

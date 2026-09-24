@@ -1,5 +1,5 @@
 
-## 🧠 Switch Architecture
+## Switch Architecture
 
 本章節重點：
 
@@ -10,7 +10,7 @@
 
 ----------
 
-## 🧩 1. 單一 Ethernet
+## 1. 單一 Ethernet
 
 ```
 CPU
@@ -22,7 +22,7 @@ PHY
 RJ45
 ```
 
-👉 一個 interface：
+一個 interface：
 
 ```
 eth0
@@ -30,7 +30,7 @@ eth0
 
 ----------
 
-## 🧩 2. Switch 架構
+## 2. Switch 架構
 
 ```
 CPU
@@ -51,38 +51,38 @@ CPU port
 
 ----------
 
-## 🔌 3. Port 分類
+## 3. Port 分類
 
 ----------
 
-### 🔹 CPU port
+### CPU port
 
 ```
 Switch ↔ CPU 的連接
 ```
 
-👉 特性：
+特性：
 
 -   通常是 **RGMII / SGMII**
 -   只有一條
 
 
-### 🔹 User port
+### User port
 
 ```
 接 RJ45 / LAN port
 ```
 
-👉 每個 port：
+每個 port：
 
 -   有自己的 PHY（或內建 PHY）
 -   對應實體網路孔
 
 
-## 🧠 4. 封包 flow
+## 4. 封包 flow
 
 
-### 📤 TX（CPU → LAN）
+### TX（CPU → LAN）
 
 ```
 CPU (eth0)
@@ -102,7 +102,7 @@ Wire
 
 ----------
 
-### 📥 RX（LAN → CPU）
+### RX（LAN → CPU）
 
 ```
 Wire
@@ -120,7 +120,7 @@ CPU
 
 ----------
 
-## ⚠️ 重點
+## 重點
 
 ```
 CPU 只看到一個 MAC（eth0）但實際有多個 port
@@ -128,22 +128,22 @@ CPU 只看到一個 MAC（eth0）但實際有多個 port
 
 ----------
 
-# 🧠 5. 沒有 DSA 的世界
+# 5. 沒有 DSA 的世界
 
-## ❌ 傳統做法（vendor driver）
+## 傳統做法（vendor driver）
 
 ```
 eth0 → 整個 switch
 ```
 
-👉 問題：
+問題：
 
 -   看不到個別 port
 -   無法用標準工具（bridge / vlan）
 
 ----------
 
-👉 常見：
+常見：
 
 ```
 ethsw / ethss driver
@@ -151,13 +151,13 @@ ethsw / ethss driver
 
 ----------
 
-# 🚀 6. 有 DSA 的世界
+# 6. 有 DSA 的世界
 
-👉 Distributed Switch Architecture
+Distributed Switch Architecture
 
 ----------
 
-## ✔ 每個 port 都變 interface
+## 每個 port 都變 interface
 
 ```
 ip link
@@ -175,7 +175,7 @@ lan4
 
 ----------
 
-## ✔ 可以用標準 Linux 工具
+## 可以用標準 Linux 工具
 
 ```
 bridge
@@ -185,48 +185,48 @@ tc
 
 ----------
 
-# 🔗 7. DSA 核心概念
+# 7. DSA 核心概念
 
 
-## 🔹 tagging
+## tagging
 
 ```
 CPU ↔ Switch 的封包需要 tag
 ```
 
-👉 用來：
+用來：
 
 ```
 告訴 switch 要去哪個 port
 ```
 
 
-## 🔹 switch forwarding
+## switch forwarding
 
 ```
 switch 內部會自己轉封包
 ```
 
-👉 CPU 不一定會看到所有流量
+CPU 不一定會看到所有流量
 
 
-## 🔹 offloading
+## offloading
 
 ```
 switch 幫你做 forwarding
 ```
 
-👉 CPU 不需要處理
+CPU 不需要處理
 
 ----------
 
-# 🧪 8. Bring-up 重點
+# 8. Bring-up 重點
 
 ----------
 
-## ✔ CPU port 正常嗎？
+## CPU port 正常嗎？
 
-👉 這就是：
+這就是：
 
 ```
 eth0 要先正常
@@ -234,7 +234,7 @@ eth0 要先正常
 
 ----------
 
-## ✔ switch driver 有沒有起來？
+## switch driver 有沒有起來？
 
 ```
 dmesg | grep dsa
@@ -242,7 +242,7 @@ dmesg | grep dsa
 
 ----------
 
-## ✔ port 有沒有出現？
+## port 有沒有出現？
 
 ```
 ip link
@@ -250,7 +250,7 @@ ip link
 
 ----------
 
-## ✔ link 狀態
+## link 狀態
 
 ```
 ethtool lan1
@@ -258,28 +258,28 @@ ethtool lan1
 
 ----------
 
-# ❗ 9. 常見問題
+# 9. 常見問題
 
 
-## ❌ 只有 eth0 沒有 lan1~lan4
+## 只有 eth0 沒有 lan1~lan4
 
-👉 原因：
+原因：
 
 ```
 DSA 沒啟動或 DTS 沒設
 ```
 
-## ❌ lan port link up 但不通
+## lan port link up 但不通
 
-👉 可能：
+可能：
 
 ```
 CPU port timing（RGMII）
 ```
 
-## ❌ switch 完全沒反應
+## switch 完全沒反應
 
-👉 檢查：
+檢查：
 
 ```
 SPI / MDIO / reset
@@ -287,7 +287,7 @@ SPI / MDIO / reset
 
 ----------
 
-# 🧠 10. 理解
+# 10. 理解
 
 要想成：
 

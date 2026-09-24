@@ -8,8 +8,8 @@
 -   **SoC**：Rockchip RK3588
 -   **Audio Codec**：ES8388
 -   **麥克風配置**：
-    -   🎤 獨立板上麥克風（Main Mic）  
-    -   🎧 耳麥麥克風（Headset Mic）
+    -   獨立板上麥克風（Main Mic）  
+    -   耳麥麥克風（Headset Mic）
 
 需求目標：
 
@@ -79,7 +79,7 @@
     -   抗雜訊（CMRR）  
     -   適合板上獨立麥克風
 
-⚠️ 重點：
+重點：
 
 > **MIC_P / MIC_N 是一對「輸入端子」  
 > 不是某一支特定麥克風**
@@ -130,7 +130,7 @@ MIC_P / MIC_N
 | 獨立 Mic   | 需要由 Codec 提供 Mic Bias → 關閉 Main Mic Switch 即無訊號 |
 | 耳麥 Mic   | Bias 可能來自外部，或已接在差分輸入端 → 不受該 Switch 控制 |
 
-👉 **共用的是「類比輸入端」  
+**共用的是「類比輸入端」  
 不是「每支 mic 的供電開關」**
 
 ----------
@@ -141,8 +141,8 @@ amixer -c 1 cset name='Headset Mic Switch' off
 amixer -c 1 cset name='Main Mic Switch' on
 ```
 因為它們：
--   ✅ 只控制 mic 是否「活著」    
--   ❌ 不控制 mic 聲音是否「進 ADC」
+-   ✓ 只控制 mic 是否「活著」    
+-   ✗ 不控制 mic 聲音是否「進 ADC」
     
 
 真正決定錄音來源的是：
@@ -156,7 +156,7 @@ amixer -c 1 cset name='Main Mic Switch' on
 
 ## 8. 最終工程結論
 
-### ❌ 在目前硬體設計下：
+### 在目前硬體設計下：
 
 > **「插著耳麥，還想只錄 Main Mic」  
 > 在純軟體層是做不到的**
@@ -171,7 +171,7 @@ amixer -c 1 cset name='Main Mic Switch' on
 #
 ## 9. 可行且正確的產品級策略
 
-### ✅ 建議行為
+### 建議行為
 
 | 狀態       | 使用的麥克風                 |
 |------------|------------------------------|
@@ -202,4 +202,4 @@ amixer -c 1 cset name='Main Mic Switch' on
 > 不是某一支麥克風**
 > 
 > 只要兩支 mic 在這裡匯流，  
-> 👉 **就沒有任何 amixer 能再把它們分開**
+> **就沒有任何 amixer 能再把它們分開**

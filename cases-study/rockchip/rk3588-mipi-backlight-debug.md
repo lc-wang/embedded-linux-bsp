@@ -55,18 +55,18 @@
 
 曾懷疑但最終排除的項目：
 
--   ❌ `pwm-backlight` driver 問題
+-   ✗ `pwm-backlight` driver 問題
     
--   ❌ PWM 頻率設定錯誤
+-   ✗ PWM 頻率設定錯誤
     
--   ❌ DTS / pinmux 設定錯誤
+-   ✗ DTS / pinmux 設定錯誤
     
--   ❌ panel driver（simple-panel / vendor panel）不相容
+-   ✗ panel driver（simple-panel / vendor panel）不相容
     
 
 最終證實為：
 
--   ✅ **單一板子的板級硬體問題（Bad board）**
+-   ✓ **單一板子的板級硬體問題（Bad board）**
     
 
 ----------
@@ -214,9 +214,9 @@ grep -R panel /proc/device-tree -n
 
 結果：
 
--   原板 ❌：亮度只能 ON / OFF
+-   原板 ✗：亮度只能 ON / OFF
     
--   新板 ✅：亮度可正常平滑調整
+-   新板 ✓：亮度可正常平滑調整
     
 
 ----------
@@ -226,7 +226,7 @@ grep -R panel /proc/device-tree -n
 > **此問題並非 Linux driver、DTS、PWM 設定或 pinmux 問題。**
 > 
 > 根本原因為：  
-> 👉 **單一板子的板級硬體異常（Bad board）**
+> **單一板子的板級硬體異常（Bad board）**
 
 可能原因包含：
 

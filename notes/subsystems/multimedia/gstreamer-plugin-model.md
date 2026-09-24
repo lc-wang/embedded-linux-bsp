@@ -19,7 +19,7 @@ GStreamer 的設計核心是 **plugin architecture**。
 
 ----------
 
-# 1️⃣ Plugin Architecture
+# 1. Plugin Architecture
 
 GStreamer 採用 **動態 plugin 模型**：
 ```
@@ -47,7 +47,7 @@ libgstkmssink.so
 ```
 ----------
 
-# 2️⃣ Plugin → Element → Pad
+# 2. Plugin → Element → Pad
 
 GStreamer 的層級：
 ```
@@ -70,7 +70,7 @@ Pad
 
 ----------
 
-# 3️⃣ Plugin Discovery
+# 3. Plugin Discovery
 
 GStreamer 啟動時會掃描 plugin。
 
@@ -98,7 +98,7 @@ gst-inspect-1.0 v4l2src
 
 ----------
 
-# 4️⃣ Element Lifecycle
+# 4. Element Lifecycle
 
 element 在 pipeline 中會經歷 lifecycle：
 ```
@@ -118,7 +118,7 @@ streaming
 ```
 ----------
 
-# 5️⃣ Pad Template
+# 5. Pad Template
 
 每個 element 會定義 pad template。
 
@@ -144,7 +144,7 @@ v4l2src.src → kmssink.sink
 ```
 ----------
 
-# 6️⃣ Caps Negotiation
+# 6. Caps Negotiation
 
 Caps negotiation 是 pipeline 成功運作的關鍵。
 
@@ -174,7 +174,7 @@ pipeline 會 fail。
 
 ----------
 
-# 7️⃣ Buffer Allocation
+# 7. Buffer Allocation
 
 Buffer allocation 通常由 **sink 或 downstream element** 決定。
 
@@ -198,7 +198,7 @@ memory type
 
 ----------
 
-# 8️⃣ Memory Type
+# 8. Memory Type
 
 GStreamer buffer 支援多種 memory。
 
@@ -221,7 +221,7 @@ camera → v4l2src → dmabuf → kmssink
 ```
 ----------
 
-# 9️⃣ Plugin 與 Kernel Driver 的關係
+# 9. Plugin 與 Kernel Driver 的關係
 
 GStreamer plugin 通常只是 **userspace wrapper**。
 
@@ -287,7 +287,7 @@ kwin
 ```
 ----------
 
-# 🔟 Example Pipeline Lifecycle
+# 10. Example Pipeline Lifecycle
 
 以下 pipeline：
 ```
@@ -325,7 +325,7 @@ DRM plane
 ```
 ----------
 
-# 11️⃣ 常見問題
+# 11. 常見問題
 
 ### pipeline 無法建立
 
@@ -355,7 +355,7 @@ DRM plane issue
 ```
 ----------
 
-# 12️⃣ BSP Debug 常用工具
+# 12. BSP Debug 常用工具
 
 查看 element：
 ```

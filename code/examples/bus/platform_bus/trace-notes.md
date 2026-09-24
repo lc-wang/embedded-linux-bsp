@@ -3,7 +3,7 @@
 
 ---
 
-## 🧩 Device Tree 是什麼時候變成 device 的？
+## Device Tree 是什麼時候變成 device 的？
 
 在 kernel boot 時：
 ```
@@ -15,7 +15,7 @@ start_kernel()
 
 ---
 
-## 🔍 DTS → platform_device
+## DTS → platform_device
 ```
 of_platform_populate()
 └─ of_platform_device_create()
@@ -30,7 +30,7 @@ of_platform_populate()
 
 ---
 
-## 🔎 driver 註冊流程
+## driver 註冊流程
 ```
 platform_driver_register()
 └─ driver_register()
@@ -41,7 +41,7 @@ platform_driver_register()
 
 ---
 
-## 🧠 match() 做什麼？
+## match() 做什麼？
 ```
 platform_bus.match()
 ```
@@ -54,7 +54,7 @@ platform_bus.match()
 
 ---
 
-## 🔥 probe() 什麼時候會被呼叫？
+## probe() 什麼時候會被呼叫？
 
 只有在：
 ```
@@ -72,7 +72,7 @@ driver.probe()
 
 ---
 
-## 🧠 關鍵心智模型
+## 關鍵心智模型
 ```
 DTS
 ↓
@@ -87,12 +87,12 @@ probe()
 
 ---
 
-## 🚫 常見誤解
+## 常見誤解
 
-❌ DTS 直接呼叫 probe  
-❌ module_init() = probe  
+✗ DTS 直接呼叫 probe  
+✗ module_init() = probe  
 
-✅ 正確是：
+✓ 正確是：
 ```
 module_init() → driver_register()
 probe() → device + driver matched

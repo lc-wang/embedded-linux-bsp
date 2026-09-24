@@ -3,7 +3,7 @@
 
 ---
 
-# 🟢 Level 1
+# Level 1
 
 想像兩個 thread：
 
@@ -17,7 +17,7 @@ B: 完成後叫醒 A
 
 ----------
 
-# 🟡 Level 2
+# Level 2
 ```
 Thread A:  
  wait_for_completion()  
@@ -33,7 +33,7 @@ Thread B:
 ```
 ----------
 
-# 🔴 Level 3
+# Level 3
 ```
 wait_for_completion()  
  └─ wait_for_common()  
@@ -46,7 +46,7 @@ complete()
 ----------
 
 
-# 🧠 與 mutex 的差異  
+# 與 mutex 的差異  
   
 | 項目 | mutex | completion |  
 |----------|------------------|-------------------|  
@@ -56,7 +56,7 @@ complete()
 
 ----------
 
-# 🔥 為什麼 driver 很常用？
+# 為什麼 driver 很常用？
 
 因為 driver 很多是：
 ```
@@ -75,7 +75,7 @@ wait_for_completion()
 
 ----------
 
-# 🧠 心智模型
+# 心智模型
 
 completion 是「同步兩個時間點」  
 不是「保護資料」

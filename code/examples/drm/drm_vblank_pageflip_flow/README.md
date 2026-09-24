@@ -8,7 +8,7 @@ DRM vblank / page flip / display timing flow 心智模型。
   
 ---  
   
-## 🎯 本章的目的  
+## 本章的目的  
   
 理解：  
   
@@ -20,7 +20,7 @@ DRM vblank / page flip / display timing flow 心智模型。
   
 ---  
   
-## 🧠 一句話先記住  
+## 一句話先記住  
   
 ```text  
 page flip  
@@ -29,7 +29,7 @@ page flip
 
 ----------
 
-## 🧠 vblank 是什麼？
+## vblank 是什麼？
 
 vblank：
 
@@ -40,7 +40,7 @@ vblank：
 
 ----------
 
-## 🔥 為什麼 vblank 很重要？
+## 為什麼 vblank 很重要？
 
 因為：
 
@@ -51,7 +51,7 @@ vblank：
 
 ----------
 
-## 🔄 scanout flow
+## scanout flow
 
 ```
 CRTC scanout framebuffer A
@@ -65,7 +65,7 @@ vblank
 
 ----------
 
-## 🧠 tearing 是什麼？
+## tearing 是什麼？
 
 如果：
 
@@ -88,7 +88,7 @@ tearing
 
 ----------
 
-## 🧩 Kernel 原始碼對照
+## Kernel 原始碼對照
 
 ```
 drivers/gpu/drm/drm_vblank.c

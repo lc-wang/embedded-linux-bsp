@@ -12,7 +12,7 @@ Linux character device（字元裝置）最小實作範例。
 
 ---
 
-## 🎯 本章的目的
+## 本章的目的
 
 此範例示範：
 
@@ -33,7 +33,7 @@ Linux character device（字元裝置）最小實作範例。
 
 ---
 
-## 🧩 Kernel 原始碼對照
+## Kernel 原始碼對照
 ```
 fs/char_dev.c
 fs/open.c
@@ -42,7 +42,7 @@ drivers/base/core.c
 ```
 ---
 
-## 🔄 完整資料流
+## 完整資料流
 ```
 userspace
 └─ open("/dev/mychardev")
@@ -66,7 +66,7 @@ ioctl()
 ```
 ---
 
-## 🧠 非常重要的觀念
+## 非常重要的觀念
 
 /dev/xxx
 不是 driver

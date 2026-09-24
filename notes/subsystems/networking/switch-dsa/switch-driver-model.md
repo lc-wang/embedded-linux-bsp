@@ -1,5 +1,5 @@
 
-## 🧠 Switch Driver Model
+## Switch Driver Model
 
 本章節重點：
 
@@ -10,7 +10,7 @@
 
 ----------
 
-# 🧩 1. Driver 在整體架構的位置
+# 1. Driver 在整體架構的位置
 
 ```
 Platform / SPI / MDIO driver        ↓Switch driver（DSA）        ↓DSA core        ↓net_device（lan1~lanX）
@@ -18,7 +18,7 @@ Platform / SPI / MDIO driver        ↓Switch driver（DSA）        ↓DSA core
 
 ----------
 
-# 🔁 2. Driver Probe Flow
+# 2. Driver Probe Flow
 
 ```
 driver probe()
@@ -38,13 +38,13 @@ DSA core 建立 port
 
 ----------
 
-## 📌 關鍵 API
+## 關鍵 API
 
 ```
 dsa_register_switch(ds);
 ```
 
-👉 這一行是：
+這一行是：
 
 ```
 把 switch 註冊到 DSA core
@@ -52,7 +52,7 @@ dsa_register_switch(ds);
 
 ----------
 
-# 🧠 3. `dsa_switch` 初始化
+# 3. `dsa_switch` 初始化
 
 ```
 struct dsa_switch *ds;
@@ -64,14 +64,14 @@ ds->priv = priv;
 
 ----------
 
-## 👉 重點
+## 重點
 
 ```
 num_ports = switch port 數量（含 CPU port）
 ```
 
 
-# 🔧 4. `dsa_switch_ops`
+# 4. `dsa_switch_ops`
 
 
 ## 最基本：
@@ -94,10 +94,10 @@ static const struct dsa_switch_ops ops = {
     .get_tag_protocol
 ```
 
-# 🔌 5. 與硬體的連接方式
+# 5. 與硬體的連接方式
 
 
-## 🔹 MDIO-based switch
+## MDIO-based switch
 
 ```
 MAC
@@ -107,13 +107,13 @@ MDIO
 Switch chip
 ```
 
-👉 常見：
+常見：
 
 -   Realtek
 -   Marvell
 
 
-## 🔹 SPI-based switch
+## SPI-based switch
 
 ```
 CPU
@@ -123,13 +123,13 @@ SPI
 Switch chip
 ```
 
-👉 常見：
+常見：
 
 -   工業控制
 -   小型 switch
 
-## 🔹 I2C-based
-👉 driver probe 會是：
+## I2C-based
+driver probe 會是：
 
 ```
 spi_driver
@@ -138,7 +138,7 @@ i2c_driver
 ```
 
 
-# 🧩 6. Port 初始化（DSA core）
+# 6. Port 初始化（DSA core）
 
 
 DSA core 會做：
@@ -150,7 +150,7 @@ for each port:
     建立 netdev（user port）
 ```
 
-# 🧠 7. CPU port 設定
+# 7. CPU port 設定
 
 driver 要標記：
 
@@ -160,7 +160,7 @@ driver 要標記：
 
 ----------
 
-👉 DTS 或 driver：
+DTS 或 driver：
 
 ```
 port@0 → CPU
@@ -168,7 +168,7 @@ port@1~4 → user
 ```
 
 
-# 🔗 8. Tagging protocol 設定
+# 8. Tagging protocol 設定
 
 
 ```
@@ -177,13 +177,13 @@ port@1~4 → user
 
 ----------
 
-👉 driver 告訴 kernel：
+driver 告訴 kernel：
 
 ```
 用哪種 tagging 格式
 ```
 
-# 🔁 9. Packet flow
+# 9. Packet flow
 
 
 ## TX
@@ -215,10 +215,10 @@ DSA core 拆 tag
 ```
 
 
-# 🧪 10. Debug
+# 10. Debug
 
 
-## ✔ driver probe
+## driver probe
 
 ```
 dmesg | grep -i switch
@@ -226,7 +226,7 @@ dmesg | grep -i switch
 
 ----------
 
-## ✔ DSA 註冊
+## DSA 註冊
 
 ```
 dmesg | grep dsa
@@ -234,7 +234,7 @@ dmesg | grep dsa
 
 ----------
 
-## ✔ netdev
+## netdev
 
 ```
 ip link
@@ -242,19 +242,19 @@ ip link
 
 ----------
 
-## ✔ driver info
+## driver info
 
 ```
 ethtool -i lan1
 ```
 
 
-# ❗ 11. 常見錯誤
+# 11. 常見錯誤
 
 
-## ❌ 沒有 lanX
+## 沒有 lanX
 
-👉 原因：
+原因：
 
 ```
 dsa_register_switch 沒成功
@@ -262,33 +262,33 @@ num_ports 錯
 ```
 
 
-## ❌ port 沒 enable
+## port 沒 enable
 
-👉 檢查：
+檢查：
 
 ```
 .port_enable 沒實作
 ```
 
 
-## ❌ 封包不通
+## 封包不通
 
-👉 可能：
+可能：
 
 ```
 tagging 錯CPU port 設錯
 ```
 
-## ❌ switch 沒反應
+## switch 沒反應
 
-👉 檢查：
+檢查：
 
 ```
 SPI / MDIO communication
 chip id
 ```
 
-# 🧠 12. Debug Flow
+# 12. Debug Flow
 
 
 ```
@@ -300,10 +300,10 @@ driver probe OK?
 ```
 
 
-# 🔍 13. Trace 建議
+# 13. Trace 建議
 
 
-## ✔ driver log
+## driver log
 
 ```
 pr_info("switch probe\n");
@@ -312,14 +312,14 @@ pr_info("port enable %d\n", port);
 
 ----------
 
-## ✔ ftrace
+## ftrace
 
 ```
 echo net_dev_xmit > /sys/kernel/debug/tracing/set_event
 ```
 
 
-# 🧠 14. 總結
+# 14. 總結
 
 ```
 switch driver = 初始化硬體 + 告訴 DSA core 怎麼用它

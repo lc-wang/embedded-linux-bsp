@@ -191,7 +191,7 @@ echo c > /proc/sysrq-trigger
 
 ---
 
-📘 **延伸閱讀**
+**延伸閱讀**
 - U-Boot 官方文件: https://u-boot.readthedocs.io  
 - Linux ARM64 Booting: `Documentation/arm64/booting.rst`  
 - Device Tree Spec v0.4  

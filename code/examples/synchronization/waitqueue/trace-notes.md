@@ -2,7 +2,7 @@
 # Kernel trace notes — waitqueue
 
 
-# 🟢 Level 1
+# Level 1
 
 想像：
 
@@ -13,7 +13,7 @@
 ```
 ----------
 
-# 🟡 Level 2
+# Level 2
 ```
 Thread A (read):  
  wait_event()  
@@ -30,7 +30,7 @@ Thread A 被喚醒
 ```
 ----------
 
-# 🔴 Level 3
+# Level 3
 ```
 wait_event()  
  └─ prepare_to_wait()  
@@ -42,7 +42,7 @@ wake_up()
 ```
 ----------
 
-# 🧠 與 completion 的差異
+# 與 completion 的差異
 
 | 項目       | completion   | waitqueue        |
 |------------|--------------|------------------|
@@ -53,7 +53,7 @@ wake_up()
 
 ----------
 
-# 🔥 wait_event 的本質
+# wait_event 的本質
 ```
 wait_event(wq, condition)
 ```
@@ -64,14 +64,14 @@ while (!condition)
 ```
 ----------
 
-# 🚫 常見錯誤
+# 常見錯誤
 
-❌ 忘記檢查 condition  
-❌ wake_up() 但條件沒改  
-❌ race condition（未加鎖）
+✗ 忘記檢查 condition  
+✗ wake_up() 但條件沒改  
+✗ race condition（未加鎖）
 
 ----------
 
-# 🧠 心智模型
+# 心智模型
 
 waitqueue = 睡到 condition 成立

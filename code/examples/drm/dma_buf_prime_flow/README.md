@@ -8,7 +8,7 @@ Linux dma-buf / DRM PRIME memory sharing flow 心智模型。
   
 ---  
   
-## 🎯 本章的目的  
+## 本章的目的  
   
 理解：  
   
@@ -19,7 +19,7 @@ Linux dma-buf / DRM PRIME memory sharing flow 心智模型。
   
 ---  
   
-## 🧠 一句話先記住  
+## 一句話先記住  
   
 ```text  
 dma-buf  
@@ -28,7 +28,7 @@ dma-buf
 
 ----------
 
-## 🔥 最重要觀念
+## 最重要觀念
 
 ```
 不是 copy memory
@@ -39,7 +39,7 @@ dma-buf
 
 ----------
 
-## 🧠 PRIME 是什麼？
+## PRIME 是什麼？
 
 PRIME：
 
@@ -56,7 +56,7 @@ DRM driver
 
 ----------
 
-## 🔄 真實 graphics stack
+## 真實 graphics stack
 
 ```
 GPU render
@@ -72,7 +72,7 @@ scanout
 
 ----------
 
-## 🧠 為什麼需要 dma-buf？
+## 為什麼需要 dma-buf？
 
 因為：
 
@@ -89,7 +89,7 @@ copy framebuffer 太貴
 
 ----------
 
-## 🔥 zero-copy 的核心
+## zero-copy 的核心
 
 ```
 同一塊 physical memory
@@ -98,7 +98,7 @@ copy framebuffer 太貴
 
 ----------
 
-## 🧩 Kernel 原始碼對照
+## Kernel 原始碼對照
 
 ```
 drivers/dma-buf/

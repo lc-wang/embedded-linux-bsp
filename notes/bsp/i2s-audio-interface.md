@@ -19,7 +19,7 @@ Audio 在 BSP 世界有幾個致命特性：
 -   問題常不是「完全不能用」，而是「聽起來不對」
 -   很多錯誤只在 runtime 或 suspend/resume 後出現
 
-👉 **Audio 問題通常不是 codec driver bug，而是 clock / 同步關係錯誤。**
+**Audio 問題通常不是 codec driver bug，而是 clock / 同步關係錯誤。**
 
 ----------
 
@@ -75,7 +75,7 @@ I2S 傳輸包含：
 -   依賴正確 clock 才能鎖定
 -   需要特定 MCLK / BCLK 比例
 
-👉 **Codec 沒 lock clock 時，通常不會明確報錯。**
+**Codec 沒 lock clock 時，通常不會明確報錯。**
 
 ----------
 
@@ -112,7 +112,7 @@ I2S 傳輸包含：
 -   播放成功但沒聲音
 -   聲音斷斷續續
 
-👉 **這是 BSP Audio 的經典問題。**
+**這是 BSP Audio 的經典問題。**
 
 ----------
 
@@ -207,7 +207,7 @@ cat /sys/kernel/debug/clk/clk_summary
 -   Audio 相關 clock 是否 enable 
 -   rate 是否符合 44.1k / 48k family
     
-👉 Audio 問題第一時間一定要看這裡。
+Audio 問題第一時間一定要看這裡。
 
 ----------
 

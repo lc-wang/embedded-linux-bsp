@@ -45,7 +45,7 @@ dhd_bus_rxctl()
 dhd_bus_start()
 dhd_bus_stop()
 ```
-👉 差異全部藏在 bus-specific 檔案中
+差異全部藏在 bus-specific 檔案中
 
 
 ## 3. SDIO Bus（`dhd_sdio.c`）
@@ -127,7 +127,7 @@ SDIO 為了效能，會：
 -   resume 後 aggregation state 錯亂 → RX 卡死
     
 
-📌 **SDIO 的問題 8 成來自 aggregation 與 power transition**
+**SDIO 的問題 8 成來自 aggregation 與 power transition**
 
 ----------
 
@@ -210,7 +210,7 @@ PCIe bcmdhd 使用 **msgbuf protocol**：
 -   credit / quota
     
 
-📌 **任一 ring 停止前進 = 整個 Wi-Fi 停擺**
+**任一 ring 停止前進 = 整個 Wi-Fi 停擺**
 
 ----------
 
@@ -245,7 +245,7 @@ PCIe bcmdhd 使用 **msgbuf protocol**：
 
 
 
-📌 **選擇原則**
+**選擇原則**
 
 -   IoT / 低功耗：SDIO
     

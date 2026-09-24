@@ -23,7 +23,7 @@ SPI 常見工程現實：
 -   **CS / reset / dc-gpio** 與資料正確性強烈耦合
 -   clock 一跑就錯，卻不一定會報錯
 
-👉 結果就是：
+結果就是：
 
 > _driver 看起來完全正常，但裝置永遠沒反應_
 
@@ -90,7 +90,7 @@ driver
 | CS 設定錯誤                  | Scope 看得到 Clock，但裝置未動作               |
 | Reset / DC GPIO polarity 錯 | Init sequence 永遠失敗                         |
 
-👉 **DT 錯誤 = 100% driver debug 浪費時間**。
+**DT 錯誤 = 100% driver debug 浪費時間**。
 
 ----------
 
@@ -140,7 +140,7 @@ echo spi_* > set_ftrace_filter
 -   data 是否對齊 clock edge
     
 
-👉 **只看 log，不看訊號 = SPI debug 一定失敗**。
+**只看 log，不看訊號 = SPI debug 一定失敗**。
 
 ----------
 

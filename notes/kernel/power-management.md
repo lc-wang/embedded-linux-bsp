@@ -226,7 +226,7 @@ echo 0 > /dev/cpu_dma_latency
 5.  了解 Android 上的 PowerHAL、wakelock 與 kernel wakeup source 的對應關係。
 ----------
 
-📘 **延伸閱讀**
+**延伸閱讀**
 
 -   `Documentation/power/runtime_pm.rst`  
 -   `Documentation/power/devices.rst`

@@ -161,7 +161,7 @@ psci_cpu_suspend();
 | suspend/resume 時序錯亂 | 裝置間相依關係未建立或缺少 power domain | 調整裝置依賴順序，或啟用 `genpd` trace 分析。 |
 | 喚醒後功耗異常高 | runtime PM 未恢復正確 | 確認每個驅動的 runtime suspend/resume 是否被觸發。 |
 
-💡 **小提示：**
+**小提示：**
 
 ```bash
 # 驗證裝置 suspend 狀態
@@ -186,7 +186,7 @@ cat /sys/kernel/debug/wakeup_sources
 
 ----------
 
-📘 **延伸閱讀**
+**延伸閱讀**
 -   `Documentation/power/suspend-and-hibernate.rst`
 -   `Documentation/power/runtime_pm.rst`
 -   `drivers/base/power/`

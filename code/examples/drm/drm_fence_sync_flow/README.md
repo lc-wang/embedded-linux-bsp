@@ -9,7 +9,7 @@ DRM / GPU synchronization 與 dma_fence flow 心智模型。
 
 ---
 
-## 🎯 本章的目的
+## 本章的目的
 
 理解：
 
@@ -21,13 +21,13 @@ DRM / GPU synchronization 與 dma_fence flow 心智模型。
 
 ---
 
-## 🧠 一句話先記住
+## 一句話先記住
 
 ```text
 fence
 = 「這份工作完成了嗎？」的同步機制
 ```
-## 🔥 為什麼 graphics stack 一定需要 sync？
+## 為什麼 graphics stack 一定需要 sync？
 
 因為：
 
@@ -41,7 +41,7 @@ display scanout
 
 ----------
 
-## 🧠 沒同步會怎樣？
+## 沒同步會怎樣？
 
 可能：
 
@@ -59,7 +59,7 @@ display controller 已開始 scanout
 
 ----------
 
-## 🔄 真正 graphics flow
+## 真正 graphics flow
 
 ```
 GPU render
@@ -77,7 +77,7 @@ page flip
 
 ----------
 
-## 🧠 dma_fence 是什麼？
+## dma_fence 是什麼？
 
 ```
 dma_fence
@@ -92,7 +92,7 @@ dma_fence
 
 ----------
 
-## 🧠 sync_file 是什麼？
+## sync_file 是什麼？
 
 ```
 sync_file
@@ -109,7 +109,7 @@ dma_fence
 
 ----------
 
-## 🧩 Kernel 原始碼對照
+## Kernel 原始碼對照
 
 ```
 drivers/dma-buf/dma-fence.c

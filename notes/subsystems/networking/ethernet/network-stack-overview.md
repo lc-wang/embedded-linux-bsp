@@ -1,4 +1,4 @@
-## 🧠 Linux Network Stack Overview
+## Linux Network Stack Overview
 
 本章節從 **BSP / Driver 工程師角度**，說明 Linux 網路 stack 的整體架構，重點放在：
 
@@ -8,7 +8,7 @@
 
 ----------
 
-## 🧩 1. 整體架構（由上到下）
+## 1. 整體架構（由上到下）
 
 +-----------------------------+  
 |        User Space           |  
@@ -51,7 +51,7 @@
 
 ----------
 
-## 🔁 2. TX Flow（送封包）
+## 2. TX Flow（送封包）
 ```
 User space  
  ↓ send()  
@@ -67,7 +67,7 @@ DMA → MAC
  ↓  
 PHY → Wire
 ```
-### 📌 關鍵點
+### 關鍵點
 
 -   driver entry point：
 ```
@@ -80,7 +80,7 @@ cat /proc/net/dev
 ```
 ----------
 
-## 🔁 3. RX Flow（收封包）
+## 3. RX Flow（收封包）
 ```
 Wire  
  ↓  
@@ -100,14 +100,14 @@ socket buffer
  ↓  
 User space
 ```
-### 📌 關鍵點
+### 關鍵點
 
 -   RX 通常走 **NAPI（polling）**
 -   skb（socket buffer）是核心資料結構
 
 ----------
 
-## 📦 4. 核心資料結構：`sk_buff`
+## 4. 核心資料結構：`sk_buff`
 ```
 struct  sk_buff {  
   unsigned  char  *data;  
@@ -122,7 +122,7 @@ struct  sk_buff {
 
 ----------
 
-## 🔌 5. `net_device`（Driver 核心）
+## 5. `net_device`（Driver 核心）
 ```
 struct  net_device {  
   const  struct  net_device_ops  *netdev_ops;  
@@ -141,7 +141,7 @@ dev->netdev_ops  =  &ops;
 ```
 ----------
 
-## 🔗 6. Ethernet Driver 在哪裡？
+## 6. Ethernet Driver 在哪裡？
 
 常接觸的 driver：
 
@@ -158,7 +158,7 @@ MAC register control
 ```
 ----------
 
-## 🔬 7. PHY / MDIO 在 stack 中的位置
+## 7. PHY / MDIO 在 stack 中的位置
 ```
 MAC driver  
  ↓  
@@ -176,7 +176,7 @@ PHY 負責：
 
 ----------
 
-## 🧪 8. Bring-up 觀察點
+## 8. Bring-up 觀察點
 
 ### 開機 log
 ```
@@ -193,20 +193,20 @@ dmesg | grep phy
 ```
 ----------
 
-## 🧰 9. 關注點
+## 9. 關注點
 
-### ✔ Driver 層
+### Driver 層
 
 -   DMA 是否正常
 -   descriptor 是否跑
 -   interrupt 是否進來
 
-### ✔ PHY 層
+### PHY 層
 
 -   MDIO 是否能讀
 -   link 是否 up
 
-### ✔ DTS
+### DTS
 
 -   phy-mode 是否正確
 -   clock / reset

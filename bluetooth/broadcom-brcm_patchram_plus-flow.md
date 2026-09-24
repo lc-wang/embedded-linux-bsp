@@ -22,7 +22,7 @@
     -   掃描不到任何 device
         
 
-👉 **原因在於：brcm_patchram_plus 只是「初始化的一部分」**  
+**原因在於：brcm_patchram_plus 只是「初始化的一部分」**  
 它不是 Bluetooth stack，也不保證 kernel 接手後一定成功。
 
 本章會把它當成一個「狀態轉換器」來看，而不是魔法工具。
@@ -44,7 +44,7 @@ Kernel (hci_uart / btusb)
        ▼
 BlueZ
 ```
-📌 **brcm_patchram_plus 的責任只到「Controller ready」為止**  
+**brcm_patchram_plus 的責任只到「Controller ready」為止**  
 後面的：
 
 -   HCI device lifecycle
@@ -88,7 +88,7 @@ BlueZ
     -   flow control（依參數）
         
 
-👉 **這一步如果跟 kernel driver 同時做，後面一定爆**
+**這一步如果跟 kernel driver 同時做，後面一定爆**
 
 ----------
 
@@ -128,7 +128,7 @@ btmon 觀察點：
 > HCI Command: Reset
 < HCI Event: Command Complete (Reset)
 ```
-👉 **如果這一步沒過，後面完全不用看**
+**如果這一步沒過，後面完全不用看**
 
 ----------
 
@@ -166,7 +166,7 @@ btmon 觀察點：
     -   通常下載後馬上 reset
         
 
-👉 **不是每顆 chip 都需要**
+**不是每顆 chip 都需要**
 
 ----------
 
@@ -214,7 +214,7 @@ brcm_patchram_plus 會：
 4.  等待每筆 command 的 completion
     
 
-📌 **這是一個高度同步、對 framing 極度敏感的流程**
+**這是一個高度同步、對 framing 極度敏感的流程**
 
 ----------
 
@@ -321,11 +321,11 @@ brcm_patchram_plus 會：
 
 **只能選一種控制權模型：**
 
--   ✔ brcm_patchram_plus → kernel attach（嚴格控順序）
+-   ✓ brcm_patchram_plus → kernel attach（嚴格控順序）
     
--   ✔ kernel btbcm 全權處理
+-   ✓ kernel btbcm 全權處理
     
--   ✘ 兩邊混用
+-   ✗ 兩邊混用
     
 
-📌 **混用 = 長期不穩定**
+**混用 = 長期不穩定**

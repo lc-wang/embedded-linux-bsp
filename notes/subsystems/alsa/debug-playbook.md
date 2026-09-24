@@ -5,7 +5,7 @@
 
 ----------
 
-# 🎯 本章目標
+# 本章目標
 
 當遇到：
 
@@ -24,7 +24,7 @@
 
 ----------
 
-# 1️⃣ 音訊問題分類模型
+# 1. 音訊問題分類模型
 
 音訊問題通常分成四大類：
 ```
@@ -35,7 +35,7 @@
 ```
 ----------
 
-# 2️⃣ Case A：Sound Card 根本沒出現
+# 2. Case A：Sound Card 根本沒出現
 
 ## 症狀
 
@@ -78,7 +78,7 @@ Machine driver probe ?`
 
 ----------
 
-# 3️⃣ Case B：PCM 打不開
+# 3. Case B：PCM 打不開
 
 ## 症狀
 
@@ -104,7 +104,7 @@ cat /proc/asound/pcm
 
 ----------
 
-# 4️⃣ Case C：PCM 正常但沒聲音
+# 4. Case C：PCM 正常但沒聲音
 
 這是 BSP 地獄。
 
@@ -179,7 +179,7 @@ GPIO 沒開也會沒聲音。
 
 ----------
 
-# 5️⃣ Case D：有聲音但異常
+# 5. Case D：有聲音但異常
 
 ----------
 
@@ -227,7 +227,7 @@ GPIO 沒開也會沒聲音。
 
 ----------
 
-# 6️⃣ Bring-up 標準流程
+# 6. Bring-up 標準流程
 
 不要亂 debug。
 
@@ -277,7 +277,7 @@ GPIO 沒開也會沒聲音。
 
 ----------
 
-# 7️⃣ 常見真實錯誤
+# 7. 常見真實錯誤
 
 
 DAPM routing 少一段
@@ -292,7 +292,7 @@ DTS format mismatch
 
 ----------
 
-# 8️⃣ 快速決策樹
+# 8. 快速決策樹
 ```
 沒聲音？
   ↓
@@ -312,27 +312,27 @@ GPIO speaker enable？
 
 ----------
 
-# 9️⃣ 高階 Debug 技巧
+# 9. 高階 Debug 技巧
 
-### 1️⃣ 打開 dynamic debug
+### 1. 打開 dynamic debug
 
 `echo  'file sound/soc/* +p' > /sys/kernel/debug/dynamic_debug/control` 
 
 ----------
 
-### 2️⃣ 在 hw_params 加 printk
+### 2. 在 hw_params 加 printk
 
 看 sample rate 是否正確。
 
 ----------
 
-### 3️⃣ 追蹤 dapm power event
+### 3. 追蹤 dapm power event
 
 `echo 1 > /sys/kernel/debug/asoc/dapm_debug` 
 
 ----------
 
-# 🔟 心智模型總結
+# 10. 心智模型總結
 
 ASoC 成功條件：
 

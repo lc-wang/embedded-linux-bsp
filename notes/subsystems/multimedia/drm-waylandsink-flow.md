@@ -6,7 +6,7 @@
 
 ----------
 
-# 1️⃣ Sink 的兩種路徑
+# 1. Sink 的兩種路徑
 
 GStreamer 顯示有兩種主要方式：
   
@@ -17,7 +17,7 @@ GStreamer 顯示有兩種主要方式：
 
 ----------
 
-# 2️⃣ kmssink Flow
+# 2. kmssink Flow
 
 ## Pipeline
 ```
@@ -60,7 +60,7 @@ DRM_IOCTL_MODE_SETPLANE
 ```
 ----------
 
-# 3️⃣ DRM 核心元件
+# 3. DRM 核心元件
 
 DRM display pipeline：
 ```
@@ -95,7 +95,7 @@ Panel
 
 ----------
 
-# 4️⃣ kmssink 與 DRM Mapping
+# 4. kmssink 與 DRM Mapping
 
 | kmssink 行為 | DRM 對應 |  
 |---------------|-------------------------|  
@@ -105,7 +105,7 @@ Panel
 
 ----------
 
-# 5️⃣ Atomic Commit Flow
+# 5. Atomic Commit Flow
 
 kmssink 使用 atomic modeset：
 ```
@@ -148,7 +148,7 @@ hardware update
 ```
 ----------
 
-# 6️⃣ DMABUF → DRM
+# 6. DMABUF → DRM
 
 kmssink 通常接收：
 ```
@@ -169,19 +169,19 @@ framebuffer
 ```
 ----------
 
-# 7️⃣ Zero-Copy Display
+# 7. Zero-Copy Display
 ```
 camera → dmabuf → DRM → panel
 ```
 沒有：
 
-❌ CPU copy
+✗ CPU copy
 
 這是 embedded display pipeline 核心。
 
 ----------
 
-# 8️⃣ waylandsink Flow
+# 8. waylandsink Flow
 
 ## Pipeline
 ```
@@ -218,7 +218,7 @@ client → Wayland protocol
 
 ----------
 
-# 9️⃣ Wayland 架構
+# 9. Wayland 架構
 ```
 Application (waylandsink)  
  │  
@@ -236,7 +236,7 @@ Display
 ```
 ----------
 
-# 🔟 kmssink vs waylandsink
+# 10. kmssink vs waylandsink
 
 | 項目 | kmssink | waylandsink |  
 |---------|--------------|--------------------|  
@@ -247,10 +247,10 @@ Display
 
 ----------
 
-# 11️⃣ BSP 常見問題
+# 11. BSP 常見問題
 
 
-## ❌ kmssink 無畫面
+## kmssink 無畫面
 
 原因：
 ```
@@ -260,7 +260,7 @@ mode 不正確
 ```
 ----------
 
-## ❌ atomic commit fail
+## atomic commit fail
 
 原因：
 ```
@@ -269,7 +269,7 @@ format mismatch
 ```
 ----------
 
-## ❌ 有 connector 但沒畫面
+## 有 connector 但沒畫面
 
 原因：
 ```
@@ -278,7 +278,7 @@ plane 沒 attach
 ```
 ----------
 
-## ❌ waylandsink 有畫面但 kmssink 沒有
+## waylandsink 有畫面但 kmssink 沒有
 
 原因：
 ```
@@ -287,7 +287,7 @@ compositor 幫你處理
 ```
 ----------
 
-# 12️⃣ Debug 工具
+# 12. Debug 工具
 
 
 ## modetest
@@ -324,7 +324,7 @@ echo 0x1ff > /sys/module/drm/parameters/debug
 ```
 GST_DEBUG=3 gst-launch-1.0 v4l2src ! kmssink
 ```
-# 13️⃣ Debug 思維
+# 13. Debug 思維
 
 當畫面不顯示：
 

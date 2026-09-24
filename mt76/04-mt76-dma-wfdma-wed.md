@@ -464,15 +464,15 @@ bandwidth
 
 原因：
 
-1️⃣ **queue abstraction**
+1. **queue abstraction**
 ```
 struct mt76_queue
 ```
-2️⃣ **bus abstraction**
+2. **bus abstraction**
 ```
 mt76_bus_ops
 ```
-3️⃣ **chipset ops**
+3. **chipset ops**
 ```
 mt76_driver_ops
 ```

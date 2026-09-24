@@ -224,7 +224,7 @@ schedule_delayed_work(&dev->dwork, msecs_to_jiffies(10));
 
 ## 7. 常見錯誤（Pitfalls）
 
-### ❌ Tasklet 裡睡眠
+### Tasklet 裡睡眠
 
 ```
 BUG: sleeping function called from invalid context
@@ -232,7 +232,7 @@ BUG: sleeping function called from invalid context
 
 原因：tasklet 在 softirq context
 
-### ❌ Workqueue race → Use-after-free
+### Workqueue race → Use-after-free
 
 若在 module_exit 未 flush：
 
@@ -243,7 +243,7 @@ flush_workqueue(wq);
 
 否則 worker 仍可能存取已釋放的結構 → crash
 
-### ❌ Tasklet 做太久 → softirq 壅塞
+### Tasklet 做太久 → softirq 壅塞
 
 導致：
 
@@ -251,7 +251,7 @@ flush_workqueue(wq);
 -   全系統 latency 升高
     
 
-### ❌ 使用 system_wq 處理 heavy job
+### 使用 system_wq 處理 heavy job
 
 會拖慢其他子系統（網路、調度器）  
 → 應建立專屬 workqueue

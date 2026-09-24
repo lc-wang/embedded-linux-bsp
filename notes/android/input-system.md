@@ -280,13 +280,13 @@ InputDispatcher → reportANR()
 | InputDispatcher thread 被排到小 core       | Input dispatch 延遲，影響互動回饋 |
 | system_server 的 uclamp.min 設定過低       | Wakeup latency 偏高              |
 | Background task 佔用過多 CPU               | Input thread 被搶佔，產生卡頓     |
-👉 **這些問題在 input log 中是看不到的**
+**這些問題在 input log 中是看不到的**
 
 ----------
 
 ### 11.4 Input latency 的實戰 debug 路徑
 
-#### 1️⃣ 確認 input threads 所屬 cgroup
+#### 1. 確認 input threads 所屬 cgroup
 ```sh
 ps -e -o pid,tid,comm,cgroup | grep Input
 ```
@@ -297,14 +297,14 @@ ps -e -o pid,tid,comm,cgroup | grep Input
 
 ----------
 
-#### 2️⃣ 檢查 system / foreground cgroup 的 uclamp
+#### 2. 檢查 system / foreground cgroup 的 uclamp
 ```sh
 cat /sys/fs/cgroup/system/uclamp.min
 cat /sys/fs/cgroup/foreground/uclamp.min
 ```
 ----------
 
-#### 3️⃣ 對照 input 與 scheduler trace
+#### 3. 對照 input 與 scheduler trace
 ```sh
 atrace input sched gfx
 ```
@@ -330,7 +330,7 @@ atrace input sched gfx
 -   但 UX 仍然明顯變差
 ---
 
-📘 **延伸閱讀**
+**延伸閱讀**
 - frameworks/native/services/inputflinger  
 - frameworks/base/services/core/java/com/android/server/input  
 - input 子系統：`Documentation/input/`  

@@ -94,7 +94,7 @@ STORE x=1
 
 記法：
 ```yaml
-sm‍p_mb() = multiprocessor full barrier
+smp_mb() = multiprocessor full barrier
 ```
 ---
 

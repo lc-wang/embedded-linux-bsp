@@ -11,7 +11,7 @@
 
 ---
 
-## 🎯 本章的目的
+## 本章的目的
 
 理解：
 
@@ -22,7 +22,7 @@
 
 ---
 
-## 🧠 快速心智模型
+## 快速心智模型
 
 read/write
 = copy
@@ -33,7 +33,7 @@ mmap
 
 ---
 
-## 🧩 Kernel 原始碼對照
+## Kernel 原始碼對照
 ```
 mm/mmap.c
 mm/memory.c
@@ -44,7 +44,7 @@ include/linux/mm.h
 
 ---
 
-## ✅ Build / Run
+## Build / Run
 
 ### 1) 編 kernel module
 ```bash
@@ -64,7 +64,7 @@ make
 ```
 dmesg | tail -n 80
 ```
-⚠ 注意
+注意
 本章為了「最小化」，只映射 1 page（4KB）。
 
 

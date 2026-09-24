@@ -3,7 +3,7 @@
 
 ---
 
-## 🔍 kmalloc() 走哪裡？
+## kmalloc() 走哪裡？
 ```
 kmalloc()
 	└─ slab allocator
@@ -16,7 +16,7 @@ kmalloc()
 
 ---
 
-## 🔍 vmalloc() 走哪裡？
+## vmalloc() 走哪裡？
 ```
 vmalloc()
 	└─ vmap()
@@ -29,7 +29,7 @@ vmalloc()
 
 ---
 
-## 🧠 為什麼 vmalloc 不能 DMA？
+## 為什麼 vmalloc 不能 DMA？
 
 因為：
 
@@ -44,7 +44,7 @@ phys addr 不連續
 
 ---
 
-## 🔥 常見 driver 實例
+## 常見 driver 實例
 
 | Driver | 使用 |
 |------|------|
@@ -55,7 +55,7 @@ phys addr 不連續
 
 ---
 
-## ⚠ Context 限制
+## Context 限制
 
 GFP_KERNEL → 可以睡眠
 GFP_ATOMIC → 不能睡眠
@@ -69,7 +69,7 @@ GFP_ATOMIC → 不能睡眠
 
 ---
 
-## 🧠 心智模型
+## 心智模型
 
 kmalloc
 = 小、快、可 DMA

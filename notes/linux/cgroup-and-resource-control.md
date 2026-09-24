@@ -116,7 +116,7 @@ CPU controller 的核心不是「保證多少 CPU」，而是：
 -   latency 顯著增加
     
 
-👉 很多效能問題不是 scheduler bug，而是 cgroup 設定結果。
+很多效能問題不是 scheduler bug，而是 cgroup 設定結果。
 
 ----------
 
@@ -162,7 +162,7 @@ IO controller 解決的是：
 -   indirect CPU stall
     
 
-👉 IO 問題常表現為「CPU 在等」。
+IO 問題常表現為「CPU 在等」。
 
 ----------
 

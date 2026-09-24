@@ -8,7 +8,7 @@ DRM atomic commit flow 心智模型。
   
 ---  
   
-## 🎯 本章的目的  
+## 本章的目的  
   
 理解：  
   
@@ -20,7 +20,7 @@ DRM atomic commit flow 心智模型。
   
 ---  
   
-## 🧠 一句話先記住  
+## 一句話先記住  
   
 ```text  
 atomic commit  
@@ -29,7 +29,7 @@ atomic commit
 
 ----------
 
-## 🔥 為什麼需要 atomic？
+## 為什麼需要 atomic？
 
 舊世界：
 
@@ -55,7 +55,7 @@ atomic commit
 
 ----------
 
-## 🧠 atomic commit 更新哪些東西？
+## atomic commit 更新哪些東西？
 
 ```
 plane state
@@ -65,7 +65,7 @@ connector state
 
 ----------
 
-## 🔄 最核心流程
+## 最核心流程
 
 ```
 userspace atomic request
@@ -83,7 +83,7 @@ hardware update
 
 ----------
 
-## 🧠 真正重要的觀念
+## 真正重要的觀念
 
 atomic commit 的本質：
 
@@ -96,7 +96,7 @@ atomic commit 的本質：
 
 ----------
 
-## 🧩 Kernel 原始碼對照
+## Kernel 原始碼對照
 
 ```
 drivers/gpu/drm/drm_atomic.c

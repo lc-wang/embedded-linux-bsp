@@ -1,7 +1,7 @@
 
-# 🧠 TPM and Attestation
+# TPM and Attestation
 
-## 🎯 本章目的
+## 本章目的
 
 本章要把以下幾個概念串起來：
 
@@ -25,11 +25,11 @@ Event Log 為什麼需要存在？
 Remote Attestation 怎麼判斷 device 是否可信？
 ```
 
-👉 這一章是理解 Measured Boot、Remote Attestation、Key Sealing 的基礎。
+這一章是理解 Measured Boot、Remote Attestation、Key Sealing 的基礎。
 
 ----------
 
-## 🧭 一張圖先看懂
+## 一張圖先看懂
 
 ```
 [Bootloader / Firmware]
@@ -59,7 +59,7 @@ Attestation 負責證明目前 device state。
 
 ----------
 
-## 1️⃣ TPM 是什麼？
+## 1. TPM 是什麼？
 
 TPM 是：
 
@@ -102,7 +102,7 @@ Device identity
 
 ----------
 
-## 2️⃣ TPM 和 Secure Boot 的差異
+## 2. TPM 和 Secure Boot 的差異
 
 TPM 主要不是拿來「擋 image 執行」。
 
@@ -125,7 +125,7 @@ TPM 主要不是拿來「擋 image 執行」。
 
 ----------
 
-## 3️⃣ PCR 是什麼？
+## 3. PCR 是什麼？
 
 PCR 是：
 
@@ -164,7 +164,7 @@ PCR_new = Hash(PCR_old || measurement)
 
 ----------
 
-## 4️⃣ PCR Extend Flow
+## 4. PCR Extend Flow
 
 Measured Boot 中常見流程：
 
@@ -215,7 +215,7 @@ Event Log 保存的是每一次 measurement 的明細。
 
 ----------
 
-## 5️⃣ Event Log 是什麼？
+## 5. Event Log 是什麼？
 
 PCR 只有最後的 hash 結果。
 
@@ -253,7 +253,7 @@ Event Log:
 
 ----------
 
-## 6️⃣ 為什麼只有 PCR 不夠？
+## 6. 為什麼只有 PCR 不夠？
 
 假設 PCR 值變了：
 
@@ -291,7 +291,7 @@ find changed component
 
 ----------
 
-## 7️⃣ Measured Boot 基本流程
+## 7. Measured Boot 基本流程
 
 完整一點的 measured boot flow：
 
@@ -324,7 +324,7 @@ Measured Boot 不一定阻止開機。
 
 ----------
 
-## 8️⃣ Attestation 是什麼？
+## 8. Attestation 是什麼？
 
 Attestation 是：
 
@@ -349,7 +349,7 @@ Attestation 的目標不是單純讀 PCR，而是：
 
 ----------
 
-## 9️⃣ TPM Quote 是什麼？
+## 9. TPM Quote 是什麼？
 
 TPM Quote 是 attestation 的核心動作之一。
 
@@ -381,7 +381,7 @@ Nonce 可以防止 replay old quote。
 
 ----------
 
-## 🔟 Remote Attestation Flow
+## 10. Remote Attestation Flow
 
 典型 remote attestation：
 
@@ -427,7 +427,7 @@ trigger remediation
 
 ----------
 
-## 1️⃣1️⃣ Known-good Baseline 是什麼？
+## 11. Known-good Baseline 是什麼？
 
 Known-good baseline 是：
 
@@ -457,7 +457,7 @@ Product A firmware v1.2 security fix
 
 ----------
 
-## 1️⃣2️⃣ Key Sealing 是什麼？
+## 12. Key Sealing 是什麼？
 
 Key Sealing 是 TPM 另一個常見用途。
 
@@ -501,7 +501,7 @@ flow：
 
 ----------
 
-## 1️⃣3️⃣ TPM 在 Embedded Linux 的位置
+## 13. TPM 在 Embedded Linux 的位置
 
 Embedded Linux 常見架構：
 
@@ -541,7 +541,7 @@ seal / unseal secret
 
 ----------
 
-## 1️⃣4️⃣ Linux TPM Debug
+## 14. Linux TPM Debug
 
 ### Step 1：確認 TPM device
 
@@ -650,7 +650,7 @@ tpm2_quote
 
 ----------
 
-## 1️⃣5️⃣ Device Tree / Driver 注意事項
+## 15. Device Tree / Driver 注意事項
 
 如果是 discrete TPM，BSP 常見要確認：
 
@@ -695,9 +695,9 @@ interrupt routing
 
 ----------
 
-## 1️⃣6️⃣ Attestation 常見錯誤
+## 16. Attestation 常見錯誤
 
-### ❌ 有 PCR，但沒有 Event Log
+### 有 PCR，但沒有 Event Log
 
 結果：
 
@@ -716,7 +716,7 @@ interrupt routing
 
 ----------
 
-### ❌ 有 Event Log，但沒有 Policy
+### 有 Event Log，但沒有 Policy
 
 結果：
 
@@ -735,7 +735,7 @@ key sealing policy
 
 ----------
 
-### ❌ PCR 每次開機都不同
+### PCR 每次開機都不同
 
 可能原因：
 
@@ -758,7 +758,7 @@ Debug 方式：
 
 ----------
 
-### ❌ Quote 沒有 nonce
+### Quote 沒有 nonce
 
 如果 quote 沒有 challenge nonce，可能被 replay。
 
@@ -772,7 +772,7 @@ verifier 檢查 nonce 是否一致
 
 ----------
 
-### ❌ Baseline 沒有版本管理
+### Baseline 沒有版本管理
 
 Firmware update 後 PCR 合理變化。
 
@@ -797,7 +797,7 @@ security patch level
 ----------
 
 
-## 1️⃣7️⃣ TPM vs OP-TEE 的差異  
+## 17. TPM vs OP-TEE 的差異  
   
 TPM 和 OP-TEE 都跟平台安全有關，但角色不同。  
   
@@ -819,7 +819,7 @@ OP-TEE 偏向提供 Secure World runtime 與安全服務。
 
 ----------
 
-## 1️⃣8️⃣ BSP Checklist
+## 18. BSP Checklist
 
 ```
 [ ] TPM hardware / fTPM implementation is identified

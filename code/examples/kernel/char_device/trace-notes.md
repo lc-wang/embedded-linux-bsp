@@ -3,7 +3,7 @@
 
 ---
 
-## 🧩 /dev 節點從哪來？
+## /dev 節點從哪來？
 ```
 device_create()
 └─ drivers/base/core.c
@@ -14,7 +14,7 @@ device_create()
 
 ---
 
-## 🔍 open() trace
+## open() trace
 ```
 open("/dev/mychardev")
 └─ sys_openat
@@ -27,7 +27,7 @@ open("/dev/mychardev")
 
 ---
 
-## 📖 read() trace
+## read() trace
 ```
 read()
 └─ vfs_read()
@@ -37,7 +37,7 @@ read()
 
 ---
 
-## ✍ write() trace
+## write() trace
 ```
 write()
 └─ vfs_write()
@@ -47,7 +47,7 @@ write()
 
 ---
 
-## 🔧 ioctl() trace
+## ioctl() trace
 ```
 ioctl()
 └─ do_vfs_ioctl()
@@ -57,7 +57,7 @@ ioctl()
 
 ---
 
-## 🧠 最重要心智模型
+## 最重要心智模型
 ```
 userspace
 ↓
@@ -72,12 +72,12 @@ driver
 
 ---
 
-## 🚫 常見錯誤觀念
+## 常見錯誤觀念
 
-❌ /dev 是 driver  
-❌ open() 直接進 driver  
+✗ /dev 是 driver  
+✗ open() 直接進 driver  
 
-✅ 實際是：
+✓ 實際是：
 
 inode → struct file → f_op
 
@@ -85,7 +85,7 @@ driver 只是 callback 集合。
 
 ---
 
-## 🔥 為什麼這一章超重要？
+## 為什麼這一章超重要？
 
 因為：
 

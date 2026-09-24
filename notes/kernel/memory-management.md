@@ -53,12 +53,12 @@ Linux 將實體記憶體以 **4KB Page** 為單位管理，
 
 | 函式 | 特性 | 物理連續性 | 用途 |
 | --- | --- | --- | --- |
-| **kmalloc()** | 快速分配小記憶體 | ✅ 物理連續 | 小型緩衝區、結構體 |
-| **vmalloc()** | 分配大區塊記憶體 | ❌ 不保證物理連續 | 大型緩衝區、映射 I/O |
-| **alloc_pages()** | 直接操作頁框 | ✅ 物理連續 | DMA / frame buffer |
-| **kzalloc()** | kmalloc + memset(0) | ✅ | 初始化為 0 的分配 |
+| **kmalloc()** | 快速分配小記憶體 | ✓ 物理連續 | 小型緩衝區、結構體 |
+| **vmalloc()** | 分配大區塊記憶體 | ✗ 不保證物理連續 | 大型緩衝區、映射 I/O |
+| **alloc_pages()** | 直接操作頁框 | ✓ 物理連續 | DMA / frame buffer |
+| **kzalloc()** | kmalloc + memset(0) | ✓ | 初始化為 0 的分配 |
 
-💡 **補充：**
+**補充：**
 - `kmalloc()` 底層仍透過 **slab/slub 分配器**。  
 - `vmalloc()` 使用非連續物理記憶體，但虛擬位址連續。  
 - `alloc_pages()` 是更底層接口，直接與 page allocator 溝通。
@@ -136,7 +136,7 @@ dma_sync_single_for_device(dev, dma_handle, BUF_SIZE, DMA_TO_DEVICE);
 
 ---
 
-### 🧰 常用工具與節點
+### 常用工具與節點
 
 | 工具 / 節點 | 功能說明 |
 |:--|:--|
@@ -149,22 +149,22 @@ dma_sync_single_for_device(dev, dma_handle, BUF_SIZE, DMA_TO_DEVICE);
 
 ---
 
-### 📋 啟用與使用範例
+### 啟用與使用範例
 
-**1️⃣ 啟用 page_owner**
+**1. 啟用 page_owner**
 
 ```bash
 echo 1 > /sys/kernel/debug/page_owner
 cat /sys/kernel/debug/page_owner | grep my_driver
 ```
-**2️⃣ 檢查 kmemleak 結果**
+**2. 檢查 kmemleak 結果**
 ```bash
 # 啟用
 echo scan > /sys/kernel/debug/kmemleak
 # 檢視洩漏報告
 cat /sys/kernel/debug/kmemleak
 ```
-**3️⃣ 追蹤記憶體函式呼叫**
+**3. 追蹤記憶體函式呼叫**
 ```bash
 echo function > /sys/kernel/debug/tracing/current_tracer
 echo 'kmalloc*' > /sys/kernel/debug/tracing/set_ftrace_filter
@@ -187,12 +187,12 @@ cat /sys/kernel/debug/tracing/trace_pipe
 
 ---
 
-### 🧩 附註
+### 附註
 - 若懷疑 **memory leak**，可啟用 `CONFIG_DEBUG_KMEMLEAK`。
 - 若懷疑 **fragmentation**，可觀察 `/proc/pagetypeinfo` 與 `buddyinfo`。
 - 若懷疑 **DMA mapping 問題**，建議開啟 `CONFIG_DMA_API_DEBUG` 以追蹤錯誤映射。
 
-📘 **延伸閱讀**
+**延伸閱讀**
 
 -   `Documentation/core-api/memory-allocation.rst`
 -   `Documentation/vm/`   

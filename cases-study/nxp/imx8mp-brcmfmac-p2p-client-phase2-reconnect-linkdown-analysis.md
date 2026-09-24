@@ -169,7 +169,7 @@ connstat event=0  up=1                     ← 真正 link-up → phase-2 繼續
 WPS-SUCCESS → WPA: Key negotiation completed [PTK=CCMP GTK=CCMP]
 P2P-GROUP-STARTED p2p-wlan0-N client freq=5180 / 5745
 DHCP → 192.168.49.94（第二次 .226）
-ping 192.168.49.1（GO）→ 0% loss ✔    ← 全程無 escan -52 迴圈
+ping 192.168.49.1（GO）→ 0% loss ✓    ← 全程無 escan -52 迴圈
 ```
 
 - **兩次皆成功。** 且觀察到假 link-down 是**間歇性**的：第 1 次有（down=1、fix 觸發）、

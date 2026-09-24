@@ -1,7 +1,7 @@
 # Kernel trace notes — drm_fence_sync_flow  
 
   
-# 🟢 Level 1：用人話理解  
+# Level 1：用人話理解  
   
 假設：  
   
@@ -23,7 +23,7 @@ GPU 到底畫完了沒？
 
 ----------
 
-# 🟢 fence 是什麼？
+# fence 是什麼？
 
 fence：
 
@@ -47,7 +47,7 @@ signal fence
 
 ----------
 
-# 🟡 Level 2：graphics synchronization
+# Level 2：graphics synchronization
 
 
 ## 沒 fence 的世界
@@ -94,7 +94,7 @@ GPU signal done
 
 ----------
 
-# 🔥 acquire fence 是什麼？
+# acquire fence 是什麼？
 
 ```
 consumer 等 producer 完成
@@ -110,7 +110,7 @@ consumer 等 producer 完成
 | decoder | compositor |
 ----------
 
-# 🔥 release fence 是什麼？
+# release fence 是什麼？
 
 ```
 consumer 通知：
@@ -121,7 +121,7 @@ producer 才能安全 reuse buffer。
 
 ----------
 
-# 🟡 explicit sync vs implicit sync
+# explicit sync vs implicit sync
 
 ## implicit sync
 
@@ -156,7 +156,7 @@ OUT_FENCE_PTR
 
 ----------
 
-# 🔴 Level 3：kernel trace（真正發生什麼）
+# Level 3：kernel trace（真正發生什麼）
 
 
 ## GPU driver
@@ -233,7 +233,7 @@ dma_fence_wait()
 
 ----------
 
-# 🔥 真正 page flip timing
+# 真正 page flip timing
 
 ```
 GPU render done
@@ -249,7 +249,7 @@ page flip
 
 ----------
 
-# 🧠 Android 世界
+# Android 世界
 
 SurfaceFlinger / HWC：
 
@@ -265,7 +265,7 @@ release fence
 
 ----------
 
-# 🧠 Wayland 世界
+# Wayland 世界
 
 Wayland compositor：
 
@@ -277,7 +277,7 @@ linux explicit sync protocol
 
 ----------
 
-# 🧠 Vulkan 世界
+# Vulkan 世界
 
 Vulkan：
 
@@ -290,7 +290,7 @@ sync fd
 
 ----------
 
-# 🔥 最重要觀念
+# 最重要觀念
 
 ```
 atomic commit
@@ -302,7 +302,7 @@ atomic commit
 
 ----------
 
-# 🧠 最重要一句話
+# 最重要一句話
 
 ```
 fence 的本質：「這塊 memory 現在能安全被使用了嗎？」

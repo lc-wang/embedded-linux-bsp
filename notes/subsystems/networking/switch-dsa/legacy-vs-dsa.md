@@ -1,5 +1,5 @@
 
-## 🧠 Legacy (ethss / ethsw) vs DSA（
+## Legacy (ethss / ethsw) vs DSA（
 
 本章節重點：
 
@@ -10,15 +10,15 @@
 
 ----------
 
-# 🧩 1. 兩個世界
+# 1. 兩個世界
 
-## 🔴 Legacy（ethss / ethsw）
+## Legacy（ethss / ethsw）
 
 ```
 Vendor BSP（私有實作）
 ```
 
-👉 常見：
+常見：
 
 -   NXP（FEC + switch）
 -   Renesas（ethss）
@@ -27,9 +27,9 @@ Vendor BSP（私有實作）
 
 ----------
 
-## 🟢 DSA（Distributed Switch Architecture）
+## DSA（Distributed Switch Architecture）
 
-👉 Distributed Switch Architecture
+Distributed Switch Architecture
 
 ```
 Linux upstream 標準架構
@@ -37,9 +37,9 @@ Linux upstream 標準架構
 
 ----------
 
-# 🔥 2. 架構對比
+# 2. 架構對比
 
-## 🔴 Legacy（ethss / ethsw）
+## Legacy（ethss / ethsw）
 
 ```
 CPU
@@ -52,7 +52,7 @@ Switch chip
  └── port3
 ```
 
-👉 特點：
+特點：
 
 ```
 只有一個 netdev（eth0）
@@ -60,7 +60,7 @@ Switch chip
 
 ----------
 
-## 🟢 DSA
+## DSA
 
 ```
 CPU
@@ -73,7 +73,7 @@ Switch
  └── lan3
 ```
 
-👉 特點：
+特點：
 
 ```
 每個 port 都有 netdev
@@ -81,10 +81,10 @@ Switch
 
 ----------
 
-# 🔁 3. Packet Flow 對照
+# 3. Packet Flow 對照
 
 
-## 🔴 Legacy（ethss）
+## Legacy（ethss）
 
 ### TX
 
@@ -110,10 +110,10 @@ eth0
 CPU
 ```
 
-👉 CPU **不知道來源 port**
+CPU **不知道來源 port**
 
 
-## 🟢 DSA
+## DSA
 
 ### TX
 
@@ -151,32 +151,32 @@ lan1
 
 ----------
 
-# ⚠️ 4. 核心差異
+# 4. 核心差異
 
-## 🔹 是否有「port awareness」
+## 是否有「port awareness」
 
 | 架構 | CPU 是否知道 port |  
 |--------|-------------------|  
-| Legacy | ❌ 不知道 |  
-| DSA | ✅ 知道 |
+| Legacy | ✗ 不知道 |  
+| DSA | ✓ 知道 |
 
 
-## 🔹 是否使用 tagging
+## 是否使用 tagging
 
 | 架構 | tagging |  
 |--------|---------|  
-| Legacy | ❌ |  
-| DSA | ✅ |
+| Legacy | ✗ |  
+| DSA | ✓ |
 
 
-## 🔹 net_device 模型
+## net_device 模型
 
 | 架構 | netdev |  
 |--------|------------------|  
 | Legacy | eth0 |  
 | DSA | eth0 + lanX |
 
-## 🔹 forwarding
+## forwarding
 
 | 架構 | forwarding |  
 |--------|-------------------|  
@@ -184,9 +184,9 @@ lan1
 | DSA | switch offload |
 
 
-# 🔧 5. Driver 架構差異
+# 5. Driver 架構差異
 
-## 🔴 Legacy（ethsw / ethss）
+## Legacy（ethsw / ethss）
 
 ```
 eth driver（整合）
@@ -196,7 +196,7 @@ eth driver（整合）
  └── forwarding
 ```
 
-👉 特點：
+特點：
 
 ```
 所有邏輯在 driver 裡
@@ -204,7 +204,7 @@ eth driver（整合）
 
 ----------
 
-## 🟢 DSA
+## DSA
 
 ```
 MAC driver
@@ -212,7 +212,7 @@ DSA core
 switch driver
 ```
 
-👉 分層：
+分層：
 
 ```
 MAC（eth0）
@@ -222,9 +222,9 @@ Port（lanX）
 
 ----------
 
-# 🧩 6. Device Tree 差異
+# 6. Device Tree 差異
 
-## 🔴 Legacy
+## Legacy
 
 ```
 ethernet@... {
@@ -233,13 +233,13 @@ ethernet@... {
 };
 ```
 
-👉 通常：
+通常：
 
 ```
 沒有標準格式（vendor-specific）
 ```
 
-## 🟢 DSA
+## DSA
 
 ```
 switch@0 {
@@ -250,14 +250,14 @@ switch@0 {
 };
 ```
 
-👉 特點：
+特點：
 
 ```
 標準化 binding
 ```
-# 🔍 7. Debug
+# 7. Debug
 
-## 🔴 Legacy
+## Legacy
 
 ### 看到：
 
@@ -286,7 +286,7 @@ vendor tool / ioctl
 ```
 
 
-## 🟢 DSA
+## DSA
 
 ### 看到：
 
@@ -310,9 +310,9 @@ bridge vlan show
 
 ----------
 
-# 🔥 8. 問題
+# 8. 問題
 
-## ❗ link up 但不通
+## link up 但不通
 
 | 架構 | 原因 |  
 |--------|----------------------|  
@@ -320,7 +320,7 @@ bridge vlan show
 | DSA | RGMII / tagging |
 
 
-## ❗ VLAN 問題
+## VLAN 問題
 
 
 | 架構 | 設定方式 |  
@@ -329,7 +329,7 @@ bridge vlan show
 | DSA | bridge / vlan|
 
 
-## ❗ port 不通
+## port 不通
 
 | 架構 | debug |  
 |--------|------------|  
@@ -338,13 +338,13 @@ bridge vlan show
 
 ----------
 
-# 🚀 9. Migration（Legacy → DSA）
+# 9. Migration（Legacy → DSA）
 
 
 ## 要做的轉換
 
 
-### 🔹 netdev
+### netdev
 
 ```
 eth0 → lanX
@@ -352,7 +352,7 @@ eth0 → lanX
 
 ----------
 
-### 🔹 config
+### config
 
 ```
 vendor API → bridge / vlan
@@ -360,7 +360,7 @@ vendor API → bridge / vlan
 
 ----------
 
-### 🔹 debug
+### debug
 
 ```
 ioctl → ethtool / tcpdump

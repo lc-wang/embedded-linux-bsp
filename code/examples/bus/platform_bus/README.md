@@ -8,7 +8,7 @@ platform bus 是 Linux 中 **SoC 裝置驅動的核心機制**，
 
 ---
 
-## 🎯 本章的目的
+## 本章的目的
 
 本章用來建立以下關鍵觀念：
 
@@ -19,7 +19,7 @@ platform bus 是 Linux 中 **SoC 裝置驅動的核心機制**，
 
 ---
 
-## 🧠 platform bus 的定位
+## platform bus 的定位
 
 platform bus
 = SoC 上「不是自動枚舉」的裝置
@@ -37,7 +37,7 @@ platform bus
 
 ---
 
-## 🧩 Kernel 原始碼對照
+## Kernel 原始碼對照
 ```
 drivers/base/platform.c
 drivers/base/bus.c
@@ -47,7 +47,7 @@ drivers/of/base.c
 
 ---
 
-## 🔄 總體流程（Device Tree → probe）
+## 總體流程（Device Tree → probe）
 ```
 Device Tree (.dts)
 └─ of_platform_populate()
@@ -60,7 +60,7 @@ Device Tree (.dts)
 
 ---
 
-## 🧠 最重要的觀念
+## 最重要的觀念
 
 沒有 platform_device
 就不會有 probe()

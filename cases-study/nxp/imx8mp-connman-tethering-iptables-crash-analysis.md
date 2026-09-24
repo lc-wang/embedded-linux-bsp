@@ -182,10 +182,10 @@ SRC_URI += "file://0001-iptables-Fix-crash-with-iptables-1.8.11.patch"
 
 | 測試 | 修正前 | 修正後 |
 |---|---|---|
-| `connmanctl tether wifi on <SSID> <PSK>` | connmand SIGABRT，systemd 重啟 | ✔ AP 正常建立 |
-| NAT / DHCP（client 連入取得 192.168.0.x） | 無法測試 | ✔ 正常 |
-| 指定 5G 頻段 `tether wifi on <SSID> <PSK> 5180` | 無法測試 | ✔ 正常（ch36） |
-| STA 模式回歸測試 | 正常 | ✔ 正常 |
+| `connmanctl tether wifi on <SSID> <PSK>` | connmand SIGABRT，systemd 重啟 | ✓ AP 正常建立 |
+| NAT / DHCP（client 連入取得 192.168.0.x） | 無法測試 | ✓ 正常 |
+| 指定 5G 頻段 `tether wifi on <SSID> <PSK> 5180` | 無法測試 | ✓ 正常（ch36） |
+| STA 模式回歸測試 | 正常 | ✓ 正常 |
 
 ## 6. 上游狀態
 
@@ -477,9 +477,9 @@ static void reset_xtables(void)
 
 ```
 reset:  dup₁ 誕生，opts = dup₁
-merge₁: libxtables 內部 free(opts) → dup₁ 回收 ✔    opts = 合併表A
-merge₂: libxtables 內部 free(opts) → 表A 回收 ✔     opts = 合併表B
-reset:  opts(表B) != orig → g_free → 表B 回收 ✔     opts = dup₂ 誕生
+merge₁: libxtables 內部 free(opts) → dup₁ 回收 ✓    opts = 合併表A
+merge₂: libxtables 內部 free(opts) → 表A 回收 ✓     opts = 合併表B
+reset:  opts(表B) != orig → g_free → 表B 回收 ✓     opts = dup₂ 誕生
 ```
 
 dup₁ 由 **libxtables 1.8.11 的 merge 順手回收**（回收點 2）——本 bug 的起因正是「新版 merge 會無條件 free 舊工作表」，patch 是順著這個行為設計的：既然它一定會 free，就給它一塊可以 free 的。
@@ -488,7 +488,7 @@ dup₁ 由 **libxtables 1.8.11 的 merge 順手回收**（回收點 2）——�
 
 ```
 reset:  dup₁ 誕生，opts = dup₁
-reset:  opts(dup₁) != orig → g_free → dup₁ 回收 ✔   opts = dup₂ 誕生
+reset:  opts(dup₁) != orig → g_free → dup₁ 回收 ✓   opts = dup₂ 誕生
 ```
 
 dup₁ 由下一次 reset 開頭的 g_free 回收。這個 `if` 原本只負責回收 merge 結果，patch 後連 dup 一起管——dup 永遠不等於 `orig_opts` 本尊，必進此 if。

@@ -104,9 +104,9 @@ gst-launch-1.0 filesrc location=./480p_demo.mp4 ! \
     
 -   RK3588 overlay plane 通常：
     
-    -   ❌ 不支援 RGB buffer
+    -   ✗ 不支援 RGB buffer
         
-    -   ❌ 不完整支援 color range metadata
+    -   ✗ 不完整支援 color range metadata
         
 -   強制指定 RGB + full-range 可能導致：
     

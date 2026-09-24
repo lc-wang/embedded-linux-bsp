@@ -1,7 +1,7 @@
 
-# 🧠 Rollback Protection
+# Rollback Protection
 
-## 🎯 本章目的
+## 本章目的
 
 本章要把以下幾個概念串起來：
 
@@ -28,11 +28,11 @@ rollback index 存在哪裡才安全？
 為什麼 counter 更新時機會影響是否 brick？
 ```
 
-👉 Rollback Protection 是 Secure Boot / Firmware Update Security 的重要補強。
+Rollback Protection 是 Secure Boot / Firmware Update Security 的重要補強。
 
 ----------
 
-## 🧭 一張圖先看懂
+## 一張圖先看懂
 
 ```
 [Current device security version = 5]
@@ -54,7 +54,7 @@ Rollback Protection 是防止 signed old vulnerable image 被重新安裝或開�
 
 ----------
 
-## 1️⃣ 為什麼需要 Rollback Protection？
+## 1. 為什麼需要 Rollback Protection？
 
 Secure Boot 可以確認：
 
@@ -91,7 +91,7 @@ v1.1:
 
 ----------
 
-## 2️⃣ Secure Boot vs Rollback Protection
+## 2. Secure Boot vs Rollback Protection
 
 
 | 項目 | Secure Boot | Rollback Protection |  
@@ -114,7 +114,7 @@ Rollback Protection:
 
 ----------
 
-## 3️⃣ Rollback Attack Flow
+## 3. Rollback Attack Flow
 
 攻擊者的目標不是偽造簽章，而是利用舊版合法 image。
 
@@ -144,7 +144,7 @@ image security_version >= device stored rollback_index
 
 ----------
 
-## 4️⃣ Rollback Index 是什麼？
+## 4. Rollback Index 是什麼？
 
 Rollback index 可以理解成：
 
@@ -178,7 +178,7 @@ reject
 
 ----------
 
-## 5️⃣ Version String vs Security Version
+## 5. Version String vs Security Version
 
 一般版本號不一定適合做 rollback protection。
 
@@ -216,7 +216,7 @@ anti_rollback_counter = 5
 
 ----------
 
-## 6️⃣ Rollback Check 有兩個時間點
+## 6. Rollback Check 有兩個時間點
 
 Rollback check 不應該只出現在 update client。
 
@@ -281,7 +281,7 @@ Boot-time check 是最後防線。
 
 ----------
 
-## 7️⃣ Rollback Counter 應該存在哪裡？
+## 7. Rollback Counter 應該存在哪裡？
 
 Rollback counter 必須存在 Normal World 不能任意修改的位置。
 
@@ -384,7 +384,7 @@ sealed key version
 
 ----------
 
-## 8️⃣ Counter 更新時機很重要
+## 8. Counter 更新時機很重要
 
 Rollback counter 不是越早更新越好。
 
@@ -412,7 +412,7 @@ device brick
 
 ----------
 
-## 9️⃣ 較安全的更新思路
+## 9. 較安全的更新思路
 
 A/B update 通常會搭配：
 
@@ -452,7 +452,7 @@ then commit security state
 
 ----------
 
-## 🔟 A/B Slot 與 Rollback Protection
+## 10. A/B Slot 與 Rollback Protection
 
 A/B update 中，slot metadata 和 rollback index 要一起設計。
 
@@ -494,7 +494,7 @@ rollback_index 不應該太早提高到 6
 
 ----------
 
-## 1️⃣1️⃣ Android AVB Rollback Index
+## 11. Android AVB Rollback Index
 
 Android Verified Boot 有 rollback index 概念。
 
@@ -541,7 +541,7 @@ fastboot / unlocked state 是否影響 policy
 
 ----------
 
-## 1️⃣2️⃣ Embedded Linux 常見做法
+## 12. Embedded Linux 常見做法
 
 Embedded Linux 沒有固定唯一標準。
 
@@ -580,7 +580,7 @@ Linux BSP 需要自己定義清楚 security_version 放哪裡、誰檢查、coun
 
 ----------
 
-## 1️⃣3️⃣ Recovery / Factory Path 也要檢查
+## 13. Recovery / Factory Path 也要檢查
 
 Rollback protection 不能只做在 OTA。
 
@@ -612,7 +612,7 @@ rollback protection 被繞過。
 
 ----------
 
-## 1️⃣4️⃣ Debug / Development Mode 注意事項
+## 14. Debug / Development Mode 注意事項
 
 開發階段常需要：
 
@@ -640,7 +640,7 @@ rollback protection 實際上不存在。
 
 ----------
 
-## 1️⃣5️⃣ BSP Debug：Rollback Protection 檢查方向
+## 15. BSP Debug：Rollback Protection 檢查方向
 
 ### Step 1：確認 image 裡的 security version
 
@@ -723,9 +723,9 @@ fallback slot 是否仍可用？
 
 ----------
 
-## 1️⃣6️⃣ 常見錯誤
+## 16. 常見錯誤
 
-### ❌ 只靠 version string
+### 只靠 version string
 
 ```
 version = "1.2.3"
@@ -741,7 +741,7 @@ version = "1.2.3"
 
 ----------
 
-### ❌ Counter 存在普通 rootfs
+### Counter 存在普通 rootfs
 
 如果 rollback counter 放在：
 
@@ -755,7 +755,7 @@ version = "1.2.3"
 
 ----------
 
-### ❌ 只在 OTA 檢查，不在 bootloader 檢查
+### 只在 OTA 檢查，不在 bootloader 檢查
 
 攻擊者可能繞過 OTA：
 
@@ -770,7 +770,7 @@ version = "1.2.3"
 
 ----------
 
-### ❌ 太早提高 rollback counter
+### 太早提高 rollback counter
 
 可能造成：
 
@@ -782,7 +782,7 @@ device brick
 
 ----------
 
-### ❌ 測試 key / debug mode 沒關
+### 測試 key / debug mode 沒關
 
 production 還允許：
 
@@ -797,7 +797,7 @@ rollback protection 可能被繞過。
 
 ----------
 
-## 1️⃣7️⃣ Rollback Protection Checklist
+## 17. Rollback Protection Checklist
 
 ```
 [ ] Image security_version / rollback_index is defined

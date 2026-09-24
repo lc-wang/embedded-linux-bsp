@@ -22,8 +22,8 @@
 常見現象如下：
 
 ```bash
-ping 8.8.8.8        ❌ 不穩定
-ping www.google.com ❌ 一定失敗
+ping 8.8.8.8        ✗ 不穩定
+ping www.google.com ✗ 一定失敗
 ```
 
 ----------
@@ -41,10 +41,10 @@ eth0: 192.0.2.124/24
 ```bash
 0.0.0.0 dev eth0 scope link
 
-default dev eth0 scope link        ❌
-default via 192.0.2.1 dev eth0  ✅
+default dev eth0 scope link        ✗
+default via 192.0.2.1 dev eth0  ✓
 
-169.254.0.0/16 dev eth0            ❌
+169.254.0.0/16 dev eth0            ✗
 
 ```
 
@@ -308,16 +308,16 @@ Loaded: masked (/dev/null)
 ### 網路驗證
 
 ```bash
-ping 192.0.2.1     ✅
-ping 8.8.8.8        ✅
-ping www.google.com ✅
+ping 192.0.2.1     ✓
+ping 8.8.8.8        ✓
+ping www.google.com ✓
 ```
 
 ----------
 
 ## 10. 重要經驗整理
 
-### 1️⃣ Network manager 只能選一個
+### 1. Network manager 只能選一個
 
 以下不可共存：
 
@@ -332,13 +332,13 @@ ping www.google.com ✅
 
 ----------
 
-### 2️⃣ `default dev ethX` 是致命 routing
+### 2. `default dev ethX` 是致命 routing
 
 此 routing 會導致 kernel 對所有 IP 直接 ARP，外網一定失敗。
 
 ----------
 
-### 3️⃣ rootfs 階段 systemctl 並不可靠
+### 3. rootfs 階段 systemctl 並不可靠
 
 -   `systemctl disable` 在 chroot 常失效
     
@@ -347,7 +347,7 @@ ping www.google.com ✅
 
 ----------
 
-### 4️⃣ DNS 問題 ≠ 網路問題
+### 4. DNS 問題 ≠ 網路問題
 
 若出現：
 
@@ -378,5 +378,5 @@ ping domain FAIL
 | static DNS           |
 +---------------------+
 
-(connman ✘ avahi ✘ resolved ✘)
+(connman ✗ avahi ✗ resolved ✗)
 ```

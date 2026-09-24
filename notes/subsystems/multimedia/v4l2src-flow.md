@@ -6,7 +6,7 @@
 
 ----------
 
-# 1️⃣ v4l2src 是什麼？
+# 1. v4l2src 是什麼？
 
 `v4l2src` 是 GStreamer 中對應 **V4L2（Video4Linux2）** 的 source plugin。
 
@@ -16,7 +16,7 @@
 ```
 ----------
 
-# 2️⃣ 基本 Pipeline
+# 2. 基本 Pipeline
 ```
 gst-launch-1.0 v4l2src ! kmssink
 ```
@@ -44,7 +44,7 @@ DRM plane
 ```
 ----------
 
-# 3️⃣ v4l2src 與 Kernel 的關係
+# 3. v4l2src 與 Kernel 的關係
 
 `v4l2src` 本質上是：
 ```
@@ -58,7 +58,7 @@ ioctl(fd, VIDIOC_*, ...)
 
 ----------
 
-# 4️⃣ Streaming Lifecycle
+# 4. Streaming Lifecycle
 
 完整流程：
 ```
@@ -87,7 +87,7 @@ stream off
 ```
 ----------
 
-# 5️⃣ 詳細 ioctl Flow
+# 5. 詳細 ioctl Flow
 
 
 ## ① open()
@@ -186,7 +186,7 @@ VIDIOC_STREAMOFF
 ```
 ----------
 
-# 6️⃣ Buffer Flow
+# 6. Buffer Flow
 ```
 Kernel driver allocate buffer  
  │  
@@ -207,36 +207,36 @@ GstBuffer
 ```
 ----------
 
-# 7️⃣ Memory Type
+# 7. Memory Type
 
 
-## 🟢 MMAP
+## MMAP
 ```
 kernel allocate  
 userspace mmap
 ```
 優點：
 
-✔ 簡單  
+✓ 簡單  
 缺點：
 
-❌ 需要 copy
+✗ 需要 copy
 
 ----------
 
-## 🟢 DMABUF
+## DMABUF
 ```
 kernel export fd  
 userspace share buffer
 ```
 優點：
 
-✔ zero-copy  
-✔ 高效能
+✓ zero-copy  
+✓ 高效能
 
 ----------
 
-## 🟢 USERPTR
+## USERPTR
 ```
 userspace 提供 memory
 ```
@@ -244,7 +244,7 @@ userspace 提供 memory
 
 ----------
 
-# 8️⃣ DMABUF Flow
+# 8. DMABUF Flow
 ```
 V4L2 driver  
  │  
@@ -269,7 +269,7 @@ camera → display (zero-copy)
 ```
 ----------
 
-# 9️⃣ 與 DRM 的關係
+# 9. 與 DRM 的關係
 
 當 pipeline：
 ```
@@ -281,15 +281,15 @@ V4L2 buffer → dmabuf → DRM framebuffer
 ```
 這正是：
 
-👉 Embedded Linux display pipeline 核心
+Embedded Linux display pipeline 核心
 
 ----------
 
-# 🔟 常見問題
+# 10. 常見問題
 
 
 
-## ❌ VIDIOC_DQBUF 卡住
+## VIDIOC_DQBUF 卡住
 
 原因：
 ```
@@ -298,7 +298,7 @@ interrupt 沒來
 ```
 ----------
 
-## ❌ 無法 STREAMON
+## 無法 STREAMON
 
 原因：
 ```
@@ -307,7 +307,7 @@ buffer 數量不足
 ```
 ----------
 
-## ❌ 畫面破圖
+## 畫面破圖
 
 原因：
 ```
@@ -315,7 +315,7 @@ stride / format mismatch
 ```
 ----------
 
-## ❌ pipeline hang
+## pipeline hang
 
 原因：
 ```
@@ -323,7 +323,7 @@ QBUF / DQBUF 不平衡
 ```
 ----------
 
-## ❌ 無法 zero-copy
+## 無法 zero-copy
 
 原因：
 ```
@@ -331,7 +331,7 @@ QBUF / DQBUF 不平衡
 ```
 ----------
 
-# 11️⃣ Debug 技巧
+# 11. Debug 技巧
 
 
 ## 查看 device 能力
@@ -364,7 +364,7 @@ dmesg | grep v4l2
 ```
 ----------
 
-# 12️⃣ BSP Debug 思維
+# 12. BSP Debug 思維
 
 當 debug：
 ```

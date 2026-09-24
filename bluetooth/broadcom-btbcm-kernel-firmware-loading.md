@@ -46,7 +46,7 @@ drivers/bluetooth/
 | HCI core                 | Command / Event 處理與狀態機管理              |
 
 
-📌 **btbcm 不負責 transport**  
+**btbcm 不負責 transport**  
 它只在「Controller ready 前」插手一次。
 
 ----------
@@ -96,7 +96,7 @@ btbcm 的定位非常關鍵：
 [9] controller reset
 [10] hci0 ready for mgmt / BlueZ
 ```
-👉 **與 brcm_patchram_plus 最大差異：**
+**與 brcm_patchram_plus 最大差異：**
 
 -   全程只有 kernel 一個 master
     
@@ -182,7 +182,7 @@ btbcm 內部會根據：
 BCM4362A2.hcd
 BCM4345C0.hcd
 ```
-📌 **檔名不對 = 100% 失敗**
+**檔名不對 = 100% 失敗**
 
 ----------
 
@@ -215,7 +215,7 @@ Kernel 呼叫：
 | 無任何 btbcm log                  | driver 未執行（未 probe）    |
 
 
-👉 **Yocto / Android BSP 最常死在這一層**
+**Yocto / Android BSP 最常死在這一層**
 
 ----------
 
@@ -241,7 +241,7 @@ Kernel 呼叫：
 -   transport 設定一致
     
 
-👉 **穩定度遠高於 user space 路線**
+**穩定度遠高於 user space 路線**
 
 ----------
 
@@ -275,7 +275,7 @@ btbcm 會主動送：
 
 ## 10. Kernel 路線的常見失敗模式
 
-### 10.1 firmware 找不到
+### 10. 1 firmware 找不到
 
 `Direct firmware load  for BCMxxxx.hcd failed with error  -2` 
 
@@ -283,7 +283,7 @@ btbcm 會主動送：
 
 ----------
 
-### 10.2 firmware 不匹配
+### 10. 2 firmware 不匹配
 
 -   patch download 中途失敗
     
@@ -294,7 +294,7 @@ btbcm 會主動送：
 
 ----------
 
-### 10.3 transport 尚未 ready
+### 10. 3 transport 尚未 ready
 
 -   UART clock / pinmux / power 尚未開
     
@@ -338,5 +338,5 @@ btbcm 會主動送：
 | UART owner       | 容易衝突           | 單一 |
 | Boot integration | 複雜               | 乾淨 |
 | Debug 難度       | 高                 | 中 |
-| 量產適合度       | ❌                 | ✅ |
+| 量產適合度       | ✗                 | ✓ |
 

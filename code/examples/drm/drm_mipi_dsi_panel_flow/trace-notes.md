@@ -1,7 +1,7 @@
 # Kernel trace notes — drm_mipi_dsi_panel_flow  
   
   
-# 🟢 Level 1：用人話理解  
+# Level 1：用人話理解  
   
 MIPI DSI panel driver 不是完整 DRM driver。  
   
@@ -23,7 +23,7 @@ MIPI DSI panel driver 不是完整 DRM driver。
 
 ----------
 
-# 🧠 panel driver 在哪裡？
+# panel driver 在哪裡？
 
 整體 display pipeline 大概是：
 
@@ -41,7 +41,7 @@ panel
 
 ----------
 
-# 🟡 Level 2：driver 結構
+# Level 2：driver 結構
 
 一個 MIPI DSI panel driver 通常同時有兩個身份：
 
@@ -81,7 +81,7 @@ get_modes()
 
 ----------
 
-# 🔥 prepare / enable 差異
+# prepare / enable 差異
 
 ## prepare
 
@@ -142,7 +142,7 @@ reset low
 
 ----------
 
-# 🔴 Level 3：kernel trace
+# Level 3：kernel trace
 
 ## Device Tree match
 
@@ -207,7 +207,7 @@ panel->unprepare()
 
 ----------
 
-# 🧠 get_modes() 在做什麼？
+# get_modes() 在做什麼？
 
 ```
 get_modes()
@@ -227,7 +227,7 @@ get_modes()
 
 ----------
 
-# 🧠 DSI attach 是什麼？
+# DSI attach 是什麼？
 
 ```
 mipi_dsi_attach()
@@ -247,13 +247,13 @@ DSI host 不知道這個 panel 存在
 
 ----------
 
-# 🚫 常見誤解
+# 常見誤解
 
-❌ panel driver 負責 framebuffer  
-❌ panel driver 負責 atomic commit  
-❌ panel driver 負責 GEM memory
+✗ panel driver 負責 framebuffer  
+✗ panel driver 負責 atomic commit  
+✗ panel driver 負責 GEM memory
 
-✅ panel driver 主要負責：
+✓ panel driver 主要負責：
 
 ```
 panel power / init / mode / enable lifecycle
@@ -261,7 +261,7 @@ panel power / init / mode / enable lifecycle
 
 ----------
 
-# 🧠 最重要一句話
+# 最重要一句話
 
 ```
 DRM core 管「怎麼顯示」

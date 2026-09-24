@@ -16,7 +16,7 @@
 - resume 後 TX 卡死
 - AP mode 下 RX 正常、TX 不動
 
-👉 **這些 9 成都與 data path / flow control 有關**
+**這些 9 成都與 data path / flow control 有關**
 
 ---
 
@@ -55,7 +55,7 @@ Linux driver 只做三件事：
   control pkt  data pkt
 ```
 
-📌 **Event 與 data packet 共用 RX 通道**
+**Event 與 data packet 共用 RX 通道**
 
 ---
 
@@ -112,7 +112,7 @@ netdev_tx_t dhd_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 -   flags
     
 
-📌 **BDC 是 firmware 判斷封包用途的唯一依據**
+**BDC 是 firmware 判斷封包用途的唯一依據**
 
 ----------
 
@@ -149,7 +149,7 @@ bus interrupt / poll
     -   control/event path
         
 
-📌 **Event packet 是「偽裝成 data packet」回來的**
+**Event packet 是「偽裝成 data packet」回來的**
 
 ----------
 
@@ -164,7 +164,7 @@ bus interrupt / poll
 
 但不論哪種：
 
-👉 **RX backlog 卡住 = event 也會卡住**
+**RX backlog 卡住 = event 也會卡住**
 
 ----------
 
@@ -179,7 +179,7 @@ bus interrupt / poll
 -   結果不是 drop，就是 firmware hang
     
 
-👉 **flow control = firmware 生存機制**
+**flow control = firmware 生存機制**
 
 ----------
 
@@ -236,10 +236,10 @@ Firmware 會透過：
 netif_stop_queue(ndev);
 netif_wake_queue(ndev);
 ```
-📌 **現象判斷**
+**現象判斷**
 
 -   netdev queue stopped，但永遠沒 wake  
-    ➜ credit 沒回來 or event RX 卡死
+    credit 沒回來 or event RX 卡死
     
 
 ----------

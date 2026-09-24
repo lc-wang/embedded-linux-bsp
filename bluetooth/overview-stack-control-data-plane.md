@@ -18,7 +18,7 @@
 -   BlueZ 能 power on，卻永遠掃描不到 device
     
 
-👉 這些 **90% 都是「層與層之間的責任邊界沒釐清」**。
+這些 **90% 都是「層與層之間的責任邊界沒釐清」**。
 
 所以這一整系列的第一章，只做一件事：  
 **把 Bluetooth 從上到下的「層級模型」釘死**。
@@ -73,14 +73,14 @@
 
 它**不負責**的事：
 
--   ❌ UART / USB 傳輸
+-   ✗ UART / USB 傳輸
     
--   ❌ firmware download
+-   ✗ firmware download
     
--   ❌ baud rate / flow control
+-   ✗ baud rate / flow control
     
 
-👉 **BlueZ 從來不直接碰 `/dev/ttyS*` 或 USB endpoint**
+**BlueZ 從來不直接碰 `/dev/ttyS*` 或 USB endpoint**
 
 ----------
 
@@ -106,7 +106,7 @@ mgmt 負責：
 -   device state sync
     
 
-📌 關鍵觀念
+關鍵觀念
 
 > **mgmt = control plane（控制面）**  
 > **HCI data = data plane（資料面）**
@@ -132,7 +132,7 @@ mgmt 負責：
 -   `smp.c` → pairing / encryption
     
 
-📌 Kernel 的角色是：
+Kernel 的角色是：
 
 > **把「政策」跟「硬體」隔離**  
 > User space 決定 _要做什麼_，Kernel 決定 _怎麼跟 controller 講話_
@@ -179,7 +179,7 @@ mgmt 負責：
     -   極度依賴 baud rate / RTS/CTS
         
 
-📌 關鍵結論
+關鍵結論
 
 > **UART Bluetooth 的穩定度 = UART 設定正確度**
 
@@ -259,14 +259,14 @@ Profile / Socket
  → btusb / hci_uart
        → controller
 ```
-📌 **debug 時一定要先判斷你卡在哪一條 plane**
+**debug 時一定要先判斷你卡在哪一條 plane**
 
 ----------
 
 ## 7. 一個「正確的 debug 心智模型」
 
 當 Bluetooth 壞掉時，你要問的不是  
-❌「為什麼藍牙不能用？」
+✗「為什麼藍牙不能用？」
 
 而是依序問：
 

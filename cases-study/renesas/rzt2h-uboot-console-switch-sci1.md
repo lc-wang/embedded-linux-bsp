@@ -1,10 +1,10 @@
 
-# 🧩 Renesas RZ/T2H
+# Renesas RZ/T2H
 
 ## U-Boot Console 從 SCI0 切換至 SCI1 技術紀錄
 
 
-## 📌 背景說明
+## 背景說明
 
 在 Renesas **RZ/T2H** 平台中：
 
@@ -28,7 +28,7 @@
 
 ----------
 
-## 🎯 修改目標
+## 修改目標
 
 
 | 項目            | SCI0（預設） | SCI1（目標） |
@@ -42,9 +42,9 @@
 
 ----------
 
-## 🔍 初始修改內容
+## 初始修改內容
 
-### 1️⃣ 新增 SCI1 device node
+### 1. 新增 SCI1 device node
 ```
 sci1: serial@80005400 {
         compatible = "renesas,r9a09g077-rz-rscif",
@@ -62,7 +62,7 @@ sci1: serial@80005400 {
 ```
 ----------
 
-### 2️⃣ 指定 serial0 alias
+### 2. 指定 serial0 alias
 
 `aliases {
         serial0 = &sci1;
@@ -70,7 +70,7 @@ sci1: serial@80005400 {
 
 ----------
 
-### 3️⃣ 啟用 SCI1
+### 3. 啟用 SCI1
 
 `&sci1 {
         status = "okay";
@@ -78,7 +78,7 @@ sci1: serial@80005400 {
 
 ----------
 
-## ❌ 問題現象
+## 問題現象
 
 即使完成以上設定：
 
@@ -89,15 +89,15 @@ sci1: serial@80005400 {
 
 ----------
 
-## 🧠 問題根因分析
+## 問題根因分析
 
-### ❗ 關鍵原因：
+### 關鍵原因：
 
 **U-Boot serial driver 並不支援該 compatible 字串。**
 
 ----------
 
-### 🔍 實際使用的 driver
+### 實際使用的 driver
 
 在本 U-Boot tree 中，Renesas UART 使用：
 
@@ -113,7 +113,7 @@ sci1: serial@80005400 {
 
 ----------
 
-### ❌ SCI1 DTS 使用的 compatible
+### SCI1 DTS 使用的 compatible
 ```
 "renesas,r9a09g077-rz-rscif"
 "renesas,rz-rscif"
@@ -123,7 +123,7 @@ sci1: serial@80005400 {
 
 ----------
 
-### 🔥 結果
+### 結果
 
 -   SCI1 節點存在
     
@@ -146,13 +146,13 @@ console = none
 
 ----------
 
-## ✅ 正確修正方式
+## 正確修正方式
 
 讓 SCI1 **與 SCI0 使用相同 compatible**，走同一條 driver path。
 
 ----------
 
-### ✅ 修正後 SCI1 DTS 節點
+### 修正後 SCI1 DTS 節點
 ```
 sci1: serial@80005400 {
         compatible = "renesas,r9a09g077-rsci",
@@ -170,7 +170,7 @@ sci1: serial@80005400 {
 ```
 ----------
 
-## ✅ 修改後結果
+## 修改後結果
 
 U-Boot 成功於 SCI1 顯示訊息：
 ```
@@ -181,7 +181,7 @@ MMC:  sdhi0@11c00000
 ```
 ----------
 
-## 🧠 為什麼 SCI0 一開始可以正常工作？
+## 為什麼 SCI0 一開始可以正常工作？
 
 因為原始 DTS 中：
 ```

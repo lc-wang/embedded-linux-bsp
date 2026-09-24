@@ -21,7 +21,7 @@
 如果資源狀態錯誤：
 -   driver 就算寫得完全正確，也無法正常運作   
 
-👉 **BSP bring-up 的本質，就是把這些資源接對、接齊。**
+**BSP bring-up 的本質，就是把這些資源接對、接齊。**
 
 ----------
 
@@ -76,7 +76,7 @@ SoC 通常提供：
 -   reset 順序錯誤
 -   reset 與 clock 時序不對
 
-👉 **reset 問題通常表現為「probe 就卡住」。**
+**reset 問題通常表現為「probe 就卡住」。**
 
 ----------
 
@@ -133,7 +133,7 @@ DTS **不負責**：
 -   reset line 遺漏
 -   regulator phandle 錯誤   
 
-👉 **DTS 看起來對，不代表資源真的 ready。**
+**DTS 看起來對，不代表資源真的 ready。**
 
 ----------
 
@@ -166,7 +166,7 @@ Suspend / resume 需要：
 -   clock 未重新 enable
     
 
-👉 **這通常是 BSP 整合問題，不是單一 driver bug。**
+**這通常是 BSP 整合問題，不是單一 driver bug。**
 
 ----------
 

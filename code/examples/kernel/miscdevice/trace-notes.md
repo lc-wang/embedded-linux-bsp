@@ -3,7 +3,7 @@
 
 ---
 
-## 🔍 misc_register() 做了什麼？
+## misc_register() 做了什麼？
 
 位置：
 ```
@@ -22,7 +22,7 @@ misc_register()
 
 ---
 
-## 🧠 open() trace
+## open() trace
 ```
 open("/dev/mymisc")
 └─ chrdev_open()
@@ -34,7 +34,7 @@ open("/dev/mymisc")
 
 ---
 
-## 🔧 為什麼 Bluetooth 很愛用 miscdevice？
+## 為什麼 Bluetooth 很愛用 miscdevice？
 
 因為：
 
@@ -52,16 +52,16 @@ drivers/hwmon/
 
 ---
 
-## 🧠 使用時機建議
+## 使用時機建議
 
-### ✅ 適合 miscdevice
+### 適合 miscdevice
 
 - debug interface
 - control ioctl
 - prototype driver
 - 單一節點裝置
 
-### ❌ 不適合 miscdevice
+### 不適合 miscdevice
 
 - 需要多個 minor
 - 高度結構化 sysfs

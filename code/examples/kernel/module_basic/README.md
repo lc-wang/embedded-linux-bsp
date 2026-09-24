@@ -8,7 +8,7 @@ Linux kernel module 最小生命週期範例。
 
 ---
 
-## 🎯 本範例的目的
+## 本範例的目的
 
 此範例用來理解：
 
@@ -28,7 +28,7 @@ Linux kernel module 最小生命週期範例。
 
 ---
 
-## 🧩 Kernel 原始碼對照位置
+## Kernel 原始碼對照位置
 
 相關核心程式碼位於：
 ```
@@ -52,7 +52,7 @@ finit_module()
 
 ---
 
-## 🔄 Module 載入流程（insmod）
+## Module 載入流程（insmod）
 ```
 userspace
 └─ insmod hello_module.ko
@@ -67,7 +67,7 @@ kernel
 
 ---
 
-## 🔁 Module 卸載流程（rmmod）
+## Module 卸載流程（rmmod）
 ```
 rmmod hello_module
 └─ delete_module()
@@ -77,7 +77,7 @@ rmmod hello_module
 
 ---
 
-## 🧠 為什麼這很重要？
+## 為什麼這很重要？
 
 在 trace kernel driver 時，你一定會看到：
 ```
@@ -96,9 +96,9 @@ do_one_initcall()
 
 ---
 
-## ⚠ 常見誤解釐清
+## 常見誤解釐清
 
-### ❓ 為什麼這個範例沒有 probe()？
+### 為什麼這個範例沒有 probe()？
 
 因為：
 

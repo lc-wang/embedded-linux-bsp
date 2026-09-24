@@ -165,7 +165,7 @@ booti ${kernel_addr_r} - ${fdt_addr_r}
 
 ----------
 
-📘 **延伸閱讀**
+**延伸閱讀**
 
 -   [U-Boot 官方文件](https://u-boot.readthedocs.io/en/latest/)
 -   `Documentation/arm64/booting.txt`

@@ -1,7 +1,7 @@
 
-# 🧠 RZ/T2H Kernel Console 從 SCI0 切換至 SCI1 技術紀錄
+# RZ/T2H Kernel Console 從 SCI0 切換至 SCI1 技術紀錄
 
-## 📌 文件目的
+## 文件目的
 
 本文件紀錄在 **Renesas RZ/T2H（r9a09g077）平台**上，  
 將 Linux kernel console 輸出 UART 由：
@@ -16,7 +16,7 @@
 
 ----------
 
-## ✅ 最終成果
+## 最終成果
 
 Linux kernel 開機 log 已可完整從 **SCI1 UART** 輸出：
 ```
@@ -28,7 +28,7 @@ SCI0 可完全 disabled，不再參與 kernel console。
 
 ----------
 
-## 🧩 測試環境
+## 測試環境
 
 | 項目         | 說明                                   |
 |--------------|----------------------------------------|
@@ -42,7 +42,7 @@ SCI0 可完全 disabled，不再參與 kernel console。
 
 ----------
 
-## 🔍 原始系統行為
+## 原始系統行為
 
 
 預設 Kernel Console 設定如下：
@@ -61,7 +61,7 @@ Kernel log：
 
 ----------
 
-## 🎯 修改目標
+## 修改目標
 
 
 | 項目         | 設定              |
@@ -74,10 +74,10 @@ Kernel log：
 
 ----------
 
-# 🛠 Kernel 修改內容
+# Kernel 修改內容
 
 
-## ✅ 一、設定 SCI1 pinmux
+## 一、設定 SCI1 pinmux
 
 ### 檔案位置
 
@@ -99,7 +99,7 @@ Kernel log：
 ```
 ----------
 
-## ✅ 二、停用 SCI0（避免 fallback）
+## 二、停用 SCI0（避免 fallback）
 ```
 &sci0 {
         status = "disabled";
@@ -109,9 +109,9 @@ Kernel log：
 
 ----------
 
-# 🧭 Kernel console 指定方式（重點）
+# Kernel console 指定方式（重點）
 
-⚠️ **本次實作並未修改 kernel DTS 的 `/chosen` node。**
+注意：**本次實作並未修改 kernel DTS 的 `/chosen` node。**
 
 ----------
 
@@ -139,7 +139,7 @@ earlycon=rscif,80005400
 ```
 ----------
 
-## 🔎 Kernel log 驗證
+## Kernel log 驗證
 
 開機訊息顯示：
 ```
@@ -158,7 +158,7 @@ earlycon=rscif,80005400
 
 ----------
 
-## 🧪 Runtime 驗證
+## Runtime 驗證
 ```
 # 確認 SCI1 device tree 狀態
 cat /sys/firmware/devicetree/base/soc/serial@80005400/status
@@ -170,9 +170,9 @@ dmesg | grep ttySC
 ```
 ----------
 
-## 🚫 常見錯誤整理
+## 常見錯誤整理
 
-### ❌ 只改 bootargs 不會成功
+### 只改 bootargs 不會成功
 
 必須同時具備：
 
@@ -187,7 +187,7 @@ dmesg | grep ttySC
 
 ----------
 
-### ❌ kernel DTS 與 U-Boot DTS 不共用
+### kernel DTS 與 U-Boot DTS 不共用
 
 | Stage   | DTS 路徑                         |
 |---------|----------------------------------|
@@ -199,7 +199,7 @@ dmesg | grep ttySC
 
 ----------
 
-### ❌ `/chosen` 非必要
+### `/chosen` 非必要
 
 本案例中：
 

@@ -1,9 +1,9 @@
 
-# 🧠 GPIO Kernel Architecture 深入解析
+# GPIO Kernel Architecture 深入解析
 
 ----------
 
-# 1️⃣ GPIO 在 Linux Kernel 中的定位
+# 1. GPIO 在 Linux Kernel 中的定位
 
 GPIO（General Purpose Input Output）是：
 
@@ -27,11 +27,11 @@ GPIO（General Purpose Input Output）是：
 -   USB hub reset
     
 
-👉 幾乎全部都會用到 GPIO
+幾乎全部都會用到 GPIO
 
 ----------
 
-# 2️⃣ GPIO 在 Kernel 的整體架構
+# 2. GPIO 在 Kernel 的整體架構
 ```
 User space
     │
@@ -50,7 +50,7 @@ Hardware register
 ```
 ----------
 
-# 3️⃣ gpiolib 的角色
+# 3. gpiolib 的角色
 
 核心檔案：
 
@@ -71,7 +71,7 @@ Hardware register
 
 ----------
 
-# 4️⃣ GPIO Controller Driver
+# 4. GPIO Controller Driver
 
 每個 SoC 都有自己的 driver，例如：
 
@@ -99,11 +99,11 @@ struct gpio_chip {
     void (*set)(...);
 };
 ```
-👉 這就是 GPIO 的最底層硬體抽象層
+這就是 GPIO 的最底層硬體抽象層
 
 ----------
 
-# 5️⃣ GPIO Descriptor 機制
+# 5. GPIO Descriptor 機制
 
 舊 API：
 ```
@@ -134,7 +134,7 @@ gpiod_set_value()
 
 ----------
 
-# 6️⃣ GPIO Numbering 問題
+# 6. GPIO Numbering 問題
 
 早期是 global number：
 
@@ -149,12 +149,12 @@ gpiod_set_value()
 
 所以現在：
 
-👉 **不要使用 GPIO number**  
-👉 使用 descriptor + DT label
+**不要使用 GPIO number**  
+使用 descriptor + DT label
 
 ----------
 
-# 7️⃣ 與 Pin Controller 的關係
+# 7. 與 Pin Controller 的關係
 
 GPIO ≠ pinctrl
 
@@ -173,7 +173,7 @@ gpio driver 才能控制方向
 
 ----------
 
-# 8️⃣ Kernel 初始化流程
+# 8. Kernel 初始化流程
 
 boot 時：
 ```
@@ -192,7 +192,7 @@ ls /dev/gpiochip*
 ```
 ----------
 
-# 9️⃣ GPIO 在 Driver 中的典型用法
+# 9. GPIO 在 Driver 中的典型用法
 ```
 struct gpio_desc *reset_gpio;
 
@@ -205,7 +205,7 @@ DT：
 
 ----------
 
-# 🔟 常見錯誤觀念
+# 10. 常見錯誤觀念
 
 | 錯誤觀念                          | 正確理解                              |
 |-----------------------------------|----------------------------------------|

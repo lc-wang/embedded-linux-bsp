@@ -52,7 +52,7 @@ system_server
 -   由 SurfaceFlinger 負責
     
 
-👉 **WMS 是「顯示事實管理者」，不是渲染者。**
+**WMS 是「顯示事實管理者」，不是渲染者。**
 
 ----------
 
@@ -126,7 +126,7 @@ AMS 根據這些事實做出系統決策。
 -   但 window 被遮住
     
 
-👉 對使用者來說，這仍然是「不可見」。
+對使用者來說，這仍然是「不可見」。
 
 ----------
 
@@ -212,7 +212,7 @@ WMS 提供：
 -   visibility
 -   z-order
     
-👉 **Graphics pipeline 依賴 WMS 提供正確的畫面結構。**
+**Graphics pipeline 依賴 WMS 提供正確的畫面結構。**
 
 ----------
 

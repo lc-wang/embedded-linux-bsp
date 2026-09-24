@@ -1,5 +1,5 @@
 
-## 🧠 MAC / PHY / MDIO 架構與運作
+## MAC / PHY / MDIO 架構與運作
 
 本章節重點：
 
@@ -11,7 +11,7 @@
 
 ----------
 
-## 🧩 1. Ethernet 硬體分層
+## 1. Ethernet 硬體分層
 
 ```
 CPU
@@ -25,11 +25,11 @@ RJ45 / cable
 
 ----------
 
-## 🔌 2. MAC vs PHY 分工
+## 2. MAC vs PHY 分工
 
-### 🧠 MAC（Media Access Controller）
+### MAC（Media Access Controller）
 
-👉 寫 driver 的地方（stmmac / fec）
+寫 driver 的地方（stmmac / fec）
 
 負責：
 
@@ -42,9 +42,9 @@ interrupt
 
 ----------
 
-### 🧠 PHY（Physical Layer）
+### PHY（Physical Layer）
 
-👉 外部晶片（Realtek / Marvell / TI）
+外部晶片（Realtek / Marvell / TI）
 
 負責：
 
@@ -57,7 +57,7 @@ cable detection
 
 ----------
 
-## 🔗 3. MAC 與 PHY 的連線（phy-mode）
+## 3. MAC 與 PHY 的連線（phy-mode）
 ```
 phy-mode 決定 MAC 與 PHY 之間「如何傳輸資料」
 ```
@@ -71,9 +71,9 @@ phy-mode 決定 MAC 與 PHY 之間「如何傳輸資料」
 | RGMII | Reduced Gigabit | 1 Gbps | 最常見（SoC） |  
 | SGMII | Serial（SerDes） | 1 Gbps+ | 高速 / switch |
 
-### 🧠 各模式直覺理解
+### 各模式直覺理解
 
-### 🔹 MII
+### MII
 
 ```
 很多線（data + clock）簡單但腳位多
@@ -81,45 +81,45 @@ phy-mode 決定 MAC 與 PHY 之間「如何傳輸資料」
 
 ----------
 
-### 🔹 RMII
+### RMII
 
 ```
 減少腳位（2-bit data）需要 reference clock（50MHz）
 ```
 
-👉 常見在：
+常見在：
 
 -   MCU
 -   低成本平台
 
 ----------
 
-### 🔹 RGMII
+### RGMII
 
 ```
 4-bit data（DDR）125MHz clock
 ```
 
-👉 特點：
+特點：
 
 ```
 少腳位 + 支援 1Gbps
 ```
 
-👉 ⚠️ 但有一個超重要問題：
+注意：但有一個超重要問題：
 
 ```
 clock 與 data 需要 delay（skew）
 ```
 ----------
 
-### 🔹 SGMII
+### SGMII
 
 ```
 高速 serial（類似 PCIe）
 ```
 
-👉 常見：
+常見：
 
 -   switch
 -   high-speed PHY
@@ -132,7 +132,7 @@ DTS：
 phy-mode = "rgmii";
 ```
 
-👉 如果設錯：
+如果設錯：
 
 ```
 link up 但不能傳或 完全沒有 link
@@ -140,7 +140,7 @@ link up 但不能傳或 完全沒有 link
 
 ----------
 
-## 🧠 4. MDIO 是什麼？
+## 4. MDIO 是什麼？
 
 ```
 MAC
@@ -150,7 +150,7 @@ MDIO bus
 PHY register
 ```
 
-👉 用來：
+用來：
 
 ```
 讀寫 PHY register
@@ -159,7 +159,7 @@ PHY register
 
 ----------
 
-### 📌 MDIO 類似：
+### MDIO 類似：
 
 ```
 "Ethernet 專用的 I2C"
@@ -167,7 +167,7 @@ PHY register
 
 ----------
 
-## 🧩 5. PHY Register（Clause 22）
+## 5. PHY Register（Clause 22）
   
 | Register | 功能 |  
 |----------|---------------------|  
@@ -177,7 +177,7 @@ PHY register
 | 5 | Link partner |
 ----------
 
-### 🔍 範例：讀 PHY
+### 範例：讀 PHY
 
 ```
 mdio-tool read eth0 1 0
@@ -191,7 +191,7 @@ ethtool eth0
 
 ----------
 
-## 🧠 6. phylib（Linux PHY framework）
+## 6. phylib（Linux PHY framework）
 
 ```
 MAC driver
@@ -228,7 +228,7 @@ callback driver
 
 ----------
 
-## 🔁 7. Link up flow
+## 7. Link up flow
 
 ```
 1. PHY reset
@@ -242,7 +242,7 @@ callback driver
 
 ----------
 
-### 📌 Kernel log
+### Kernel log
 
 ```
 dmesg | grep eth
@@ -256,7 +256,7 @@ eth0: Link is Up - 1000Mbps/Full
 
 ----------
 
-## 🔄 8. PHY state machine
+## 8. PHY state machine
 
 ```
 DOWN
@@ -278,7 +278,7 @@ phy_state_machine()
 
 ----------
 
-## 🔧 9. DTS 描述
+## 9. DTS 描述
 
 ```
 ethernet@... {
@@ -296,7 +296,7 @@ mdio {
 
 ----------
 
-### 📌 重點
+### 重點
 
 ```
 reg = <1>  → PHY address
@@ -304,7 +304,7 @@ reg = <1>  → PHY address
 
 ----------
 
-## 🧪 10. Bring-up Flow
+## 10. Bring-up Flow
 
 ```
 1. probe MAC driver
@@ -317,9 +317,9 @@ reg = <1>  → PHY address
 
 ----------
 
-## 🔍 11. Debug Playbook
+## 11. Debug Playbook
 
-### ✔ PHY 有沒有抓到？
+### PHY 有沒有抓到？
 
 ```
 dmesg | grep phy
@@ -327,7 +327,7 @@ dmesg | grep phy
 
 ----------
 
-### ✔ MDIO 有沒有動？
+### MDIO 有沒有動？
 
 ```
 dmesg | grep mdio
@@ -335,7 +335,7 @@ dmesg | grep mdio
 
 ----------
 
-### ✔ link 狀態
+### link 狀態
 
 ```
 ethtool eth0
@@ -343,7 +343,7 @@ ethtool eth0
 
 ----------
 
-### ✔ PHY register
+### PHY register
 
 ```
 mdio-tool dump eth0 1
@@ -351,7 +351,7 @@ mdio-tool dump eth0 1
 
 ----------
 
-### ✔ driver
+### driver
 
 ```
 ethtool -i eth0
@@ -359,16 +359,16 @@ ethtool -i eth0
 
 ----------
 
-## ❗ 12. 常見錯誤
+## 12. 常見錯誤
 
 
-### ❌ 沒有 PHY
+### 沒有 PHY
 
 ```
 No PHY found
 ```
 
-👉 檢查：
+檢查：
 
 -   DTS phy-handle
 -   MDIO bus
@@ -376,9 +376,9 @@ No PHY found
 
 ----------
 
-### ❌ link down
+### link down
 
-👉 檢查：
+檢查：
 
 ```
 線
@@ -388,9 +388,9 @@ PHY power/reset
 
 ----------
 
-### ❌ link up 但不通
+### link up 但不通
 
-👉 90% 是：
+90% 是：
 
 ```
 phy-mode 錯
@@ -399,9 +399,9 @@ RGMII delay 沒設
 
 ----------
 
-### ❌ intermittent link
+### intermittent link
 
-👉 檢查：
+檢查：
 
 ```
 clock
@@ -411,7 +411,7 @@ power
 
 ----------
 
-## 🧠 13. debug 觀點
+## 13. debug 觀點
 
 debug 時要分清：
 

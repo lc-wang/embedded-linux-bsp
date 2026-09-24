@@ -20,7 +20,7 @@
 -   換 firmware 沒差，換 kernel 版本沒差
     
 
-👉 這一章專門拆解 **UART 層真正會壞的地方**
+這一章專門拆解 **UART 層真正會壞的地方**
 
 ----------
 
@@ -57,7 +57,7 @@ UART 的特性：
 | HCI Event    | 0x04  | Controller → Host            |
 
 
-👉 **只要第一個 byte 錯，整個 stream 都會崩**
+**只要第一個 byte 錯，整個 stream 都會崩**
 
 ----------
 
@@ -71,7 +71,7 @@ ACL packet：
 
 `| Type | Handle (2) | Data Len (2) | Payload |` 
 
-📌 關鍵問題
+關鍵問題
 
 > UART **不知道** 封包結束在哪  
 > parser 必須「完全相信 header」
@@ -114,7 +114,7 @@ N_HCI 做的事：
 -   把 byte stream 丟給 hci_uart parser
     
 
-👉 **任何其他 process 開 tty 都會破壞這個模型**
+**任何其他 process 開 tty 都會破壞這個模型**
 
 ----------
 
@@ -145,7 +145,7 @@ Process B: hci_uart (kernel)
 -   表現為「玄學不穩」
     
 
-📌 **硬規則**
+**硬規則**
 
 > 同一時間，只能有一個 entity 控制該 UART
 
@@ -167,7 +167,7 @@ Process B: hci_uart (kernel)
 -   user space 不碰 tty
     
 
-👉 混用 = 必爆
+混用 = 必爆
 
 ----------
 
@@ -201,7 +201,7 @@ Process B: hci_uart (kernel)
 
 `< HCI Event: Unknown (garbage)` 
 
-👉 **不是 controller 掛掉，是 UART 對話壞了**
+**不是 controller 掛掉，是 UART 對話壞了**
 
 ----------
 
@@ -280,7 +280,7 @@ Process B: hci_uart (kernel)
 -   不需 user space 開 tty
     
 
-👉 **更適合 BSP / 量產系統**
+**更適合 BSP / 量產系統**
 
 ----------
 
@@ -312,4 +312,4 @@ Process B: hci_uart (kernel)
 5.  只測 `btmgmt power on`
     
 
-👉 **只要 HCI Reset 沒回 event，就 100% 是 UART 層**
+**只要 HCI Reset 沒回 event，就 100% 是 UART 層**

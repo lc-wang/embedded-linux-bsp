@@ -3,7 +3,7 @@
 
 ----------
 
-# 1️⃣ 為什麼 GPIO 一定跟 Device Tree 綁在一起？
+# 1. 為什麼 GPIO 一定跟 Device Tree 綁在一起？
 
 在現代 ARM SoC（RK3588 / RZ/V2H / i.MX）上：
 
@@ -20,11 +20,11 @@
 
 沒有正確 DT：
 
-👉 driver 根本拿不到 GPIO descriptor
+driver 根本拿不到 GPIO descriptor
 
 ----------
 
-# 2️⃣ GPIO Controller 在 DT 中的樣子
+# 2. GPIO Controller 在 DT 中的樣子
 
 範例（Rockchip 類型）：
 ```
@@ -48,7 +48,7 @@ gpio0: gpio@fec20000 {
 
 ----------
 
-# 3️⃣ GPIO Binding 基本格式
+# 3. GPIO Binding 基本格式
 
 標準格式：
 ```
@@ -69,7 +69,7 @@ reset-gpios = <&gpio3 5 GPIO_ACTIVE_LOW>;
 
 ----------
 
-# 4️⃣ flags 解釋
+# 4. flags 解釋
 DT 中第三個參數叫做 **flags**：
 
 reset-gpios = <&gpio3 5 GPIO_ACTIVE_LOW>;
@@ -89,7 +89,7 @@ include/dt-bindings/gpio/gpio.h
 #define GPIO_PULL_UP          8  
 #define GPIO_PULL_DOWN        16
 ```
-⚠ 注意：不同 kernel 版本 bit 定義可能不同，但概念相同。
+注意：不同 kernel 版本 bit 定義可能不同，但概念相同。
 
 ----------
 
@@ -110,7 +110,7 @@ gpiod_set_value()
 
 ----------
 
-### 🔎 常見錯誤
+### 常見錯誤
 
 很多人以為：
 ```
@@ -169,7 +169,7 @@ DT flags 只是「宣告」，
 gpio controller driver 是否支援
 ----------
 
-# 5️⃣ #gpio-cells 是什麼？
+# 5. #gpio-cells 是什麼？
 
 
 ## 5.1 基本概念
@@ -253,7 +253,7 @@ of_parse_phandle_with_args()
 
 ----------
 
-# 6️⃣ GPIO Hog 機制
+# 6. GPIO Hog 機制
 
 DT 可直接 claim GPIO：
 ```
@@ -284,7 +284,7 @@ enable-hog {
 
 ----------
 
-# 7️⃣ reset-gpios / enable-gpios 命名規則
+# 7. reset-gpios / enable-gpios 命名規則
 
 標準 naming：
 ```
@@ -298,11 +298,11 @@ devm_gpiod_get(dev, "reset", GPIOD_OUT_LOW);
 ```
 reset-gpios
 ```
-👉 這是 descriptor model 的關鍵。
+這是 descriptor model 的關鍵。
 
 ----------
 
-# 8️⃣ interrupt-gpios 與 interrupt-controller
+# 8. interrupt-gpios 與 interrupt-controller
 
 
 ## 8.1 GPIO 同時是 interrupt source
@@ -316,8 +316,8 @@ reset-gpios
 
 DT 需要描述：
 
-1️⃣ 該 controller 是 interrupt-controller  
-2️⃣ 該裝置的 interrupt 來源
+1. 該 controller 是 interrupt-controller  
+2. 該裝置的 interrupt 來源
 
 ----------
 
@@ -369,7 +369,7 @@ interrupt-gpios = <&gpio3 5 GPIO_ACTIVE_LOW>;
 -   依 binding 定義而定
     
 
-⚠ 不等於 interrupt-parent
+注意：不等於 interrupt-parent
 
 ----------
 
@@ -394,12 +394,12 @@ driver ISR
 -   IRQ_TYPE 錯誤
     
 
-👉 gpiomon 永遠不會觸發
+gpiomon 永遠不會觸發
     
 
 ----------
 
-# 9️⃣ 與 pinctrl 的關係
+# 9. 與 pinctrl 的關係
 
 
 GPIO = 控制電平  
@@ -449,10 +449,10 @@ pinctrl 是「電氣層」
 
 | 功能 | flags 支援 | pinctrl 支援 |  
 |-----------------|------------|--------------|  
-| active-low | ✅ | ❌ |  
+| active-low | ✓ | ✗ |  
 | open-drain | 部分支援 | 多數由 pinctrl 設定 |  
-| pull-up | ❌ | ✅ |  
-| drive strength | ❌ | ✅ |
+| pull-up | ✗ | ✓ |  
+| drive strength | ✗ | ✓ |
 
 ----------
 
@@ -491,7 +491,7 @@ reset 拉不起來
 
 ----------
 
-# 🔟 Open Drain + Pull-up
+# 10. Open Drain + Pull-up
 
 正確寫法：
 ```
@@ -506,7 +506,7 @@ drive-open-drain;
 ```
 GPIO_OPEN_DRAIN
 ```
-⚠ 很多人誤以為：
+注意：很多人誤以為：
 ```
 GPIO_ACTIVE_LOW = open drain
 ```
@@ -514,7 +514,7 @@ GPIO_ACTIVE_LOW = open drain
 
 ----------
 
-# 1️⃣1️⃣ 多 GPIO 定義
+# 11. 多 GPIO 定義
 
 支援 multi-line：
 ```
@@ -529,7 +529,7 @@ devm_gpiod_get_array();
 
 
 
-# 1️⃣2️⃣Debug 指令
+# 12.Debug 指令
 
 Dump DT：
 ```
@@ -545,7 +545,7 @@ cat /sys/kernel/debug/gpio
 ```
 ----------
 
-# 1️⃣3️⃣ 常見錯誤觀念
+# 13. 常見錯誤觀念
 
 
 | 錯誤觀念 | 正確理解 |  

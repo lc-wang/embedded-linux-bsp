@@ -1,6 +1,6 @@
 # Kernel trace notes — drm_vblank_pageflip_flow
   
-# 🟢 Level 1：用人話理解  
+# Level 1：用人話理解  
   
 假設：  
   
@@ -34,7 +34,7 @@ page flip
 
 ----------
 
-# 🟢 scanout 是持續進行的
+# scanout 是持續進行的
 
 CRTC：
 
@@ -59,7 +59,7 @@ line 2
 
 ----------
 
-# 🔥 這就是 tearing 的來源
+# 這就是 tearing 的來源
 
 如果：
 
@@ -76,7 +76,7 @@ scanout 到一半 framebuffer 被換掉
 
 ----------
 
-# 🟡 Level 2：vblank 是什麼？
+# Level 2：vblank 是什麼？
 
 display timing：
 
@@ -97,7 +97,7 @@ vertical blank
 
 ----------
 
-# 🔥 page flip 最安全的時間
+# page flip 最安全的時間
 
 ```
 vblank
@@ -111,7 +111,7 @@ vblank
 
 ----------
 
-# 🟡 atomic commit 與 page flip
+# atomic commit 與 page flip
 
 atomic commit：
 
@@ -128,7 +128,7 @@ atomic commit：
 
 ----------
 
-# 🔴 Level 3：kernel trace（真正發生什麼）
+# Level 3：kernel trace（真正發生什麼）
 
 ## userspace commit
 
@@ -178,7 +178,7 @@ driver：
 
 ----------
 
-# 🧠 scanout address 是什麼？
+# scanout address 是什麼？
 
 display controller：
 
@@ -233,7 +233,7 @@ flip 完成
 
 ----------
 
-# 🧠 double buffering
+# double buffering
 
 最常見：
 
@@ -264,7 +264,7 @@ swap
 
 ----------
 
-# 🔥 最重要觀念
+# 最重要觀念
 
 ```
 rendering
@@ -276,7 +276,7 @@ scanout
 
 ----------
 
-# 🧠 為什麼 modern graphics 很複雜？
+# 為什麼 modern graphics 很複雜？
 
 因為：
 
@@ -295,7 +295,7 @@ applications
 
 ----------
 
-# 🧠 最重要一句話
+# 最重要一句話
 
 ```
 page flip
@@ -303,7 +303,7 @@ page flip
 「下一 frame 要掃哪張 framebuffer」
 ```
 
-# 🧠 最後總結（display timing mental model）  
+# 最後總結（display timing mental model）  
 ```
 GPU render back buffer  
 ↓  
@@ -316,7 +316,7 @@ flip scanout address
 new frame visible
 ```
 
-# 🔧 userspace 對照程式  
+# userspace 對照程式  
   
 本章新增：  
   
@@ -349,7 +349,7 @@ swap front/back buffer
 
 ----------
 
-## 🧠 front buffer / back buffer
+## front buffer / back buffer
 
 | buffer | 意義 |  
 |---------------|------|  
@@ -358,7 +358,7 @@ swap front/back buffer
 
 ----------
 
-## 🔥 page flip 的真正意義
+## page flip 的真正意義
 
 ```
 drmModePageFlip()
@@ -375,7 +375,7 @@ drmModePageFlip()
 
 ----------
 
-## 🔴 對應 kernel flow
+## 對應 kernel flow
 
 ```
 drmModePageFlip()
@@ -395,7 +395,7 @@ userspace page_flip_handler()
 
 ----------
 
-## 🧠 為什麼需要 drmHandleEvent()？
+## 為什麼需要 drmHandleEvent()？
 
 因為 page flip 是非同步的。
 
@@ -423,7 +423,7 @@ page_flip_handler()
 
 ----------
 
-## 🧠 最重要一句話
+## 最重要一句話
 
 ```
 page flip = 切換 CRTC 下一個要 scanout 的 framebuffer

@@ -20,7 +20,7 @@
 -   很多 IP 被包在 **獨立的 power domain** 內
 -   power domain 的 on/off 可能完全獨立於 clock
 
-👉 **power domain 問題通常不是立即爆炸，而是隨機或延遲出現。**
+**power domain 問題通常不是立即爆炸，而是隨機或延遲出現。**
 
 ----------
 
@@ -43,7 +43,7 @@ Power domain 是：
 -   clock enable，但 domain 沒電
 -   domain 有電，但 clock 沒開
     
-👉 **兩者必須同時正確，裝置才會正常。**
+**兩者必須同時正確，裝置才會正常。**
 
 ----------
 
@@ -108,7 +108,7 @@ runtime PM 假設：
 -   裝置閒置後再使用失敗    
 -   第一次 OK，第二次壞掉
 
-👉 **這類問題非常典型地指向 power domain。**
+**這類問題非常典型地指向 power domain。**
 
 ----------
 

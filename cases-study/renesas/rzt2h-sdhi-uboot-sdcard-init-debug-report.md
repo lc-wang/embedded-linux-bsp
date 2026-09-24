@@ -1,5 +1,5 @@
 
-# 📝 **RZ/T2HSD 卡初始化失敗技術分析報告**
+# **RZ/T2HSD 卡初始化失敗技術分析報告**
 
 **Issue：U-Boot SD card init timeout (`-110: Card did not respond to voltage select`)**
 
@@ -42,7 +42,7 @@ Card did not respond to voltage select! : -110
 | 32GB | SDHC/SDXC | 可正常啟動 |
 | 16GB | SDHC（常見舊版本） | 一定失敗，顯示 -110 |
 
-> 📌 注意：  
+> 注意：  
 > 這一點在 Debug 初期造成誤導，但後續調查證明這只是 **副作用**，非真正 root cause。
 
 ----------
@@ -190,7 +190,7 @@ git revert ed302f38a8e28604fc13e9af5e8fd9eecc3101a6
 ```
 並且也 revert 掉 SDHI_SD_STATUS register 操作。
 
-### ✔ revert 後：
+### revert 後：
 
 -   16GB SDHC 正常讀取
 -   32GB 正常

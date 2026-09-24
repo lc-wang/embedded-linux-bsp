@@ -3,7 +3,7 @@
 
 ---
 
-## 🧑‍💻 userspace 呼叫點
+## userspace 呼叫點
 ```
 ioctl(fd, cmd, arg)
 glibc：
@@ -12,7 +12,7 @@ syscall(SYS_ioctl, fd, cmd, arg)
 
 ---
 
-## 🧠 kernel syscall 入口
+## kernel syscall 入口
 ```
 SYSCALL_DEFINE3(ioctl)
 ```
@@ -24,7 +24,7 @@ fs/ioctl.c
 
 ---
 
-## 🔍 呼叫流程
+## 呼叫流程
 ```
 ioctl()
 └─ sys_ioctl()
@@ -35,7 +35,7 @@ ioctl()
 
 ---
 
-## 🔑 ioctl cmd 結構
+## ioctl cmd 結構
 ```
 | dir | size | magic | nr |
 ```
@@ -44,7 +44,7 @@ ioctl()
 
 ---
 
-## 🔄 user / kernel 資料流
+## user / kernel 資料流
 
 ### _IOW
 ```
@@ -60,7 +60,7 @@ kernel data
 
 ---
 
-## 🧠 與 read/write 的差異
+## 與 read/write 的差異
 
 | API | 用途 |
 |----|----|
@@ -69,12 +69,12 @@ kernel data
 
 ---
 
-## 🚫 常見誤解
+## 常見誤解
 
-❌ ioctl 是慢的  
-❌ ioctl 不能傳結構  
+✗ ioctl 是慢的  
+✗ ioctl 不能傳結構  
 
-✅ 事實是：
+✓ 事實是：
 
 - ioctl 是同步 syscall
 - 90% driver 都在用

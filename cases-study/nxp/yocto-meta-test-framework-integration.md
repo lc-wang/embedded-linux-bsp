@@ -1,5 +1,5 @@
 
-# 📄 **Yocto devtool × bitbake-layers × test-framework 整合技術報告**
+# **Yocto devtool × bitbake-layers × test-framework 整合技術報告**
 
 
 # 1. 背景說明
@@ -73,17 +73,17 @@ workspace/
 
 ## 4.2 devtool 常見問題：branch=main 仍找 master
 
-### ✔ 症狀
+### 症狀
 ```sh
 Unable to resolve 'master' in upstream git repository` 
 ```
-### ✔ 根本原因
+### 根本原因
 ```sh
 Yocto 的 git fetcher 在部分版本會強制 fallback 至 master。
 ```
-### ✔ 解法
+### 解法
 
-👉 在 GitHub 建立一個 master branch。
+在 GitHub 建立一個 master branch。
 
 ----------
 

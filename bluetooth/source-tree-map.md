@@ -40,7 +40,7 @@ Transport / TTY / USB
 ├─ drivers/tty/                   (UART / serdev)
 ├─ drivers/usb/                   (USB core)
 ```
-👉 **Bluetooth 不只在 `drivers/bluetooth/`**  
+**Bluetooth 不只在 `drivers/bluetooth/`**  
 很多關鍵邏輯其實在 `net/bluetooth/`。
 
 ----------
@@ -100,7 +100,7 @@ bluez/
 -   與 kernel mgmt 的狀態同步
     
 
-👉 如果問題是「BlueZ 顯示 power on，但實際硬體沒反應」，  
+如果問題是「BlueZ 顯示 power on，但實際硬體沒反應」，  
 **一定要看這裡 + kernel mgmt**。
 
 ----------
@@ -134,7 +134,7 @@ net/bluetooth/
 ├─ l2cap_core.c      # L2CAP data path
 ├─ smp.c             # pairing / encryption
 ```
-👉 **Debug 原則**
+**Debug 原則**
 
 -   「控制失敗」→ `mgmt.c` / `hci_core.c`
     
@@ -158,7 +158,7 @@ net/bluetooth/
 -   hci_uart attach 成功後
     
 
-👉 如果你 **根本看不到 hci0**  
+如果你 **根本看不到 hci0**  
 → 問題一定在 driver 層，還沒進到 BlueZ。
 
 ----------
@@ -190,7 +190,7 @@ drivers/bluetooth/
 -   HCI command / event / ACL data 傳輸
     
 
-👉 如果是 USB dongle：
+如果是 USB dongle：
 
 -   問題多半在這個檔案 + USB core
     
@@ -235,7 +235,7 @@ drivers/bluetooth/
 -   將 byte stream 丟給 hci_uart
     
 
-👉 **這就是為什麼 brcm_patchram_plus 容易跟 kernel 打架**  
+**這就是為什麼 brcm_patchram_plus 容易跟 kernel 打架**  
 因為兩邊都想「擁有 tty」。
 
 ----------
@@ -255,7 +255,7 @@ drivers/bluetooth/
 -   將 `.hcd` 拆成 vendor HCI commands 下載
     
 
-👉 如果你走「kernel 自動載 firmware」方案  
+如果你走「kernel 自動載 firmware」方案  
 → **90% 時間都會在這個檔案打轉**
 
 ----------
@@ -273,7 +273,7 @@ drivers/tty/
 -   新式（DT）：serdev child device → hci_uart
     
 
-👉 DT / power / clock / reset 問題  
+DT / power / clock / reset 問題  
 **不會出現在 Bluetooth driver 裡，而是在 UART driver / DT**
 
 ----------

@@ -2,20 +2,20 @@
 # GPIO Debug Playbook
 
 
-# 🎯 GPIO 問題的本質
+# GPIO 問題的本質
 
 所有 GPIO 問題，本質只會是以下其中之一：
 
-1️⃣ pin 沒 mux 成 gpio  
-2️⃣ polarity 錯誤（active-low）  
-3️⃣ 被 hog / driver 佔用  
-4️⃣ open-drain / pull-up 設錯  
-5️⃣ regulator 沒 enable  
-6️⃣ interrupt domain 設錯
+1. pin 沒 mux 成 gpio  
+2. polarity 錯誤（active-low）  
+3. 被 hog / driver 佔用  
+4. open-drain / pull-up 設錯  
+5. regulator 沒 enable  
+6. interrupt domain 設錯
 
 ----------
 
-# 🧭 總體 Debug 流程
+# 總體 Debug 流程
 ```
 Step 1  → 確認 DT 正確  
 Step 2  → 確認 pinctrl mux  
@@ -28,9 +28,9 @@ Step 7  → trace driver 行為
 
 ----------
 
-# 🔎 Case 1：Reset 拉不起來
+# Case 1：Reset 拉不起來
 
-## Step 1️⃣ 檢查 Device Tree
+## Step 1 檢查 Device Tree
 ```
 dtc -I fs /sys/firmware/devicetree/base
 ```
@@ -42,7 +42,7 @@ reset-gpios = <&gpio3 5 GPIO_ACTIVE_LOW>;
 
 ----------
 
-## Step 2️⃣ 檢查是否 active-low 搞錯
+## Step 2 檢查是否 active-low 搞錯
 
 用：
 ```
@@ -57,13 +57,13 @@ active-low
 gpioset gpiochipX 5=1  
 gpioset gpiochipX 5=0
 ```
-⚠ 如果 active-low：
+注意：如果 active-low：
 
 1 = physical low
 
 ----------
 
-## Step 3️⃣ 檢查 pinctrl
+## Step 3 檢查 pinctrl
 ```
 ls /sys/kernel/debug/pinctrl/
 ```
@@ -82,7 +82,7 @@ i2c mode / pwm mode / dsi mode
 
 ----------
 
-## Step 4️⃣ 檢查 hog
+## Step 4 檢查 hog
 ```
 cat /sys/kernel/debug/gpio
 ```
@@ -99,7 +99,7 @@ gpio-XX (panel-enable) hogged
 
 ----------
 
-## Step 5️⃣ 示波器驗證
+## Step 5 示波器驗證
 
 不要相信軟體。
 
@@ -114,7 +114,7 @@ gpio-XX (panel-enable) hogged
 
 ----------
 
-# 🔎 Case 2：WiFi Power 拉不起來
+# Case 2：WiFi Power 拉不起來
 
 常見情況：
 
@@ -139,16 +139,16 @@ wifi_vdd disabled
 
 ----------
 
-# 🔎 Case 3：gpiomon 沒事件
+# Case 3：gpiomon 沒事件
 
-## Step 1️⃣ 確認 DT IRQ
+## Step 1 確認 DT IRQ
 ```
 interrupt-parent = <&gpio3>;  
 interrupts = <5 IRQ_TYPE_LEVEL_LOW>;
 ```
 ----------
 
-## Step 2️⃣ 檢查 controller 是否 interrupt-controller
+## Step 2 檢查 controller 是否 interrupt-controller
 ```
 gpio-controller;  
 interrupt-controller;  
@@ -156,7 +156,7 @@ interrupt-controller;
 ```
 ----------
 
-## Step 3️⃣ 確認 /proc/interrupts
+## Step 3 確認 /proc/interrupts
 ```
 cat /proc/interrupts
 ```
@@ -164,7 +164,7 @@ cat /proc/interrupts
 
 ----------
 
-## Step 4️⃣ 確認 trigger type
+## Step 4 確認 trigger type
 
 很多問題出在：
 ```
@@ -174,15 +174,15 @@ LEVEL_LOW vs EDGE_FALLING
 
 ----------
 
-# 🔎 Case 4：GPIO 設了但硬體不動
+# Case 4：GPIO 設了但硬體不動
 
 可能原因：
 
-### 1️⃣ pin 還在 alternate function
+### 1. pin 還在 alternate function
 
 最常見。
 
-### 2️⃣ open drain 沒 pull-up
+### 2. open drain 沒 pull-up
 
 如果：
 ```
@@ -194,7 +194,7 @@ GPIO_OPEN_DRAIN
 
 ----------
 
-### 3️⃣ drive strength 太弱
+### 3. drive strength 太弱
 
 某些 SoC 預設：
 ```
@@ -204,7 +204,7 @@ GPIO_OPEN_DRAIN
 
 ----------
 
-# 🧠 進階 Debug：Trace Kernel
+# 進階 Debug：Trace Kernel
 
 ----------
 
@@ -230,7 +230,7 @@ echo gpiod_set_value > set_ftrace_filter
 
 ----------
 
-# 🔎 Case 5：Driver probe 失敗
+# Case 5：Driver probe 失敗
 
 如果：
 ```
@@ -251,7 +251,7 @@ reset  =  devm_gpiod_get(dev, "reset", GPIOD_OUT_LOW);
 
 ----------
 
-# 🧰 標準 GPIO Bring-up Checklist
+# 標準 GPIO Bring-up Checklist
 
 
 | 項目 | 檢查重點 |  
@@ -286,7 +286,7 @@ GPIO 問題 80% 不是 GPIO。
 
 ----------
 
-# 🧩 GPIO + Regulator + Reset Sequence 模型
+# GPIO + Regulator + Reset Sequence 模型
 
 標準 reset 流程應該是：
 ```

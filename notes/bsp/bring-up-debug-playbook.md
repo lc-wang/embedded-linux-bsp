@@ -25,7 +25,7 @@ BSP 問題的困難點，不在於單一技術，而在於：
 -   嘗試性 patch
 -   修到看似正常但其實沒找到根因
 
-👉 **Playbook 的價值在於「決策順序」，而不是技巧本身。**
+**Playbook 的價值在於「決策順序」，而不是技巧本身。**
 
 ----------
 
@@ -93,7 +93,7 @@ BSP 問題的困難點，不在於單一技術，而在於：
 5.  **Driver 行為**
 6.  **Userspace / Framework**
 
-👉 越前面的層級沒確認，越不要往後改。
+越前面的層級沒確認，越不要往後改。
 
 ----------
 
@@ -108,7 +108,7 @@ BSP 問題的困難點，不在於單一技術，而在於：
 3.  power domain 是否真的 on
 4.  firmware 是否在 blocking 狀態
 
-❌ 不要第一時間改 I2C driver
+✗ 不要第一時間改 I2C driver
 
 ----------
 
@@ -121,7 +121,7 @@ BSP 問題的困難點，不在於單一技術，而在於：
 3.  pinctrl sleep / default state
 4.  suspend / resume 行為
 
-❌ 不要先怪 codec driver
+✗ 不要先怪 codec driver
 
 ----------
 
@@ -169,7 +169,7 @@ BSP 問題的困難點，不在於單一技術，而在於：
 -   suspend / resume 重複測試
 -   clock / power domain 行為符合預期
 
-👉 這不是測試項目，是 **信心來源**。
+這不是測試項目，是 **信心來源**。
 
 ----------
 

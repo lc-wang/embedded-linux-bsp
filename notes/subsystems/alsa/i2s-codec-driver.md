@@ -5,7 +5,7 @@
 
 ----------
 
-# 1️⃣ ASoC Driver 分層回顧
+# 1. ASoC Driver 分層回顧
 
 之前我們講到：
 ```
@@ -20,7 +20,7 @@ Codec driver
 ```
 ----------
 
-# 2️⃣ CPU DAI Driver 是什麼？
+# 2. CPU DAI Driver 是什麼？
 
 CPU DAI driver 通常是：
 
@@ -47,7 +47,7 @@ sound/soc/renesas/rcar/
 
 ----------
 
-# 3️⃣ 核心結構：snd_soc_dai_driver
+# 3. 核心結構：snd_soc_dai_driver
 
 在 CPU driver 中你會看到：
 ```
@@ -65,7 +65,7 @@ static  struct  snd_soc_dai_driver  rockchip_i2s_dai = {
 ```
 ----------
 
-# 4️⃣ snd_soc_dai_ops
+# 4. snd_soc_dai_ops
 ```
 struct snd_soc_dai_ops {
     int (*startup)(...);
@@ -79,7 +79,7 @@ struct snd_soc_dai_ops {
 
 ----------
 
-# 5️⃣ 播放完整 call flow
+# 5. 播放完整 call flow
 
 播放時會發生：
 ```
@@ -99,7 +99,7 @@ codec_dai->ops->trigger()
 ```
 ----------
 
-# 6️⃣ hw_params 在做什麼？
+# 6. hw_params 在做什麼？
 
 這是最重要的函式。
 
@@ -128,7 +128,7 @@ static int rockchip_i2s_hw_params(...)
 
 ----------
 
-# 7️⃣ I2S Clock 計算
+# 7. I2S Clock 計算
 
 I2S clock 組成：
 ```
@@ -157,7 +157,7 @@ BCLK = Sample Rate × Channels × BitWidth
 
 ----------
 
-# 8️⃣ Master / Slave 問題
+# 8. Master / Slave 問題
 
 在 DAI link 中：
 
@@ -181,7 +181,7 @@ BCLK = Sample Rate × Channels × BitWidth
 
 ----------
 
-# 9️⃣ Codec Driver 是什麼？
+# 9. Codec Driver 是什麼？
 
 Codec driver 通常：
 
@@ -205,7 +205,7 @@ rt5651.c
 
 ----------
 
-# 🔟 Codec Driver 結構
+# 10. Codec Driver 結構
 ```
 static struct snd_soc_component_driver soc_codec_dev_wm8960 = {
     .dapm_widgets = wm8960_dapm_widgets,
@@ -221,7 +221,7 @@ static struct snd_soc_dai_driver wm8960_dai = {
 ```
 ----------
 
-# 1️⃣1️⃣ codec hw_params 在做什麼？
+# 11. codec hw_params 在做什麼？
 
 典型：
 ```
@@ -243,25 +243,25 @@ Codec 可能需要：
 
 ----------
 
-# 1️⃣2️⃣ CPU DAI vs Codec DAI 誰是 clock master？
+# 12. CPU DAI vs Codec DAI 誰是 clock master？
 
 三種常見模式：
 
-### 1️⃣ CPU master
+### 1. CPU master
 
 CPU 提供 BCLK + LRCLK
 
-### 2️⃣ Codec master
+### 2. Codec master
 
 Codec 提供 BCLK
 
-### 3️⃣ External clock
+### 3. External clock
 
 例如 audio PLL
 
 ----------
 
-# 1️⃣3️⃣ 為什麼聲音會變成雜音？
+# 13. 為什麼聲音會變成雜音？
 
 通常原因：
 
@@ -280,7 +280,7 @@ Codec 提供 BCLK
 
 ----------
 
-# 1️⃣4️⃣ BSP Debug Clock Checklist
+# 14. BSP Debug Clock Checklist
 
 ### Step 1
 
@@ -300,7 +300,7 @@ Codec 提供 BCLK
 
 ----------
 
-# 1️⃣5️⃣ Driver 初始化流程
+# 15. Driver 初始化流程
 
 Probe 時：
 ```
@@ -318,7 +318,7 @@ snd_soc_register_component()
 ```
 ----------
 
-# 1️⃣6️⃣ 完整播放流程
+# 16. 完整播放流程
 ```
 Machine driver 建立 link
   ↓
@@ -342,7 +342,7 @@ speaker 輸出
 ```
 ----------
 
-# 1️⃣7️⃣ 心智模型總結
+# 17. 心智模型總結
 
 ASoC driver 成功條件：
 

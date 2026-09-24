@@ -1,8 +1,8 @@
 
-# 🔗 GPIO → IRQ Domain → GIC → CPU 流程解析
+# GPIO → IRQ Domain → GIC → CPU 流程解析
 
 
-# 🎯 本章目的
+# 本章目的
 
 把以下全部串起來：
 
@@ -13,11 +13,11 @@
 -   Linux IRQ subsystem
 -   user space（gpiomon）
 
-👉 這一章是 **GPIO interrupt 真正的核心理解**
+這一章是 **GPIO interrupt 真正的核心理解**
 
 ----------
 
-# 🧭 一張圖先看懂
+# 一張圖先看懂
 ```
 [GPIO pin edge]  
  ↓  
@@ -39,7 +39,7 @@
 ```
 ----------
 
-# 1️⃣ Device Tree → Interrupt Flow 起點
+# 1. Device Tree → Interrupt Flow 起點
 
 
 ## 裝置使用 GPIO interrupt
@@ -49,7 +49,7 @@ my_device {
     interrupts = <5 IRQ_TYPE_EDGE_FALLING>;
 };
 ```
-👉 代表：
+代表：
 
 -   使用 gpio3 的第 5 條 line
 -   edge falling trigger
@@ -67,7 +67,7 @@ gpio3: gpio@xxxx {
     interrupts = <GIC_SPI 89 IRQ_TYPE_LEVEL_HIGH>;
 };
 ```
-👉 關鍵：
+關鍵：
 
 | 層級 | 說明 |  
 |------|-------------------------|  
@@ -76,10 +76,10 @@ gpio3: gpio@xxxx {
 
 ----------
 
-# 2️⃣ Kernel 初始化流程
+# 2. Kernel 初始化流程
 
 
-## Step 1️⃣ GIC 初始化
+## Step 1 GIC 初始化
 
 driver：
 ```
@@ -91,7 +91,7 @@ gic_irq_domain
 ```
 ----------
 
-## Step 2️⃣ GPIO controller probe
+## Step 2 GPIO controller probe
 
 driver：
 ```
@@ -105,13 +105,13 @@ gpio_irq_domain
 ```
 irq_domain_create_hierarchy()
 ```
-👉 建立：
+建立：
 ```
 gpio domain → gic domain
 ```
 ----------
 
-# 3️⃣ IRQ mapping 建立
+# 3. IRQ mapping 建立
 
 當 driver 或 gpiod request interrupt：
 ```
@@ -127,7 +127,7 @@ GPIO hwirq → GIC hwirq → Linux virq
 ```
 ----------
 
-## 🔎 Mapping 範例
+## Mapping 範例
 ```
 GPIO3_5  
  ↓  
@@ -141,23 +141,23 @@ virq = 123
 ```
 ----------
 
-# 4️⃣ Interrupt 發生時
+# 4. Interrupt 發生時
 
 
-## Step 1️⃣ 硬體觸發
+## Step 1 硬體觸發
 ```
 GPIO pin 發生 edge
 ```
 ----------
 
-## Step 2️⃣ GPIO controller
+## Step 2 GPIO controller
 
 -   detect edge
 -   產生 IRQ signal
 
 ----------
 
-## Step 3️⃣ GIC 接收
+## Step 3 GIC 接收
 ```
 SPI 89 active
 ```
@@ -168,7 +168,7 @@ GIC：
 
 ----------
 
-## Step 4️⃣ CPU exception
+## Step 4 CPU exception
 
 ARM CPU 進入：
 ```
@@ -176,7 +176,7 @@ IRQ exception handler
 ```
 ----------
 
-## Step 5️⃣ Kernel IRQ handling
+## Step 5 Kernel IRQ handling
 ```
 gic_handle_irq()  
   ↓  
@@ -184,13 +184,13 @@ generic_handle_irq(virq)
 ```
 ----------
 
-## Step 6️⃣ driver ISR
+## Step 6 driver ISR
 ```
 my_irq_handler()
 ```
 ----------
 
-## Step 7️⃣ user space（如果有）
+## Step 7 user space（如果有）
 
 例如：
 
@@ -200,7 +200,7 @@ my_irq_handler()
 
 ----------
 
-# 5️⃣ gpiomon / libgpiod flow
+# 5. gpiomon / libgpiod flow
 
 ## 設定 edge
 ```
@@ -226,7 +226,7 @@ user space event
 ```
 ----------
 
-# 6️⃣ 重要：兩層 irq_domain
+# 6. 重要：兩層 irq_domain
 
 
 ## child domain（GPIO）
@@ -245,16 +245,16 @@ GIC hwirq → CPU IRQ
 ```
 ----------
 
-## 🔥 合起來
+## 合起來
 ```
 GPIO → gpio domain → GIC domain → CPU
 ```
 ----------
 
-# 7️⃣ Debug
+# 7. Debug
 
 
-## Step 1️⃣ 看 interrupt 是否存在
+## Step 1 看 interrupt 是否存在
 ```
 cat /proc/interrupts
 ```
@@ -264,7 +264,7 @@ cat /proc/interrupts
 ```
 ----------
 
-## Step 2️⃣ 觸發 GPIO
+## Step 2 觸發 GPIO
 
 觀察：
 
@@ -272,9 +272,9 @@ cat /proc/interrupts
 
 ----------
 
-## Step 3️⃣ 如果沒增加
+## Step 3 如果沒增加
 
-👉 問題在：
+問題在：
 
 -   GPIO controller
 -   irq_domain mapping
@@ -283,19 +283,19 @@ cat /proc/interrupts
 
 ----------
 
-## Step 4️⃣ 如果有增加但沒 event
+## Step 4 如果有增加但沒 event
 
-👉 問題在：
+問題在：
 
 -   driver ISR
 -   poll / event
 
 ----------
 
-# 8️⃣ 常見錯誤
+# 8. 常見錯誤
 
 
-## ❌ interrupt-parent 錯
+## interrupt-parent 錯
 ```
 device → gpio3 OK  
 但 gpio3 沒接 GIC
@@ -304,7 +304,7 @@ device → gpio3 OK
 
 ----------
 
-## ❌ trigger type 錯
+## trigger type 錯
 ```
 LEVEL vs EDGE
 ```
@@ -312,13 +312,13 @@ LEVEL vs EDGE
 
 ----------
 
-## ❌ irq_domain 沒建立
+## irq_domain 沒建立
 
 → request_irq 失敗
 
 ----------
 
-## ❌ pinctrl 沒設 input
+## pinctrl 沒設 input
 
 → edge 永遠不變
 

@@ -50,7 +50,7 @@ spin_unlock(&lock);
     -   `spin_lock_irqsave()` / `spin_unlock_irqrestore()`：保護中斷 context。
     -   `rwlock_t`：多讀單寫。
         
--   ⚠️ **禁止在 spinlock 內睡眠**。
+-   注意：**禁止在 spinlock 內睡眠**。
     
 
 ----------
@@ -191,7 +191,7 @@ schedule_work(&my_work);
 5.  深入研究 RCU：閱讀 `kernel/rcu/` 原始碼與文檔。
 ----------
 
-📘 **延伸閱讀**
+**延伸閱讀**
 
 -   `Documentation/locking/`
 -   `Documentation/core-api/atomic_ops.rst`

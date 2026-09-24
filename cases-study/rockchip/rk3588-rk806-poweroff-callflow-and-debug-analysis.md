@@ -109,7 +109,7 @@ kernel_power_off()
              └─ pinctrl_select_state("pmic-power-off")
                  └─ 拉動 PWRDN 腳位
 ```
-⚠️ **到這裡為止，kernel 的責任結束**
+注意：**到這裡為止，kernel 的責任結束**
 
 ----------
 
@@ -133,7 +133,7 @@ kernel_power_off()
 -   是否 SoC 本身仍有 reset source
     
 
-👉 **是否真的斷電 = 硬體設計責任**
+**是否真的斷電 = 硬體設計責任**
 
 ----------
 
@@ -152,7 +152,7 @@ kernel_power_off()
 5.  表現為「reboot」
     
 
-👉 **Kernel 已完成它該做的事**
+**Kernel 已完成它該做的事**
 
 ----------
 
@@ -171,7 +171,7 @@ echo  function > /sys/kernel/tracing/current_tracer echo rk806 > /sys/kernel/tra
 -   trace buffer 尚未 flush
     
 
-👉 **這不是 ftrace 無效，而是 poweroff 特性**
+**這不是 ftrace 無效，而是 poweroff 特性**
 
 ----------
 
@@ -217,7 +217,7 @@ echo  function > /sys/kernel/tracing/current_tracer echo rk806 > /sys/kernel/tra
 -   poweroff 前最後訊息
     
 
-👉 **pstore 是唯一能跨 reboot 保存證據的工具**
+**pstore 是唯一能跨 reboot 保存證據的工具**
 
 ----------
 
@@ -240,13 +240,13 @@ echo  function > /sys/kernel/tracing/current_tracer echo rk806 > /sys/kernel/tra
 
 ## 10. kallsyms / vmlinux / faddr2line
 
-### 10.1 kallsyms
+### 10. 1 kallsyms
 
 確認 symbol 是否存在、是否被編譯進 kernel：
 ```bash
 cat /proc/kallsyms | grep rk806
 ```
-### 10.2 vmlinux + faddr2line
+### 10. 2 vmlinux + faddr2line
 ```bash
 aarch64-linux-gnu-addr2line -e vmlinux ffffffc0xxxxxxxx
 ```

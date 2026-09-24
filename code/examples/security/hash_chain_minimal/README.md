@@ -8,7 +8,7 @@ Root of Trust / Secure Boot 中最基本的 hash chain 範例。
   
 ---  
   
-## 🎯 本章的目的  
+## 本章的目的  
   
 理解：  
   
@@ -20,7 +20,7 @@ Root of Trust / Secure Boot 中最基本的 hash chain 範例。
   
 ---  
   
-## 🧠 一句話先記住  
+## 一句話先記住  
   
 ```text  
 hash  
@@ -32,7 +32,7 @@ hash chain
 
 ----------
 
-## 🔄 基本模型
+## 基本模型
 
 ```
 BootROM
@@ -60,7 +60,7 @@ chain = H(previous_chain || current_image_hash)
 
 ----------
 
-## 🧠 為什麼需要 hash chain？
+## 為什麼需要 hash chain？
 
 如果只記錄單一 hash：
 
@@ -84,7 +84,7 @@ RootFS
 
 ----------
 
-## 🔥 最重要觀念
+## 最重要觀念
 
 hash chain 本身只能回答：
 
@@ -107,7 +107,7 @@ hash chain 本身只能回答：
 
 ----------
 
-## 🧩 對應真實技術
+## 對應真實技術
 
 | 技術 | 對應概念 |  
 |------|----------|  
@@ -119,7 +119,7 @@ hash chain 本身只能回答：
 
 ----------
 
-## ✅ Build
+## Build
 
 需要 OpenSSL development package：
 
@@ -135,7 +135,7 @@ make
 
 ----------
 
-## ✅ Run
+## Run
 
 建立測試檔案：
 
@@ -156,7 +156,7 @@ echo "Device Tree Blob" > board.dtb
 
 ----------
 
-## ⚠ 注意
+## 注意
 
 這個範例只是 hash chain model。
 

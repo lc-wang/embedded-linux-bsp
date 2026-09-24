@@ -296,7 +296,7 @@ P2P-GO-NEG-SUCCESS role=client → WPS-SUCCESS
 WPA: Key negotiation completed [PTK=CCMP GTK=CCMP]
 CTRL-EVENT-CONNECTED / P2P-GROUP-STARTED p2p-wlan0-0 client
 DHCP → 192.168.49.28
-ping 192.168.49.1 → 4 packets, 0% loss ✔
+ping 192.168.49.1 → 4 packets, 0% loss ✓
 ```
 
 **方向 B — 板子當 GO 被手機連（`connect -i 15`）：**
@@ -305,7 +305,7 @@ ping 192.168.49.1 → 4 packets, 0% loss ✔
 P2P-GROUP-STARTED p2p-wlan0-0 GO freq=5785 (VHT80 / ch157)
 AP-STA-CONNECTED <phone-mac>
 手機 DHCP 取得 192.168.49.x
-ping <client-ip> → 0% loss ✔
+ping <client-ip> → 0% loss ✓
 ```
 
 兩個方向皆端到端成立、可重複；WiFi Direct 驗收 = **Pass（雙向）**。

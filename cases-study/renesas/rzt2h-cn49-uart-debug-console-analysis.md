@@ -27,7 +27,7 @@
 | CN13             | UART            | 是            | 未焊接                       |
 
 
-👉 **唯一符合條件的介面為 CN49（PMOD2 UART）**
+**唯一符合條件的介面為 CN49（PMOD2 UART）**
 
 ----------
 
@@ -83,7 +83,7 @@ grep -R "P11_0\|P11_1" /sys/kernel/debug/pinctrl/*/pinmux-pins
 pin 88 (P11_0): device 80005400.serial  function sci1 group sci1
 pin 89 (P11_1): device 80005400.serial  function sci1 group sci1 
 ```
-👉 確認 **P11_0 / P11_1 已正確切換為 SCI1**。
+確認 **P11_0 / P11_1 已正確切換為 SCI1**。
 
 ----------
 
@@ -105,7 +105,7 @@ P11_0_BSC_A5_LCDC_DATG0_PMOD2_RXD1
              │
         DIP-Switch-10pol-SMD (SW6)
 ```
-👉 **CN49 的 UART 腳位實際上是經過 10-pin DIP switch 才會接通**
+**CN49 的 UART 腳位實際上是經過 10-pin DIP switch 才會接通**
 
 ### 6.3 必要設定
 

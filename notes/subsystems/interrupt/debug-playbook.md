@@ -9,11 +9,11 @@
 -   driver ISR
 -   user space（gpiomon / poll）
 
-👉 變成一套「**可以直接解問題的流程**」
+變成一套「**可以直接解問題的流程**」
 
 ----------
 
-# 🎯 Interrupt 問題本質分類
+# Interrupt 問題本質分類
 
 所有 interrupt 問題，幾乎都落在這 6 類：
 
@@ -26,7 +26,7 @@
 
 ----------
 
-# 🧭 標準 Debug 流程
+# 標準 Debug 流程
 ```
 Step 1  → 確認 DT interrupt 設定  
 Step 2  → 確認 pinctrl（input + mux）  
@@ -38,10 +38,10 @@ Step 7  → 確認 user space event
 ```
 ----------
 
-# 🔎 Case 1：gpiomon 完全沒反應
+# Case 1：gpiomon 完全沒反應
 
 
-## Step 1️⃣ 檢查 Device Tree
+## Step 1 檢查 Device Tree
 ```
 interrupt-parent = <&gpio3>;  
 interrupts = <5 IRQ_TYPE_EDGE_FALLING>;
@@ -53,7 +53,7 @@ interrupts = <5 IRQ_TYPE_EDGE_FALLING>;
 
 ----------
 
-## Step 2️⃣ 檢查 pinctrl
+## Step 2 檢查 pinctrl
 ```
 cat /sys/kernel/debug/pinctrl/*/pinmux-pins
 ```
@@ -62,11 +62,11 @@ cat /sys/kernel/debug/pinctrl/*/pinmux-pins
 -   該 pin 是 `gpio`
 -   設為 `input`
 
-👉 沒設 input = 永遠不會有 edge
+沒設 input = 永遠不會有 edge
 
 ----------
 
-## Step 3️⃣ 檢查 GPIO controller 是否支援 IRQ
+## Step 3 檢查 GPIO controller 是否支援 IRQ
 ```
 gpio3: gpio@xxxx {
     interrupt-controller;
@@ -74,13 +74,13 @@ gpio3: gpio@xxxx {
 ```
 ----------
 
-## Step 4️⃣ 檢查 mapping
+## Step 4 檢查 mapping
 ```
 cat /proc/interrupts
 ```
 如果完全沒有該 IRQ：
 
-👉 問題在：
+問題在：
 
 -   interrupt-parent
 -   irq_domain
@@ -88,7 +88,7 @@ cat /proc/interrupts
 
 ----------
 
-## Step 5️⃣ 手動觸發
+## Step 5 手動觸發
 
 用：
 ```
@@ -98,21 +98,21 @@ gpioset / gpioget
 
 ----------
 
-# 🔎 Case 2：/proc/interrupts 沒有 entry
+# Case 2：/proc/interrupts 沒有 entry
 
-👉 代表 interrupt **根本沒註冊成功**
+代表 interrupt **根本沒註冊成功**
 
 ----------
 
 ## 可能原因
 
-### ❌ interrupt-parent 錯
+### interrupt-parent 錯
 ```
 interrupt-parent = <&wrong_node>;
 ```
 ----------
 
-### ❌ gpio 沒接 GIC
+### gpio 沒接 GIC
 
 缺少：
 ```
@@ -122,7 +122,7 @@ interrupt-parent = <&gic>;
 
 ----------
 
-### ❌ #interrupt-cells 錯
+### #interrupt-cells 錯
 ```
 #interrupt-cells = <2>;
 ```
@@ -130,7 +130,7 @@ interrupt-parent = <&gic>;
 
 ----------
 
-### ❌ driver 沒 request_irq
+### driver 沒 request_irq
 ```
 request_irq(...)
 ```
@@ -138,7 +138,7 @@ request_irq(...)
 
 ----------
 
-# 🔎 Case 3：counter 不增加
+# Case 3：counter 不增加
 ```
 cat /proc/interrupts
 ```
@@ -146,35 +146,35 @@ cat /proc/interrupts
 ```
 123: 0 0 GICv3 89 gpio-keys
 ```
-👉 一直是 0
+一直是 0
 
 ----------
 
 ## 可能原因
 
-### ❌ GPIO 沒輸出 interrupt
+### GPIO 沒輸出 interrupt
 
 -   pinctrl 沒設 input
 -   edge 沒變化
 
 ----------
 
-### ❌ trigger type 錯
+### trigger type 錯
 ```
 EDGE vs LEVEL  
 HIGH vs LOW
 ```
-👉 最常見
+最常見
 
 ----------
 
-### ❌ polarity 錯
+### polarity 錯
 
 active-low 搞反
 
 ----------
 
-# 🔎 Case 4：interrupt storm
+# Case 4：interrupt storm
 ```
 CPU usage 100%  
 interrupt 不斷觸發
@@ -183,26 +183,26 @@ interrupt 不斷觸發
 
 ## 常見原因
 
-### ❌ level-trigger 沒 clear
+### level-trigger 沒 clear
 
 device interrupt flag 沒清
 
 ----------
 
-### ❌ edge 設成 level
+### edge 設成 level
 
 應該 EDGE_FALLING  
 卻設 LEVEL_LOW
 
 ----------
 
-### ❌ open drain + pull-up 問題
+### open drain + pull-up 問題
 
 line 永遠被拉低
 
 ----------
 
-# 🔎 Case 5：ISR 沒被呼叫
+# Case 5：ISR 沒被呼叫
 
 
 ## 檢查 request_irq
@@ -224,7 +224,7 @@ dmesg | grep irq
 ```
 ----------
 
-# 🔎 Case 6：user space 沒事件
+# Case 6：user space 沒事件
 
 
 ## 可能原因
@@ -241,9 +241,9 @@ gpiomon gpiochip0 5
 ```
 ----------
 
-# 🔎 Case 7：GPIO 有動但沒 IRQ
+# Case 7：GPIO 有動但沒 IRQ
 
-👉 非常常見
+非常常見
 
 
 ## 原因
@@ -261,7 +261,7 @@ GPIO output OK
 
 ----------
 
-# 🧠 進階 Debug
+# 進階 Debug
 
 ## 查看 IRQ 詳細資訊
 ```
@@ -288,9 +288,9 @@ echo  'file drivers/irqchip/* +p' > dynamic_debug/control
 ```
 ----------
 
-# 🔬 硬體驗證
+# 硬體驗證
 
-👉 不要只看軟體
+不要只看軟體
 
 用：
 
@@ -303,7 +303,7 @@ GPIO 是否真的有 edge
 
 ----------
 
-# 🧭 最終 Debug Flow
+# 最終 Debug Flow
 ```
 GPIO edge 有沒有？  
  ↓  

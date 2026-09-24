@@ -1,5 +1,5 @@
 
-# 📘 **Android 15 MIPI Display Rotation Technical Report**
+# **Android 15 MIPI Display Rotation Technical Report**
 
 # # **目錄（Table of Contents）**
 
@@ -86,10 +86,10 @@ wm → cmd window → WindowManagerService.setUserRotation
 
 這條路徑會：
 
-✔ 正確重新計算 Insets  
-✔ 正確更新 LogicalDisplay geometry  
-✔ 正確通知 SurfaceFlinger 更新投影矩陣  
-✔ 正確更新 Input system（touch rotation）
+✓ 正確重新計算 Insets  
+✓ 正確更新 LogicalDisplay geometry  
+✓ 正確通知 SurfaceFlinger 更新投影矩陣  
+✓ 正確更新 Input system（touch rotation）
 
 任何跳過 WMS 的方法（如直接改 SF）都會錯亂 → 導致裁切。
 
@@ -103,7 +103,7 @@ displayId=2 出現：
 -   **SurfaceFlinger 計算的投影矩陣與預期不一致**
 其根因是：
 
-### 🚀 **Android 15 的多顯示器旋轉邏輯完全倚賴 WMS + DisplayRotation 的 notification chain**
+### **Android 15 的多顯示器旋轉邏輯完全倚賴 WMS + DisplayRotation 的 notification chain**
 
 如果在 SF / LogicalDisplay 直接 override：
 ## 後果
@@ -131,11 +131,11 @@ exit 127
 neverallow
 system_server_service denied
 ``` 
-### ❌ 原因 1：wm 需要 shell PATH，init 沒有
-### ❌ 原因 2：wm 需要 binder IPC，init 執行時 system_server 還沒 ready
-### ❌ 原因 3：exec 對象被 SELinux 阻擋
-### ❌ 原因 4：Android 15 WMS 更嚴格，不接受 early rotation call
-### 🔥 結論：
+### 原因 1：wm 需要 shell PATH，init 沒有
+### 原因 2：wm 需要 binder IPC，init 執行時 system_server 還沒 ready
+### 原因 3：exec 對象被 SELinux 阻擋
+### 原因 4：Android 15 WMS 更嚴格，不接受 early rotation call
+### 結論：
 **init.rc 無法做 per-display rotation。**  
 唯一方法：**進 framework。**
 
@@ -146,15 +146,15 @@ system_server_service denied
 
 | 功能 | Android 14 | Android 15 |
 |--------|------------|------------|
-| per-display `einit-1` | ✔ 有效 | ✖ 無效 |
-| per-display `efull-1` | ✔ 有效 | ✖ 無效 |
+| per-display `einit-1` | ✓ 有效 | ✗ 無效 |
+| per-display `efull-1` | ✓ 有效 | ✗ 無效 |
 | LocalDisplayAdapter | 覆寫 rotation | A15 行為改變 |
 | LogicalDisplay | 覆寫 appWidth/Height | A15 仍會被後面 override |
 | ContentRecorder | Mirror path 正常 | A15 改 Mirror 路徑，對實體顯示無效 |
 
 結論：
 
-### 🎯 Rockchip A14 patch 無法直接移植到 A15
+### Rockchip A14 patch 無法直接移植到 A15
 
 因為抽象層全部重新設計。
 
@@ -192,8 +192,8 @@ dumpsys 證實：
 LogicalDisplay 設定的 geometry 被 InputFlinger / InsetsPolicy 覆蓋。
 
 這證實：  
-✔ 必須走 WMS 正規種子流程  
-✖ 不能只 patch SF / LogicalDisplay
+✓ 必須走 WMS 正規種子流程  
+✗ 不能只 patch SF / LogicalDisplay
 
 ----------
 
@@ -201,7 +201,7 @@ LogicalDisplay 設定的 geometry 被 InputFlinger / InsetsPolicy 覆蓋。
 
 後來成功的方案：
 
-### 🔥 **在 WindowManagerService.systemReady 呼叫：**
+### **在 WindowManagerService.systemReady 呼叫：**
 
 `setUserRotation(displayId, USER_ROTATION_LOCKED, rotation);` 
 
@@ -213,7 +213,7 @@ LogicalDisplay 設定的 geometry 被 InputFlinger / InsetsPolicy 覆蓋。
 -   不會裁切
 -   不會偏移
 
-💡 這也是 `wm user-rotation` 正常的原因  
+這也是 `wm user-rotation` 正常的原因  
 把 wm 的邏輯搬到 framework 內自動執行！
 
 ----------
@@ -233,10 +233,10 @@ LogicalDisplay 設定的 geometry 被 InputFlinger / InsetsPolicy 覆蓋。
 
 # # **12. 結論**
 
-✔ Android 15 的外接顯示器 rotation 必須走 **WindowManagerService 正規流程**  
-✔ init.rc 無法設定 per-display rotation  
-✔ Rockchip A14 patch 無法直接套用於 A15  
-✔ 正確做法：  
+✓ Android 15 的外接顯示器 rotation 必須走 **WindowManagerService 正規流程**  
+✓ init.rc 無法設定 per-display rotation  
+✓ Rockchip A14 patch 無法直接套用於 A15  
+✓ 正確做法：  
 **在 WMS boot 完成後，自動呼叫 setUserRotation(displayId)**
 
 這是：

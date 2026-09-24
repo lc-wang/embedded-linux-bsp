@@ -1,7 +1,7 @@
 # RZ/T2H SD/eSD 開機 Image 製作與 Debug
 
 
-# 📘 目錄
+# 目錄
 
 1.  背景與目標
 2.  RZ/T2H 開機流程與 Bootloader 布局
@@ -51,7 +51,7 @@ RZ/T2H eSD boot 的 boot chain：
 | BL2 | 8 之後 | 0x1000 | 與 BP（bl2_bp_esd.bin）合併 |
 | FIP | 768 | 768 × 512 = 0x60000 | 固定位置，由 TF-A 設定 |
 
-🔍 **ROM 不從 LBA0 開始載入 BootParam！而是從 LBA1載入 BootParam。**
+**ROM 不從 LBA0 開始載入 BootParam！而是從 LBA1載入 BootParam。**
 
 ----------
 
@@ -70,7 +70,7 @@ RZ/T2H eSD boot 的 boot chain：
 
 # 4. 使用 fdisk / wic / xxd 比對 Yocto 與自製 image
 
-## ✔ Yocto `.wic` 檢查
+## Yocto `.wic` 檢查
 
 ```nginx
 fdisk -l core-image*.wic` 
@@ -86,7 +86,7 @@ xxd -s 0 -l 16`：
 
 → 前面不是 0，也不是 bl2_bp，表示 Yocto WIC **並沒有把 BL2_BP 放在 LBA0**。
 
-## ✔ 自製 image（錯誤版本）
+## 自製 image（錯誤版本）
 ```yaml
 xxd -s 0 -l 16 ubuntu.img
 00000000: 0100 0000 0000 0000 ......
@@ -94,10 +94,10 @@ xxd -s 0 -l 16 ubuntu.img
 
 代表：
 
-❌ 把 `bl2_bp_esd.bin`寫到 **LBA0**  
+✗ 把 `bl2_bp_esd.bin`寫到 **LBA0**  
 → ROM 無法找到 BootParam → 無法開機
 
-## ✔ 正確 Yocto 的 BL2_BP offset 查核
+## 正確 Yocto 的 BL2_BP offset 查核
 
 ```bash
 xxd -s $((1*512)) -l 16 wic.img
@@ -109,14 +109,14 @@ xxd -s $((1*512)) -l 16 wic.img
 ```
 證實：
 
-✔ BootParam 起始 LBA = **1**  
-✔ LBA0 不是 bootloader，而是 WIC header
+✓ BootParam 起始 LBA = **1**  
+✓ LBA0 不是 bootloader，而是 WIC header
 
 ----------
 
 # 5. Debug Problem Timeline
 
-## 🔥 問題 1：不能開機（因為 BL2_BP 寫錯 offset）
+## 問題 1：不能開機（因為 BL2_BP 寫錯 offset）
 
 一開始的 script：
 ```bash
@@ -131,7 +131,7 @@ dd  if=bl2_bp_esd.bin of=$loop_dev conv=notrunc
 
 ----------
 
-## 🔥 問題 2：FIP offset 錯誤
+## 問題 2：FIP offset 錯誤
 
 探勘 offset：
 ```nginx
@@ -141,7 +141,7 @@ xxd -s $((768*512)) -l 16 core-image*.wic`
 
 ----------
 
-## 🔥 問題 3：你用錯 partition layout
+## 問題 3：你用錯 partition layout
 
 Yocto：
 ```sql
@@ -156,13 +156,13 @@ start=524288
 
 ----------
 
-## 🔥 問題 4：rootfs 抽 tar 時空間不足
+## 問題 4：rootfs 抽 tar 時空間不足
 
 因為 P2 開太小（用 6GB image 但 rootfs 沒對齊），後來你調整 P2 start 沒問題。
 
 ----------
 
-## 🔥 問題 5：mount 後 umount 失敗（busy）
+## 問題 5：mount 後 umount 失敗（busy）
 
 修正 trap/dir remove 後解決。
 
@@ -170,12 +170,12 @@ start=524288
 
 # 6. 最終 Root Cause 與結論
 
-### ✔ 不能開機的真正原因：
+### 不能開機的真正原因：
 
 > **你把 BL2_BP 寫到 LBA 0。但 Yocto 寫在 LBA 1。**  
 > ROM 只從 LBA1 讀 BootParam → LBA0 完全無作用。
 
-### ✔ Partition layout 需完全符合 Yocto：
+### Partition layout 需完全符合 Yocto：
 
 
 | Partition | Start | Type |
@@ -183,7 +183,7 @@ start=524288
 | P1 | 4096 | FAT32 (0x0c) |
 | P2 | 44536 | EXT4 (0x83) |
 
-### ✔ Bootloader offset 必須固定：
+### Bootloader offset 必須固定：
 
 | Component | LBA |
 |-----------|------|
@@ -230,14 +230,14 @@ K --> L["Boot Completed"]
 
 ----------
 
-## ✔ Bootloader offset 計算
+## Bootloader offset 計算
 ```ini
 LBA1 = 1 * 512 = 0x200
 LBA768 = 768 * 512 = 0x60000
 ```
 ----------
 
-## ✔ 分析工具指令
+## 分析工具指令
 
 
 | 功能 | 指令 |

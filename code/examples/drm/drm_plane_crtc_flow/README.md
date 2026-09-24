@@ -9,7 +9,7 @@ DRM plane / CRTC / scanout flow 心智模型。
 
 ---
 
-## 🎯 本章的目的
+## 本章的目的
 
 理解：
 
@@ -20,7 +20,7 @@ DRM plane / CRTC / scanout flow 心智模型。
 
 ---
 
-## 🧠 先記住
+## 先記住
 
 ```text
 framebuffer = 一張圖
@@ -30,7 +30,7 @@ plane = 放圖的圖層
 CRTC = 負責掃描輸出的核心
 ```
 
-## 🔄 最核心流程
+## 最核心流程
 
 ```
 framebuffer
@@ -48,7 +48,7 @@ panel / monitor
 
 ----------
 
-## 🧠 直覺理解
+## 直覺理解
 
 ### framebuffer
 
@@ -82,7 +82,7 @@ panel / monitor
 
 ----------
 
-## 🧠 最重要觀念
+## 最重要觀念
 
 ```
 framebuffer 不等於畫面
@@ -93,7 +93,7 @@ CRTC 掃描 plane
 
 ----------
 
-## 🧩 Kernel 原始碼對照
+## Kernel 原始碼對照
 
 ```
 drivers/gpu/drm/drm_plane.c

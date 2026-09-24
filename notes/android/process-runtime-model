@@ -22,7 +22,7 @@
 -   cgroup 決定「誰拿得到 CPU / memory」
 -   scheduler 決定「誰真的跑到 CPU」
 
-👉 沒有橫向模型，你只能在 log 裡盲猜。
+沒有橫向模型，你只能在 log 裡盲猜。
 
 ----------
 
@@ -76,7 +76,7 @@ system_server 內含：
 -   AMS 負責 process 的「重要性」與生命週期
 -   WMS 影響前景互動與可視狀態
     
-👉 AMS / WMS 是同一個 runtime 模型的兩側。
+AMS / WMS 是同一個 runtime 模型的兩側。
 
 ----------
 
@@ -106,7 +106,7 @@ Android 以 UID 為中心來做：
 -   資源統計
 -   cgroup 分組
     
-👉  debug 時要習慣用 uid 來追問題。
+debug 時要習慣用 uid 來追問題。
 
 ----------
 
@@ -170,7 +170,7 @@ Android 會把不同類型的 thread 放進不同群組，例如：
 -   priority 只在同 group 內有效
 -   group 決定你能不能拿到 CPU
     
-👉 debug jank 時，要先看你在什麼 group。
+debug jank 時，要先看你在什麼 group。
 
 ----------
 

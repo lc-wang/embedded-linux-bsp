@@ -1,6 +1,6 @@
 # Kernel trace notes — dumb_buffer_flow  
   
-# 🟢 Level 1：用人話理解  
+# Level 1：用人話理解  
   
 userspace 想做的事情其實很單純：  
   
@@ -14,7 +14,7 @@ userspace 想做的事情其實很單純：
 
 ----------
 
-# 🟡 Level 2：流程理解
+# Level 2：流程理解
 
 ## 1. 建立 dumb buffer
 
@@ -48,7 +48,7 @@ userspace 開始能直接碰 framebuffer memory。
 memset(buf.map, 0xff, buf.size);
 ```
 
-👉 直接改 framebuffer memory。
+直接改 framebuffer memory。
 
 ----------
 
@@ -75,7 +75,7 @@ buffer handle
 
 ----------
 
-# 🔴 Level 3：kernel trace
+# Level 3：kernel trace
 
 ## create dumb
 
@@ -107,7 +107,7 @@ drmModeAddFB2
 
 ----------
 
-# 🧠 handle vs framebuffer object
+# handle vs framebuffer object
 
 | 名稱 | 意義 |  
 |---------------|-------------------|  
@@ -116,7 +116,7 @@ drmModeAddFB2
 
 ----------
 
-# 🧠 memory vs framebuffer
+# memory vs framebuffer
   
 很多人會誤以為：  
   
@@ -166,7 +166,7 @@ framebuffer 是 DRM 的「顯示描述物件」。
 
 ----------
 
-## 🔥 關鍵流程
+## 關鍵流程
 
 ```
 memory allocation
@@ -180,7 +180,7 @@ drm framebuffer object
 
 ----------
 
-## 🧠 framebuffer 真正的角色
+## framebuffer 真正的角色
 
 framebuffer 的本質：
 
@@ -192,7 +192,7 @@ metadata + memory reference
 
 ----------
 
-## 🧠 為什麼 DRM 要分開？
+## 為什麼 DRM 要分開？
 
 因為：
 
@@ -217,7 +217,7 @@ memory 沒變，
 ----------
 
 
-# 🔥 對照
+# 對照
 
 | userspace | kernel |  
 |----------------|--------------------|  

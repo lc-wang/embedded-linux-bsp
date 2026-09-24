@@ -89,7 +89,7 @@ Client 持有 proxy (BpBinder)，透過 ioctl 與 Server 通訊
 
 ---
 
-💡 **補充說明**
+**補充說明**
 - `ServiceManager` 是所有 Binder 服務的中央登錄機制。  
 - Client 與 Server 之間不會直接連線，而是透過 Binder driver 與 ServiceManager 轉譯。  
 - 你可以透過以下指令觀察當前註冊的服務：
@@ -128,7 +128,7 @@ Server 處理後以 binder_reply 回傳結果給 Client
 
 ---
 
-💡 **補充說明**
+**補充說明**
 - 每個進程在第一次使用 Binder 時，會 mmap 一段共享記憶體（通常 1MB）。  
 - Binder Driver 在不同進程間進行 **零拷貝共享傳輸**，只在必要時使用 `copy_from_user` / `copy_to_user`。  
 - 你可以透過以下方式觀察 mmap：
@@ -193,7 +193,7 @@ ALOGI("%s", String8(reply.readString16()).string());
 
 ----------
 
-💡 **補充說明**
+**補充說明**
 
 -   **AIDL (stable)** 已取代 HIDL 成為新版 HAL IPC 標準。
 -   **Native Binder** 仍廣泛用於 system service、daemon，例如 `surfaceflinger`、`audioserver`。
@@ -255,7 +255,7 @@ dumpsys -l
     -   User space: `frameworks/native/libs/binder/`
 -   手寫一個簡單的 native binder 範例（client/server pair）以實際理解 transaction。
 
-📘 **延伸閱讀**
+**延伸閱讀**
 -   AOSP: `frameworks/native/libs/binder/`
 -   Kernel: `drivers/android/binder.c`
 -   `Documentation/dev-tools/binderfs.rst`

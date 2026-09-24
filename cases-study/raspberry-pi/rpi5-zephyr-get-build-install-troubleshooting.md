@@ -503,7 +503,7 @@ Zephyr:
 
 ## 10. Troubleshooting
 
-### 10.1 `pip install -r zephyr/scripts/requirements.txt` 找不到檔案
+### 10. 1 `pip install -r zephyr/scripts/requirements.txt` 找不到檔案
 
 錯誤：
 
@@ -551,7 +551,7 @@ pip install -r scripts/requirements.txt
 
 ----------
 
-### 10.2 Python version too old
+### 10. 2 Python version too old
 
 錯誤：
 
@@ -582,7 +582,7 @@ pip install -r zephyr/scripts/requirements.txt
 
 ----------
 
-### 10.3 Could not find Zephyr-sdk
+### 10. 3 Could not find Zephyr-sdk
 
 錯誤：
 
@@ -613,7 +613,7 @@ Register Zephyr SDK CMake package [y/n]? y
 
 ----------
 
-### 10.4 Zephyr SDK version incompatible
+### 10. 4 Zephyr SDK version incompatible
 
 錯誤現象：
 
@@ -654,7 +654,7 @@ cd zephyr-sdk-1.0.0-rc1
 
 ----------
 
-### 10.5 Devicetree overlay file exists but build says No such file
+### 10. 5 Devicetree overlay file exists but build says No such file
 
 錯誤：
 
@@ -691,7 +691,7 @@ west build -p always -b rpi_5 samples/hello_world \
 
 ----------
 
-### 10.6 GPIO14/GPIO15 沒有 hello_world console output
+### 10. 6 GPIO14/GPIO15 沒有 hello_world console output
 
 現象：
 
@@ -774,21 +774,21 @@ console=serial0,115200 console=tty1 root=PARTUUID=45110d0a-02 rootfstype=ext4 fs
 本次已完成：
 
 ```text
-✅ Zephyr source tree 取得
-✅ Python 3.12 venv 建立
-✅ west 安裝
-✅ Zephyr SDK 1.0.0-rc1 安裝
-✅ rpi_5 hello_world build 成功
-✅ zephyr.bin 複製到 Raspberry Pi boot partition
-✅ Raspberry Pi 5 從 SD card boot Zephyr 成功
-✅ blinky sample 驗證 Zephyr runtime 成功執行
+✓ Zephyr source tree 取得
+✓ Python 3.12 venv 建立
+✓ west 安裝
+✓ Zephyr SDK 1.0.0-rc1 安裝
+✓ rpi_5 hello_world build 成功
+✓ zephyr.bin 複製到 Raspberry Pi boot partition
+✓ Raspberry Pi 5 從 SD card boot Zephyr 成功
+✓ blinky sample 驗證 Zephyr runtime 成功執行
 
 ```
 
 目前限制：
 
 ```text
-❌ GPIO14/GPIO15 尚未能作為 Zephyr console
+✗ GPIO14/GPIO15 尚未能作為 Zephyr console
 
 ```
 

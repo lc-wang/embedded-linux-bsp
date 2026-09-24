@@ -5,7 +5,7 @@
 
 ----------
 
-# 1️⃣ DAPM 是什麼？
+# 1. DAPM 是什麼？
 
 DAPM = **Dynamic Audio Power Management**
 
@@ -30,7 +30,7 @@ DAPM = **Dynamic Audio Power Management**
 
 ----------
 
-# 2️⃣ ALSA Core 為什麼沒有 DAPM？
+# 2. ALSA Core 為什麼沒有 DAPM？
 
 因為 PC sound card：
 
@@ -52,7 +52,7 @@ SoC world：
 
 ----------
 
-# 3️⃣ DAPM 的核心概念
+# 3. DAPM 的核心概念
 
 DAPM 是一個：
 
@@ -71,7 +71,7 @@ DAPM 是一個：
 
 ----------
 
-# 4️⃣ DAPM 的核心資料結構
+# 4. DAPM 的核心資料結構
 ```
 struct snd_soc_dapm_widget
 struct snd_soc_dapm_route
@@ -122,7 +122,7 @@ static  const  struct  snd_soc_dapm_route  routes[] = {
 
 ----------
 
-# 5️⃣ DAPM Graph 如何運作？
+# 5. DAPM Graph 如何運作？
 
 當你播放：
 
@@ -149,7 +149,7 @@ DAPM 會：
 
 ----------
 
-# 6️⃣ 真實 codec 範例（以 WM8960 為例）
+# 6. 真實 codec 範例（以 WM8960 為例）
 
 在 wm8960 driver 中：
 ```
@@ -169,7 +169,7 @@ Route：
 
 ----------
 
-# 7️⃣ 為什麼會 PCM 正常但沒聲音？
+# 7. 為什麼會 PCM 正常但沒聲音？
 
 這是 BSP 常見地獄。
 
@@ -200,7 +200,7 @@ Route：
 
 ----------
 
-# 8️⃣ debugfs 是你最好的朋友
+# 8. debugfs 是你最好的朋友
 
 掛載：
 
@@ -221,7 +221,7 @@ Route：
 
 ----------
 
-# 9️⃣ DAPM 的四種 Widget 類型
+# 9. DAPM 的四種 Widget 類型
 
 
 | 類型     | 說明                          |
@@ -234,7 +234,7 @@ Route：
 
 ----------
 
-# 🔟 Supply Widget
+# 10. Supply Widget
 
 例如：
 
@@ -246,7 +246,7 @@ DAC 可能不會開。
 
 ----------
 
-# 1️⃣1️⃣ Machine driver 也會加 routing
+# 11. Machine driver 也會加 routing
 
 Machine driver 裡：
 ```
@@ -258,7 +258,7 @@ static  const  struct  snd_soc_dapm_route  audio_map[] = {
 
 ----------
 
-# 1️⃣2️⃣ 完整播放時 DAPM 動作
+# 12. 完整播放時 DAPM 動作
 ```
 snd_soc_dapm_stream_event()
   ↓ dapm_power_widgets()
@@ -268,7 +268,7 @@ snd_soc_dapm_stream_event()
 ```
 ----------
 
-# 1️⃣3️⃣ BSP Debug Checklist
+# 13. BSP Debug Checklist
 
 如果沒聲音：
 
@@ -298,21 +298,21 @@ snd_soc_dapm_stream_event()
 
 ----------
 
-# 1️⃣4️⃣ 真實世界常見錯誤
+# 14. 真實世界常見錯誤
 
-### ❌ 忘記 machine routing
+### 忘記 machine routing
 
 Codec 有 DAC，但 machine 沒接到 speaker。
 
 ----------
 
-### ❌ supply 沒接
+### supply 沒接
 
 DAC power 永遠 off。
 
 ----------
 
-### ❌ Endpoint 名稱不一致
+### Endpoint 名稱不一致
 
 Widget 名稱大小寫錯誤。
 
@@ -320,7 +320,7 @@ DAPM 找不到。
 
 ----------
 
-# 1️⃣5️⃣ 心智模型總結
+# 15. 心智模型總結
 
 ASoC 音訊成功條件：
 

@@ -135,7 +135,7 @@ addr2line
 -   `ioctl()` → driver / Binder
     
 
-👉 若卡在 ioctl，下一步進 **Syscall / Kernel 邊界**
+若卡在 ioctl，下一步進 **Syscall / Kernel 邊界**
 
 ----------
 

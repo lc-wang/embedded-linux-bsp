@@ -41,7 +41,7 @@ cfg80211 假設：
 | `roam` | firmware 主動行為 |
 | AP mode | firmware 切換角色 |
 
-👉 **cfg80211 只負責「請求」與「回報」，不負責「決策」**
+**cfg80211 只負責「請求」與「回報」，不負責「決策」**
 
 ---
 ## 3. Scan 流程
@@ -71,7 +71,7 @@ cfg80211_ops->scan
 -   scan complete event → 結束 scan
     
 
-📌 **關鍵觀念**
+**關鍵觀念**
 
 > cfg80211 的 BSS table ≠ firmware 的真實狀態  
 > 只是「曾經回報過的結果」
@@ -97,7 +97,7 @@ cfg80211_ops->connect
      ├─ 設定 PMK（必要時）
      └─ wldev_iovar_setbuf("join")
 ```
-📌 **Linux 不會同步等待結果**
+**Linux 不會同步等待結果**
 
 ----------
 
@@ -147,7 +147,7 @@ cfg80211_ops->connect
 -   power save timeout
     
 
-👉 **所有斷線都以 event 為準**
+**所有斷線都以 event 為準**
 
 ----------
 
@@ -169,7 +169,7 @@ firmware roam
      └─ wl_cfg80211_event()
          └─ cfg80211_roamed()
 ```
-📌 **cfg80211 無法阻止 firmware roam**
+**cfg80211 無法阻止 firmware roam**
 
 ----------
 
@@ -207,7 +207,7 @@ cfg80211_ops->start_ap
 | Power save    | Firmware |
 
 
-👉 **Linux 只是設定者，不是 AP controller**
+**Linux 只是設定者，不是 AP controller**
 
 ----------
 
@@ -242,7 +242,7 @@ cfg80211_ops->start_ap
 -   cfg80211 顯示 disconnected，但 firmware 還在送封包
     
 
-📌 **cfg80211 是「觀察者」，不是「事實來源」**
+**cfg80211 是「觀察者」，不是「事實來源」**
 
 ----------
 

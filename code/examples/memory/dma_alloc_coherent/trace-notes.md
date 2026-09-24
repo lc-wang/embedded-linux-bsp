@@ -3,7 +3,7 @@
 
 ---
 
-## 🔍 dma_alloc_coherent() 走哪裡？
+## dma_alloc_coherent() 走哪裡？
 ```
 dma_alloc_coherent()
 	└─ dma_alloc_attrs()
@@ -19,7 +19,7 @@ dma_alloc_coherent()
 
 ---
 
-## 🧠 CPU / Device 看的是什麼？
+## CPU / Device 看的是什麼？
 
 CPU → cpu_addr (virtual)
 Device → dma_addr (DMA address)
@@ -32,7 +32,7 @@ Device → dma_addr (DMA address)
 
 ---
 
-## 🔥 為什麼需要 coherent？
+## 為什麼需要 coherent？
 
 沒有 coherent 的世界：
 
@@ -47,7 +47,7 @@ coherent 保證：
 
 ---
 
-## 🧩 為什麼 kmalloc 不夠？
+## 為什麼 kmalloc 不夠？
 
 
 kmalloc:
@@ -70,7 +70,7 @@ dma_alloc_coherent:
 
 ---
 
-## 🔥 真實 driver 對照
+## 真實 driver 對照
 
 | Subsystem | 用途 |
 |----------|------|
@@ -81,7 +81,7 @@ dma_alloc_coherent:
 
 ---
 
-## 🧠 心智模型
+## 心智模型
 
 DMA buffer
 ≠ normal memory

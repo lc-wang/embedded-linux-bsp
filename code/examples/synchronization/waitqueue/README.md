@@ -9,7 +9,7 @@ Linux kernel 中最通用的「阻塞等待機制」。
 
 ---
 
-## 🎯 本章目的
+## 本章目的
 
 理解：
 
@@ -20,19 +20,19 @@ Linux kernel 中最通用的「阻塞等待機制」。
 
 ---
 
-## 🧠 一句話先記住
+## 一句話先記住
 
 ```
 waitqueue
 = 等「某個條件成立」
 ```
 
-## 🔧 本範例做什麼？
+## 本範例做什麼？
 
 -   userspace read → 如果沒有資料，就睡
 -   userspace write → 寫入資料 + 喚醒 reader
 
-👉 模擬：
+模擬：
 
 -   pipe / socket
 -   input device
@@ -41,7 +41,7 @@ waitqueue
 
 ----------
 
-## 🧩 Kernel 原始碼對照
+## Kernel 原始碼對照
 ```
 kernel/sched/wait.c  
 include/linux/wait.h  

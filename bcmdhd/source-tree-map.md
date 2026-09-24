@@ -52,7 +52,7 @@ bcmdhd/
   - Broadcom ioctl
   - Broadcom iovar
 
-👉 **所有無線行為最終都變成「對 firmware 的指令」**
+**所有無線行為最終都變成「對 firmware 的指令」**
 
 ---
 
@@ -64,7 +64,7 @@ bcmdhd/
 - `wl_cfg80211_add_key()`
 - `wl_cfg80211_start_ap()`
 
-📌 **重點**  
+**重點**  
 > 這一層「描述 *要做什麼*」，不描述「*怎麼做*」。
 
 ---
@@ -101,7 +101,7 @@ bcmdhd/
 - `dhd_rx_frame()`
 - `dhd_watchdog()`
 
-📌 **實務建議**  
+**實務建議**  
 > 任何「Wi-Fi 卡住 / 沒流量 / resume 掛掉」  
 > **第一個 grep 的檔案就是 `dhd_linux.c`**
 
@@ -147,7 +147,7 @@ bcmdhd/
 - RX/TX aggregation
 - sleep / wakeup handshake
 
-📌 **SDIO 是最常見問題來源**
+**SDIO 是最常見問題來源**
 - resume 後卡死
 - timeout
 - data corruption
@@ -170,7 +170,7 @@ Host memory (rings) ⇄ Dongle DMA
 - DMA mapping
 - completion handling
 
-📌 **PCIe debug 難度最高，但效能最好**
+**PCIe debug 難度最高，但效能最好**
 
 ---
 

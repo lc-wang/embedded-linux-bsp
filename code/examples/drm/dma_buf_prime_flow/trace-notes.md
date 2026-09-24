@@ -1,7 +1,7 @@
 
 # Kernel trace notes — dma_buf_prime_flow
 
-# 🟢 Level 1：用人話理解假設：
+# Level 1：用人話理解假設：
 ```text
 GPU 畫好一張圖
 ```
@@ -16,7 +16,7 @@ compositor copy 一份
 DRM 再 copy 一份
 ```
 
-👉 非常慢。
+非常慢。
 
 ----------
 
@@ -30,7 +30,7 @@ DRM 再 copy 一份
 
 ----------
 
-# 🟢 dma-buf fd 是什麼？
+# dma-buf fd 是什麼？
 
 dma-buf 可以：
 
@@ -45,10 +45,10 @@ dma-buf 可以：
 
 ----------
 
-# 🟡 Level 2：流程理解
+# Level 2：流程理解
 
 
-## 1️⃣ GPU driver export memory
+## 1. GPU driver export memory
 
 GPU driver：
 
@@ -68,7 +68,7 @@ dma-buf fd
 
 ----------
 
-## 2️⃣ compositor 傳遞 fd
+## 2. compositor 傳遞 fd
 
 Wayland / SurfaceFlinger：
 
@@ -82,7 +82,7 @@ Wayland / SurfaceFlinger：
 
 ----------
 
-## 3️⃣ DRM driver import
+## 3. DRM driver import
 
 DRM：
 
@@ -110,7 +110,7 @@ drm_gem_prime_import()
 
 ----------
 
-# 🔥 最重要觀念
+# 最重要觀念
 
 ```
 import 不等於 copy
@@ -124,7 +124,7 @@ import 不等於 copy
 
 ----------
 
-# 🔥 scanout flow
+# scanout flow
 
 最後：
 
@@ -140,7 +140,7 @@ CRTC scanout
 
 ----------
 
-# 🔴 Level 3：kernel trace
+# Level 3：kernel trace
 
 
 ## export
@@ -207,7 +207,7 @@ scatter-gather table
 
 ----------
 
-# 🧠 為什麼會有 sg_table？
+# 為什麼會有 sg_table？
 
 因為：
 
@@ -223,7 +223,7 @@ dma-buf 用 sg_table 描述 memory layout
 
 ----------
 
-# 🔥 真實 subsystem sharing
+# 真實 subsystem sharing
 
 | Producer | Consumer |  
 |---------------------|-------------------|  
@@ -234,7 +234,7 @@ dma-buf 用 sg_table 描述 memory layout
 
 ----------
 
-# 🧠 Android 世界
+# Android 世界
 
 Android gralloc：
 
@@ -248,7 +248,7 @@ SurfaceFlinger
 HWC / DRM
 ```
 
-# 🔧 userspace 對照程式
+# userspace 對照程式
 ```text
 userspace/prime_fd_notes.c
 ```
@@ -257,7 +257,7 @@ userspace/prime_fd_notes.c
 
 ----------
 
-## 🧠 dma-buf fd 從哪裡來？
+## dma-buf fd 從哪裡來？
 
 dma-buf fd 一定要由 producer export 出來。
 
@@ -272,7 +272,7 @@ dma-buf fd 一定要由 producer export 出來。
 
 ----------
 
-## 🔄 userspace PRIME import flow
+## userspace PRIME import flow
 
 ```
 external dma-buf fd
@@ -290,7 +290,7 @@ atomic commit
 plane scanout
 ```
 
-## 🧠 fd vs GEM handle
+## fd vs GEM handle
 
 
 | 名稱 | 意義 |  
@@ -300,7 +300,7 @@ plane scanout
 | framebuffer id | DRM display pipeline 使用的顯示物件 |
 
 
-## 🔥 最重要觀念
+## 最重要觀念
 
 ```
 drmPrimeFDToHandle()
@@ -313,7 +313,7 @@ import 成目前 DRM device 可使用的 GEM handle
 
 ----------
 
-## 🧠 完整心智模型
+## 完整心智模型
 
 ```
 producer memory

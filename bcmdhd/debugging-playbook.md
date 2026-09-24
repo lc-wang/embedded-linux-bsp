@@ -33,10 +33,10 @@
 [ L5 ] Firmware / NVRAM / PM
 ```
 
-📌 **錯誤示範**
+**錯誤示範**
 - 在 L1（cfg80211）找一個其實是 L5（firmware / PM）的問題
 
-📌 **正確示範**
+**正確示範**
 - 先用症狀判斷在哪一層，再深入
 
 ---
@@ -64,7 +64,7 @@
 2. data path 有沒有在跑？
 3. bus 有沒有真的動？
 
-👉 **只看 cfg80211 state 永遠不夠**
+**只看 cfg80211 state 永遠不夠**
 
 ---
 
@@ -92,7 +92,7 @@
 - netdev queue 是否被 stop？
 - flow credit / ring 是否前進？
 
-📌 **TX 卡住 ≠ RX 不動，但 RX 卡住 = TX + Control 一起死**
+**TX 卡住 ≠ RX 不動，但 RX 卡住 = TX + Control 一起死**
 
 ---
 
@@ -102,7 +102,7 @@
 - PCIe ring index 是否前進？
 - DMA / CMD53 是否有 error / retry？
 
-👉 **Bus 問題常被誤判成 data path bug**
+**Bus 問題常被誤判成 data path bug**
 
 ---
 
@@ -112,7 +112,7 @@
 - WOWLAN 是否影響行為？
 - runtime PM / system suspend 是否交錯？
 
-📌 **「待機後才發生」幾乎必是 PM**
+**「待機後才發生」幾乎必是 PM**
 
 ---
 
@@ -126,7 +126,7 @@
 2. L4：bus TX 是否成功？
 3. L5：firmware 是否 sleep？
 
-❌ 不要先看 cfg80211
+✗ 不要先看 cfg80211
 
 ---
 
@@ -172,7 +172,7 @@
 - PM state transition
 - watchdog trigger 條件
 
-📌 **沒有 timeline 的 log，等於沒有 log**
+**沒有 timeline 的 log，等於沒有 log**
 
 ---
 
@@ -182,5 +182,5 @@
 - recovery 失敗 ≠ recovery 沒做
 - 有些 firmware 卡死 **只能 reboot**
 
-👉 **不要過度神話 watchdog / recovery**
+**不要過度神話 watchdog / recovery**
 

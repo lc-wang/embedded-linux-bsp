@@ -6,7 +6,7 @@
 
 ----------
 
-# 1️⃣ 為什麼需要 DMA-BUF？
+# 1. 為什麼需要 DMA-BUF？
 
 在 multimedia pipeline 中，資料通常經過：
 ```
@@ -14,17 +14,17 @@ camera → ISP → codec → display
 ```
 如果每一層都 copy：
 
-❌ CPU copy → latency ↑  
-❌ memory bandwidth ↑  
-❌ power consumption ↑
+✗ CPU copy → latency ↑  
+✗ memory bandwidth ↑  
+✗ power consumption ↑
 
-👉 解法就是：
+解法就是：
 ```
 DMA-BUF（zero-copy）
 ```
 ----------
 
-# 2️⃣ Zero-Copy Pipeline
+# 2. Zero-Copy Pipeline
 ```
 Camera  
  │  
@@ -43,12 +43,12 @@ DRM framebuffer
  ▼  
 Display
 ```
-✔ 沒有 memory copy  
-✔ buffer 在 driver 間共享
+✓ 沒有 memory copy  
+✓ buffer 在 driver 間共享
 
 ----------
 
-# 3️⃣ DMA-BUF 核心概念
+# 3. DMA-BUF 核心概念
 
 DMA-BUF 是 Linux kernel 中的：
 
@@ -73,7 +73,7 @@ DRM → importer
 ```
 ----------
 
-# 4️⃣ Exporter / Importer Flow
+# 4. Exporter / Importer Flow
 ```
 [V4L2 driver]  
  │  
@@ -92,7 +92,7 @@ dma_buf_map_attachment()
 ```
 ----------
 
-# 5️⃣ Userspace Flow
+# 5. Userspace Flow
 
 userspace（GStreamer / Android）只看到：
 ```
@@ -110,7 +110,7 @@ kmssink → DRM import fd
 ```
 ----------
 
-# 6️⃣ DRM PRIME
+# 6. DRM PRIME
 
 DRM 使用 PRIME 來處理 dmabuf：
 ```
@@ -128,7 +128,7 @@ framebuffer
 ```
 ----------
 
-# 7️⃣ 完整 Zero-Copy Flow
+# 7. 完整 Zero-Copy Flow
 ```
 Camera  
  │  
@@ -152,7 +152,7 @@ plane scanout
 ```
 ----------
 
-# 8️⃣ Memory Layout
+# 8. Memory Layout
 
 dmabuf 並不是單純 linear memory。
 
@@ -176,12 +176,12 @@ GPU-friendly
 ```
 問題：
 
-❌ DRM driver 不一定支援  
-❌ kmssink 可能無法使用
+✗ DRM driver 不一定支援  
+✗ kmssink 可能無法使用
 
 ----------
 
-# 9️⃣ Cache Coherency
+# 9. Cache Coherency
 
 CPU / device 共享 memory：
 ```
@@ -198,7 +198,7 @@ dma_sync_*
 
 ----------
 
-# 🔟 Scatter-Gather
+# 10. Scatter-Gather
 
 dmabuf buffer 可能是：
 ```
@@ -216,7 +216,7 @@ dma_map_sg
 ```
 ----------
 
-# 11️⃣ Android Pipeline
+# 11. Android Pipeline
 
 Android pipeline：
 ```
@@ -239,10 +239,10 @@ DRM
 ```
 ----------
 
-# 12️⃣ 常見問題（BSP）
+# 12. 常見問題（BSP）
 
 
-## ❌ drmPrimeFDToHandle fail
+## drmPrimeFDToHandle fail
 
 原因：
 ```
@@ -250,7 +250,7 @@ format / modifier 不支援
 ```
 ----------
 
-## ❌ 畫面亂掉
+## 畫面亂掉
 
 原因：
 ```
@@ -259,7 +259,7 @@ stride 錯誤
 ```
 ----------
 
-## ❌ zero-copy 失敗
+## zero-copy 失敗
 
 原因：
 ```
@@ -268,7 +268,7 @@ buffer 不是 dmabuf
 ```
 ----------
 
-## ❌ Android 強制 AFBC
+## Android 強制 AFBC
 
 原因：
 ```
@@ -276,7 +276,7 @@ gralloc 預設開 AFBC
 ```
 ----------
 
-# 13️⃣ Debug 技巧
+# 13. Debug 技巧
 
 
 ## 查看 buffer modifier（Android）
@@ -303,7 +303,7 @@ dmesg | grep dma
 ```
 ----------
 
-# 14️⃣ BSP Debug 思維
+# 14. BSP Debug 思維
 
 當畫面有問題：
 

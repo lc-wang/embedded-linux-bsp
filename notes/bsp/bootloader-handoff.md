@@ -22,7 +22,7 @@
 -   有些資源由 bootloader 初始化
 -   kernel 假設這些狀態已存在或會被重設 
 
-👉 **當雙方假設不一致，就會產生極難判斷的 BSP 問題。**
+**當雙方假設不一致，就會產生極難判斷的 BSP 問題。**
 
 ----------
 
@@ -62,7 +62,7 @@ bootloader 常為了：
 -   卻實際繼承 bootloader 狀態
     
 
-👉 可能造成 clock tree 行為不一致。
+可能造成 clock tree 行為不一致。
 
 ----------
 
@@ -121,7 +121,7 @@ Device Tree 是：
 -   bootloader DTS 與 kernel DTS 不一致
 -   clock / pinctrl node 定義不同
     
-👉 **這是 BSP 專案中非常常見的隱性 bug 來源。**
+**這是 BSP 專案中非常常見的隱性 bug 來源。**
 
 ----------
 
@@ -162,7 +162,7 @@ cat /proc/cmdline
 -   嘗試關閉 bootloader 某些初始化 
 -   觀察 kernel 行為是否改變
 
-👉 可快速定位責任歸屬。
+可快速定位責任歸屬。
 
 ----------
 

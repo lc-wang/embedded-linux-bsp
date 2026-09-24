@@ -1,5 +1,5 @@
 
-## 🧠 net_device 與 Ethernet Driver（核心結構）
+## net_device 與 Ethernet Driver（核心結構）
 
 本章節重點：
 
@@ -10,7 +10,7 @@
 
 ----------
 
-## 🧩 1. net_device 是什麼？
+## 1. net_device 是什麼？
 
 ```
 struct net_device {
@@ -21,7 +21,7 @@ struct net_device {
 };
 ```
 
-👉 可以理解成：
+可以理解成：
 
 ```
 "Linux kernel 對一張網卡的抽象"
@@ -38,7 +38,7 @@ eth1
 
 ----------
 
-## 🔌 2. driver 如何建立 net_device
+## 2. driver 如何建立 net_device
 
 ### (1) 分配
 
@@ -48,7 +48,7 @@ struct net_device *dev;
 dev = alloc_etherdev(sizeof(struct priv_data));
 ```
 
-👉 同時會分配：
+同時會分配：
 
 -   net_device
 -   private data（driver 自己用）
@@ -75,7 +75,7 @@ dev->netdev_ops = &my_ops;
 register_netdev(dev);
 ```
 
-👉 完成後：
+完成後：
 
 ```
 ip link
@@ -85,9 +85,9 @@ ip link
 
 ----------
 
-## 🔁 3. Driver Lifecycle
+## 3. Driver Lifecycle
 
-### 🧭 整體流程
+### 整體流程
 
 ```
 probe()
@@ -111,7 +111,7 @@ network ready
 
 ----------
 
-## 🚀 4. `ip link up` 發生什麼？
+## 4. `ip link up` 發生什麼？
 
 ```
 ip link set eth0 up
@@ -127,7 +127,7 @@ __dev_open()
 netdev_ops->ndo_open()
 ```
 
-👉 進入 driver：
+進入 driver：
 
 ```
 static int my_open(struct net_device *dev)
@@ -141,13 +141,13 @@ static int my_open(struct net_device *dev)
 
 ----------
 
-### 📌 重點
+### 重點
 
 ```
 netif_start_queue(dev);
 ```
 
-👉 這行代表：
+這行代表：
 
 ```
 開始允許 TX
@@ -155,7 +155,7 @@ netif_start_queue(dev);
 
 ----------
 
-## 🛑 5. `ip link down`
+## 5. `ip link down`
 
 ```
 ip link set eth0 down
@@ -183,7 +183,7 @@ static int my_stop(struct net_device *dev)
 
 ----------
 
-## 📤 6. TX entry point
+## 6. TX entry point
 
 ```
 static netdev_tx_t my_xmit(struct sk_buff *skb,
@@ -200,7 +200,7 @@ dev_queue_xmit()
 ndo_start_xmit()
 ```
 
-👉 driver 要做：
+driver 要做：
 
 ```
 copy skb → DMA buffer
@@ -209,7 +209,7 @@ kick hardware
 
 ----------
 
-## 📥 7. RX flow（driver 端）
+## 7. RX flow（driver 端）
 
 ```
 IRQ / NAPI
@@ -223,7 +223,7 @@ netif_receive_skb()
 
 ----------
 
-## 🔧 8. private data（driver 自己的 state）
+## 8. private data（driver 自己的 state）
 
 ```
 struct my_priv {
@@ -241,7 +241,7 @@ struct my_priv *priv = netdev_priv(dev);
 
 ----------
 
-## 🔗 9. net_device 與 PHY 關係
+## 9. net_device 與 PHY 關係
 
 ```
 net_device
@@ -265,7 +265,7 @@ of_phy_connect()
 
 ----------
 
-## 🧪 10. Debug 重點
+## 10. Debug 重點
 
 ### 查看 interface
 
@@ -299,16 +299,16 @@ tc qdisc show dev eth0
 
 ----------
 
-## 🧠 11. Checklist
+## 11. Checklist
 
-### ✔ probe 階段
+### probe 階段
 
 -   register_netdev 成功？
 -   interface 有出現？
 
 ----------
 
-### ✔ link up
+### link up
 
 -   ndo_open 有被呼叫？
 -   IRQ 有 enable？
@@ -316,43 +316,43 @@ tc qdisc show dev eth0
 
 ----------
 
-### ✔ TX
+### TX
 
 -   ndo_start_xmit 有進？
 -   queue 有沒有停住？
 
 ----------
 
-### ✔ RX
+### RX
 
 -   IRQ / NAPI 有跑？
 -   有沒有 skb 上來？
 
 ----------
 
-## 🧠 12. 常見問題
+## 12. 常見問題
 
-### ❌ `ip link up` 沒反應
+### `ip link up` 沒反應
 
-👉 檢查：
+檢查：
 
 -   ndo_open 有沒有實作
 -   register_netdev 是否成功
 
 ----------
 
-### ❌ 可以 up 但不能傳
+### 可以 up 但不能傳
 
-👉 檢查：
+檢查：
 
 -   netif_start_queue 有沒有呼叫
 -   ndo_start_xmit 是否被呼叫
 
 ----------
 
-### ❌ 沒有 RX
+### 沒有 RX
 
-👉 檢查：
+檢查：
 
 -   IRQ
 -   NAPI
@@ -360,7 +360,7 @@ tc qdisc show dev eth0
 
 ----------
 
-## 🔍 13. Trace 
+## 13. Trace 
 
 可以加 log：
 

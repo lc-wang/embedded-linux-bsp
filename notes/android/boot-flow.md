@@ -165,7 +165,7 @@ Looper.loop()
 
 完成後 Framework 即可接受 App IPC 呼叫。
 
-💡 **補充說明**
+**補充說明**
 
 -   **Bootstrap 階段**：啟動 ActivityManagerService (AMS)、PackageManagerService (PMS)、PowerManagerService 等最關鍵元件。
 -   **Core 階段**：確保系統可正常管理電池、使用統計與性能監控。
@@ -193,7 +193,7 @@ attachApplication()
 | **ApplicationThread** | Binder Proxy | 負責與 SystemServer 進行 IPC，接收來自 AMS 的指令。 |
 | **Instrumentation** | 控制生命週期 | 呼叫應用的 `onCreate()`、`onResume()` 等回調函式。 |
 
-💡 **補充說明**
+**補充說明**
 -   `ActivityManagerService` 為整個應用管理中心，位於 SystemServer 內。
     
 -   `ActivityThread` 是每個應用程序的主執行緒（對應 UI thread）。
@@ -225,7 +225,7 @@ attachApplication()
 | **無法啟動 Zygote** | `/system/bin/app_process` 缺失或權限錯誤 | 檢查 system image 完整性與檔案權限。 |
 | **SystemServer crash** | 某服務初始化失敗 | 使用 `logcat -b system` 尋找 `Fatal Exception in SystemServer`。 |
 
-💡 **補充檢查建議**
+**補充檢查建議**
 
 ```bash
 # 查看 kernel 啟動 log
@@ -241,7 +241,7 @@ ls -l /dev/binder
 logcat -b system | grep SystemServer
 
 ```
-📘 **延伸閱讀**
+**延伸閱讀**
 
 -   `system/core/init/`
 -   `frameworks/base/core/java/com/android/internal/os/ZygoteInit.java`

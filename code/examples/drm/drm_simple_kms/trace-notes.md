@@ -1,7 +1,7 @@
 
 # Kernel trace notes — drm_simple_kms
   
-# 🟢 Level 1：用人話理解  
+# Level 1：用人話理解  
   
 DRM driver 做的事情其實很單純：  
   
@@ -27,7 +27,7 @@ display
 
 ----------
 
-# 🟡 Level 2：流程理解
+# Level 2：流程理解
 
 ## 1. driver probe
 
@@ -101,7 +101,7 @@ framebuffer 已經準備好了
 
 ----------
 
-# 🔴 Level 3：kernel trace
+# Level 3：kernel trace
 
 ## probe 路徑
 
@@ -148,7 +148,7 @@ atomic commit
 
 ----------
 
-# 🧠 framebuffer / plane / CRTC / connector 的關係
+# framebuffer / plane / CRTC / connector 的關係
 
 | 元件 | 直覺理解 |  
 |-------------|--------------------|  
@@ -163,7 +163,7 @@ atomic commit
 
 ----------
 
-# 🧠 為什麼 simple display pipe 很常見？
+# 為什麼 simple display pipe 很常見？
 
 因為很多小型顯示裝置其實不需要：
 

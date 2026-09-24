@@ -62,7 +62,7 @@ struct mt76_dev {
     ...
 };` 
 ```
-👉 **關鍵概念**：  
+**關鍵概念**：  
 mt76 從一開始就將「匯流排差異」封裝在 `mt76_bus_ops`。
 
 ----------
@@ -93,7 +93,7 @@ MediaTek Wi-Fi 晶片為 **Hybrid architecture**：
     -   管理 PHY / RF / rate / power / calibration
     -   執行 timing-critical 任務
 
-👉 mt76 driver **沒有**直接操作 PHY，而是透過 MCU command。
+mt76 driver **沒有**直接操作 PHY，而是透過 MCU command。
 
 ----------
 

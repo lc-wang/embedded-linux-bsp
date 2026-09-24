@@ -1,8 +1,8 @@
 
-# 🧩 Kakip Board 網路異常除錯報告（static IP → DHCP network）
+# Kakip Board 網路異常除錯報告（static IP → DHCP network）
 
 
-## 📌 問題摘要
+## 問題摘要
 
 Kakip 開發板接上 switch 後，網路介面 `end0` 無法取得 lab network 的 DHCP IP：
 
@@ -21,7 +21,7 @@ Kakip 開發板接上 switch 後，網路介面 `end0` 無法取得 lab network 
 
 ----------
 
-## 🖥️ 系統環境
+## 系統環境
 
 -   Board：Kakip
     
@@ -35,14 +35,14 @@ Kakip 開發板接上 switch 後，網路介面 `end0` 無法取得 lab network 
     
 -   DHCP client：
     
-    -   `dhclient` ❌
+    -   `dhclient` ✗
         
-    -   `udhcpc` ❌
+    -   `udhcpc` ✗
         
 
 ----------
 
-## 🔍 問題現象
+## 問題現象
 
 ### IP 狀態
 ```
@@ -56,9 +56,9 @@ $ ip route
 
 198.51.100.0/24 dev end0 scope link
 ```
--   ❌ 無 `default via`
+-   ✗ 無 `default via`
     
--   ❌ 無 gateway
+-   ✗ 無 gateway
     
 
 ### ARP / Neighbor
@@ -81,7 +81,7 @@ Destination Host Unreachable
 ```
 ----------
 
-## 🔌 實體網路確認
+## 實體網路確認
 ```
 $ ethtool end0
 
@@ -98,11 +98,11 @@ RX packets: >10k
 
 TX packets: normal
 ```
-✅ PHY 正常 ✅ RJ45 正常 ✅ switch port 有流量
+✓ PHY 正常 ✓ RJ45 正常 ✓ switch port 有流量
 
 ----------
 
-## 🧠 問題分析
+## 問題分析
 
 ### 關鍵線索
 
@@ -118,7 +118,7 @@ ipv4.addresses: 198.51.100.10/24
 ```
 ----------
 
-## ❗ 根本原因（Root Cause）
+## 根本原因（Root Cause）
 
 > **NetworkManager 被設定為 Static IP（manual），導致 DHCP 完全沒有啟動。**
 
@@ -134,9 +134,9 @@ ipv4.addresses: 198.51.100.10/24
 | 無法取得 192.0.2.x       | DHCP client 根本未執行             |
 
 
-## 🔧 解決方式
+## 解決方式
 
-### 1️⃣ 將 IPv4 改回 DHCP
+### 1. 將 IPv4 改回 DHCP
 ```
 sudo nmcli connection modify "有線接続 1" \
 
@@ -150,7 +150,7 @@ ipv4.dns ""
 ```
 ----------
 
-### 2️⃣ 重新啟用連線
+### 2. 重新啟用連線
 ```
 sudo nmcli connection down "有線接続 1"
 
@@ -158,7 +158,7 @@ sudo nmcli connection up "有線接続 1"
 ```
 ----------
 
-### 3️⃣ 驗證結果
+### 3. 驗證結果
 ```
 $ ip addr show end0
 
@@ -170,11 +170,11 @@ $ ip route
 
 default via 192.0.2.1 dev end0
 ```
-✅ 成功取得 DHCP IP
+✓ 成功取得 DHCP IP
 
 ----------
 
-## ✅ 最終狀態
+## 最終狀態
 
 -   end0 正常由 NetworkManager 管理
     
@@ -187,21 +187,21 @@ default via 192.0.2.1 dev end0
 
 ----------
 
-## 🧩 問題總結
+## 問題總結
 
-### ❌ 不是以下問題：
+### 不是以下問題：
 
--   ❌ 非 switch 問題
+-   ✗ 非 switch 問題
     
--   ❌ 非 PHY / driver 問題
+-   ✗ 非 PHY / driver 問題
     
--   ❌ 非 cable 問題
+-   ✗ 非 cable 問題
     
--   ❌ 非 VLAN 錯誤
+-   ✗ 非 VLAN 錯誤
     
--   ❌ 非 DHCP server 故障
+-   ✗ 非 DHCP server 故障
     
 
-### ✅ 真正原因：
+### 真正原因：
 
 > **NetworkManager connection profile 被設定為 static IP（manual）。**

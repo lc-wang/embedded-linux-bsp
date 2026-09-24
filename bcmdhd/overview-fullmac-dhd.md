@@ -9,9 +9,9 @@
 在 FullMAC 架構中：
 
 - **MAC / MLME / Roaming / Scan / Rate control**  
-  ➜ 全部執行在 **Wi-Fi dongle firmware**
+  全部執行在 **Wi-Fi dongle firmware**
 - **Linux driver（bcmdhd）**  
-  ➜ 只負責「控制通道 + 資料搬運 + cfg80211 glue」
+  只負責「控制通道 + 資料搬運 + cfg80211 glue」
 
 這個根本差異，導致 bcmdhd 在：
 - 架構
@@ -34,7 +34,7 @@
 | Firmware | 極薄（PHY control） |
 | Debug | trace + cfg80211/mac80211 |
 
-👉 Linux 掌握 **完整無線狀態**
+Linux 掌握 **完整無線狀態**
 
 ---
 
@@ -48,7 +48,7 @@
 | Rate control | Firmware |
 | Linux driver | Control + Data path |
 
-👉 **Linux 並不知道 Wi-Fi 真正怎麼運作，只是在「下指令 + 收事件」**
+**Linux 並不知道 Wi-Fi 真正怎麼運作，只是在「下指令 + 收事件」**
 
 ---
 
@@ -113,7 +113,7 @@ v
 - watchdog / recovery
 - power management glue
 
-👉 **這裡是 driver 的「心臟」**
+**這裡是 driver 的「心臟」**
 
 ---
 
@@ -171,7 +171,7 @@ typedef struct dhd_info {
 -   notifier
     
 
-👉 **`dhd_info_t` = Linux 世界的入口**
+**`dhd_info_t` = Linux 世界的入口**
 
 ----------
 
@@ -199,14 +199,14 @@ typedef struct dhd_info {
 -   firmware event
     
 
-📌 **bcmdhd ≠ 邏輯執行者，只是 command transporter**
+**bcmdhd ≠ 邏輯執行者，只是 command transporter**
 
 ----------
 
 ### 6.2 Data Plane（封包流）
 
--   TX：Host ➜ Dongle
+-   TX：Host Dongle
     
--   RX：Dongle ➜ Host
+-   RX：Dongle Host
     
 -   Flow control 完全受 firmware 回報影響

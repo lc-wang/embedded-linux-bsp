@@ -18,7 +18,7 @@ Android HAL（Hardware Abstraction Layer）負責連接 **Framework ↔ 驅動�
 | Android 8 ~ 11 | **HIDL** | 透過 Binder IPC 封裝 HAL，支援多版本與 vendor 分離 |
 | Android 12+ | **AIDL (stable)** | 統一 IPC 機制，支援穩定版本與跨分區更新 (Treble) |
 
-💡 **設計目標**
+**設計目標**
 - Framework 與 Vendor HAL 隔離（Treble 架構）  
 - 使用 Binder 實現跨進程通訊  
 - 提供介面版本管理與向後相容性  
@@ -122,7 +122,7 @@ aidl_interface {
 -   `IExampleService.cpp` 
 -   `IExampleClient.cpp`
 
-💡 **補充說明：**
+**補充說明：**
 -   `libbinder_ndk` 位於 `frameworks/native/libs/binder/ndk/`，  
     是 HAL 層最常用的 AIDL NDK 封裝 API。
 -   `/dev/vndbinder` 是 Vendor 專用通道，與 `/dev/hwbinder`、`/dev/binder` 相對應。
@@ -142,7 +142,7 @@ aidl_interface {
 | **跨分區支援** | 部分 | 完整（system/vendor 分離） |
 | **向後相容性** | 複雜（需維護多版本 interface） | 透過穩定 AIDL 自動維持版本相容性 |
 
-💡 **補充說明**
+**補充說明**
 
 -   HIDL 採「介面多版本」策略，例如 `@1.0`, `@1.1`，每次新增都需維護多套檔案。
 -   AIDL (Stable) 改以 **VINTF 穩定性模型** 控制版本，讓 framework/vendor 可獨立升級。
@@ -183,7 +183,7 @@ aidl_interface {
 | `strace -p <pid>` | 追蹤 HAL Daemon 的 Binder ioctl 活動。 |
 | `vndservicemanager --list` | 列出目前 Vendor 層 AIDL 服務。 |
 
-💡 **補充說明**
+**補充說明**
 
 -   `lshal` 是最直觀的 HAL 層檢查工具，可同時列出 HIDL 與 AIDL HAL。
 -   `hwservicemanager` 與 `vndservicemanager` 是分層的 service manager（system/vendor 分離）。
@@ -203,7 +203,7 @@ aidl_interface {
 | **HAL crash** | 介面版本不相容或 interface 定義錯誤 | 對齊 Framework 對應的 interface 版本。 |
 | **轉換至 AIDL-stable 失敗** | Soong 檔未設定 `stability: "vintf"` | 補上設定並重新生成介面。 |
 
-💡 **補充說明**
+**補充說明**
 
 -   `registerAsService()` 是所有 HIDL HAL 的註冊入口。 
 -   AIDL-stable HAL 若設定錯誤，`vndservicemanager --list` 中不會出現對應服務。
@@ -222,7 +222,7 @@ adb shell vndservicemanager --list
 4.  在 `vndservicemanager` 啟動後觀察 `/dev/vndbinder` 活動。
 5.  分析從 Framework 呼叫 HAL 的 binder transaction 流程。
 
-📘 **延伸閱讀**
+**延伸閱讀**
 
 -   `hardware/interfaces/`（HIDL 原始碼）
 -   `aidl/`（AIDL stable 原始碼）
