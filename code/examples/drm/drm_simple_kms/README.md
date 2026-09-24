@@ -1,27 +1,20 @@
-
 # drm_simple_kms
 本章不是完整可用的顯示驅動，  
 而是用最小骨架說明：  
-  
+
 - DRM driver 如何註冊  
 - `drm_simple_display_pipe` 是什麼  
 - framebuffer 如何進入 display pipeline  
 - atomic commit 時 driver callback 會在什麼時候被呼叫  
-  
----  
-  
-## 本章的目的  
-  
+
 理解以下問題：  
-  
+
 - DRM/KMS 的核心元件是什麼  
 - `drm_simple_display_pipe` 為什麼適合小型/simple 顯示裝置  
 - framebuffer、plane、CRTC、connector 之間的關係  
 - driver 在哪裡真正更新畫面
 
-----------
-
-## 最核心的顯示路徑
+## 1. 最核心的顯示路徑
 
 ```
 userspace buffer
@@ -37,9 +30,7 @@ connector
 display device / panel
 ```
 
-----------
-
-## `drm_simple_display_pipe` 是什麼？
+## 2. `drm_simple_display_pipe` 是什麼？
 
 它是一個簡化版的顯示 pipeline helper。
 
@@ -56,9 +47,7 @@ display device / panel
 「我只有一條很單純的顯示路徑」
 ```
 
-----------
-
-## 本範例做什麼？
+## 3. 本範例做什麼？
 
 本範例提供：
 
@@ -79,9 +68,7 @@ helper
 driver callback
 ```
 
-----------
-
-## Kernel 原始碼對照
+## 4. Kernel 原始碼對照
 
 ```
 drivers/gpu/drm/drm_simple_kms_helper.c

@@ -1,34 +1,26 @@
-# dma_buf_prime_flow  
-  
+# dma_buf_prime_flow
+
 Linux dma-buf / DRM PRIME memory sharing flow 心智模型。  
-  
+
 本章目的：  
-  
+
 > 理解不同 driver / subsystem 如何共享同一塊 framebuffer memory。  
-  
----  
-  
-## 本章的目的  
-  
+
 理解：  
-  
+
 - dma-buf 是什麼  
 - PRIME 是什麼  
 - 為什麼 graphics stack 一直在 import/export memory  
 - GPU / DRM / camera 如何共享同一塊 memory  
-  
----  
-  
-## 一句話先記住  
-  
+
+## 1. 一句話先記住
+
 ```text  
 dma-buf  
 = Linux kernel 的共享 memory 機制
 ```
 
-----------
-
-## 最重要觀念
+## 2. 最重要觀念
 
 ```
 不是 copy memory
@@ -37,9 +29,7 @@ dma-buf
 共享同一塊 memory
 ```
 
-----------
-
-## PRIME 是什麼？
+## 3. PRIME 是什麼？
 
 PRIME：
 
@@ -54,9 +44,7 @@ DRM driver
 如何 import/export dma-buf
 ```
 
-----------
-
-## 真實 graphics stack
+## 4. 真實 graphics stack
 
 ```
 GPU render
@@ -70,9 +58,7 @@ DRM import
 scanout
 ```
 
-----------
-
-## 為什麼需要 dma-buf？
+## 5. 為什麼需要 dma-buf？
 
 因為：
 
@@ -87,18 +73,14 @@ copy framebuffer 太貴
 -   HDR
 -   多 layer
 
-----------
-
-## zero-copy 的核心
+## 6. zero-copy 的核心
 
 ```
 同一塊 physical memory
 被不同 subsystem 共用
 ```
 
-----------
-
-## Kernel 原始碼對照
+## 7. Kernel 原始碼對照
 
 ```
 drivers/dma-buf/

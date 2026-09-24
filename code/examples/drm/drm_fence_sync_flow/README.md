@@ -1,4 +1,3 @@
-
 # drm_fence_sync_flow
 
 DRM / GPU synchronization 與 dma_fence flow 心智模型。
@@ -6,10 +5,6 @@ DRM / GPU synchronization 與 dma_fence flow 心智模型。
 本章目的：
 
 > 理解 GPU render 與 DRM scanout 之間如何同步。
-
----
-
-## 本章的目的
 
 理解：
 
@@ -19,15 +14,14 @@ DRM / GPU synchronization 與 dma_fence flow 心智模型。
 - acquire fence / release fence
 - 為什麼 atomic commit 需要 IN_FENCE_FD
 
----
-
-## 一句話先記住
+## 1. 一句話先記住
 
 ```text
 fence
 = 「這份工作完成了嗎？」的同步機制
 ```
-## 為什麼 graphics stack 一定需要 sync？
+
+## 2. 為什麼 graphics stack 一定需要 sync？
 
 因為：
 
@@ -39,9 +33,7 @@ display scanout
 是並行進行的
 ```
 
-----------
-
-## 沒同步會怎樣？
+## 3. 沒同步會怎樣？
 
 可能：
 
@@ -57,9 +49,7 @@ display controller 已開始 scanout
 -   corruption
 -   半張 frame
 
-----------
-
-## 真正 graphics flow
+## 4. 真正 graphics flow
 
 ```
 GPU render
@@ -75,9 +65,7 @@ vblank
 page flip
 ```
 
-----------
-
-## dma_fence 是什麼？
+## 5. dma_fence 是什麼？
 
 ```
 dma_fence
@@ -90,9 +78,7 @@ dma_fence
 某個 producer 的工作完成狀態
 ```
 
-----------
-
-## sync_file 是什麼？
+## 6. sync_file 是什麼？
 
 ```
 sync_file
@@ -107,14 +93,11 @@ dma_fence
 包裝成 fd
 ```
 
-----------
-
-## Kernel 原始碼對照
+## 7. Kernel 原始碼對照
 
 ```
 drivers/dma-buf/dma-fence.c
 drivers/dma-buf/sync_file.c
 drivers/gpu/drm/drm_atomic.c
 include/linux/dma-fence.h
-```text
 ```

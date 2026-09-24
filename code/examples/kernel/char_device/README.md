@@ -1,4 +1,3 @@
-
 # char_device
 
 Linux character device（字元裝置）最小實作範例。
@@ -9,10 +8,6 @@ Linux character device（字元裝置）最小實作範例。
 - file_operations 是什麼
 - open / read / write / ioctl 的實際呼叫流程
 - userspace 如何進入 kernel driver
-
----
-
-## 本章的目的
 
 此範例示範：
 
@@ -31,18 +26,15 @@ Linux character device（字元裝置）最小實作範例。
 - miscdevice
 - remoteproc character interface
 
----
-
-## Kernel 原始碼對照
+## 1. Kernel 原始碼對照
 ```
 fs/char_dev.c
 fs/open.c
 fs/read_write.c
 drivers/base/core.c
 ```
----
 
-## 完整資料流
+## 2. 完整資料流
 ```
 userspace
 └─ open("/dev/mychardev")
@@ -64,9 +56,8 @@ ioctl()
 └─ do_vfs_ioctl()
 └─ file->f_op->unlocked_ioctl()
 ```
----
 
-## 非常重要的觀念
+## 3. 非常重要的觀念
 
 /dev/xxx
 不是 driver

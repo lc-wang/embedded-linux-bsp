@@ -1,14 +1,9 @@
-
 # module_basic
 
 Linux kernel module 最小生命週期範例。
 
 此目錄提供一個**最小可運作的 kernel module**，用途並非教學，
 而是作為日後 trace Linux kernel driver 時的「對照心智模型」。
-
----
-
-## 本範例的目的
 
 此範例用來理解：
 
@@ -26,9 +21,7 @@ Linux kernel module 最小生命週期範例。
 - network driver
 - staging driver
 
----
-
-## Kernel 原始碼對照位置
+## 1. Kernel 原始碼對照位置
 
 相關核心程式碼位於：
 ```
@@ -59,9 +52,7 @@ finit_module()
 
 以 v6.6 / v6.12 的 `kernel/module/main.c` 為準。`init_module()` syscall（傳入 buffer 而非 fd）則走 `copy_module_from_user()` → `load_module()`。
 
----
-
-## Module 載入流程（insmod）
+## 2. Module 載入流程（insmod）
 ```
 userspace
 └─ insmod hello_module.ko
@@ -74,9 +65,7 @@ kernel
          └─ hello_init()
 ```
 
----
-
-## Module 卸載流程（rmmod）
+## 3. Module 卸載流程（rmmod）
 ```
 rmmod hello_module
 └─ delete_module()
@@ -86,9 +75,7 @@ rmmod hello_module
    └─ free_module()
 ```
 
----
-
-## 為什麼這很重要？
+## 4. 為什麼這很重要？
 
 在 trace kernel driver 時，你一定會看到：
 ```
@@ -105,11 +92,9 @@ do_one_initcall()
 
 **所有 driver init 都會經過同一條路徑**。
 
----
+## 5. 常見問題與排查（常見誤解釐清）
 
-## 常見誤解釐清
-
-### 為什麼這個範例沒有 probe()？
+### 5.1 為什麼這個範例沒有 probe()？
 
 因為：
 

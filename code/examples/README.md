@@ -8,10 +8,10 @@
 | `mutex_example.c` | Mutex | 適用於 process context，可睡眠 |
 | `completion_example.c` | Completion | 等待事件完成的同步方法 |
 
-## 編譯與測試
+## 1. 編譯與測試
 ```bash
 make -C /lib/modules/$(uname -r)/build M=$(pwd) modules
 sudo insmod spinlock_example.ko
 dmesg | tail
 sudo rmmod spinlock_example
-
+```

@@ -1,4 +1,3 @@
-
 # completion
 
 Linux kernel 中的「一次性事件同步機制」。
@@ -8,10 +7,6 @@ Linux kernel 中的「一次性事件同步機制」。
 > completion 不是鎖  
 > 而是「等待某件事情完成」
 
----
-
-## 本章的目的
-
 理解：
 
 - completion 是什麼
@@ -19,16 +14,14 @@ Linux kernel 中的「一次性事件同步機制」。
 - complete() 如何喚醒等待者
 - 為什麼 driver 很常用 completion
 
----
-
-## 一句話先記住
+## 1. 一句話先記住
 
 ```
 completion
 = 一個 thread 等另一個 thread 說「好了」
 ```
 
-## 本範例做什麼？
+## 2. 本範例做什麼？
 
 -   userspace write → 模擬「開始一個工作」
 -   kernel 啟動一個 delayed work（延遲 2 秒）
