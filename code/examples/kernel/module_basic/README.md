@@ -35,20 +35,29 @@ Linux kernel module 最小生命週期範例。
 include/linux/module.h
 kernel/module/main.c
 kernel/module/kmod.c
-kernel/init/main.c
+init/main.c
 ```
 
 模組載入時的關鍵函式：
 ```
 finit_module()
-└─ load_module()
-├─ layout_and_allocate()
-├─ copy_module_from_user()
-├─ resolve_symbols()
-├─ do_init_module()
-│ └─ do_one_initcall()
-└─ module_enable_ro()
+└─ idempotent_init_module()
+   └─ init_module_from_file()
+      ├─ kernel_read_file()          // 讀入 .ko
+      └─ load_module()
+         ├─ layout_and_allocate()
+         ├─ simplify_symbols()       // 解析未定義符號
+         ├─ apply_relocations()
+         ├─ post_relocation()
+         │  └─ module_finalize()     // arch-specific
+         ├─ complete_formation()
+         └─ do_init_module()
+            ├─ do_one_initcall(mod->init)
+            │  └─ hello_init()
+            └─ module_enable_ro()    // v6.12 起為 module_enable_rodata_ro()
 ```
+
+以 v6.6 / v6.12 的 `kernel/module/main.c` 為準。`init_module()` syscall（傳入 buffer 而非 fd）則走 `copy_module_from_user()` → `load_module()`。
 
 ---
 
@@ -56,13 +65,13 @@ finit_module()
 ```
 userspace
 └─ insmod hello_module.ko
-└─ finit_module()
+   └─ finit_module()
 
 kernel
 └─ load_module()
-└─ do_init_module()
-└─ do_one_initcall()
-└─ hello_init()
+   └─ do_init_module()
+      └─ do_one_initcall()
+         └─ hello_init()
 ```
 
 ---
@@ -71,8 +80,10 @@ kernel
 ```
 rmmod hello_module
 └─ delete_module()
-└─ exit_module()
-└─ hello_exit()
+   ├─ try_stop_module()
+   ├─ mod->exit()
+   │  └─ hello_exit()
+   └─ free_module()
 ```
 
 ---
@@ -108,8 +119,6 @@ do_one_initcall()
 
 probe() 只有在下列條件同時成立時才會呼叫：
 
-driver_register()
-
+-   driver_register()
 -   device_register()
-    
 -   bus match
