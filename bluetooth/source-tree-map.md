@@ -1,9 +1,4 @@
-
 # Bluetooth Source Tree 導覽
-
-----------
-
-## 1. 本章目標
 
 在實際 debug Bluetooth 問題時，最常見的困境不是「看不懂 code」，而是：
 
@@ -19,15 +14,12 @@
     
 -   brcm_patchram_plus 跟 kernel driver 行為打架
     
-
 這一章的目的只有一個：
 
 > **建立一張「可操作的 source tree mental map」**  
 > 讓你知道「某一類問題，該直接進哪個目錄、哪個檔案」。
 
-----------
-
-## 2. 整體 Source Tree 分佈總覽
+## 1. 整體 Source Tree 分佈總覽
 ```
 User Space
 ├─ bluez/                         (bluetoothd, tools)
@@ -43,11 +35,9 @@ Transport / TTY / USB
 **Bluetooth 不只在 `drivers/bluetooth/`**  
 很多關鍵邏輯其實在 `net/bluetooth/`。
 
-----------
+## 2. User Space：BlueZ Source Tree
 
-## 3. User Space：BlueZ Source Tree
-
-### 3.1 BlueZ 原始碼根目錄結構（重點）
+### 2.1 BlueZ 原始碼根目錄結構（重點）
 ```
 bluez/
 ├─ src/
@@ -68,9 +58,8 @@ bluez/
 │  ├─ btmgmt.c            # mgmt socket tool (no bluetoothd)
 │  ├─ btmon.c             # HCI traffic monitor
 ```
-----------
 
-### 3.2 bluetoothd 的「核心控制點」
+### 2.2 bluetoothd 的「核心控制點」
 
 #### Entry point
 
@@ -84,9 +73,6 @@ bluez/
     
 -   Adapter manager 啟動流程
     
-
-----------
-
 #### Adapter（hci0）的核心狀態機
 
 `src/adapter.c` 
@@ -99,11 +85,8 @@ bluez/
     
 -   與 kernel mgmt 的狀態同步
     
-
 如果問題是「BlueZ 顯示 power on，但實際硬體沒反應」，  
 **一定要看這裡 + kernel mgmt**。
-
-----------
 
 #### mgmt socket（BlueZ ↔ Kernel）
 
@@ -119,12 +102,9 @@ bluez/
     
 -   kernel 再轉成 HCI command
     
+## 3. Kernel Space：Bluetooth Core（Host Stack）
 
-----------
-
-## 4. Kernel Space：Bluetooth Core（Host Stack）
-
-### 4.1 `net/bluetooth/` 是整個核心
+### 3.1 `net/bluetooth/` 是整個核心
 ```
 net/bluetooth/
 ├─ hci_core.c        # HCI device lifecycle, command queue
@@ -142,10 +122,7 @@ net/bluetooth/
     
 -   「資料傳不動」→ `l2cap_core.c` / driver
     
-
-----------
-
-### 4.2 HCI device 是怎麼出現的？
+### 3.2 HCI device 是怎麼出現的？
 
 關鍵 API：
 
@@ -157,15 +134,12 @@ net/bluetooth/
     
 -   hci_uart attach 成功後
     
-
 如果你 **根本看不到 hci0**  
 → 問題一定在 driver 層，還沒進到 BlueZ。
 
-----------
+## 4. Kernel Space：Bluetooth Drivers
 
-## 5. Kernel Space：Bluetooth Drivers
-
-### 5.1 drivers/bluetooth/ 目錄總覽
+### 4.1 drivers/bluetooth/ 目錄總覽
 ```
 drivers/bluetooth/
 ├─ btusb.c           # HCI over USB
@@ -175,9 +149,8 @@ drivers/bluetooth/
 ├─ btintel.c         # Intel firmware helper
 ├─ btrtl.c           # Realtek firmware helper
 ```
-----------
 
-### 5.2 btusb（USB 藍牙）
+### 4.2 btusb（USB 藍牙）
 
 `drivers/bluetooth/btusb.c` 
 
@@ -189,17 +162,13 @@ drivers/bluetooth/
     
 -   HCI command / event / ACL data 傳輸
     
-
 如果是 USB dongle：
 
 -   問題多半在這個檔案 + USB core
     
 -   幾乎不會碰到 baud / framing 類問題
     
-
-----------
-
-### 5.3 hci_uart（UART 藍牙核心）
+### 4.3 hci_uart（UART 藍牙核心）
 
 `drivers/bluetooth/hci_uart.c` 
 
@@ -211,7 +180,6 @@ drivers/bluetooth/
     
 -   attach / detach lifecycle
     
-
 它本身 **不直接解析 byte framing**，  
 而是配合：
 
@@ -219,10 +187,7 @@ drivers/bluetooth/
     
 -   或 serdev（新式 DT）
     
-
-----------
-
-### 5.4 hci_ldisc（TTY line discipline）
+### 4.4 hci_ldisc（TTY line discipline）
 
 `drivers/bluetooth/hci_ldisc.c` 
 
@@ -234,13 +199,10 @@ drivers/bluetooth/
     
 -   將 byte stream 丟給 hci_uart
     
-
 **這就是為什麼 brcm_patchram_plus 容易跟 kernel 打架**  
 因為兩邊都想「擁有 tty」。
 
-----------
-
-### 5.5 btbcm（Broadcom firmware helper）
+### 4.5 btbcm（Broadcom firmware helper）
 
 `drivers/bluetooth/btbcm.c` 
 
@@ -254,15 +216,12 @@ drivers/bluetooth/
     
 -   將 `.hcd` 拆成 vendor HCI commands 下載
     
-
 如果你走「kernel 自動載 firmware」方案  
 → **90% 時間都會在這個檔案打轉**
 
-----------
+## 5. Transport 關聯：TTY / serdev / USB
 
-## 6. Transport 關聯：TTY / serdev / USB
-
-### 6.1 UART / TTY / serdev
+### 5.1 UART / TTY / serdev
 ```
 drivers/tty/
 ├─ serial/           # UART controller drivers
@@ -272,13 +231,10 @@ drivers/tty/
     
 -   新式（DT）：serdev child device → hci_uart
     
-
 DT / power / clock / reset 問題  
 **不會出現在 Bluetooth driver 裡，而是在 UART driver / DT**
 
-----------
-
-### 6.2 USB Core
+### 5.2 USB Core
 
 `drivers/usb/` 
 
@@ -286,35 +242,29 @@ btusb 只是 client：
 
 -   真正的 error 可能來自 USB core / PHY / power
     
+## 6. 常見問題與排查（問題導向：你現在該看哪？）
 
-----------
-
-## 7. 問題導向：你現在該看哪？
-
-### 問題 1：看不到 hci0
+### 6.1 問題 1：看不到 hci0
 ```
 drivers/bluetooth/btusb.c
 drivers/bluetooth/hci_uart.c
 ```
-----------
 
-### 問題 2：hci0 存在，但 up 不起來
+### 6.2 問題 2：hci0 存在，但 up 不起來
 ```
 net/bluetooth/hci_core.c
 net/bluetooth/hci_event.c
 btmon（搭配）
 ```
-----------
 
-### 問題 3：firmware 沒載 / 載錯
+### 6.3 問題 3：firmware 沒載 / 載錯
 ```
 drivers/bluetooth/btbcm.c
 request_firmware()
 /lib/firmware/*
 ```
-----------
 
-### 問題 4：BlueZ 顯示異常
+### 6.4 問題 4：BlueZ 顯示異常
 ```
 bluez/src/adapter.c
 bluez/src/mgmt.c

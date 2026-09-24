@@ -1,8 +1,4 @@
-
 # Broadcom bcmdhd (DHD) Wi-Fi Driver — Firmware, NVRAM, and Bring-up Flow
-
-
-## 1. 本章定位
 
 在 bcmdhd 架構中，**firmware 與 NVRAM 不是「資源檔」，而是「行為定義的一部分」**。
 
@@ -15,11 +11,9 @@
 
 **這些問題有極高比例不是 driver bug，而是 firmware / NVRAM / regulatory mismatch。**
 
----
+## 1. bcmdhd Bring-up 的整體流程
 
-## 2. bcmdhd Bring-up 的整體流程
-
-### 2.1 高層初始化順序
+### 1.1 高層初始化順序
 
 ```text
 dhd_attach()
@@ -40,10 +34,7 @@ dhd_attach()
     
 -   `dhd_sdio.c` / `dhd_pcie.c`
     
-
-----------
-
-### 2.2 Bring-up 成功 ≠ Wi-Fi 可用
+### 1.2 Bring-up 成功 ≠ Wi-Fi 可用
 
 Bring-up 只代表：
 
@@ -53,7 +44,6 @@ Bring-up 只代表：
     
 -   interface 能註冊
     
-
 **不代表：**
 
 -   scan 一定成功
@@ -62,12 +52,9 @@ Bring-up 只代表：
     
 -   PA / RF 設定符合板子
     
+## 2. Firmware（`.bin` / `.trx`）
 
-----------
-
-## 3. Firmware（`.bin` / `.trx`）
-
-### 3.1 Firmware 在 bcmdhd 中的角色
+### 2.1 Firmware 在 bcmdhd 中的角色
 
 Firmware 負責：
 
@@ -79,12 +66,9 @@ Firmware 負責：
     
 -   Power save / WOWLAN
     
-
 **Firmware 定義「Wi-Fi 怎麼運作」**
 
-----------
-
-### 3.2 Firmware Download 流程
+### 2.2 Firmware Download 流程
 
 -   SDIO：
     
@@ -98,7 +82,6 @@ Firmware 負責：
         
     -   較快，但 reset 成本高
         
-
 **常見失敗點**
 
 -   firmware 與 driver 版本不匹配
@@ -107,12 +90,9 @@ Firmware 負責：
     
 -   firmware 啟動但 event 不回
     
+## 3. NVRAM：最容易被低估的關鍵
 
-----------
-
-## 4. NVRAM：最容易被低估的關鍵
-
-### 4.1 什麼是 NVRAM？
+### 3.1 什麼是 NVRAM？
 
 在 bcmdhd 中，NVRAM 通常是一份 **文字檔（key=value）**，包含：
 
@@ -124,12 +104,9 @@ Firmware 負責：
     
 -   Regulatory hint
     
-
 **NVRAM ≈ 板級硬體描述（但不是 device tree）**
 
-----------
-
-### 4.2 常見 NVRAM 參數類型
+### 3.2 常見 NVRAM 參數類型
 
 | 類型        | 影響說明             |
 |-------------|----------------------|
@@ -139,12 +116,9 @@ Firmware 負責：
 | aa*         | 天線配置             |
 | regrev     | 區域法規限制         |
 
-
 **錯一個值，Wi-Fi 不一定掛，但行為會「很怪」**
 
-----------
-
-### 4.3 NVRAM Download 與套用時機
+### 3.3 NVRAM Download 與套用時機
 
 -   firmware boot 前下載
     
@@ -152,12 +126,9 @@ Firmware 負責：
     
 -   driver **無法修正 NVRAM 錯誤**
     
+## 4. Regulatory / CLM（法規與頻道）
 
-----------
-
-## 5. Regulatory / CLM（法規與頻道）
-
-### 5.1 為什麼 regulatory 在 bcmdhd 特別重要？
+### 4.1 為什麼 regulatory 在 bcmdhd 特別重要？
 
 在 FullMAC 中：
 
@@ -167,14 +138,11 @@ Firmware 負責：
     
 -   DFS 行為
     
-
 **全部由 firmware 決定**
 
 Linux cfg80211 只能「被告知結果」。
 
-----------
-
-### 5.2 CLM / regulatory blob
+### 4.2 CLM / regulatory blob
 
 許多新一代 bcmdhd 會使用：
 
@@ -182,7 +150,6 @@ Linux cfg80211 只能「被告知結果」。
     
 -   或 firmware 內建 regulatory table
     
-
 常見問題：
 
 -   國碼設定成功，但頻道仍被禁用
@@ -191,12 +158,9 @@ Linux cfg80211 只能「被告知結果」。
     
 -   5G / DFS 頻道永遠不可用
     
+## 5. Preinit IOCTLs
 
-----------
-
-## 6. Preinit IOCTLs
-
-### 6.1 什麼是 preinit ioctls？
+### 5.1 什麼是 preinit ioctls？
 
 在 firmware boot 後，driver 會送出一系列 iovar：
 
@@ -210,12 +174,9 @@ Linux cfg80211 只能「被告知結果」。
     
 -   `frameburst`
     
-
 **這些指令會「覆蓋 firmware 預設行為」**
 
-----------
-
-### 6.2 順序的重要性
+### 5.2 順序的重要性
 
 -   country 設定太晚 → scan 結果錯
     
@@ -223,14 +184,13 @@ Linux cfg80211 只能「被告知結果」。
     
 -   roam 設定不一致 → 連線不穩
     
-
 **順序錯誤 ≈ 行為錯誤**
 
-----------
+## 6. 常見問題與排查
 
-## 7. 常見 Bring-up 故障模式
+### 6.1 常見 Bring-up 故障模式
 
-### 7.1 Interface 存在，但 scan 無結果
+#### Interface 存在，但 scan 無結果
 
 可能原因：
 
@@ -240,10 +200,7 @@ Linux cfg80211 只能「被告知結果」。
     
 -   firmware 不支援該 band
     
-
-----------
-
-### 7.2 只能用 2.4G，5G 完全消失
+#### 只能用 2.4G，5G 完全消失
 
 -   NVRAM 天線設定錯
     
@@ -251,10 +208,7 @@ Linux cfg80211 只能「被告知結果」。
     
 -   PA table 不完整
     
-
-----------
-
-### 7.3 AP mode throughput 異常低
+#### AP mode throughput 異常低
 
 -   PA / power 設定錯誤
     
@@ -262,12 +216,9 @@ Linux cfg80211 只能「被告知結果」。
     
 -   AMPDU 被 disable
     
+### 6.2 Debug Firmware / NVRAM
 
-----------
-
-## 8. Debug Firmware / NVRAM 
-
-### 8.1 第一優先確認事項
+#### 第一優先確認事項
 
 -   firmware 與 driver 是否為同一 vendor / release
     
@@ -275,10 +226,7 @@ Linux cfg80211 只能「被告知結果」。
     
 -   regulatory / country 設定是否成功
     
-
-----------
-
-### 8.2 Debug 技巧
+#### Debug 技巧
 
 -   開啟 firmware console log（若支援）
     
@@ -286,12 +234,9 @@ Linux cfg80211 只能「被告知結果」。
     
 -   用最小化 NVRAM 測試行為變化
     
-
 **NVRAM debug 是「比較法」，不是「單點修正」**
 
-----------
-
-## 9. 常見誤解澄清
+### 6.3 常見誤解澄清
 
 -   ✗「Wi-Fi 掛了就是 driver bug」
     
@@ -299,5 +244,4 @@ Linux cfg80211 只能「被告知結果」。
     
 -   ✗「country code 設定成功就代表 regulatory 正確」
     
-
 **bcmdhd 的 bring-up 是 firmware + NVRAM + bus 的整體工程**

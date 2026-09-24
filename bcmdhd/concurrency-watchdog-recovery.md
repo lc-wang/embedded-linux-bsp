@@ -1,8 +1,4 @@
-
 # Broadcom bcmdhd (DHD) Wi-Fi Driver — Concurrency, Watchdog, and Recovery
----
-
-## 1. 本章定位
 
 在 bcmdhd（FullMAC）中，**最難 debug 的問題不是功能錯誤，而是「偶發卡死」**：
 
@@ -20,11 +16,9 @@
 - watchdog 的檢查邏輯與觸發條件
 - reset / recovery 的實際流程與失敗模式
 
----
+## 1. bcmdhd 的並行模型總覽
 
-## 2. bcmdhd 的並行模型總覽
-
-### 2.1 同時存在的執行 context
+### 1.1 同時存在的執行 context
 
 bcmdhd 不是單一執行緒模型，實際同時存在：
 
@@ -38,20 +32,16 @@ bcmdhd 不是單一執行緒模型，實際同時存在：
 
 **任何共享狀態，幾乎都可能被多個 context 同時碰觸**
 
----
-
-### 2.2 主要共享狀態
+### 1.2 主要共享狀態
 
 - `dhd_pub_t`
 - flow control state
 - firmware up/down 狀態
 - bus state（sleep / wake / reset）
 
----
+## 2. Locking 與同步策略
 
-## 3. Locking 與同步策略
-
-### 3.1 常見同步原語
+### 2.1 常見同步原語
 
 在 bcmdhd 中會看到：
 
@@ -63,9 +53,7 @@ bcmdhd 不是單一執行緒模型，實際同時存在：
 
 **鎖粒度不小，且跨層使用**
 
----
-
-### 3.2 典型高風險區域
+### 2.2 典型高風險區域
 
 #### TX path × flow control
 - TX 在 softirq
@@ -77,19 +65,15 @@ bcmdhd 不是單一執行緒模型，實際同時存在：
 - workqueue 處理 event
 - cfg80211 state 在 process context
 
----
-
-### 3.3 常見 concurrency bug 型態
+### 2.3 常見 concurrency bug 型態
 
 - double stop queue（stop 了但沒人 wake）
 - state flag race（up / down 不一致）
 - recovery 與正常路徑同時執行
 
----
+## 3. Watchdog：bcmdhd 的健康檢查機制
 
-## 4. Watchdog：bcmdhd 的健康檢查機制
-
-### 4.1 Watchdog 的目的
+### 3.1 Watchdog 的目的
 
 Watchdog 並不是效能優化工具，而是：
 
@@ -97,9 +81,7 @@ Watchdog 並不是效能優化工具，而是：
 - 偵測 TX/RX 是否有 forward progress
 - 決定是否觸發 recovery
 
----
-
-### 4.2 Watchdog 的執行來源
+### 3.2 Watchdog 的執行來源
 
 - 以 timer 或 delayed work 形式執行
 - 週期性（數百 ms ～ 數秒）
@@ -109,9 +91,7 @@ Watchdog 並不是效能優化工具，而是：
 - `dhd_watchdog()`
 - `dhd_health_check()`
 
----
-
-### 4.3 Watchdog 常見檢查項目
+### 3.3 Watchdog 常見檢查項目
 
 - TX counter 是否前進
 - RX counter 是否更新
@@ -120,11 +100,9 @@ Watchdog 並不是效能優化工具，而是：
 
 **Watchdog 只能看到「症狀」，不知道「原因」**
 
----
+## 4. Recovery 流程
 
-## 5. Recovery 流程
-
-### 5.1 高層 recovery 流程
+### 4.1 高層 recovery 流程
 
 ```
 watchdog detect stall
@@ -137,7 +115,7 @@ watchdog detect stall
              └─ reinit cfg80211
 ```
 
-### 5.2 Recovery 涉及的關鍵動作
+### 4.2 Recovery 涉及的關鍵動作
 
 -   停止 TX queue
     
@@ -149,12 +127,9 @@ watchdog detect stall
     
 -   重新註冊 netdev / wiphy
     
+## 5. Recovery 常見失敗模式
 
-----------
-
-## 6. Recovery 常見失敗模式
-
-### 6.1 Recovery 沒被觸發
+### 5.1 Recovery 沒被觸發
 
 可能原因：
 
@@ -164,10 +139,7 @@ watchdog detect stall
     
 -   counter 沒歸零
     
-
-----------
-
-### 6.2 Recovery 被觸發，但沒救回來
+### 5.2 Recovery 被觸發，但沒救回來
 
 -   firmware reset 失敗
     
@@ -175,10 +147,7 @@ watchdog detect stall
     
 -   舊 state 沒清乾淨（flow ring / flags）
     
-
-----------
-
-### 6.3 Recovery 與正常路徑 race
+### 5.3 Recovery 與正常路徑 race
 
 -   recovery 執行時，cfg80211 仍在下指令
     
@@ -186,12 +155,9 @@ watchdog detect stall
     
 -   導致二次 crash 或永久 dead state
     
+## 6. SDIO vs PCIe：Recovery 的差異
 
-----------
-
-## 7. SDIO vs PCIe：Recovery 的差異
-
-### 7.1 SDIO Recovery 特性
+### 6.1 SDIO Recovery 特性
 
 -   reset 成本低
     
@@ -199,10 +165,7 @@ watchdog detect stall
     
 -   常見「reset 後第一包送不出去」
     
-
-----------
-
-### 7.2 PCIe Recovery 特性
+### 6.2 PCIe Recovery 特性
 
 -   reset 成本高
     
@@ -210,12 +173,9 @@ watchdog detect stall
     
 -   DMA state 若殘留，後果嚴重
     
+## 7. 常見問題與排查（Debug Concurrency / Watchdog 的實務方法）
 
-----------
-
-## 8. Debug Concurrency / Watchdog 的實務方法
-
-### 8.1 建議觀察順序
+### 7.1 建議觀察順序
 
 1.  TX 是否真的停了？
     
@@ -225,10 +185,7 @@ watchdog detect stall
     
 4.  recovery 是否完整跑完？
     
-
-----------
-
-### 8.2 實用 debug 手段
+### 7.2 實用 debug 手段
 
 -   在 watchdog 加詳細 counter log
     
@@ -236,5 +193,4 @@ watchdog detect stall
     
 -   標記 firmware reset 的開始與結束
     
-
 **沒有完整 timeline，很難 debug concurrency 問題**

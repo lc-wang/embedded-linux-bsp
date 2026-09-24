@@ -1,7 +1,6 @@
 # Kernel trace notes — drm_gem_shmem_flow
 
-
-# Level 1：用人話理解
+## 1. Level 1：用人話理解
 
 framebuffer 看起來像：
 
@@ -21,9 +20,7 @@ framebuffer 本身其實沒有真正的像素資料
 在 GEM memory object 裡
 ```
 
-----------
-
-# GEM object 是什麼？
+## 2. GEM object 是什麼？
 
 你可以把 GEM object 想成：
 
@@ -38,11 +35,9 @@ DRM 專用的 memory container
 -   reference counting
 -   share/import/export
 
-----------
+## 3. Level 2：流程理解
 
-# Level 2：流程理解
-
-## dumb buffer flow
+### 3.1 dumb buffer flow
 
 ```
 CREATE_DUMB
@@ -54,9 +49,7 @@ CREATE_DUMB
 回傳 handle
 ```
 
-----------
-
-## AddFB2
+### 3.2 AddFB2
 
 ```
 drmModeAddFB2()
@@ -70,9 +63,7 @@ framebuffer
 reference GEM object
 ```
 
-----------
-
-# 最重要觀念
+## 4. 最重要觀念
 
 ```
 framebuffer
@@ -82,9 +73,7 @@ GEM object
 才是真正的 memory owner
 ```
 
-----------
-
-# mmap flow
+## 5. mmap flow
 
 ```
 userspace mmap
@@ -98,12 +87,9 @@ page fault
 shmem page
 ```
 
+## 6. Level 3：kernel trace
 
-
-# Level 3：kernel trace
-
-
-## 1. userspace 建立 dumb buffer  
+### 6.1 userspace 建立 dumb buffer
 ``` 
 userspace：  
 DRM_IOCTL_MODE_CREATE_DUMB
@@ -121,7 +107,7 @@ driver->dumb_create()
 drm_gem_shmem_create()
 ```
 
-## drm_gem_shmem_create 做了什麼？
+### 6.2 drm_gem_shmem_create 做了什麼？
 
 它會：
 
@@ -138,9 +124,7 @@ drm_gem_shmem_create()
 GEM object真正開始擁有 memory
 ```
 
-----------
-
-## 2. userspace mmap framebuffer memory
+### 6.3 userspace mmap framebuffer memory
 ```
 userspace：
 mmap()
@@ -159,9 +143,7 @@ drm_gem_shmem_mmap()
 但 page 還不一定存在
 ```
 
-----------
-
-## 3. userspace 第一次 access memory
+### 6.4 userspace 第一次 access memory
 
 例如：
 
@@ -176,9 +158,7 @@ kernel：
 drm_gem_shmem_fault()
 ```
 
-----------
-
-## drm_gem_shmem_fault 做了什麼？
+### 6.5 drm_gem_shmem_fault 做了什麼？
 
 它會：
 
@@ -189,9 +169,7 @@ drm_gem_shmem_fault()
 4. 回傳給 MM subsystem
 ```
 
-----------
-
-## 所以真正流程其實是
+### 6.6 所以真正流程其實是
 
 ```
 userspace mmap
@@ -209,9 +187,7 @@ shmem page 出現
 userspace 真正拿到 memory
 ```
 
-----------
-
-## 最重要理解
+### 6.7 最重要理解
 
 ```
 mmap()
@@ -221,10 +197,7 @@ page fault
 才是真正拿到 page 的時刻
 ```
 
-----------
-
-# GEM vs framebuffer
-
+## 7. GEM vs framebuffer
 
 | 元件 | 本質 |  
 |---------------|-------------------------------|  
@@ -233,17 +206,13 @@ page fault
 | plane | 顯示哪張 framebuffer |  
 | CRTC | Scanout |
 
-----------
-
-# 為什麼同一塊 GEM memory 可以共用？
+## 8. 為什麼同一塊 GEM memory 可以共用？
 
 想成：
 
 ```
 一塊共享畫布
 ```
-
-----------
 
 不同人：
 
@@ -257,17 +226,13 @@ page fault
 看同一塊畫布
 ```
 
-----------
-
-# 不是 copy！
+## 9. 不是 copy！
 
 這很重要：
 
 ✗ GPU render 一份  
 ✗ compositor copy 一份  
 ✗ DRM 再 copy 一份
-
-----------
 
 真正 modern graphics stack：
 
@@ -276,11 +241,9 @@ page fault
 一路傳下去
 ```
 
-----------
+## 10. 真實流程
 
-# 真實流程
-
-## 1. GPU render
+### 10.1 GPU render
 
 GPU：
 
@@ -294,9 +257,7 @@ GPU：
 OpenGL render target
 ```
 
-----------
-
-## 2. Wayland compositor
+### 10.2 Wayland compositor
 
 Wayland：
 
@@ -310,9 +271,7 @@ Wayland：
 -   scaling
 -   layer management
 
-----------
-
-## 3. DRM scanout
+### 10.3 DRM scanout
 
 最後：
 
@@ -326,9 +285,7 @@ CRTC：
 直接 scanout
 ```
 
-----------
-
-# 所以真正發生的是
+## 11. 所以真正發生的是
 
 ```
 同一塊 memory：
@@ -340,9 +297,7 @@ Wayland 管理
 DRM 顯示
 ```
 
-----------
-
-# 為什麼這很重要？
+## 12. 為什麼這很重要？
 
 因為：
 
@@ -356,17 +311,13 @@ copy framebuffer 超貴
 -   60fps
 -   多 layer
 
-----------
-
 所以 modern graphics stack：
 
 ```
 核心目標 = zero-copy
 ```
 
-----------
-
-# kernel 世界
+## 13. kernel 世界
 
 這通常透過：
 
@@ -376,9 +327,7 @@ dma-buf
 
 完成。
 
-----------
-
-## GPU driver
+### 13.1 GPU driver
 
 輸出：
 
@@ -386,9 +335,7 @@ dma-buf
 dma-buf fd
 ```
 
-----------
-
-## Wayland / compositor
+### 13.2 Wayland / compositor
 
 拿到：
 
@@ -398,9 +345,7 @@ dma-buf fd
 
 import 成自己的 GEM object。
 
-----------
-
-## DRM driver
+### 13.3 DRM driver
 
 再：
 
@@ -414,9 +359,7 @@ drm_gem_prime_import()
 scanout-able GEM memory
 ```
 
-----------
-
-# 所以真正的是
+## 14. 所以真正的是
 
 ```
 同一塊 physical memory
@@ -430,7 +373,9 @@ scanout-able GEM memory
 
 共同 reference。
 
-# kernel skeleton 對照程式本章新增：
+## 15. kernel skeleton 對照程式
+
+本章新增：
 
 ```text
 gem_shmem_skeleton.c
@@ -446,8 +391,7 @@ GEM shmem helper
 mmap / PRIME / GEM object
 ```
 
-
-## 這個 skeleton 的重點
+### 15.1 這個 skeleton 的重點
 
 ```
 DRM_GEM_SHMEM_DRIVER_OPS
@@ -462,9 +406,7 @@ DRM_GEM_SHMEM_DRIVER_OPS
 -   PRIME import/export 基礎
 -   vmap / vunmap helper
 
-----------
-
-## 對應 kernel flow
+### 15.2 對應 kernel flow
 
 ```
 userspace open /dev/dri/cardX

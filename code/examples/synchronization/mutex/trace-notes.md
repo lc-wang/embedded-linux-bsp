@@ -1,9 +1,6 @@
-
 # Kernel trace notes — mutex
 
----
-
-# Level 1
+## 1. Level 1
 
 如果兩個 thread 同時改同一個變數：
 
@@ -17,9 +14,7 @@ mutex 的作用就是：
 一次只允許一個人進去改  
 其他人先等
 
-----------
-
-# Level 2
+## 2. Level 2
 
 本範例中：
 
@@ -44,9 +39,8 @@ mutex_lock()
  ↓  
 mutex_unlock()
 ```
-----------
 
-# Level 3
+## 3. Level 3
 ```
 mutex_lock()  
  └─ __mutex_lock()  
@@ -61,9 +55,7 @@ mutex_unlock()
 
 拿不到 mutex 的 thread 會睡眠
 
-----------
-
-# 為什麼 mutex 不能在 IRQ 用？
+## 4. 為什麼 mutex 不能在 IRQ 用？
 
 因為 mutex 的本質是：
 
@@ -76,11 +68,8 @@ mutex_unlock()
 -   process context → 可以 mutex
 -   interrupt context → 不可以 mutex
 
-----------
+## 5. 與 spinlock 的本質差異
 
-
-# 與 spinlock 的本質差異  
-  
 | 項目 | mutex | spinlock |  
 |------------|--------------|-----------------|  
 | 拿不到鎖 | 睡眠等待 | 原地忙等 |  
@@ -88,9 +77,7 @@ mutex_unlock()
 | 使用情境 | process context | IRQ / atomic context |  
 | 臨界區長短 | 可較長 | 必須很短 |
 
-----------
-
-# 心智模型
+## 6. 心智模型
 
 mutex 適合保護「會睡眠的共享狀態」  
 spinlock 適合保護「不能睡眠的短臨界區」

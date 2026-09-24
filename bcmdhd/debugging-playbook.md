@@ -1,8 +1,4 @@
-
 # Broadcom bcmdhd (DHD) Wi-Fi Driver — Debugging Playbook
-
-
-## 1. 本章定位：為什麼需要 Playbook？
 
 在 bcmdhd（FullMAC）世界中，Wi-Fi 問題常見特徵是：
 
@@ -20,11 +16,9 @@
 - **症狀導向（symptom-driven）**
 - **可實際執行的 Debug 決策流程**
 
----
+## 1. Debug 的第一原則：先選對層級
 
-## 2. Debug 的第一原則：先選對層級
-
-### 2.1 bcmdhd 的五個 Debug 層級
+### 1.1 bcmdhd 的五個 Debug 層級
 ```
 [ L1 ] cfg80211 / userspace
 [ L2 ] Control Path (ioctl / iovar / event)
@@ -39,9 +33,7 @@
 **正確示範**
 - 先用症狀判斷在哪一層，再深入
 
----
-
-## 3. 症狀 → 層級 對照表（快速入口）
+## 2. 症狀 → 層級 對照表（快速入口）
 
 | 症狀 | 優先懷疑層級 |
 |---|---|
@@ -52,11 +44,9 @@
 | cfg80211 state 明顯錯亂 | L2 / L3 |
 | 重開 Wi-Fi 才好 | L5（PM / firmware） |
 
----
+## 3. 標準 Debug 決策流程
 
-## 4. 標準 Debug 決策流程
-
-### Step 1：cfg80211 是否只是「看起來不對」？
+### 3.1 Step 1：cfg80211 是否只是「看起來不對」？
 
 問自己三個問題：
 
@@ -66,9 +56,7 @@
 
 **只看 cfg80211 state 永遠不夠**
 
----
-
-### Step 2：Control Path 是否正常？
+### 3.2 Step 2：Control Path 是否正常？
 
 檢查：
 
@@ -82,9 +70,7 @@
 - `dhd_event_process()`
 - `wl_cfg80211_event()`
 
----
-
-### Step 3：Data Path 是否 forward progress？
+### 3.3 Step 3：Data Path 是否 forward progress？
 
 檢查：
 
@@ -94,9 +80,7 @@
 
 **TX 卡住 ≠ RX 不動，但 RX 卡住 = TX + Control 一起死**
 
----
-
-### Step 4：Bus 是否在「假醒」狀態？
+### 3.4 Step 4：Bus 是否在「假醒」狀態？
 
 - SDIO interrupt 是否真的進來？
 - PCIe ring index 是否前進？
@@ -104,9 +88,7 @@
 
 **Bus 問題常被誤判成 data path bug**
 
----
-
-### Step 5：PM / Firmware 是否不同步？
+### 3.5 Step 5：PM / Firmware 是否不同步？
 
 - firmware 是否還在 sleep？
 - WOWLAN 是否影響行為？
@@ -114,11 +96,9 @@
 
 **「待機後才發生」幾乎必是 PM**
 
----
+## 4. 常見 Debug Case 與正確切入點
 
-## 5. 常見 Debug Case 與正確切入點
-
-### Case 1：已連線、有 IP，但 ping 不通
+### 4.1 Case 1：已連線、有 IP，但 ping 不通
 
 優先順序：
 
@@ -128,9 +108,7 @@
 
 ✗ 不要先看 cfg80211
 
----
-
-### Case 2：Scan 正常 callback，但永遠掃不到 AP
+### 4.2 Case 2：Scan 正常 callback，但永遠掃不到 AP
 
 優先順序：
 
@@ -138,9 +116,7 @@
 2. L2：scan event 是否真的回來
 3. L1：userspace 是否過濾結果
 
----
-
-### Case 3：Resume 後偶發 Wi-Fi 死亡
+### 4.3 Case 3：Resume 後偶發 Wi-Fi 死亡
 
 優先順序：
 
@@ -148,11 +124,9 @@
 2. L4：bus resume 是否完整
 3. L3：flow control 是否 reset
 
----
+## 5. 必備 Debug Instrument
 
-## 6. 必備 Debug Instrument
-
-### 6.1 必 grep 關鍵字（全系列通用）
+### 5.1 必 grep 關鍵字（全系列通用）
 
 - `txoff`
 - `flow`
@@ -163,9 +137,7 @@
 - `resume`
 - `watchdog`
 
----
-
-### 6.2 建議一定要加的 log
+### 5.2 建議一定要加的 log
 
 - 每次 `netif_stop_queue()` / `netif_wake_queue()`
 - firmware reset start / end
@@ -174,13 +146,10 @@
 
 **沒有 timeline 的 log，等於沒有 log**
 
----
-
-## 7. Recovery Debug 的現實認知
+## 6. Recovery Debug 的現實認知
 
 - recovery 本身就是高風險動作
 - recovery 失敗 ≠ recovery 沒做
 - 有些 firmware 卡死 **只能 reboot**
 
 **不要過度神話 watchdog / recovery**
-

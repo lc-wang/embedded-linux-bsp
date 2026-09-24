@@ -1,34 +1,25 @@
-
 # Bluetooth Debugging Playbook
-
-
-## 1. 本章定位
-    
 
 **本章的目標只有一個：**
 
 > 給你一套「不用猜、不用試運氣」  
 > **從症狀 → 層級 → 根因 → 修正方向** 的 Bluetooth 除錯手冊
 
-----------
+## 1. 除錯的最高原則
 
-## 2. 除錯的最高原則
-
-### 原則 1：先排除 BlueZ
+### 1.1 原則 1：先排除 BlueZ
 
 > **90% 的 bring-up 問題不在 BlueZ**
 
-### 原則 2：先驗證 Control Plane，再看 Data Plane
+### 1.2 原則 2：先驗證 Control Plane，再看 Data Plane
 
 > hci0 起不來，資料面不可能正常
 
-### 原則 3：UART 問題優先懷疑 transport
+### 1.3 原則 3：UART 問題優先懷疑 transport
 
 > firmware 很少「真的壞掉」
 
-----------
-
-## 3. 標準除錯工具組
+## 2. 標準除錯工具組
 
 | 工具        | 用途說明                                      |
 |-------------|-----------------------------------------------|
@@ -39,9 +30,7 @@
 | stty        | UART 參數與 baud rate 檢查                    |
 | lsof        | 檢查 tty 裝置是否被多個程序佔用               |
 
-----------
-
-## 4. 除錯總流程
+## 3. 除錯總流程
 ```
 [Step 1] hci0 是否存在？
 [Step 2] hci0 能否 power on？
@@ -50,16 +39,16 @@
 [Step 5] transport 是否穩定？
 [Step 6] 才看 BlueZ / profile
 ```
-----------
 
-## 5. Step 1：hci0 不存在
+## 4. Step 1：hci0 不存在
 
-### 5.1 檢查方式
+### 4.1 檢查方式
 ```
 hciconfig -a
 btmgmt info
 ```
-### 5.2 若 hci0 完全不存在
+
+### 4.2 若 hci0 完全不存在
 
 高機率問題層級：
 
@@ -69,7 +58,6 @@ btmgmt info
     
 -   ✗ DT / ACPI / power / clock 問題
     
-
 優先查看：
 
 -   `drivers/bluetooth/hci_uart.c`
@@ -78,18 +66,16 @@ btmgmt info
     
 -   UART driver probe log
     
+## 5. Step 2：hci0 存在，但 power on 失敗
 
-----------
-
-## 6. Step 2：hci0 存在，但 power on 失敗
-
-### 6.1 驗證方式
+### 5.1 驗證方式
 ```
 systemctl stop bluetooth
 btmon &
 btmgmt power on
 ```
-### 6.2 常見結果與解讀
+
+### 5.2 常見結果與解讀
 
 #### 情況 A：完全沒有 HCI command
 
@@ -97,16 +83,12 @@ btmgmt power on
     
 -   hci_dev state 不正確
     
-
 檢查：
 
 -   `net/bluetooth/mgmt.c`
     
 -   `hci_dev_do_open()`
     
-
-----------
-
 #### 情況 B：有 command，沒有 event
 
 btmon：
@@ -119,10 +101,7 @@ btmon：
     
 -   USB：firmware missing / controller crash
     
-
-----------
-
-## 7. Step 3：HCI command / event 對照判斷表
+## 6. Step 3：HCI command / event 對照判斷表
 
 | btmon 行為                 | 判斷方向                         |
 |----------------------------|----------------------------------|
@@ -131,11 +110,9 @@ btmon：
 | Event 為亂碼               | UART framing / Baud rate 錯誤    |
 | 僅 Reset 成功              | Firmware download 流程卡住       |
 
-----------
+## 7. Step 4：Firmware 相關問題定位
 
-## 8. Step 4：Firmware 相關問題定位
-
-### 8.1 Kernel 路線（btbcm）
+### 7.1 Kernel 路線（btbcm）
 
 檢查：
 
@@ -147,9 +124,7 @@ btmon：
 
 → rootfs 沒放 / 檔名錯
 
-----------
-
-### 8.2 User space 路線（brcm_patchram_plus）
+### 7.2 User space 路線（brcm_patchram_plus）
 
 檢查：
 
@@ -159,12 +134,9 @@ btmon：
     
 -   是否與 kernel driver 搶 tty
     
+## 8. Step 5：UART 專屬除錯流程（H4）
 
-----------
-
-## 9. Step 5：UART 專屬除錯流程（H4）
-
-### 9.1 確認只有一個 UART 使用者
+### 8.1 確認只有一個 UART 使用者
 
 `lsof /dev/ttyS9` 
 
@@ -177,10 +149,7 @@ btmon：
 -   hciattach  
     同時存在 → **必爆**
     
-
-----------
-
-### 9.2 確認 UART 參數
+### 8.2 確認 UART 參數
 
 `stty -F /dev/ttyS9 -a` 
 
@@ -190,10 +159,7 @@ btmon：
     
 -   `crtscts` 是否與硬體一致
     
-
-----------
-
-### 9.3 最小測試法（UART）
+### 8.3 最小測試法（UART）
 ```
 systemctl stop bluetooth
 btmon &
@@ -201,16 +167,14 @@ btmgmt power on
 ```
 **只要 Reset 沒 event = UART 問題**
 
-----------
+## 9. Step 6：USB 專屬除錯流程
 
-## 10. Step 6：USB 專屬除錯流程
-
-### 10. 1 USB enumeration
+### 9.1 USB enumeration
 
 `lsusb
 lsusb -t` 
 
-### 10. 2 btusb log
+### 9.2 btusb log
 
 `dmesg | grep -i btusb` 
 
@@ -222,12 +186,9 @@ USB 問題通常非常明確：
     
 -   device reset loop
     
+## 10. Step 7：確認 Data Plane（scan / connect）
 
-----------
-
-## 11. Step 7：確認 Data Plane（scan / connect）
-
-### 11.1 Control OK ≠ Data OK
+### 10.1 Control OK ≠ Data OK
 
 確認：
 
@@ -237,10 +198,7 @@ USB 問題通常非常明確：
     
 -   find 成功，但 profile 不行 → BlueZ / profile
     
-
-----------
-
-### 11.2 ACL data 是否正常
+### 10.2 ACL data 是否正常
 
 btmon 中是否看到：
 
@@ -252,11 +210,7 @@ btmon 中是否看到：
     
 -   pairing / encryption 問題
     
-
-----------
-
-## 12. 常見「假象」與真相對照表
-
+## 11. 常見「假象」與真相對照表
 
 | 假象                     | 真相說明                     |
 |--------------------------|------------------------------|
@@ -265,9 +219,7 @@ btmon 中是否看到：
 | 偶爾成功                 | Race condition（時序問題）   |
 | USB OK / UART 不 OK      | UART 問題機率 100%           |
 
-----------
-
-## 13. USB 作為「黃金對照組」
+## 12. USB 作為「黃金對照組」
 
 如果同一顆 BT chip：
 
@@ -275,5 +227,4 @@ btmon 中是否看到：
     
 -   UART 異常
     
-
 **請立刻停止懷疑 firmware**

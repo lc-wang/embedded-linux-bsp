@@ -1,8 +1,4 @@
-
 # Broadcom Bluetooth Firmware Bring-up（Kernel 路線）
-
-
-## 1. 本章定位：為什麼 Kernel 路線才是「量產正解」
 
 在前一章我們已經看到：
 
@@ -16,27 +12,22 @@
         
     -   systemd / 開機流程容易 race
         
-
 因此在 **正式 BSP、量產系統、Android / Yocto** 中，  
 **主流做法是讓 kernel 全權負責 firmware bring-up**。
 
 本章將完整拆解 **btbcm** 這條路線。
 
-----------
+## 1. Kernel Broadcom Bluetooth 架構總覽
 
-## 2. Kernel Broadcom Bluetooth 架構總覽
-
-### 2.1 相關 driver 與位置
+### 1.1 相關 driver 與位置
 ```
 drivers/bluetooth/
 ├─ hci_uart.c        # HCI over UART core
 ├─ btusb.c           # HCI over USB
 ├─ btbcm.c           # Broadcom vendor helper
 ```
-### 2.2 分工關係
 
-
-### 2.2 分工關係
+### 1.2 分工關係
 
 | 元件                     | 負責內容                                     |
 |--------------------------|----------------------------------------------|
@@ -45,15 +36,12 @@ drivers/bluetooth/
 | request_firmware         | 從 rootfs 載入 Bluetooth firmware            |
 | HCI core                 | Command / Event 處理與狀態機管理              |
 
-
 **btbcm 不負責 transport**  
 它只在「Controller ready 前」插手一次。
 
-----------
+## 2. btbcm 的角色與設計理念
 
-## 3. btbcm 的角色與設計理念
-
-### 3.1 btbcm 是「Vendor Helper」
+### 2.1 btbcm 是「Vendor Helper」
 
 btbcm 的定位非常關鍵：
 
@@ -69,19 +57,14 @@ btbcm 的定位非常關鍵：
     
 -   **btbcm 被呼叫來完成 firmware download**
     
-
-----------
-
-### 3.2 主要檔案
+### 2.2 主要檔案
 
 `drivers/bluetooth/btbcm.c` 
 
 你之後 trace Broadcom kernel bring-up，  
 **90% 時間都會在這個檔案**
 
-----------
-
-## 4. Kernel 路線的高階 Bring-up 流程
+## 3. Kernel 路線的高階 Bring-up 流程
 
 以下流程以 **UART + serdev + btbcm** 為例：
 ```
@@ -102,12 +85,9 @@ btbcm 的定位非常關鍵：
     
 -   不需要 user space 參與 UART
     
+## 4. btbcm_initialize()：一切的起點
 
-----------
-
-## 5. btbcm_initialize()：一切的起點
-
-### 5.1 呼叫時機
+### 4.1 呼叫時機
 
 btbcm 通常在以下時機被呼叫：
 
@@ -115,17 +95,13 @@ btbcm 通常在以下時機被呼叫：
     
 -   或 setup callback
     
-
 具體取決於：
 
 -   transport driver
     
 -   kernel 版本
     
-
-----------
-
-### 5.2 主要工作內容
+### 4.2 主要工作內容
 
 `btbcm_initialize()` 做的事：
 
@@ -139,12 +115,9 @@ btbcm 通常在以下時機被呼叫：
     
 5.  reset controller
     
+## 5. 判斷 Chip ID 與 Revision
 
-----------
-
-## 6. 判斷 Chip ID 與 Revision
-
-### 6.1 為什麼要先讀 version？
+### 5.1 為什麼要先讀 version？
 
 Broadcom 同一顆型號：
 
@@ -154,17 +127,13 @@ Broadcom 同一顆型號：
     
 -   可能需要不同 firmware
     
-
 因此 btbcm 會先送：
 
 -   HCI Read Local Version
     
 -   Vendor-specific Read Chip ID
     
-
-----------
-
-### 6.2 決定 firmware 名稱
+### 5.2 決定 firmware 名稱
 
 btbcm 內部會根據：
 
@@ -176,7 +145,6 @@ btbcm 內部會根據：
     
 -   有時也考慮 board variant
     
-
 組合出 firmware 檔名，例如：
 ```
 BCM4362A2.hcd
@@ -184,11 +152,9 @@ BCM4345C0.hcd
 ```
 **檔名不對 = 100% 失敗**
 
-----------
+## 6. request_firmware()：最常見踩雷點
 
-## 7. request_firmware()：最常見踩雷點
-
-### 7.1 firmware 載入流程
+### 6.1 firmware 載入流程
 
 Kernel 呼叫：
 
@@ -202,11 +168,7 @@ Kernel 呼叫：
     
 3.  btbcm 初始化中止
     
-
-----------
-
-### 7.2 常見錯誤與症狀
-
+### 6.2 常見錯誤與症狀
 
 | 現象                              | 原因說明                     |
 |-----------------------------------|------------------------------|
@@ -214,14 +176,11 @@ Kernel 呼叫：
 | firmware found but init fail      | firmware 檔案不相容或錯誤    |
 | 無任何 btbcm log                  | driver 未執行（未 probe）    |
 
-
 **Yocto / Android BSP 最常死在這一層**
 
-----------
+## 7. `.hcd` 在 Kernel 中如何被下載
 
-## 8. `.hcd` 在 Kernel 中如何被下載
-
-### 8.1 與 brcm_patchram_plus 的相同點
+### 7.1 與 brcm_patchram_plus 的相同點
 
 -   `.hcd` 仍然是一連串 vendor HCI commands
     
@@ -229,10 +188,7 @@ Kernel 呼叫：
     
 -   仍然需要等 Command Complete
     
-
-----------
-
-### 8.2 Kernel 下載的優勢
+### 7.2 Kernel 下載的優勢
 
 -   UART framing 完全由 kernel 掌控
     
@@ -240,14 +196,11 @@ Kernel 呼叫：
     
 -   transport 設定一致
     
-
 **穩定度遠高於 user space 路線**
 
-----------
+## 8. Reset 與 Firmware 生效語意
 
-## 9. Reset 與 Firmware 生效語意
-
-### 9.1 Reset 是必須的
+### 8.1 Reset 是必須的
 
 Firmware 下載完成後：
 
@@ -255,14 +208,11 @@ Firmware 下載完成後：
     
 -   必須 reset 才會跳到 patched state
     
-
 btbcm 會主動送：
 
 `HCI Reset` 
 
-----------
-
-### 9.2 Reset 後的狀態
+### 8.2 Reset 後的狀態
 
 -   Firmware 已常駐 RAM
     
@@ -270,44 +220,9 @@ btbcm 會主動送：
     
 -   等待 HCI core 繼續初始化
     
+## 9. 為什麼 Kernel 路線更適合 BSP / 量產
 
-----------
-
-## 10. Kernel 路線的常見失敗模式
-
-### 10. 1 firmware 找不到
-
-`Direct firmware load  for BCMxxxx.hcd failed with error  -2` 
-
-→ rootfs / recipe / install path 問題
-
-----------
-
-### 10. 2 firmware 不匹配
-
--   patch download 中途失敗
-    
--   reset 後 controller 無回應
-    
-
-→ firmware 檔名或 revision 不對
-
-----------
-
-### 10. 3 transport 尚未 ready
-
--   UART clock / pinmux / power 尚未開
-    
--   serdev 綁定不完整
-    
-
-→ btbcm 初始化卡在第一個 command
-
-----------
-
-## 11. 為什麼 Kernel 路線更適合 BSP / 量產
-
-### 11.1 穩定性
+### 9.1 穩定性
 
 -   單一控制者（kernel）
     
@@ -315,10 +230,7 @@ btbcm 會主動送：
     
 -   boot 流程可預期
     
-
-----------
-
-### 11.2 可維護性
+### 9.2 可維護性
 
 -   firmware 由 rootfs 管理
     
@@ -326,11 +238,7 @@ btbcm 會主動送：
     
 -   Android / Yocto 官方路線一致
     
-
-----------
-
-## 12. User space vs Kernel 路線總對照
-
+## 10. User space vs Kernel 路線總對照
 
 | 項目             | brcm_patchram_plus | btbcm |
 |------------------|--------------------|-------|
@@ -340,3 +248,26 @@ btbcm 會主動送：
 | Debug 難度       | 高                 | 中 |
 | 量產適合度       | ✗                 | ✓ |
 
+## 11. 常見問題與排查（Kernel 路線的常見失敗模式）
+
+### 11.1 firmware 找不到
+
+`Direct firmware load  for BCMxxxx.hcd failed with error  -2` 
+
+→ rootfs / recipe / install path 問題
+
+### 11.2 firmware 不匹配
+
+-   patch download 中途失敗
+    
+-   reset 後 controller 無回應
+    
+→ firmware 檔名或 revision 不對
+
+### 11.3 transport 尚未 ready
+
+-   UART clock / pinmux / power 尚未開
+    
+-   serdev 綁定不完整
+    
+→ btbcm 初始化卡在第一個 command

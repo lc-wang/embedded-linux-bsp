@@ -1,10 +1,9 @@
-# Kernel trace notes — drm_fence_sync_flow  
+# Kernel trace notes — drm_fence_sync_flow
 
-  
-# Level 1：用人話理解  
-  
+## 1. Level 1：用人話理解
+
 假設：  
-  
+
 ```text  
 GPU 正在畫 framebuffer B
 ```
@@ -21,9 +20,7 @@ display controller 已經準備 scanout
 GPU 到底畫完了沒？
 ```
 
-----------
-
-# fence 是什麼？
+## 2. fence 是什麼？
 
 fence：
 
@@ -31,9 +28,7 @@ fence：
 「工作完成通知」
 ```
 
-----------
-
-## GPU render flow
+### 2.1 GPU render flow
 
 ```
 GPU render start
@@ -45,12 +40,9 @@ GPU render done
 signal fence
 ```
 
-----------
+## 3. Level 2：graphics synchronization
 
-# Level 2：graphics synchronization
-
-
-## 沒 fence 的世界
+### 3.1 沒 fence 的世界
 
 display：
 
@@ -70,9 +62,7 @@ GPU 還沒畫完
 -   artifact
 -   tearing
 
-----------
-
-## 有 fence 的世界
+### 3.2 有 fence 的世界
 
 DRM：
 
@@ -92,9 +82,7 @@ GPU signal done
 才允許 page flip
 ```
 
-----------
-
-# acquire fence 是什麼？
+## 4. acquire fence 是什麼？
 
 ```
 consumer 等 producer 完成
@@ -102,15 +90,13 @@ consumer 等 producer 完成
 
 例如：
 
-
 | producer | consumer |  
 |-----------|------------|  
 | GPU | DRM |  
 | camera | GPU |  
 | decoder | compositor |
-----------
 
-# release fence 是什麼？
+## 5. release fence 是什麼？
 
 ```
 consumer 通知：
@@ -119,11 +105,9 @@ buffer 已經用完
 
 producer 才能安全 reuse buffer。
 
-----------
+## 6. explicit sync vs implicit sync
 
-# explicit sync vs implicit sync
-
-## implicit sync
+### 6.1 implicit sync
 
 kernel：
 
@@ -137,9 +121,7 @@ userspace：
 看不到 fence
 ```
 
-----------
-
-## explicit sync
+### 6.2 explicit sync
 
 userspace：
 
@@ -154,12 +136,9 @@ IN_FENCE_FD
 OUT_FENCE_PTR
 ```
 
-----------
+## 7. Level 3：kernel trace（真正發生什麼）
 
-# Level 3：kernel trace（真正發生什麼）
-
-
-## GPU driver
+### 7.1 GPU driver
 
 GPU render：
 
@@ -175,9 +154,7 @@ submit GPU job
 struct dma_fence
 ```
 
-----------
-
-## signal
+### 7.2 signal
 
 GPU IRQ：
 
@@ -191,9 +168,7 @@ render complete
 dma_fence_signal()
 ```
 
-----------
-
-## userspace
+### 7.3 userspace
 
 GPU driver export：
 
@@ -207,9 +182,7 @@ userspace 拿到：
 fence fd
 ```
 
-----------
-
-## DRM atomic commit
+### 7.4 DRM atomic commit
 
 userspace：
 
@@ -231,9 +204,7 @@ drm_atomic_set_fence_for_plane()
 dma_fence_wait()
 ```
 
-----------
-
-# 真正 page flip timing
+## 8. 真正 page flip timing
 
 ```
 GPU render done
@@ -247,9 +218,7 @@ wait vblank
 page flip
 ```
 
-----------
-
-# Android 世界
+## 9. Android 世界
 
 SurfaceFlinger / HWC：
 
@@ -263,9 +232,7 @@ display
 release fence
 ```
 
-----------
-
-# Wayland 世界
+## 10. Wayland 世界
 
 Wayland compositor：
 
@@ -275,9 +242,7 @@ linux explicit sync protocol
 
 也是 fence fd 傳遞。
 
-----------
-
-# Vulkan 世界
+## 11. Vulkan 世界
 
 Vulkan：
 
@@ -288,9 +253,7 @@ sync fd
 
 最後也可能接到 dma_fence。
 
-----------
-
-# 最重要觀念
+## 12. 最重要觀念
 
 ```
 atomic commit
@@ -300,9 +263,7 @@ atomic commit
 「buffer 內容已經準備好」
 ```
 
-----------
-
-# 最重要一句話
+## 13. 最重要一句話
 
 ```
 fence 的本質：「這塊 memory 現在能安全被使用了嗎？」

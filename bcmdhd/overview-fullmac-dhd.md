@@ -1,7 +1,4 @@
-
 # Broadcom bcmdhd (DHD) Wi-Fi Driver — FullMAC Architecture Overview
-
-## 1. Introduction
 
 `bcmdhd` 是 Broadcom / Cypress Wi-Fi 晶片在 **Android / vendor kernel tree** 中最常見的驅動形式，  
 其核心設計並非 Linux upstream 常見的 `mac80211`（SoftMAC），而是 **FullMAC（Dongle-based）架構**。
@@ -20,11 +17,9 @@
 
 都與 mac80211 driver **完全不同**。
 
----
+## 1. FullMAC vs SoftMAC：關鍵心智模型差異
 
-## 2. FullMAC vs SoftMAC：關鍵心智模型差異
-
-### 2.1 SoftMAC（mac80211）的特徵
+### 1.1 SoftMAC（mac80211）的特徵
 
 | 項目 | SoftMAC |
 |----|----|
@@ -36,9 +31,7 @@
 
 Linux 掌握 **完整無線狀態**
 
----
-
-### 2.2 FullMAC（DHD）的特徵
+### 1.2 FullMAC（DHD）的特徵
 
 | 項目 | FullMAC (bcmdhd) |
 |----|----|
@@ -50,9 +43,7 @@ Linux 掌握 **完整無線狀態**
 
 **Linux 並不知道 Wi-Fi 真正怎麼運作，只是在「下指令 + 收事件」**
 
----
-
-## 3. DHD（Dongle Host Driver）的整體分層
+## 2. DHD（Dongle Host Driver）的整體分層
 ```
 +-----------------------------+
 | cfg80211 |
@@ -85,11 +76,9 @@ v
 +-----------------------------+
 ```
 
----
+## 3. bcmdhd 的三個核心角色
 
-## 4. bcmdhd 的三個核心角色
-
-### 4.1 cfg80211 glue（`wl_cfg80211.c`）
+### 3.1 cfg80211 glue（`wl_cfg80211.c`）
 
 - 實作 `struct cfg80211_ops`
 - 將 Linux 標準操作轉換為 **Broadcom 私有 ioctl / iovar**
@@ -102,9 +91,7 @@ v
 - `set_key`
 - `start_ap`
 
----
-
-### 4.2 DHD Core（`dhd_linux.c`, `dhd_common.c`）
+### 3.2 DHD Core（`dhd_linux.c`, `dhd_common.c`）
 
 - netdevice lifecycle
 - TX/RX data path
@@ -115,9 +102,7 @@ v
 
 **這裡是 driver 的「心臟」**
 
----
-
-### 4.3 Bus Layer（SDIO / PCIe / USB）
+### 3.3 Bus Layer（SDIO / PCIe / USB）
 
 - 與實體硬體強烈耦合
 - 決定效能、穩定性、debug 難度
@@ -128,11 +113,9 @@ v
 | PCIe | DMA ring、msgbuf protocol |
 | USB | bulk transfer、latency 高 |
 
----
+## 4. 核心資料結構（閱讀 code 的鑰匙）
 
-## 5. 核心資料結構（閱讀 code 的鑰匙）
-
-### 5.1 `dhd_pub_t` — DHD 公共核心狀態
+### 4.1 `dhd_pub_t` — DHD 公共核心狀態
 
 ```c
 typedef struct dhd_pub {
@@ -151,8 +134,7 @@ typedef struct dhd_pub {
     
 -   幾乎所有 dhd_* API 都會傳遞它
 
-
-### 5.2 `dhd_info_t` — Linux glue 層
+### 4.2 `dhd_info_t` — Linux glue 層
 ```
 typedef struct dhd_info {
     dhd_pub_t pub;
@@ -170,12 +152,9 @@ typedef struct dhd_info {
     
 -   notifier
     
-
 **`dhd_info_t` = Linux 世界的入口**
 
-----------
-
-### 5.3 `wl_cfg80211_info` — cfg80211 狀態機
+### 4.3 `wl_cfg80211_info` — cfg80211 狀態機
 
 -   scan state
     
@@ -185,12 +164,9 @@ typedef struct dhd_info {
     
 -   mutex / completion
     
+## 5. Control Plane 與 Data Plane 的根本分離
 
-----------
-
-## 6. Control Plane 與 Data Plane 的根本分離
-
-### 6.1 Control Plane（命令 / 事件）
+### 5.1 Control Plane（命令 / 事件）
 
 -   ioctl
     
@@ -198,12 +174,9 @@ typedef struct dhd_info {
     
 -   firmware event
     
-
 **bcmdhd ≠ 邏輯執行者，只是 command transporter**
 
-----------
-
-### 6.2 Data Plane（封包流）
+### 5.2 Data Plane（封包流）
 
 -   TX：Host Dongle
     

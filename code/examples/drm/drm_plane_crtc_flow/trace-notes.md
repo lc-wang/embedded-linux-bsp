@@ -1,6 +1,6 @@
 # Kernel trace notes — drm_plane_crtc_flow
 
-# Level 1：用人話理解
+## 1. Level 1：用人話理解
 
 假設：
 
@@ -13,9 +13,7 @@ framebuffer = 一張圖片
 圖片放在記憶體裡不代表會出現在螢幕
 ```
 
-----------
-
-# plane 是什麼？
+## 2. plane 是什麼？
 
 plane 的工作：
 
@@ -29,9 +27,7 @@ plane 的工作：
 顯示圖層
 ```
 
-----------
-
-# CRTC 是什麼？
+## 3. CRTC 是什麼？
 
 CRTC 的工作：
 
@@ -52,11 +48,9 @@ CRTC 的工作：
 -   eDP
 -   MIPI DSI
 
-----------
+## 4. Level 2：流程理解
 
-# Level 2：流程理解
-
-## atomic commit 在做什麼？
+### 4.1 atomic commit 在做什麼？
 
 atomic commit 本質上是在更新：
 
@@ -66,9 +60,7 @@ crtc state
 connector state
 ```
 
-----------
-
-## 最常見的更新
+### 4.2 最常見的更新
 
 ```
 plane framebuffer 改了
@@ -80,9 +72,7 @@ plane framebuffer 改了
 這個 plane 現在要顯示新的 framebuffer
 ```
 
-----------
-
-# 真正重要的地方
+## 5. 真正重要的地方
 
 driver 最終通常會做：
 
@@ -96,11 +86,9 @@ driver 最終通常會做：
 告訴硬體：從哪塊 memory 開始掃描像素
 ```
 
-----------
+## 6. Level 3：kernel trace
 
-# Level 3：kernel trace
-
-## userspace commit
+### 6.1 userspace commit
 
 ```
 DRM_IOCTL_MODE_ATOMIC
@@ -113,18 +101,14 @@ drm_mode_atomic_ioctl
  └─ drm_atomic_commit
 ```
 
-----------
-
-## helper commit flow
+### 6.2 helper commit flow
 
 ```
 drm_atomic_helper_commit
  └─ drm_atomic_helper_commit_planes
 ```
 
-----------
-
-## 最後到 driver callback
+### 6.3 最後到 driver callback
 
 ```
 pipe->update()
@@ -136,9 +120,7 @@ driver 在這裡：
 -   取得 GEM memory
 -   設定硬體 scanout
 
-----------
-
-# plane vs framebuffer
+## 7. plane vs framebuffer
 
 | 元件 | 本質 |  
 |-------------|----------------|  
@@ -146,9 +128,7 @@ driver 在這裡：
 | plane | 顯示哪張圖 |  
 | CRTC | 真正輸出圖 |
 
-----------
-
-# scanout 是什麼？
+## 8. scanout 是什麼？
 
 scanout：
 
@@ -168,9 +148,7 @@ pixel 2
 
 然後送到 panel。
 
-----------
-
-# 為什麼叫 CRTC？
+## 9. 為什麼叫 CRTC？
 
 歷史名稱：
 
@@ -182,7 +160,7 @@ Cathode Ray Tube Controller
 
 但名稱保留下來。
 
-# 最後收斂
+## 10. 最後收斂
 ```
 memory  
 ↓  
@@ -199,10 +177,10 @@ connector
 display
 ```
 
-# userspace 對照程式  
-  
+## 11. userspace 對照程式
+
 本章新增：  
-  
+
 ```text  
 userspace/modeset_minimal.c
 ```

@@ -1,7 +1,6 @@
+# 第 1 章：mt76 家族與驅動定位
 
-# **第 1 章：mt76 家族與驅動定位**
-
-## 1.1 mt76 是什麼？
+## 1. mt76 是什麼？
 
 mt76 是 MediaTek 開源 Wi-Fi 的 SoftMAC 驅動，主線 Linux **唯一官方支援的 MTK mac80211 Wi-Fi 驅動**。
 
@@ -10,8 +9,7 @@ mt76 是 MediaTek 開源 Wi-Fi 的 SoftMAC 驅動，主線 Linux **唯一官方�
 -   **非 FullMAC**（不像 ath10k、iwlwifi）
 -   **使用 Unified MCU Command 與韌體溝通**
 
-
-### 1.2 支援晶片家族
+## 2. 支援晶片家族
 
 以下整理 mt76 驅動目前支援的晶片家族與其對應規格：
 
@@ -25,8 +23,7 @@ mt76 是 MediaTek 開源 Wi-Fi 的 SoftMAC 驅動，主線 Linux **唯一官方�
 | **mt7996**        | 802.11be (Wi-Fi 7)     | PCIe             | Filogic 880                |
 | **mt7981 / mt7986** | SoC 內建 AX             | SoC (內建 MAC/PHY) | OpenWrt 熱門平台            |
 
-
-## 1.3 SoftMAC 架構定位
+## 3. SoftMAC 架構定位
 
 SoftMAC 驅動的責任清楚：
 
@@ -44,7 +41,9 @@ mac80211 則負責：
 -   Channel switch
 -   AMPDU/AMSDU
 
-## 參考來源
+## 附錄
+
+### A. 參考來源
 
 1.  mt76 Driver — Linux Wireless Documentation: “mediatek — mac80211 wireless driver for MediaTek MT7xxx series…”。[Linux Wireless Documentation](https://wireless.docs.kernel.org/en/latest/en/users/drivers/mediatek.html?utm_source=chatgpt.com)
 2.  mt76 Repository — OpenWrt GitHub: “mac80211 driver for MediaTek MT76x0e, MT76x2e, MT7615, …” [GitHub](https://github.com/openwrt/mt76?utm_source=chatgpt.com)

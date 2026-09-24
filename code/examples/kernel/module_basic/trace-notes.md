@@ -1,12 +1,9 @@
-
 # Kernel trace 筆記 — module_basic
 
 本文件說明當載入 kernel module 時，
 實際進入 Linux kernel 原始碼的路徑位置。
 
----
-
-## Userspace 入口
+## 1. Userspace 入口
 
 執行指令：
 ```
@@ -18,9 +15,7 @@ insmod hello_module.ko
 finit_module(fd, "", 0)
 ```
 
----
-
-## Kernel 入口點
+## 2. Kernel 入口點
 
 定義於：
 ```
@@ -32,9 +27,7 @@ kernel/module/main.c
 SYSCALL_DEFINE3(finit_module)
 ```
 
----
-
-## 主要呼叫流程
+## 3. 主要呼叫流程
 ```
 finit_module()
 └─ load_module()
@@ -48,9 +41,7 @@ finit_module()
 └─ hello_init()
 ```
 
----
-
-## 為什麼所有 driver 都長一樣？
+## 4. 為什麼所有 driver 都長一樣？
 
 因為：
 
@@ -115,5 +106,3 @@ bus match
 probe()
 ```
 不要把 module_init() 當成 probe()。
-
-

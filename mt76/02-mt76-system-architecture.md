@@ -1,7 +1,6 @@
+# 第 2 章：整體系統架構
 
-# **第 2 章：整體系統架構**
-
-## 2.1 全域架構圖
+## 1. 全域架構圖
 
 ```mermaid
 flowchart TB
@@ -20,11 +19,10 @@ end
 
 A --> B --> C --> D --> E --> F --> G
 ```
-----------
 
-## 2.2 最重要的核心資料結構
+## 2. 最重要的核心資料結構
 
-### **2.2.1 struct mt76_dev**
+### 2.1 struct mt76_dev
 
 所有 mt76 裝置的核心物件：
 ```c
@@ -42,7 +40,6 @@ struct mt76_dev {
 };
 ```
 
-
 功能：
 
 -   TX/RX queue 管理
@@ -50,8 +47,7 @@ struct mt76_dev {
 -   DMA ring 狀態
 -   mac80211 結合（hw）
     
-
-### **2.2.2 struct ieee80211_ops**（由 mt76 實作）
+### 2.2 struct ieee80211_ops（由 mt76 實作）
 
 mt76 的核心由以下回調構成：
 ```c
@@ -68,4 +64,3 @@ static  const  struct  ieee80211_ops  mt7915_ops = {
     .sw_scan = mt76_sw_scan,
 };
 ```
-

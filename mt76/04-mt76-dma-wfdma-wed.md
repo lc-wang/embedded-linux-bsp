@@ -1,7 +1,4 @@
-
 # 第 4 章：DMA / WFDMA / WED 架構與 TX/RX 資料流
-
-# 4.1 本章目標
 
 真正的資料傳輸依賴以下核心機制：
 
@@ -15,15 +12,13 @@
     
 -   **queue scheduling**
     
-
 本章會完整解析：
 ```
 skb → mt76 → DMA → WFDMA → WiFi MAC → air  
 air → WiFi MAC → WFDMA → DMA → mt76 → mac80211
 ```
-----------
 
-# 4.2 mt76 Data Plane 架構
+## 1. mt76 Data Plane 架構
 
 mt76 的資料平面設計如下：
 ```
@@ -62,9 +57,8 @@ mt76 RX handler
  ▼  
 mac80211
 ```
-----------
 
-# 4.3 DMA Ring 設計
+## 2. DMA Ring 設計
 
 Wi-Fi driver 幾乎都採用 **ring buffer + descriptor** 架構。
 
@@ -88,9 +82,7 @@ mt76 也不例外。
 | head | Driver 新增 descriptor |  
 | tail | Hardware 已處理 descriptor |
 
-----------
-
-# 4.4 mt76 queue abstraction
+## 3. mt76 queue abstraction
 
 mt76 使用以下資料結構抽象 queue：
 ```
@@ -113,9 +105,8 @@ struct  mt76_queue {
 | head | Driver write pointer |  
 | tail | Device read pointer |  
 | ndesc | Queue size |
-----------
 
-# 4.5 TX 資料流
+## 4. TX 資料流
 
 TX path 起點是：
 ```
@@ -144,9 +135,8 @@ WFDMA TX ring
  ▼  
 Hardware transmission
 ```
-----------
 
-# 4.6 TX Descriptor（TXWI）
+## 5. TX Descriptor（TXWI）
 
 MediaTek TX descriptor 叫做：
 
@@ -172,9 +162,7 @@ TXWI 包含：
 | power| TX power |  
 | flags| Aggregation / retry |
 
-----------
-
-# 4.7 RX Descriptor（RXWI）
+## 6. RX Descriptor（RXWI）
 
 RX descriptor 叫：
 
@@ -199,9 +187,7 @@ RXWI 包含：
 | flags | AMPDU / AMSDU |  
 | antenna| RX chain |
 
-----------
-
-# 4.8 WFDMA（Wireless Front-end DMA）
+## 7. WFDMA（Wireless Front-end DMA）
 
 WFDMA 是 MediaTek Wi-Fi SoC 的 DMA engine。
 
@@ -215,7 +201,6 @@ WFDMA 是 MediaTek Wi-Fi SoC 的 DMA engine。
     
 -   queue scheduling
     
-
 簡化架構：
 ```
 Host memory  
@@ -233,9 +218,8 @@ WFDMA register 通常定義於：
 ```
 drivers/net/wireless/mediatek/mt76/<chip>/regs.h
 ```
-----------
 
-# 4.9 RX path（資料接收）
+## 8. RX path（資料接收）
 
 RX path：
 ```
@@ -266,11 +250,7 @@ driver 主要做：
     
 4.  呼叫 mac80211
     
-
-----------
-
-# 4.10 WED（Wireless Ethernet Dispatcher）
-
+## 9. WED（Wireless Ethernet Dispatcher）
 
 WED 是 **MediaTek SoC networking accelerator hardware**。
 
@@ -284,8 +264,7 @@ WED 主要用於：
     
 -   offload RX reorder
 
-----------
-## 4.10.1 WED 在 SoC 中的位置
+### 9.1 WED 在 SoC 中的位置
 
 MediaTek SoC networking pipeline：
 ```
@@ -305,7 +284,8 @@ MediaTek SoC networking pipeline：
  ▼  
  WiFi MAC
 ```
-## 4.10.2 為什麼需要 WED
+
+### 9.2 為什麼需要 WED
 
 沒有 WED 時：
 ```
@@ -334,9 +314,7 @@ mac80211
     
 -  CPU 成為 throughput bottleneck
     
-----------
-
-## 4.10.3 WED Offload 功能
+### 9.3 WED Offload 功能
 
 WED 可 offload：
 
@@ -349,9 +327,7 @@ WED 可 offload：
 
 其中 **RRO（Reorder Offload）** 是最重要功能之一。
 
-----------
-
-## 4.10.4 RRO（Reorder Offload）
+### 9.4 RRO（Reorder Offload）
 
 802.11 AMPDU packet 常常 out-of-order：
 ```
@@ -368,8 +344,7 @@ RX → WED reorder → mac80211
 ```
 CPU 負擔大幅降低。
 
-----------
-## 4.10.5 Interrupt batching
+### 9.5 Interrupt batching
 
 WED 也會減少 interrupt。
 
@@ -388,9 +363,7 @@ single interrupt
 ```
 這種 **batch completion** 可以降低 interrupt rate。
 
-----------
-
-## 4.10.6 WED 與 mt76 driver 的關係
+### 9.6 WED 與 mt76 driver 的關係
 
 WED driver 位於：
 ```
@@ -402,9 +375,8 @@ register wed device
 setup wed rx rings  
 enable wed offload
 ```
-----------
 
-# 4.11 WED2（Wi-Fi 7）
+## 10. WED2（Wi-Fi 7）
 
 在 **MT7996 / MT7988** 上，WED 進化為 **WED2**。
 
@@ -417,11 +389,7 @@ enable wed offload
 | Higher throughput | 支援 Wi-Fi 7 traffic |  
 | Improved RRO | 更大的 reorder window |
     
-
-----------
-
-
-# 4.12 不同晶片 DMA 架構
+## 11. 不同晶片 DMA 架構
 
 | Chipset | TX ring | RX ring | WED |  
 |--------|----------|----------|------|  
@@ -432,8 +400,7 @@ enable wed offload
 
 mt76 core 對這些差異做了抽象化。
 
-----------
-# 4.13 CPU bottleneck 為什麼仍存在
+## 12. CPU bottleneck 為什麼仍存在
 
 即使使用 DMA：
 
@@ -447,7 +414,6 @@ CPU 仍需處理：
     
 -   protocol processing
     
-
 因此 throughput 常受：
 ```
 packets/sec
@@ -458,9 +424,7 @@ bandwidth
 ```
 限制。
 
-----------
-
-# 4.14 為什麼 mt76 DMA 設計可以長期維護？
+## 13. 為什麼 mt76 DMA 設計可以長期維護？
 
 原因：
 
@@ -482,5 +446,4 @@ mt76_driver_ops
     
 -   新 SoC（Filogic）
     
-
 都可以重用 mt76 core。

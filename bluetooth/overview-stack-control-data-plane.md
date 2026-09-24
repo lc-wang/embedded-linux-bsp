@@ -1,6 +1,4 @@
-
 # Bluetooth Stack 全景總覽
-
 
 ## 1. 為什麼 Bluetooth 一定要「分層」理解？
 
@@ -17,13 +15,10 @@
     
 -   BlueZ 能 power on，卻永遠掃描不到 device
     
-
 這些 **90% 都是「層與層之間的責任邊界沒釐清」**。
 
 所以這一整系列的第一章，只做一件事：  
 **把 Bluetooth 從上到下的「層級模型」釘死**。
-
-----------
 
 ## 2. Bluetooth Stack 的整體分層（Bird’s-eye View）
 ```
@@ -52,7 +47,6 @@
 +--------------------------------------------------+
 
 ```
-----------
 
 ## 3. 關鍵角色與「誰負責什麼」
 
@@ -70,7 +64,6 @@
     
 -   Key / bonding database
     
-
 它**不負責**的事：
 
 -   ✗ UART / USB 傳輸
@@ -79,10 +72,7 @@
     
 -   ✗ baud rate / flow control
     
-
 **BlueZ 從來不直接碰 `/dev/ttyS*` 或 USB endpoint**
-
-----------
 
 ### 3.2 mgmt socket：BlueZ 與 Kernel 的「控制面 API」
 
@@ -105,13 +95,10 @@ mgmt 負責：
     
 -   device state sync
     
-
 關鍵觀念
 
 > **mgmt = control plane（控制面）**  
 > **HCI data = data plane（資料面）**
-
-----------
 
 ### 3.3 Kernel Bluetooth Core（Host stack）
 
@@ -131,13 +118,10 @@ mgmt 負責：
     
 -   `smp.c` → pairing / encryption
     
-
 Kernel 的角色是：
 
 > **把「政策」跟「硬體」隔離**  
 > User space 決定 _要做什麼_，Kernel 決定 _怎麼跟 controller 講話_
-
-----------
 
 ## 4. Transport Layer：USB vs UART 的本質差異
 
@@ -161,10 +145,7 @@ Kernel 的角色是：
         
     -   部分 SoC combo module
         
-
-----------
-
-### 4.2 UART（hci_uart）— **嵌入式最常出問題的地方**
+### 4.2 UART（hci_uart）— 嵌入式最常出問題的地方
 
 -   Driver：`drivers/bluetooth/hci_uart.c`
     
@@ -178,12 +159,9 @@ Kernel 的角色是：
         
     -   極度依賴 baud rate / RTS/CTS
         
-
 關鍵結論
 
 > **UART Bluetooth 的穩定度 = UART 設定正確度**
-
-----------
 
 ## 5. Controller 與 Firmware
 
@@ -196,7 +174,6 @@ Bluetooth controller ≠ dumb device
     
 -   Vendor configuration（NVRAM）
     
-
 ### 5.1 Broadcom / Cypress 類型
 
 -   上電後只有 minimal ROM
@@ -207,16 +184,12 @@ Bluetooth controller ≠ dumb device
         
     -   NVRAM config（晶振 / power / baud / BD_ADDR）
         
-
 這就是為什麼會有：
 
 -   `brcm_patchram_plus`（user space）
     
 -   `btbcm`（kernel space）
     
-
-----------
-
 ## 6. 兩條「面」一定要分清楚
 
 ### 6.1 Control Plane（控制面）
@@ -231,7 +204,6 @@ Bluetooth controller ≠ dumb device
     
 -   set parameters
     
-
 路徑：
 ```
 App
@@ -240,7 +212,6 @@ App
  → kernel HCI
        → controller
 ```
-----------
 
 ### 6.2 Data Plane（資料面）
 
@@ -250,7 +221,6 @@ App
     
 -   SCO data（語音）
     
-
 路徑：
 ```
 Profile / Socket
@@ -260,8 +230,6 @@ Profile / Socket
        → controller
 ```
 **debug 時一定要先判斷你卡在哪一條 plane**
-
-----------
 
 ## 7. 一個「正確的 debug 心智模型」
 

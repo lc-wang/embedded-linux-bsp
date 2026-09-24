@@ -1,8 +1,4 @@
-
 # Bluetooth Transport 架構對照
-
-
-## 1. 本章定位：為什麼「換成 USB 就好了」其實是工程決策問題
 
 在實務討論 Bluetooth bring-up 時，常會聽到一句話：
 
@@ -14,15 +10,12 @@
     
 -   ✗ 但它不是「免費解法」，而是 **系統架構選擇**
     
-
 本章會從 **kernel / transport / firmware / debug** 四個角度，  
 系統性對照 **btusb vs hci_uart**，讓你在 BSP / board 設計階段就做對決策。
 
-----------
+## 1. Transport 的本質差異
 
-## 2. Transport 的本質差異
-
-### 2.1 USB：封包導向（Packet-oriented）
+### 1.1 USB：封包導向（Packet-oriented）
 
 USB 的特性：
 
@@ -34,12 +27,9 @@ USB 的特性：
     
 -   Host controller 管理 flow control
     
-
 Bluetooth over USB 幾乎不需要關心 framing
 
-----------
-
-### 2.2 UART：純 byte stream（Stream-oriented）
+### 1.2 UART：純 byte stream（Stream-oriented）
 
 UART 的特性：
 
@@ -51,14 +41,11 @@ UART 的特性：
     
 -   所有 framing / flow control 由軟體處理
     
-
 Bluetooth over UART **任何 byte 錯誤都會擴散成災難**
 
-----------
+## 2. Kernel Driver 架構對照
 
-## 3. Kernel Driver 架構對照
-
-### 3.1 USB Bluetooth（btusb）
+### 2.1 USB Bluetooth（btusb）
 
 主要檔案：
 
@@ -72,7 +59,6 @@ Bluetooth over UART **任何 byte 錯誤都會擴散成災難**
     
 -   HCI command/event 封裝在 USB URB 中
     
-
 資料流（簡化）：
 ```
 HCI core
@@ -83,9 +69,8 @@ USB core
   ↕
 USB Host Controller
 ```
-----------
 
-### 3.2 UART Bluetooth（hci_uart）
+### 2.2 UART Bluetooth（hci_uart）
 
 主要檔案：
 ```
@@ -100,7 +85,6 @@ drivers/bluetooth/hci_ldisc.c
     
 -   transport 與 power / clock 強烈耦合
     
-
 資料流（簡化）：
 ```
 HCI core
@@ -110,11 +94,10 @@ hci_uart
   ↕
 UART controller
 ```
-----------
 
-## 4. Firmware Bring-up 的差異
+## 3. Firmware Bring-up 的差異
 
-### 4.1 USB Bluetooth 的 firmware 世界
+### 3.1 USB Bluetooth 的 firmware 世界
 
 -   多數 USB BT controller：
     
@@ -128,14 +111,11 @@ UART controller
         
     -   但 transport 穩定度高
         
-
 常見感受：
 
 > 「USB BT 幾乎不會卡在 firmware 階段」
 
-----------
-
-### 4.2 UART Bluetooth 的 firmware 世界
+### 3.2 UART Bluetooth 的 firmware 世界
 
 -   幾乎一定需要：
     
@@ -152,16 +132,13 @@ UART controller
     -   framing  
         極度敏感
         
-
 常見感受：
 
 > 「同一套 firmware，在 USB 好好的，在 UART 就炸」
 
-----------
+## 4. 穩定度比較
 
-## 5. 穩定度比較
-
-### 5.1 為什麼 USB 穩定？
+### 4.1 為什麼 USB 穩定？
 
 -   framing 由硬體處理
     
@@ -171,12 +148,9 @@ UART controller
     
 -   不受系統 load 影響
     
-
 **USB BT 的穩定度幾乎與 CPU load 無關**
 
-----------
-
-### 5.2 為什麼 UART 不穩？
+### 4.2 為什麼 UART 不穩？
 
 -   framing 全靠軟體
     
@@ -186,14 +160,11 @@ UART controller
     
 -   系統 load / interrupt latency 會影響接收
     
-
 **UART BT 對「系統品質」非常敏感**
 
-----------
+## 5. Debug 成本差異
 
-## 6. Debug 成本差異
-
-### 6.1 USB Bluetooth Debug 成本
+### 5.1 USB Bluetooth Debug 成本
 
 常見 debug 路徑：
 
@@ -203,7 +174,6 @@ UART controller
     
 -   `btmon`
     
-
 問題分類清楚：
 
 -   USB enumeration 問題
@@ -212,12 +182,9 @@ UART controller
     
 -   HCI protocol 問題
     
-
 **問題通常集中在一層**
 
-----------
-
-### 6.2 UART Bluetooth Debug 成本
+### 5.2 UART Bluetooth Debug 成本
 
 常見 debug 路徑：
 
@@ -229,7 +196,6 @@ UART controller
     
 -   scope / logic analyzer
     
-
 問題交錯：
 
 -   UART driver
@@ -242,14 +208,11 @@ UART controller
     
 -   kernel race
     
-
 **debug 成本是 USB 的數倍**
 
-----------
+## 6. 系統設計選型建議
 
-## 7. 系統設計選型建議
-
-### 7.1 什麼情境適合 USB Bluetooth
+### 6.1 什麼情境適合 USB Bluetooth
 
 -   有 USB host controller
     
@@ -259,12 +222,9 @@ UART controller
     
 -   量產 / 商用產品
     
-
 **首選 USB**
 
-----------
-
-### 7.2 什麼情境不得不用 UART Bluetooth
+### 6.2 什麼情境不得不用 UART Bluetooth
 
 -   SoC 無多餘 USB
     
@@ -274,12 +234,9 @@ UART controller
     
 -   BOM 極度受限
     
-
 **選 UART 但要付出整合成本**
 
-----------
-
-## 8. 快速判斷問題層級的「分流技巧」
+## 7. 快速判斷問題層級的「分流技巧」
 
 當你同時有 USB 與 UART 版本的 module：
 
@@ -293,12 +250,9 @@ UART controller
     
     -   100% 不是 firmware bug
         
-
 **USB 是非常好的「對照組」**
 
-----------
-
-## 9. Android / Yocto 實務觀察
+## 8. Android / Yocto 實務觀察
 
 -   Android reference design：
     
@@ -310,7 +264,6 @@ UART controller
         
     -   但 kernel 路線（btbcm + serdev）成為主流
         
-
 趨勢總結：
 
 > 「UART BT 不會消失，但門檻越來越高」

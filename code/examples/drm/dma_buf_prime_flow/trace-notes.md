@@ -1,7 +1,8 @@
-
 # Kernel trace notes — dma_buf_prime_flow
 
-# Level 1：用人話理解假設：
+## 1. Level 1：用人話理解
+
+假設：
 ```text
 GPU 畫好一張圖
 ```
@@ -18,9 +19,7 @@ DRM 再 copy 一份
 
 非常慢。
 
-----------
-
-## dma-buf 的世界
+### 1.1 dma-buf 的世界
 
 真正做法：
 
@@ -28,9 +27,7 @@ DRM 再 copy 一份
 同一塊 memory大家一起用
 ```
 
-----------
-
-# dma-buf fd 是什麼？
+## 2. dma-buf fd 是什麼？
 
 dma-buf 可以：
 
@@ -43,12 +40,9 @@ dma-buf 可以：
 -   userspace 能傳遞
 -   不同 driver 能 import/export
 
-----------
+## 3. Level 2：流程理解
 
-# Level 2：流程理解
-
-
-## 1. GPU driver export memory
+### 3.1 GPU driver export memory
 
 GPU driver：
 
@@ -66,9 +60,7 @@ userspace 拿到：
 dma-buf fd
 ```
 
-----------
-
-## 2. compositor 傳遞 fd
+### 3.2 compositor 傳遞 fd
 
 Wayland / SurfaceFlinger：
 
@@ -80,9 +72,7 @@ Wayland / SurfaceFlinger：
 
 傳給 DRM。
 
-----------
-
-## 3. DRM driver import
+### 3.3 DRM driver import
 
 DRM：
 
@@ -108,9 +98,7 @@ drm_gem_prime_import()
 還是同一塊 physical memory
 ```
 
-----------
-
-# 最重要觀念
+## 4. 最重要觀念
 
 ```
 import 不等於 copy
@@ -122,9 +110,7 @@ import 不等於 copy
 建立新的 reference
 ```
 
-----------
-
-# scanout flow
+## 5. scanout flow
 
 最後：
 
@@ -138,12 +124,9 @@ imported GEM memory
 CRTC scanout
 ```
 
-----------
+## 6. Level 3：kernel trace
 
-# Level 3：kernel trace
-
-
-## export
+### 6.1 export
 
 GPU driver：
 
@@ -165,9 +148,7 @@ dma_buf_export()
 struct dma_buf
 ```
 
-----------
-
-## userspace
+### 6.2 userspace
 
 拿到：
 
@@ -175,9 +156,7 @@ struct dma_buf
 dma-buf fd
 ```
 
-----------
-
-## import
+### 6.3 import
 
 DRM driver：
 
@@ -205,9 +184,7 @@ dma_buf_map_attachment()
 scatter-gather table
 ```
 
-----------
-
-# 為什麼會有 sg_table？
+## 7. 為什麼會有 sg_table？
 
 因為：
 
@@ -221,9 +198,7 @@ memory 不一定 physical contiguous
 dma-buf 用 sg_table 描述 memory layout
 ```
 
-----------
-
-# 真實 subsystem sharing
+## 8. 真實 subsystem sharing
 
 | Producer | Consumer |  
 |---------------------|-------------------|  
@@ -232,9 +207,7 @@ dma-buf 用 sg_table 描述 memory layout
 | Video decoder | DRM |  
 | Wayland compositor | Display |
 
-----------
-
-# Android 世界
+## 9. Android 世界
 
 Android gralloc：
 
@@ -248,16 +221,14 @@ SurfaceFlinger
 HWC / DRM
 ```
 
-# userspace 對照程式
+## 10. userspace 對照程式
 ```text
 userspace/prime_fd_notes.c
 ```
 
 這不是完整可跑的顯示程式，而是用 code 表示 PRIME / dma-buf fd 的核心流程。
 
-----------
-
-## dma-buf fd 從哪裡來？
+### 10.1 dma-buf fd 從哪裡來？
 
 dma-buf fd 一定要由 producer export 出來。
 
@@ -270,9 +241,7 @@ dma-buf fd 一定要由 producer export 出來。
 
 所以不能隨便 open 一個普通檔案來假裝 dma-buf。
 
-----------
-
-## userspace PRIME import flow
+### 10.2 userspace PRIME import flow
 
 ```
 external dma-buf fd
@@ -290,8 +259,7 @@ atomic commit
 plane scanout
 ```
 
-## fd vs GEM handle
-
+### 10.3 fd vs GEM handle
 
 | 名稱 | 意義 |  
 |-----------------|------|  
@@ -299,8 +267,7 @@ plane scanout
 | GEM handle | 單一 DRM device 內部使用的 memory reference |  
 | framebuffer id | DRM display pipeline 使用的顯示物件 |
 
-
-## 最重要觀念
+### 10.4 最重要觀念
 
 ```
 drmPrimeFDToHandle()
@@ -311,9 +278,7 @@ drmPrimeFDToHandle()
 import 成目前 DRM device 可使用的 GEM handle
 ```
 
-----------
-
-## 完整心智模型
+### 10.5 完整心智模型
 
 ```
 producer memory

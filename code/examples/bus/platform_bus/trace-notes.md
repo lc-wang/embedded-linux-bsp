@@ -1,9 +1,6 @@
-
 # Kernel trace notes — platform_bus
 
----
-
-## Device Tree 是什麼時候變成 device 的？
+## 1. Device Tree 是什麼時候變成 device 的？
 
 在 kernel boot 時：
 ```
@@ -13,9 +10,7 @@ start_kernel()
 └─ of_platform_populate()
 ```
 
----
-
-## DTS → platform_device
+## 2. DTS → platform_device
 ```
 of_platform_populate()
 └─ of_platform_device_create()
@@ -28,9 +23,7 @@ of_platform_populate()
 - struct device 已存在
 - 但 driver 尚未匹配
 
----
-
-## driver 註冊流程
+## 3. driver 註冊流程
 ```
 platform_driver_register()
 └─ driver_register()
@@ -39,9 +32,7 @@ platform_driver_register()
 └─ platform_bus.match()
 ```
 
----
-
-## match() 做什麼？
+## 4. match() 做什麼？
 ```
 platform_bus.match()
 ```
@@ -52,9 +43,7 @@ platform_bus.match()
 2. platform_device_id
 3. name
 
----
-
-## probe() 什麼時候會被呼叫？
+## 5. probe() 什麼時候會被呼叫？
 
 只有在：
 ```
@@ -70,9 +59,7 @@ match() 成功
 driver.probe()
 ```
 
----
-
-## 關鍵心智模型
+## 6. 關鍵心智模型
 ```
 DTS
 ↓
@@ -85,9 +72,7 @@ match
 probe()
 ```
 
----
-
-## 常見誤解
+## 7. 常見問題與排查（常見誤解）
 
 ✗ DTS 直接呼叫 probe  
 ✗ module_init() = probe  
@@ -97,4 +82,3 @@ probe()
 module_init() → driver_register()
 probe() → device + driver matched
 ```
-

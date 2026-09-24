@@ -1,9 +1,6 @@
-
 # Kernel trace notes — kmalloc_vs_vmalloc
 
----
-
-## kmalloc() 走哪裡？
+## 1. kmalloc() 走哪裡？
 ```
 kmalloc()
 	└─ slab allocator
@@ -14,9 +11,7 @@ kmalloc()
 - 實體連續
 - 可能失敗（高階 order）
 
----
-
-## vmalloc() 走哪裡？
+## 2. vmalloc() 走哪裡？
 ```
 vmalloc()
 	└─ vmap()
@@ -27,24 +22,18 @@ vmalloc()
 - page table 組合
 - 不適合 DMA
 
----
-
-## 為什麼 vmalloc 不能 DMA？
+## 3. 為什麼 vmalloc 不能 DMA？
 
 因為：
 
 DMA 需要實體連續位址
-
 
 而 vmalloc：
 
 virt addr 連續
 phys addr 不連續
 
-
----
-
-## 常見 driver 實例
+## 4. 常見 driver 實例
 
 | Driver | 使用 |
 |------|------|
@@ -53,13 +42,10 @@ phys addr 不連續
 | camera buffer | CMA |
 | debug buffer | vmalloc |
 
----
-
-## Context 限制
+## 5. Context 限制
 
 GFP_KERNEL → 可以睡眠
 GFP_ATOMIC → 不能睡眠
-
 
 在以下情境 **不能用 GFP_KERNEL**：
 
@@ -67,14 +53,10 @@ GFP_ATOMIC → 不能睡眠
 - spinlock 區段
 - atomic context
 
----
-
-## 心智模型
+## 6. 心智模型
 
 kmalloc
 = 小、快、可 DMA
 
 vmalloc
 = 大、慢、不可 DMA
-
-

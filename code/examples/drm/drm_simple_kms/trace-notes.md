@@ -1,10 +1,9 @@
-
 # Kernel trace notes — drm_simple_kms
-  
-# Level 1：用人話理解  
-  
+
+## 1. Level 1：用人話理解
+
 DRM driver 做的事情其實很單純：  
-  
+
 ```text  
 有人給我一張圖  
 ↓  
@@ -25,11 +24,9 @@ connector
 display
 ```
 
-----------
+## 2. Level 2：流程理解
 
-# Level 2：流程理解
-
-## 1. driver probe
+### 2.1 driver probe
 
 ```
 platform_driver probe
@@ -45,9 +42,7 @@ drm_dev_register()
 
 這一步做完後，DRM 裝置才真正出現在系統裡。
 
-----------
-
-## 2. userspace 建 framebuffer
+### 2.2 userspace 建 framebuffer
 
 userspace 可能透過：
 
@@ -59,9 +54,7 @@ DRM ioctl（dumb buffer / AddFB2 / atomic commit）
 
 建立一張 framebuffer。
 
-----------
-
-## 3. atomic commit
+### 2.3 atomic commit
 
 當顯示內容要更新時：
 
@@ -81,9 +74,7 @@ driver callback
 -   `update`
 -   `disable`
 
-----------
-
-## 4. 真正更新畫面的位置
+### 2.4 真正更新畫面的位置
 
 這一章最重要的觀念：
 
@@ -99,11 +90,9 @@ framebuffer 已經準備好了
 現在要把它送進實際顯示硬體
 ```
 
-----------
+## 3. Level 3：kernel trace
 
-# Level 3：kernel trace
-
-## probe 路徑
+### 3.1 probe 路徑
 
 ```
 platform probe
@@ -116,9 +105,8 @@ platform probe
      ├─ drm_dev_register()
      └─ drm_fbdev_generic_setup()
 ```
-----------
 
-## 顯示更新路徑
+### 3.2 顯示更新路徑
 
 ```
 drm_mode_atomic_ioctl
@@ -128,27 +116,21 @@ drm_mode_atomic_ioctl
              └─ pipe->update()
 ```
 
-----------
-
-## 如果第一次開啟顯示
+### 3.3 如果第一次開啟顯示
 
 ```
 atomic commit
  └─ pipe->enable()
 ```
 
-----------
-
-## 如果關閉輸出
+### 3.4 如果關閉輸出
 
 ```
 atomic commit
  └─ pipe->disable()
 ```
 
-----------
-
-# framebuffer / plane / CRTC / connector 的關係
+## 4. framebuffer / plane / CRTC / connector 的關係
 
 | 元件 | 直覺理解 |  
 |-------------|--------------------|  
@@ -161,9 +143,7 @@ atomic commit
 這些關係被打包得比較簡單，  
 適合先建立基本心智模型。
 
-----------
-
-# 為什麼 simple display pipe 很常見？
+## 5. 為什麼 simple display pipe 很常見？
 
 因為很多小型顯示裝置其實不需要：
 

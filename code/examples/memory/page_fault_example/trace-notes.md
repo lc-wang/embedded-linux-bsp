@@ -1,23 +1,21 @@
+# Kernel trace notes — page_fault_example
 
-# Kernel trace notes — page_fault_example  
+## 1. Level 1
 
-  
-# Level 1
-  
 你在 userspace 做這件事：  
 ```
 p[0] = 'A';
 ```
-  
+
 但這塊 memory：  
-  
+
 **其實還沒有真的存在**  
-  
+
 所以 CPU 會觸發：  
 ```
 page fault
 ```
-  
+
 接著 kernel 會：  
 ```
 1.  發現這塊 memory 還沒準備好
@@ -26,10 +24,8 @@ page fault
 4.  kernel 幫你建立 mapping
   ```
 之後再存取，就不會再 fault。  
-  
----  
-  
-# Level 2
+
+## 2. Level 2
 ```
 userspace 存取 memory  
 ↓  
@@ -43,24 +39,18 @@ driver 提供一個 page
 ↓  
 mapping 建立完成
 ```
-  
----  
-  
-## 這一章做的事  
-  
+
+### 2.1 這一章做的事
+
 在 `.mmap()`：  
 
 vma->vm_ops = &my_vm_ops;
 
-  
 在 `.fault()`：  
 
 alloc_page → 回傳給 kernel
 
-  
----  
-  
-# Level 3
+## 3. Level 3
 ```
 do_page_fault()  
 └─ handle_mm_fault()  
@@ -70,11 +60,9 @@ do_page_fault()
 └─ vma->vm_ops->fault()  
 └─ my_fault()
 ```
-  
----  
-  
-# fault handler 在做什麼？  
-  
+
+## 4. fault handler 在做什麼？
+
 ```
 get_page(page);  
 vmf->page = page;
@@ -84,13 +72,10 @@ vmf->page = page;
 告訴 kernel：  
 「這一頁給你，用這個 page」
 
-----------
+## 5. 與 mmap 的差別
 
-# 與 mmap 的差別
+### 5.1 mmap vs page fault
 
-
-### mmap vs page fault
-  
 | 項目 | mmap | page fault|  
 |-------------|------------------|----------------------|  
 | mapping | 一開始就做完 | 用到才做 |  
@@ -98,32 +83,26 @@ vmf->page = page;
 | 行為 | 靜態 | 動態 |  
 | 真實 driver | 少 | 非常多 |
 
-----------
-
-# 最重要結論
+## 6. 最重要結論
 
 mmap ≠ 拿到記憶體  
 page fault = 真正拿到 page
 
-----------
+## 7. 常見問題與排查（Debug 建議）
 
-# Debug 建議
-
-### 看 fault 觸發
+### 7.1 看 fault 觸發
 ```
 pr_info("myfault: page fault triggered\n");
 ```
-### userspace
+### 7.2 userspace
 
 第一次 access → 一定會看到 log  
 第二次 access → 不會再觸發
 
-----------
-
-# 心智模型
+## 8. 心智模型
 
 memory mapping  
 只是「承諾」  
-  
+
 page fault  
 才是「兌現」

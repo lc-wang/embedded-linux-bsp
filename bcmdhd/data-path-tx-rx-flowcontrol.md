@@ -1,8 +1,4 @@
-
 # Broadcom bcmdhd (DHD) Wi-Fi Driver — Data Path: TX, RX, and Flow Control
-
-
-## 1. 本章定位
 
 在 bcmdhd（DHD）架構中：
 
@@ -18,11 +14,9 @@
 
 **這些 9 成都與 data path / flow control 有關**
 
----
+## 1. Data Path 的設計哲學（FullMAC 視角）
 
-## 2. Data Path 的設計哲學（FullMAC 視角）
-
-### 2.1 Linux 不是 MAC owner
+### 1.1 Linux 不是 MAC owner
 
 在 bcmdhd 中：
 
@@ -36,9 +30,7 @@ Linux driver 只做三件事：
 2. **依 firmware 回報進行 flow control**
 3. **把封包送進 bus layer**
 
----
-
-### 2.2 TX / RX 與 control path 的關係
+### 1.2 TX / RX 與 control path 的關係
 
 ```
        ┌──────────┐
@@ -57,11 +49,9 @@ Linux driver 只做三件事：
 
 **Event 與 data packet 共用 RX 通道**
 
----
+## 2. TX Path（Host → Dongle）
 
-## 3. TX Path（Host → Dongle）
-
-### 3.1 TX Path 高層流程
+### 2.1 TX Path 高層流程
 ```
 netdev TX
  └─ ndo_start_xmit()
@@ -72,9 +62,8 @@ netdev TX
          └─ dhd_bus_txdata()
              └─ SDIO / PCIe
 ```
----
 
-### 3.2 `dhd_start_xmit()`：TX 的第一關
+### 2.2 `dhd_start_xmit()`：TX 的第一關
 
 位置：
 - `dhd_linux.c`
@@ -99,7 +88,7 @@ netdev_tx_t dhd_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 }
 ```
 
-### 3.3 BDC Header（Broadcom Data Channel）
+### 2.3 BDC Header（Broadcom Data Channel）
 
 在送到 dongle 前，bcmdhd 會在 skb 前面加上 **BDC header**：
 
@@ -111,14 +100,11 @@ netdev_tx_t dhd_start_xmit(struct sk_buff *skb, struct net_device *ndev)
     
 -   flags
     
-
 **BDC 是 firmware 判斷封包用途的唯一依據**
 
-----------
+## 3. RX Path（Dongle → Host）
 
-## 4. RX Path（Dongle → Host）
-
-### 4.1 RX Path 高層流程
+### 3.1 RX Path 高層流程
 ```
 bus interrupt / poll
   └─ dhd_bus_rxdata()
@@ -127,15 +113,13 @@ bus interrupt / poll
           ├─ 判斷 data vs event ├─ data → netif_receive_skb()
           └─ event → dhd_event_process()
 ```
-----------
 
-### 4.2 `dhd_rx_frame()`：RX 分流點
+### 3.2 `dhd_rx_frame()`：RX 分流點
 
 位置：
 
 -   `dhd_linux.c`
     
-
 責任：
 
 -   拆 BDC header
@@ -148,12 +132,9 @@ bus interrupt / poll
         
     -   control/event path
         
-
 **Event packet 是「偽裝成 data packet」回來的**
 
-----------
-
-### 4.3 RX 與 NAPI（依 tree / platform）
+### 3.3 RX 與 NAPI（依 tree / platform）
 
 部分 tree 會使用：
 
@@ -161,16 +142,13 @@ bus interrupt / poll
     
 -   或 NAPI polling
     
-
 但不論哪種：
 
 **RX backlog 卡住 = event 也會卡住**
 
-----------
+## 4. Flow Control
 
-## 5. Flow Control
-
-### 5.1 為什麼一定要 flow control？
+### 4.1 為什麼一定要 flow control？
 
 -   dongle firmware 有有限 buffer
     
@@ -178,12 +156,9 @@ bus interrupt / poll
     
 -   結果不是 drop，就是 firmware hang
     
-
 **flow control = firmware 生存機制**
 
-----------
-
-### 5.2 Flow Control 的基本模型
+### 4.2 Flow Control 的基本模型
 ```
 Host TX queue
    │
@@ -193,9 +168,8 @@ Host TX queue
    ├─ OK    → send skb
    └─ BLOCK → stop netdev queue
 ```
-----------
 
-### 5.3 Flow Control 的資訊來源
+### 4.3 Flow Control 的資訊來源
 
 Firmware 會透過：
 
@@ -205,33 +179,25 @@ Firmware 會透過：
     
 -   ring status
     
-
 通知 host：
 
 -   哪些 flow / ring 可以繼續送
     
+## 5. Flow Ring / Credit 機制
 
-----------
-
-## 6. Flow Ring / Credit 機制
-
-### 6.1 Flow ring 概念（PCIe 常見）
+### 5.1 Flow ring 概念（PCIe 常見）
 
 -   每個 destination / priority 對應一個 flow ring
     
 -   firmware 回收 ring entry 才代表「可以再送」
     
-
 位置（依 tree）：
 
 -   `dhd_flowring.c`
     
 -   `dhd_msgbuf.c`
     
-
-----------
-
-### 6.2 Flow control 與 netdev queue
+### 5.2 Flow control 與 netdev queue
 ```
 netif_stop_queue(ndev);
 netif_wake_queue(ndev);
@@ -241,12 +207,9 @@ netif_wake_queue(ndev);
 -   netdev queue stopped，但永遠沒 wake  
     credit 沒回來 or event RX 卡死
     
+## 6. SDIO vs PCIe：Data Path 差異
 
-----------
-
-## 7. SDIO vs PCIe：Data Path 差異
-
-### 7.1 SDIO Data Path 特性
+### 6.1 SDIO Data Path 特性
 
 -   transaction-based
     
@@ -254,7 +217,6 @@ netif_wake_queue(ndev);
     
 -   latency 高、頻繁 wake/sleep
     
-
 常見問題：
 
 -   aggregation overflow
@@ -263,10 +225,7 @@ netif_wake_queue(ndev);
     
 -   resume 後第一包送不出去
     
-
-----------
-
-### 7.2 PCIe Data Path 特性
+### 6.2 PCIe Data Path 特性
 
 -   DMA ring buffer
     
@@ -274,7 +233,6 @@ netif_wake_queue(ndev);
     
 -   高效能，但狀態同步複雜
     
-
 常見問題：
 
 -   ring 不前進
@@ -283,12 +241,11 @@ netif_wake_queue(ndev);
     
 -   DMA mapping mismatch
     
+## 7. 常見問題與排查
 
-----------
+### 7.1 Data Path 常見故障模式
 
-## 8. Data Path 常見故障模式
-
-### 8.1 已連線，但完全沒流量
+#### 已連線，但完全沒流量
 
 檢查點：
 
@@ -298,10 +255,7 @@ netif_wake_queue(ndev);
     
 -   flow ring credit 是否歸零
     
-
-----------
-
-### 8.2 TX 偶發卡死
+#### TX 偶發卡死
 
 可能原因：
 
@@ -311,10 +265,7 @@ netif_wake_queue(ndev);
     
 -   resume 後 flow state 未重設
     
-
-----------
-
-### 8.3 RX 正常、TX 不動（AP mode 常見）
+#### RX 正常、TX 不動（AP mode 常見）
 
 -   AP TX flow ring 被 block
     
@@ -322,12 +273,9 @@ netif_wake_queue(ndev);
     
 -   firmware AP buffer 用盡
     
+### 7.2 Debug Data Path 的實用技巧
 
-----------
-
-## 9. Debug Data Path 的實用技巧
-
-### 9.1 必 grep 的關鍵字
+#### 必 grep 的關鍵字
 
 -   `txoff`
     
@@ -339,10 +287,7 @@ netif_wake_queue(ndev);
     
 -   `netif_wake_queue`
     
-
-----------
-
-### 9.2 問題定位思維
+#### 問題定位思維
 
 > 「是 **driver 不送**，還是 **firmware 不收**？」
 

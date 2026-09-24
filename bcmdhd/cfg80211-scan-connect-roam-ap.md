@@ -1,8 +1,4 @@
-
 # Broadcom bcmdhd (DHD) Wi-Fi Driver — cfg80211 Operations: Scan, Connect, Roam, and AP Mode
----
-
-## 1. 本章定位
 
 在 Linux 無線架構中，**cfg80211 是使用者空間與 driver 的唯一正式介面**。  
 但在 bcmdhd（FullMAC）架構下：
@@ -15,11 +11,9 @@
 - scan / connect / roam / AP mode 的完整 call flow
 - 哪些 cfg80211 行為「看起來有效，其實只是被動回報」
 
----
+## 1. cfg80211 在 FullMAC 架構中的真實地位
 
-## 2. cfg80211 在 FullMAC 架構中的真實地位
-
-### 2.1 cfg80211 的原始設計假設（SoftMAC）
+### 1.1 cfg80211 的原始設計假設（SoftMAC）
 
 cfg80211 假設：
 
@@ -27,9 +21,7 @@ cfg80211 假設：
 - driver 能決定 scan / assoc / roam
 - cfg80211 是「控制介面」
 
----
-
-### 2.2 bcmdhd 對 cfg80211 的實際使用方式
+### 1.2 bcmdhd 對 cfg80211 的實際使用方式
 
 在 bcmdhd 中：
 
@@ -43,10 +35,9 @@ cfg80211 假設：
 
 **cfg80211 只負責「請求」與「回報」，不負責「決策」**
 
----
-## 3. Scan 流程
+## 2. Scan 流程
 
-### 3.1 Scan 的完整 call flow
+### 2.1 Scan 的完整 call flow
 
 ```
 cfg80211_ops->scan
@@ -57,7 +48,7 @@ cfg80211_ops->scan
                  └─ firmware scan engine
 ```
 
-### 3.2 Scan result 如何回到 Linux
+### 2.2 Scan result 如何回到 Linux
 
 -   firmware 掃描到 BSS
     
@@ -65,31 +56,24 @@ cfg80211_ops->scan
     
 -   driver 呼叫：
     
-
 `cfg80211_inform_bss()` 
 
 -   scan complete event → 結束 scan
     
-
 **關鍵觀念**
 
 > cfg80211 的 BSS table ≠ firmware 的真實狀態  
 > 只是「曾經回報過的結果」
 
-----------
-
-### 3.3 常見 scan 問題誤區
+### 2.3 常見 scan 問題誤區
 
 -   scan callback 有回來 ≠ firmware 掃到 AP
     
 -   scan result 為空 ≠ scan 失敗（可能被 regulatory 擋）
     
+## 3. Connect（STA Join）流程
 
-----------
-
-## 4. Connect（STA Join）流程
-
-### 4.1 Connect 的控制流程
+### 3.1 Connect 的控制流程
 ```
 cfg80211_ops->connect
  └─ wl_cfg80211_connect()
@@ -99,9 +83,7 @@ cfg80211_ops->connect
 ```
 **Linux 不會同步等待結果**
 
-----------
-
-### 4.2 Connect 結果的來源
+### 3.2 Connect 結果的來源
 
 -   firmware 嘗試 association
     
@@ -109,12 +91,9 @@ cfg80211_ops->connect
     
 -   driver 轉譯為：
     
-
 `cfg80211_connect_result()` 
 
-----------
-
-### 4.3 常見 connect 問題
+### 3.3 常見 connect 問題
 
 -   join iovar 成功，但永遠等不到 event
     
@@ -122,12 +101,9 @@ cfg80211_ops->connect
     
 -   NVRAM / regulatory 導致 join 被拒
     
+## 4. Disconnect 與 Link State
 
-----------
-
-## 5. Disconnect 與 Link State
-
-### 5.1 Disconnect 行為
+### 4.1 Disconnect 行為
 
 -   cfg80211 `disconnect()`
     
@@ -135,10 +111,7 @@ cfg80211_ops->connect
     
 -   firmware 回報 link down event
     
-
-----------
-
-### 5.2 非預期斷線
+### 4.2 非預期斷線
 
 -   AP deauth
     
@@ -146,23 +119,17 @@ cfg80211_ops->connect
     
 -   power save timeout
     
-
 **所有斷線都以 event 為準**
 
-----------
+## 5. Roaming
 
-## 6. Roaming
-
-### 6.1 bcmdhd 的 roam 模型
+### 5.1 bcmdhd 的 roam 模型
 
 -   roaming 完全由 firmware 決定
     
 -   host 只接收 roam event
     
-
-----------
-
-### 6.2 Roam event 流程
+### 5.2 Roam event 流程
 ```
 firmware roam
  └─ WLC_E_ROAM
@@ -171,9 +138,7 @@ firmware roam
 ```
 **cfg80211 無法阻止 firmware roam**
 
-----------
-
-### 6.3 Roam 相關誤解
+### 5.3 Roam 相關誤解
 
 -   cfg80211 無法設定 roam threshold
     
@@ -181,12 +146,9 @@ firmware roam
     
 -   Linux 端只能開 / 關 roam
     
+## 6. AP Mode
 
-----------
-
-## 7. AP Mode
-
-### 7.1 啟動 AP 的流程
+### 6.1 啟動 AP 的流程
 ```
 cfg80211_ops->start_ap
  └─ wl_cfg80211_start_ap()
@@ -195,9 +157,8 @@ cfg80211_ops->start_ap
      ├─ 設定 channel
      └─ 啟動 firmware AP mode
 ```
-----------
 
-### 7.2 AP mode 的實際控制權
+### 6.2 AP mode 的實際控制權
 
 | 項目          | 控制者   |
 |---------------|----------|
@@ -206,12 +167,9 @@ cfg80211_ops->start_ap
 | Rate control  | Firmware |
 | Power save    | Firmware |
 
-
 **Linux 只是設定者，不是 AP controller**
 
-----------
-
-### 7.3 AP mode 常見問題
+### 6.3 AP mode 常見問題
 
 -   AP 起來但 client 掃不到
     
@@ -219,12 +177,9 @@ cfg80211_ops->start_ap
     
 -   AP 在 DFS channel 行為異常
     
+## 7. cfg80211 與 firmware state 不同步的問題
 
-----------
-
-## 8. cfg80211 與 firmware state 不同步的問題
-
-### 8.1 為什麼會不同步？
+### 7.1 為什麼會不同步？
 
 -   event 丟失
     
@@ -232,23 +187,17 @@ cfg80211_ops->start_ap
     
 -   firmware reset 未同步通知
     
-
-----------
-
-### 8.2 常見症狀
+### 7.2 常見症狀
 
 -   cfg80211 顯示 connected，但實際沒流量
     
 -   cfg80211 顯示 disconnected，但 firmware 還在送封包
     
-
 **cfg80211 是「觀察者」，不是「事實來源」**
 
-----------
+## 8. 常見問題與排查（Debug cfg80211 × bcmdhd）
 
-## 9. Debug cfg80211 × bcmdhd
-
-### 9.1 不要只看 cfg80211 state
+### 8.1 不要只看 cfg80211 state
 
 請同時檢查：
 
@@ -258,10 +207,7 @@ cfg80211_ops->start_ap
     
 -   bus layer 是否卡住
     
-
-----------
-
-### 9.2 Debug 問題時的正確順序
+### 8.2 Debug 問題時的正確順序
 
 1.  firmware 是否收到指令？
     
@@ -270,4 +216,3 @@ cfg80211_ops->start_ap
 3.  driver 是否正確轉譯 event？
     
 4.  cfg80211 是否正確更新 state？
-

@@ -1,9 +1,9 @@
-# Trace notes — hash_chain_minimal  
-  
-## Level 1：用人話理解  
-  
+# Trace notes — hash_chain_minimal
+
+## 1. Level 1：用人話理解
+
 hash 可以想成：  
-  
+
 ```text  
 資料的指紋
 ```
@@ -24,9 +24,7 @@ SHA256
 kernel hash
 ```
 
-----------
-
-## hash chain 是什麼？
+## 2. hash chain 是什麼？
 
 hash chain 是把每一步的 hash 串起來：
 
@@ -44,9 +42,7 @@ hash chain 是把每一步的 hash 串起來：
 final chain digest 也會改變
 ```
 
-----------
-
-## Level 2：流程理解
+## 3. Level 2：流程理解
 
 本範例輸入多個 component：
 
@@ -78,9 +74,7 @@ chain_4 = SHA256(chain_3 || measurement_4)
 final chain digest
 ```
 
-----------
-
-## 為什麼這對 Root of Trust 重要？
+## 4. 為什麼這對 Root of Trust 重要？
 
 Boot flow 不是單一檔案。
 
@@ -106,11 +100,9 @@ RootFS
 
 hash chain 可以把整個 boot sequence 壓成一個 digest。
 
-----------
+## 5. Level 3：對應真實系統
 
-## Level 3：對應真實系統
-
-### Measured Boot
+### 5.1 Measured Boot
 
 Measured Boot 的概念是：
 
@@ -121,9 +113,7 @@ Measured Boot 的概念是：
 
 每一層 boot component 被量測後，結果會被 extend 到紀錄中。
 
-----------
-
-### TPM PCR
+### 5.2 TPM PCR
 
 TPM PCR 的概念類似：
 
@@ -139,9 +129,7 @@ chain_new = SHA256(chain_old || image_hash)
 
 是同一種心智模型。
 
-----------
-
-### Secure Boot
+### 5.3 Secure Boot
 
 Secure Boot 則更進一步：
 
@@ -159,11 +147,9 @@ trusted public key
 能不能執行
 ```
 
-----------
+## 6. 常見問題與排查（常見誤解）
 
-## 常見誤解
-
-### hash 一樣就代表可信
+### 6.1 hash 一樣就代表可信
 
 不完全對。
 
@@ -181,9 +167,7 @@ hash 一樣只能表示：
 
 除非你知道正確 hash 來自可信來源。
 
-----------
-
-### hash chain 等於 Secure Boot
+### 6.2 hash chain 等於 Secure Boot
 
 不對。
 
@@ -197,9 +181,7 @@ trusted key
 enforcement policy
 ```
 
-----------
-
-## 最重要一句話
+## 7. 最重要一句話
 
 ```
 hash chain 可以描述「開機流程變了沒有」

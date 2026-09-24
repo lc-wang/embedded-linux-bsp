@@ -1,12 +1,11 @@
-# Kernel trace notes — drm_mipi_dsi_panel_flow  
-  
-  
-# Level 1：用人話理解  
-  
+# Kernel trace notes — drm_mipi_dsi_panel_flow
+
+## 1. Level 1：用人話理解
+
 MIPI DSI panel driver 不是完整 DRM driver。  
-  
+
 它比較像：  
-  
+
 ```text  
 「螢幕本體的驅動」
 ```
@@ -21,9 +20,7 @@ MIPI DSI panel driver 不是完整 DRM driver。
 怎麼關畫面
 ```
 
-----------
-
-# panel driver 在哪裡？
+## 2. panel driver 在哪裡？
 
 整體 display pipeline 大概是：
 
@@ -39,9 +36,7 @@ MIPI DSI panel driver
 panel
 ```
 
-----------
-
-# Level 2：driver 結構
+## 3. Level 2：driver 結構
 
 一個 MIPI DSI panel driver 通常同時有兩個身份：
 
@@ -51,9 +46,7 @@ mipi_dsi_driver
 drm_panel
 ```
 
-----------
-
-## mipi_dsi_driver
+### 3.1 mipi_dsi_driver
 
 負責掛在 MIPI DSI bus 上：
 
@@ -65,9 +58,7 @@ probe()
 mipi_dsi_attach()
 ```
 
-----------
-
-## drm_panel
+### 3.2 drm_panel
 
 提供 DRM panel callback：
 
@@ -79,11 +70,9 @@ unprepare()
 get_modes()
 ```
 
-----------
+## 4. prepare / enable 差異
 
-# prepare / enable 差異
-
-## prepare
+### 4.1 prepare
 
 通常做：
 
@@ -100,9 +89,7 @@ exit sleep mode
 panel 硬體準備好了
 ```
 
-----------
-
-## enable
+### 4.2 enable
 
 通常做：
 
@@ -117,9 +104,7 @@ backlight on
 畫面可以亮了
 ```
 
-----------
-
-## disable
+### 4.3 disable
 
 通常做：
 
@@ -128,9 +113,7 @@ backlight off
 display off
 ```
 
-----------
-
-## unprepare
+### 4.4 unprepare
 
 通常做：
 
@@ -140,11 +123,9 @@ power off
 reset low
 ```
 
-----------
+## 5. Level 3：kernel trace
 
-# Level 3：kernel trace
-
-## Device Tree match
+### 5.1 Device Tree match
 
 ```
 compatible = "example,panel-dsi-minimal"
@@ -154,9 +135,7 @@ mipi_dsi_driver.probe()
 minimal_panel_probe()
 ```
 
-----------
-
-## probe 內部流程
+### 5.2 probe 內部流程
 
 ```
 minimal_panel_probe()
@@ -167,9 +146,7 @@ minimal_panel_probe()
  └─ mipi_dsi_attach()
 ```
 
-----------
-
-## display enable flow
+### 5.3 display enable flow
 
 當 DRM pipeline 要啟用輸出時：
 
@@ -187,9 +164,7 @@ drm_panel_enable()
 panel->enable()
 ```
 
-----------
-
-## display disable flow
+### 5.4 display disable flow
 
 關閉輸出時：
 
@@ -205,9 +180,7 @@ drm_panel_unprepare()
 panel->unprepare()
 ```
 
-----------
-
-# get_modes() 在做什麼？
+## 6. get_modes() 在做什麼？
 
 ```
 get_modes()
@@ -225,9 +198,7 @@ get_modes()
 800x480
 ```
 
-----------
-
-# DSI attach 是什麼？
+## 7. DSI attach 是什麼？
 
 ```
 mipi_dsi_attach()
@@ -245,9 +216,7 @@ mipi_dsi_attach()
 DSI host 不知道這個 panel 存在
 ```
 
-----------
-
-# 常見誤解
+## 8. 常見問題與排查（常見誤解）
 
 ✗ panel driver 負責 framebuffer  
 ✗ panel driver 負責 atomic commit  
@@ -259,9 +228,7 @@ DSI host 不知道這個 panel 存在
 panel power / init / mode / enable lifecycle
 ```
 
-----------
-
-# 最重要一句話
+## 9. 最重要一句話
 
 ```
 DRM core 管「怎麼顯示」

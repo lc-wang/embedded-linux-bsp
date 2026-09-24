@@ -1,9 +1,6 @@
-
 # Kernel trace notes — miscdevice
 
----
-
-## misc_register() 做了什麼？
+## 1. misc_register() 做了什麼？
 
 位置：
 ```
@@ -20,9 +17,7 @@ misc_register()
 └─ 建立 /dev/mymisc
 ```
 
----
-
-## open() trace
+## 2. open() trace
 ```
 open("/dev/mymisc")
 └─ chrdev_open()
@@ -32,9 +27,7 @@ open("/dev/mymisc")
 
 和 char_device 完全一樣。
 
----
-
-## 為什麼 Bluetooth 很愛用 miscdevice？
+## 3. 為什麼 Bluetooth 很愛用 miscdevice？
 
 因為：
 
@@ -50,18 +43,16 @@ drivers/media/
 drivers/hwmon/
 ```
 
----
+## 4. 使用時機建議
 
-## 使用時機建議
-
-### 適合 miscdevice
+### 4.1 適合 miscdevice
 
 - debug interface
 - control ioctl
 - prototype driver
 - 單一節點裝置
 
-### 不適合 miscdevice
+### 4.2 不適合 miscdevice
 
 - 需要多個 minor
 - 高度結構化 sysfs

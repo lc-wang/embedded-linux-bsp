@@ -1,7 +1,4 @@
-
 # Broadcom bcmdhd (DHD) Wi-Fi Driver — Source Tree Map & Reading Guide
-
-## 1. 本章目的
 
 本章目標是：
 
@@ -9,15 +6,12 @@
 - 清楚劃分 **cfg80211 glue / DHD core / bus layer**
 - 給出一條 **實際可操作的閱讀路線**
 
----
-
-## 2. Source Tree 高層分類
+## 1. Source Tree 高層分類
 
 在 Android / vendor kernel 中，bcmdhd 通常集中於：
 ```
 drivers/net/wireless/bcmdhd/
 ```
-
 
 可以邏輯上分成 **四大區塊**：
 ```
@@ -28,11 +22,9 @@ bcmdhd/
 └── Shared / utility
 ```
 
----
+## 2. cfg80211 Glue Layer
 
-## 3. cfg80211 Glue Layer
-
-### 3.1 主要檔案
+### 2.1 主要檔案
 
 | 檔案 | 說明 |
 |---|---|
@@ -41,9 +33,7 @@ bcmdhd/
 | `wl_cfgscan.c` | scan 流程輔助 |
 | `wl_cfgvendor.c` | vendor-specific NL80211 commands |
 
----
-
-### 3.2 角色定位
+### 2.2 角色定位
 
 - **實作 Linux 標準介面**
   - `struct cfg80211_ops`
@@ -54,9 +44,7 @@ bcmdhd/
 
 **所有無線行為最終都變成「對 firmware 的指令」**
 
----
-
-### 3.3 你會在這裡看到的典型內容
+### 2.3 你會在這裡看到的典型內容
 
 - `wl_cfg80211_scan()`
 - `wl_cfg80211_connect()`
@@ -67,11 +55,9 @@ bcmdhd/
 **重點**  
 > 這一層「描述 *要做什麼*」，不描述「*怎麼做*」。
 
----
+## 3. DHD Core Layer（Driver Heart）
 
-## 4. DHD Core Layer（Driver Heart）
-
-### 4.1 主要檔案
+### 3.1 主要檔案
 
 | 檔案 | 說明 |
 |---|---|
@@ -81,9 +67,7 @@ bcmdhd/
 | `dhd_wlfc.c` | Wireless Flow Control（依 tree） |
 | `dhd_watchdog.c` | watchdog / health check |
 
----
-
-### 4.2 `dhd_linux.c`：第一優先閱讀檔案
+### 3.2 `dhd_linux.c`：第一優先閱讀檔案
 
 `dhd_linux.c` 是 **Linux 世界的入口點**：
 
@@ -105,9 +89,7 @@ bcmdhd/
 > 任何「Wi-Fi 卡住 / 沒流量 / resume 掛掉」  
 > **第一個 grep 的檔案就是 `dhd_linux.c`**
 
----
-
-### 4.3 `dhd_common.c`：控制平面核心
+### 3.3 `dhd_common.c`：控制平面核心
 
 - ioctl / iovar 包裝
 - 與 firmware 的 command protocol
@@ -119,11 +101,9 @@ bcmdhd/
 - `dhd_iovar()`
 - `dhd_event_process()`
 
----
+## 4. Bus Layer
 
-## 5. Bus Layer
-
-### 5.1 Bus 對應檔案
+### 4.1 Bus 對應檔案
 
 | Bus | 檔案 |
 |---|---|
@@ -131,9 +111,7 @@ bcmdhd/
 | PCIe | `dhd_pcie.c`, `dhd_msgbuf.c` |
 | USB | `dhd_usb.c` |
 
----
-
-### 5.2 SDIO Bus（`dhd_sdio.c`）
+### 4.2 SDIO Bus（`dhd_sdio.c`）
 
 特徵：
 
@@ -152,9 +130,7 @@ bcmdhd/
 - timeout
 - data corruption
 
----
-
-### 5.3 PCIe Bus（`dhd_pcie.c`）
+### 4.3 PCIe Bus（`dhd_pcie.c`）
 
 特徵：
 
@@ -172,11 +148,9 @@ Host memory (rings) ⇄ Dongle DMA
 
 **PCIe debug 難度最高，但效能最好**
 
----
+## 5. Shared / Utility Layer
 
-## 6. Shared / Utility Layer
-
-### 6.1 常見輔助檔案
+### 5.1 常見輔助檔案
 
 | 檔案 | 用途 |
 |---|---|
@@ -186,17 +160,13 @@ Host memory (rings) ⇄ Dongle DMA
 | `sbutils.c` | system bus helper |
 | `dhd_dbg.h` | log 等級與 debug macro |
 
----
-
-### 6.2 為什麼這些檔案重要？
+### 5.2 為什麼這些檔案重要？
 
 - event format 解析常常要回來看
 - 很多 magic number / flag 定義在這裡
 - vendor tree 差異通常藏在 utility layer
 
----
-
-## 7. 模組責任邊界總覽
+## 6. 模組責任邊界總覽
 
 | 問題類型 | 該看哪一層 |
 |---|---|
@@ -206,4 +176,3 @@ Host memory (rings) ⇄ Dongle DMA
 | TX 卡住 | `dhd_flowring.c` |
 | resume 後掛死 | `dhd_sdio.c` / `dhd_pcie.c` |
 | firmware 下載失敗 | bus layer + `dhd_common.c` |
-

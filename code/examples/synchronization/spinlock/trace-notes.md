@@ -1,8 +1,6 @@
-
 # Kernel trace notes — spinlock
 
-
-# Level 1
+## 1. Level 1
 
 mutex：
 
@@ -13,9 +11,8 @@ spinlock：
 ```
 拿不到鎖 → 原地一直轉（忙等）
 ```
-----------
 
-# Level 2
+## 2. Level 2
 ```
 spin_lock()  
  ↓  
@@ -25,9 +22,8 @@ spin_lock()
  ↓  
 拿到鎖 → 進入 critical section
 ```
-----------
 
-## 為什麼叫 spin？
+### 2.1 為什麼叫 spin？
 
 因為 CPU 會這樣：
 
@@ -36,18 +32,15 @@ while (lock_taken)
 
 一直「空轉」
 
-----------
-
-# Level 3
+## 3. Level 3
 ```
 spin_lock()  
  └─ raw_spin_lock()  
  └─ arch_spin_lock()  
  └─ CPU atomic 指令
 ```
-----------
 
-# spin_lock_irqsave 在幹嘛？
+## 4. spin_lock_irqsave 在幹嘛？
 ```
 spin_lock_irqsave(&lock, flags);
 ```
@@ -56,9 +49,7 @@ spin_lock_irqsave(&lock, flags);
 1. 關閉 local interrupt  
 2. 拿 spinlock
 
-----------
-
-# 為什麼要關中斷？
+## 5. 為什麼要關中斷？
 
 避免這種情況：
 
@@ -67,9 +58,7 @@ CPU0 拿 lock
 → interrupt handler 也想拿 lock  
 → deadlock
 
-----------
-
-# 絕對禁止
+## 6. 絕對禁止
 
 在 spinlock 區段內：
 
@@ -82,10 +71,8 @@ CPU0 拿 lock
 ```
 spinlock 區段不能睡眠
 ```
-----------
 
-
-# mutex vs spinlock
+## 7. mutex vs spinlock
 
 | 項目           | mutex     | spinlock        |
 |----------------|-----------|-----------------|
@@ -94,8 +81,6 @@ spinlock 區段不能睡眠
 | 使用 context   | process   | IRQ / atomic    |
 | 臨界區長度     | 可長      | 必須極短        |
 
-----------
-
-# 心智模型
+## 8. 心智模型
 
 spinlock 是為了「不能睡眠的世界」而存在

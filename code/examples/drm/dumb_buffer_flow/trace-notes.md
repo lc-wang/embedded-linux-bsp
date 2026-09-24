@@ -1,9 +1,9 @@
-# Kernel trace notes — dumb_buffer_flow  
-  
-# Level 1：用人話理解  
-  
+# Kernel trace notes — dumb_buffer_flow
+
+## 1. Level 1：用人話理解
+
 userspace 想做的事情其實很單純：  
-  
+
 ```text  
 我要一塊畫圖用的 memory  
 ↓  
@@ -12,11 +12,9 @@ userspace 想做的事情其實很單純：
 交給 DRM 顯示
 ```
 
-----------
+## 2. Level 2：流程理解
 
-# Level 2：流程理解
-
-## 1. 建立 dumb buffer
+### 2.1 建立 dumb buffer
 
 ```
 DRM_IOCTL_MODE_CREATE_DUMB
@@ -28,9 +26,7 @@ kernel 會：
 配置一塊 linear framebuffer memory
 ```
 
-----------
-
-## 2. mmap
+### 2.2 mmap
 
 ```
 DRM_IOCTL_MODE_MAP_DUMB
@@ -40,9 +36,7 @@ mmap()
 
 userspace 開始能直接碰 framebuffer memory。
 
-----------
-
-## 3. userspace 畫圖
+### 2.3 userspace 畫圖
 
 ```
 memset(buf.map, 0xff, buf.size);
@@ -50,9 +44,7 @@ memset(buf.map, 0xff, buf.size);
 
 直接改 framebuffer memory。
 
-----------
-
-## 4. drmModeAddFB2()
+### 2.4 drmModeAddFB2()
 
 這一步非常重要：
 
@@ -73,11 +65,9 @@ buffer handle
 「DRM pipeline 可以使用的 framebuffer」
 ```
 
-----------
+## 3. Level 3：kernel trace
 
-# Level 3：kernel trace
-
-## create dumb
+### 3.1 create dumb
 
 ```
 DRM_IOCTL_MODE_CREATE_DUMB  
@@ -85,18 +75,14 @@ DRM_IOCTL_MODE_CREATE_DUMB
 └─ driver->dumb_create()
 ```
 
-----------
-
-## map dumb
+### 3.2 map dumb
 
 ```
 DRM_IOCTL_MODE_MAP_DUMB
  └─ drm_mode_mmap_dumb_ioctl
 ```
 
-----------
-
-## AddFB2
+### 3.3 AddFB2
 
 ```
 drmModeAddFB2
@@ -105,21 +91,17 @@ drmModeAddFB2
          └─ drm_internal_framebuffer_create()
 ```
 
-----------
-
-# handle vs framebuffer object
+## 4. handle vs framebuffer object
 
 | 名稱 | 意義 |  
 |---------------|-------------------|  
 | GEM handle | Memory object |  
 | framebuffer | Display object |
 
-----------
+## 5. memory vs framebuffer
 
-# memory vs framebuffer
-  
 很多人會誤以為：  
-  
+
 ```text  
 framebuffer = memory
 ```
@@ -144,9 +126,7 @@ memory 本身不知道：
 -   pitch
 -   怎麼顯示
 
-----------
-
-## framebuffer 是什麼？
+### 5.1 framebuffer 是什麼？
 
 framebuffer 是 DRM 的「顯示描述物件」。
 
@@ -164,9 +144,7 @@ framebuffer 是 DRM 的「顯示描述物件」。
 -   pitch
 -   GEM buffer reference
 
-----------
-
-## 關鍵流程
+### 5.2 關鍵流程
 
 ```
 memory allocation
@@ -178,9 +156,7 @@ drmModeAddFB2()
 drm framebuffer object
 ```
 
-----------
-
-## framebuffer 真正的角色
+### 5.3 framebuffer 真正的角色
 
 framebuffer 的本質：
 
@@ -190,9 +166,7 @@ metadata + memory reference
 
 不是 memory 本身。
 
-----------
-
-## 為什麼 DRM 要分開？
+### 5.4 為什麼 DRM 要分開？
 
 因為：
 
@@ -214,10 +188,7 @@ ARGB8888 framebuffer
 memory 沒變，  
 但顯示方式不同。
 
-----------
-
-
-# 對照
+## 6. 對照
 
 | userspace | kernel |  
 |----------------|--------------------|  

@@ -1,8 +1,4 @@
-
 # Broadcom bcmdhd (DHD) Wi-Fi Driver — Power Management and Android Integration
----
-
-## 1. 本章定位
 
 在 bcmdhd（FullMAC）系統中，**Power Management（PM）是穩定性問題的最大來源之一**：
 
@@ -22,11 +18,9 @@
 - Android userspace 對 Wi-Fi PM 的實際影響
 - 常見 PM 故障模式與判斷方式
 
----
+## 1. bcmdhd 的 Power Management 架構總覽
 
-## 2. bcmdhd 的 Power Management 架構總覽
-
-### 2.1 三層 PM 同時存在
+### 1.1 三層 PM 同時存在
 ```
 Android userspace  
 	└─ (suspend policy / power hints)  
@@ -36,12 +30,9 @@ Android userspace
 					└─ (power save / WOWLAN / sleep)
 ```
 
-
 **任一層狀態不同步，都可能導致 Wi-Fi 行為異常**
 
----
-
-### 2.2 FullMAC 的 PM 核心現實
+### 1.2 FullMAC 的 PM 核心現實
 
 - Linux **不控制 RF sleep**
 - Linux **不能強制 firmware 醒來**
@@ -49,11 +40,9 @@ Android userspace
 
 **PM 是協調問題，不是單一模組問題**
 
----
+## 2. Runtime PM（閒置省電）
 
-## 3. Runtime PM（閒置省電）
-
-### 3.1 Runtime PM 的目的
+### 2.1 Runtime PM 的目的
 
 - 在 Wi-Fi 閒置時降低功耗
 - 避免頻繁 RF / bus 活動
@@ -63,9 +52,7 @@ Android userspace
 - bus（SDIO / PCIe）是否可進入低功耗
 - firmware 是否允許 power save mode
 
----
-
-### 3.2 常見 Runtime PM 行為
+### 2.2 常見 Runtime PM 行為
 
 - 無流量 → firmware 進入 power save
 - 有 TX/RX → firmware wake up
@@ -74,19 +61,15 @@ Android userspace
 **問題關鍵**  
 > firmware 已 sleep，但 Linux 仍嘗試送 control / data
 
----
-
-### 3.3 Runtime PM 常見故障模式
+### 2.3 Runtime PM 常見故障模式
 
 - 第一包 TX 卡住（firmware 尚未 wake）
 - RX event 丟失（bus 尚未恢復）
 - PM state 永遠卡在「suspended」
 
----
+## 3. System Suspend / Resume（系統睡眠）
 
-## 4. System Suspend / Resume（系統睡眠）
-
-### 4.1 Suspend 流程（高層）
+### 3.1 Suspend 流程（高層）
 
 ```
 system suspend
@@ -97,7 +80,7 @@ system suspend
      └─ (optional) enable WOWLAN
  ```    
 
-### 4.2 Resume 流程（高層）
+### 3.2 Resume 流程（高層）
 ```
 system resume
  └─ dhd_resume()
@@ -108,9 +91,7 @@ system resume
 ```
 **resume 的順序極其重要**
 
-----------
-
-### 4.3 Resume 常見問題
+### 3.3 Resume 常見問題
 
 -   bus 已醒，firmware 未醒
     
@@ -118,14 +99,11 @@ system resume
     
 -   flow control / ring state 未重建
     
-
 **症狀通常是「已連線但沒流量」**
 
-----------
+## 4. WOWLAN（Wake on Wireless LAN）
 
-## 5. WOWLAN（Wake on Wireless LAN）
-
-### 5.1 WOWLAN 的角色
+### 4.1 WOWLAN 的角色
 
 WOWLAN 允許：
 
@@ -133,17 +111,13 @@ WOWLAN 允許：
     
 -   由 Wi-Fi event（magic packet / pattern）喚醒系統
     
-
 在 bcmdhd 中：
 
 -   WOWLAN **完全由 firmware 實作**
     
 -   Linux 只設定 pattern / enable
     
-
-----------
-
-### 5.2 WOWLAN 的現實限制
+### 4.2 WOWLAN 的現實限制
 
 -   開啟 WOWLAN ≠ firmware 一定穩定
     
@@ -155,14 +129,11 @@ WOWLAN 允許：
         
 -   resume 後需完整重新初始化 control state
     
-
 **WOWLAN 是 PM 複雜度放大器**
 
-----------
+## 5. Android 整合：PM 問題的放大來源
 
-## 6. Android 整合：PM 問題的放大來源
-
-### 6.1 Android userspace 會做什麼？
+### 5.1 Android userspace 會做什麼？
 
 Android 透過：
 
@@ -172,7 +143,6 @@ Android 透過：
     
 -   ConnectivityService
     
-
 動態改變：
 
 -   power save policy
@@ -181,12 +151,9 @@ Android 透過：
     
 -   suspend 條件
     
-
 **Linux driver 並不知道「為什麼」狀態被改**
 
-----------
-
-### 6.2 wakelock（Android 專屬）
+### 5.2 wakelock（Android 專屬）
 
 -   bcmdhd 可能持有 wakelock
     
@@ -198,10 +165,7 @@ Android 透過：
         
     -   過早 suspend（Wi-Fi 掛）
         
-
-----------
-
-### 6.3 Android PM 常見陷阱
+### 5.3 Android PM 常見陷阱
 
 -   螢幕關閉 → Wi-Fi 進 aggressive power save
     
@@ -209,12 +173,9 @@ Android 透過：
     
 -   userspace 與 kernel PM 狀態不同步
     
+## 6. PM × Data / Control Path 的交互影響
 
-----------
-
-## 7. PM × Data / Control Path 的交互影響
-
-### 7.1 PM 與 Control Path
+### 6.1 PM 與 Control Path
 
 -   control iovar 在 suspend/resume 間送出
     
@@ -222,10 +183,7 @@ Android 透過：
     
 -   導致 cfg80211 state 與實際不符
     
-
-----------
-
-### 7.2 PM 與 Data Path
+### 6.2 PM 與 Data Path
 
 -   TX 在 firmware sleep 時送出
     
@@ -233,14 +191,11 @@ Android 透過：
     
 -   RX event 永遠不回
     
-
 **PM 問題經常「假裝成 data path bug」**
 
-----------
+## 7. 常見問題與排查（常見 PM 故障模式）
 
-## 8. 常見 PM 故障模式
-
-### 8.1 待機後 Wi-Fi 偶發死亡
+### 7.1 待機後 Wi-Fi 偶發死亡
 
 -   firmware 未正確 wake
     
@@ -248,10 +203,7 @@ Android 透過：
     
 -   bus state 與 firmware 不一致
     
-
-----------
-
-### 8.2 螢幕關閉就斷線
+### 7.2 螢幕關閉就斷線
 
 -   aggressive power save
     
@@ -259,10 +211,7 @@ Android 透過：
     
 -   firmware roam / disconnect
     
-
-----------
-
-### 8.3 只有 reboot 才能救回
+### 7.3 只有 reboot 才能救回
 
 -   recovery path 無法重設 PM state
     

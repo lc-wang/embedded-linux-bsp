@@ -1,7 +1,4 @@
-
 # Broadcom bcmdhd (DHD) Wi-Fi Driver — Control Path: ioctl, iovar, and Event Flow
-
-## 1. 本章定位
 
 在 bcmdhd（DHD）架構中：
 
@@ -17,11 +14,9 @@
 - cfg80211 → DHD → firmware 的實際呼叫路徑
 - firmware event 如何回到 Linux 並影響系統狀態
 
----
+## 1. Control Path 的核心設計哲學
 
-## 2. Control Path 的核心設計哲學
-
-### 2.1 Host 不做決策，只做轉送
+### 1.1 Host 不做決策，只做轉送
 
 在 FullMAC 模型中：
 
@@ -34,9 +29,7 @@ Host 的角色只有三個：
 2. **收事件**
 3. **轉譯成 cfg80211 語意**
 
----
-
-### 2.2 Control Path 的三個元件
+### 1.2 Control Path 的三個元件
 ```
 cfg80211 ops
 │
@@ -49,11 +42,10 @@ Firmware execution
 ▼
 Event packet (Firmware → Host)
 ```
----
 
-## 3. ioctl 與 iovar：兩種控制介面
+## 2. ioctl 與 iovar：兩種控制介面
 
-### 3.1 wl ioctl（舊式控制介面）
+### 2.1 wl ioctl（舊式控制介面）
 
 特性：
 
@@ -73,8 +65,7 @@ dhd_wl_ioctl(dhd_pub, cmd, buf, len, set);
     
 -   相容性保留
 
-
-### 3.2 iovar（主流、也是最重要的介面）
+### 2.2 iovar（主流、也是最重要的介面）
 
 **iovar = I/O Variable**
 
@@ -84,7 +75,6 @@ dhd_wl_ioctl(dhd_pub, cmd, buf, len, set);
     
 -   幾乎所有新功能都用 iovar
     
-
 範例：
 
 `wldev_iovar_setbuf(dev, "country", &ccode, sizeof(ccode), buf, buflen);` 
@@ -99,15 +89,14 @@ dhd_wl_ioctl(dhd_pub, cmd, buf, len, set);
 | Power Mgmt| mpc, keep_alive         |
 | AP        | bss, up                 |
 
-
 重要事實
 
 iovar 的「語意與行為」完全定義在 firmware 裡
 driver 只是把 name + payload 送出去
 
-## 4. cfg80211 → iovar 的實際呼叫路徑
+## 3. cfg80211 → iovar 的實際呼叫路徑
 
-### 4.1 Scan 的完整 control flow
+### 3.1 Scan 的完整 control flow
 ```
 cfg80211_ops->scan
   └─ wl_cfg80211_scan()
@@ -129,7 +118,7 @@ cfg80211_ops->scan
     
 -   `dhd_sdio.c` / `dhd_pcie.c`
 
-###  4.2 Connect（join）流程
+### 3.2 Connect（join）流程
 ```
 cfg80211_connect()
   └─ wl_cfg80211_connect()
@@ -144,8 +133,8 @@ cfg80211_connect()
     
 -   真正結果由 **event** 回報
 
-## 5. dhd_common.c：Control Path 核心
-### 5.1 ioctl / iovar 的統一入口
+## 4. dhd_common.c：Control Path 核心
+### 4.1 ioctl / iovar 的統一入口
 ```
 int dhd_wl_ioctl(dhd_pub_t *dhdp, int cmd, void *buf, int len, bool set)
 ````
@@ -158,7 +147,7 @@ int dhd_wl_ioctl(dhd_pub_t *dhdp, int cmd, void *buf, int len, bool set)
     
 -   呼叫 bus layer 傳送 control frame
 
-### 5.2 protocol layer（與 bus 無關）
+### 4.2 protocol layer（與 bus 無關）
 ```
 dhd_prot_ioctl()
 ```
@@ -167,19 +156,15 @@ dhd_prot_ioctl()
     
 -   只負責「邏輯格式」
 
-
-### 5.3 bus layer 的 control 傳送
+### 4.3 bus layer 的 control 傳送
 
 -   SDIO：CMD52 / CMD53
     
 -   PCIe：msgbuf / DMA
     
+## 5. Firmware Event：真正的「狀態來源」
 
-----------
-
-## 6. Firmware Event：真正的「狀態來源」
-
-### 6.1 為什麼 event 這麼重要？
+### 5.1 為什麼 event 這麼重要？
 
 在 FullMAC 架構中：
 
@@ -187,19 +172,15 @@ dhd_prot_ioctl()
     
 -   ioctl / iovar 只是「請求」
     
-
 如果：
 
 -   指令送成功
     
 -   但事件沒回來
     
-
 **等同於什麼都沒發生**
 
-----------
-
-### 6.2 Event packet 的來源
+### 5.2 Event packet 的來源
 
 -   event 是 **從 RX data path 回來**
     
@@ -210,18 +191,16 @@ RX packet
   ├─ normal data
   └─ event packet
 ```
-----------
 
-### 6.3 Event 判斷與解析流程
+### 5.3 Event 判斷與解析流程
 ```
 dhd_rx_frame()
   └─ dhd_event_process()
       └─ wl_cfg80211_event()
           └─ cfg80211_*()
 ```
-----------
 
-### 6.4 常見 Event 類型
+### 5.4 常見 Event 類型
 
 | Event                 | 意義說明              |
 |-----------------------|-----------------------|
@@ -231,37 +210,31 @@ dhd_rx_frame()
 | WLC_E_DEAUTH          | 被 AP deauth / 踢除   |
 | WLC_E_ROAM            | Firmware 觸發漫遊     |
 
-
 **關鍵觀念**
 
 > cfg80211 的狀態完全取決於 event  
 > 不是取決於你「送了什麼指令」
 
-----------
+## 6. Event 與 cfg80211 的對應關係
 
-## 7. Event 與 cfg80211 的對應關係
-
-### 7.1 Link / Disconnect
+### 6.1 Link / Disconnect
 ```
 cfg80211_connect_result()
 cfg80211_disconnected()
 ```
-### 7.2 Roam
+### 6.2 Roam
 
 `cfg80211_roamed()` 
 
-### 7.3 Scan result
+### 6.3 Scan result
 
 -   BSS entry 由 event 逐筆回報
     
 -   scan complete event 結束流程
     
+## 7. 常見問題與排查（Control Path 常見問題模式）
 
-----------
-
-## 8. Control Path 常見問題模式
-
-### 8.1 指令送成功，但 Wi-Fi 沒動
+### 7.1 指令送成功，但 Wi-Fi 沒動
 
 可能原因：
 
@@ -271,10 +244,7 @@ cfg80211_disconnected()
     
 -   前一個動作未完成
     
-
-----------
-
-### 8.2 Scan / connect 偶發失敗
+### 7.2 Scan / connect 偶發失敗
 
 -   event 丟失
     
@@ -282,10 +252,7 @@ cfg80211_disconnected()
     
 -   firmware 忙於 roam / power transition
     
-
-----------
-
-### 8.3 Resume 後 control path 失效
+### 7.3 Resume 後 control path 失效
 
 -   firmware state 與 host 不同步
     

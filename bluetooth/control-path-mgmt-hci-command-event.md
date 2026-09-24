@@ -1,9 +1,4 @@
-
 # Bluetooth Control Path 深入解析
-
-----------
-
-## 1. 本章定位：專門解釋「為什麼控制會卡」
 
 在 Bluetooth bring-up / debug 時，最常見、也最難解的問題幾乎都集中在 **control path**：
 
@@ -15,13 +10,10 @@
     
 -   BlueZ 顯示 power on，但 controller 實際沒動作
     
-
 這一章只做一件事：  
 **把「mgmt → HCI command → HCI event → completion」這條路完整拆解**
 
-----------
-
-## 2. Control Path 全景
+## 1. Control Path 全景
 ```
 User space
 ──────────
@@ -56,11 +48,9 @@ mgmt.c / bluetoothd
 ```
 **整條路只要有一個環節斷掉，控制就會「假死」**
 
-----------
+## 2. mgmt socket：Bluetooth 的「控制面 API」
 
-## 3. mgmt socket：Bluetooth 的「控制面 API」
-
-### 3.1 為什麼需要 mgmt？
+### 2.1 為什麼需要 mgmt？
 
 歷史背景簡化版：
 
@@ -80,12 +70,9 @@ mgmt.c / bluetoothd
         
     -   user space 只送「意圖」
         
-
 **mgmt 就是「意圖層（intent layer）」**
 
-----------
-
-### 3.2 mgmt 的入口點（Kernel）
+### 2.2 mgmt 的入口點（Kernel）
 
 檔案：
 
@@ -103,11 +90,7 @@ mgmt.c / bluetoothd
     
 3.  對應到 HCI 動作（通常是送 HCI command）
     
-
-----------
-
-### 3.3 常見 mgmt command 與用途
-
+### 2.3 常見 mgmt command 與用途
 
 | mgmt opcode               | 意義             |
 |---------------------------|------------------|
@@ -117,15 +100,12 @@ mgmt.c / bluetoothd
 | MGMT_OP_CONNECT           | 建立連線         |
 | MGMT_OP_SET_LE            | 啟用 Low Energy  |
 
-
 **btmgmt** 工具就是直接在打這些 mgmt command  
 完全不經過 bluetoothd
 
-----------
+## 3. 從 mgmt 到 HCI：轉換的關鍵節點
 
-## 4. 從 mgmt 到 HCI：轉換的關鍵節點
-
-### 4.1 以「power on」為例
+### 3.1 以「power on」為例
 
 User space：
 
@@ -138,9 +118,8 @@ mgmt_set_powered()
        └─ hci_open_dev()
             └─ hci_power_on()
 ```
-----------
 
-### 4.2 `hci_power_on()` 在做什麼？
+### 3.2 `hci_power_on()` 在做什麼？
 
 位置：
 
@@ -160,14 +139,11 @@ mgmt_set_powered()
         
     -   LE setup（如果支援）
         
-
 **如果這裡任何一個 command 沒完成 → power on 卡住**
 
-----------
+## 4. HCI Command Queue 機制（為什麼會 timeout）
 
-## 5. HCI Command Queue 機制（為什麼會 timeout）
-
-### 5.1 HCI command 不是「立刻送」
+### 4.1 HCI command 不是「立刻送」
 
 HCI core 有自己的 command queue：
 
@@ -179,7 +155,6 @@ HCI core 有自己的 command queue：
         
     -   或 `Command Status`
         
-
 關鍵資料結構：
 ```
 struct hci_dev {
@@ -188,9 +163,8 @@ struct hci_dev {
     ...
 };
 ```
-----------
 
-### 5.2 `hci_cmd_sync()` 的同步語意
+### 4.2 `hci_cmd_sync()` 的同步語意
 
 常見 pattern：
 
@@ -206,16 +180,13 @@ struct hci_dev {
     
 4.  在 event handler 中被喚醒
     
-
 **timeout 的本質**
 
 > command 有送，但對應的 event 沒回來
 
-----------
+## 5. HCI Event：完成控制流程的最後一哩
 
-## 6. HCI Event：完成控制流程的最後一哩
-
-### 6.1 Event 解析入口
+### 5.1 Event 解析入口
 
 檔案：
 
@@ -235,16 +206,12 @@ struct hci_dev {
     
 -   完成 pending command
     
-
-----------
-
-### 6.2 關鍵事件：Command Complete / Status
+### 5.2 關鍵事件：Command Complete / Status
 
 | Event              | 意義說明                                   |
 |--------------------|--------------------------------------------|
 | Command Complete   | Command 已執行完成，並回傳最終結果         |
 | Command Status     | Command 已被 Controller 接受，稍後完成     |
-
 
 如果這兩個 event **任一沒回來**：
 
@@ -256,12 +223,9 @@ struct hci_dev {
         
     -   btmgmt power on timeout
         
+## 6. btmon：把控制流程「實體化」的工具
 
-----------
-
-## 7. btmon：把控制流程「實體化」的工具
-
-### 7.1 btmon 能看到什麼？
+### 6.1 btmon 能看到什麼？
 
 -   HCI Command（Host → Controller）
     
@@ -269,8 +233,7 @@ struct hci_dev {
     
 -   ACL data（資料面）
     
-
-### 7.2 用 btmon 對照 control path
+### 6.2 用 btmon 對照 control path
 
 典型健康流程：
 
@@ -284,11 +247,11 @@ struct hci_dev {
 
 **這一刻就可以直接斷定：不是 BlueZ 的問題**
 
-----------
+## 7. 常見問題與排查
 
-## 8. 常見失敗模式 × 對應卡點
+### 7.1 常見失敗模式 × 對應卡點
 
-### 8.1 command 有送，event 沒回
+#### command 有送，event 沒回
 
 高機率原因：
 
@@ -300,15 +263,12 @@ struct hci_dev {
     
 -   transport driver 沒真的送出去
     
-
 優先檢查：
 
 `drivers/bluetooth/hci_uart.c
 drivers/bluetooth/btusb.c` 
 
-----------
-
-### 8.2 event 回來，但 status 非 0
+#### event 回來，但 status 非 0
 
 代表：
 
@@ -318,10 +278,7 @@ drivers/bluetooth/btusb.c`
     
 -   controller 狀態不對（尚未 ready）
     
-
-----------
-
-### 8.3 mgmt command 沒進到 HCI
+#### mgmt command 沒進到 HCI
 
 可能原因：
 
@@ -331,10 +288,7 @@ drivers/bluetooth/btusb.c`
     
 -   先前 command queue 卡死
     
-
-----------
-
-## 9. Debug Control Path 的「標準流程」
+### 7.2 Debug Control Path 的「標準流程」
 
 建議你之後都照這個順序：
 
@@ -352,5 +306,4 @@ drivers/bluetooth/btusb.c`
         
 5.  再決定要不要看 BlueZ
     
-
 **不要一開始就怪 BlueZ**

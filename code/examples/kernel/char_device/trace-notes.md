@@ -1,9 +1,6 @@
-
 # Kernel trace notes — char_device
 
----
-
-## /dev 節點從哪來？
+## 1. /dev 節點從哪來？
 ```
 device_create()
 └─ drivers/base/core.c
@@ -12,9 +9,7 @@ device_create()
 └─ udev 建立 /dev/mychardev
 ```
 
----
-
-## open() trace
+## 2. open() trace
 ```
 open("/dev/mychardev")
 └─ sys_openat
@@ -25,9 +20,7 @@ open("/dev/mychardev")
 └─ my_open()
 ```
 
----
-
-## read() trace
+## 3. read() trace
 ```
 read()
 └─ vfs_read()
@@ -35,9 +28,7 @@ read()
 └─ my_read()
 ```
 
----
-
-## write() trace
+## 4. write() trace
 ```
 write()
 └─ vfs_write()
@@ -45,9 +36,7 @@ write()
 └─ my_write()
 ```
 
----
-
-## ioctl() trace
+## 5. ioctl() trace
 ```
 ioctl()
 └─ do_vfs_ioctl()
@@ -55,9 +44,7 @@ ioctl()
 └─ my_ioctl()
 ```
 
----
-
-## 最重要心智模型
+## 6. 最重要心智模型
 ```
 userspace
 ↓
@@ -70,9 +57,7 @@ file_operations
 driver
 ```
 
----
-
-## 常見錯誤觀念
+## 7. 常見問題與排查（常見錯誤觀念）
 
 ✗ /dev 是 driver  
 ✗ open() 直接進 driver  
@@ -83,9 +68,7 @@ inode → struct file → f_op
 
 driver 只是 callback 集合。
 
----
-
-## 為什麼這一章超重要？
+## 8. 為什麼這一章超重要？
 
 因為：
 
