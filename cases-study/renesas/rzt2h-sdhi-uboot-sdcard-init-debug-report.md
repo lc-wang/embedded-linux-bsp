@@ -125,7 +125,7 @@ sh_sdhi_writel(host, SDHI_SD_STATUS, SD_STATUS_SD_PWEN);
 #endif
 ```
 這段 code 來自以下 commit：
-```yaml
+```text
 ed302f38a8e28604fc13e9af5e8fd9eecc3101a6  "mmc: sh_sdhi: Fix fail to boot sd card"
 ```
 該 commit 強制加入 **SD 卡硬體電源循環 (power-cycle)**：

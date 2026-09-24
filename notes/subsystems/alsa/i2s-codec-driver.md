@@ -138,8 +138,10 @@ BCLK = Sample Rate × Channels × BitWidth
 
 -   16 bit
 
-`BCLK = 48000 × 2 × 16
-     = 1.536 MHz` 
+```text
+BCLK = 48000 × 2 × 16
+     = 1.536 MHz
+```
 
 ## 8. Master / Slave 問題
 

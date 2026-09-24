@@ -99,7 +99,7 @@ CONFIG_LOCKDEP = y
 CONFIG_PROVE_LOCKING = y
 ```
 Kernel log 若發現：
-```pgsql
+```text
 WARNING: possible recursive locking detected
 ```
 代表鎖使用順序錯誤。

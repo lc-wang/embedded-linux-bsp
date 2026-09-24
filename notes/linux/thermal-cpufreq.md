@@ -16,7 +16,7 @@
 Linux thermal 偵測溫度並進行降頻、降電壓或降速。
 
 架構：
-```yaml
+```text
 thermal sensor → thermal zone → governor → cooling device → hardware
 ```
 
@@ -91,7 +91,7 @@ CPUFreq = CPU 調頻（Frequency scaling）
 
 架構：
 
-```sh
+```text
 policy → governor → frequency driver → hardware
 ```
 元件 | 功能
@@ -162,7 +162,7 @@ DVFS 是 OPP + clock + regulator 的整合。
 
 流程：
 
-```sh
+```text
 CPU load ↑
 → governor（schedutil）要求更高頻率
 → cpufreq driver 查 OPP
@@ -171,7 +171,7 @@ CPU load ↑
 ```
 thermal 也會介入：
 
-```sh
+```text
 temp ↑ → thermal trip
 → cooling device set_state
 → 降低 OPP（降低電壓 + 頻率）

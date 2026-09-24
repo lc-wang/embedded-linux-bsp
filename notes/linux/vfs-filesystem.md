@@ -4,7 +4,7 @@
 
 ## 1. Linux VFS 架構
 
-```yaml
+```text
 VFS (Virtual File System) 是所有檔案系統的抽象層：
 
 Userspace (glibc, open/read/write)
@@ -44,7 +44,7 @@ VFS 提供統一 API：
 | **address_space** | page cache 管理器 |
 
 資料流示意：
-```yaml
+```text
 path → dentry lookup → inode → page cache → block device
 ```
 
@@ -52,7 +52,7 @@ path → dentry lookup → inode → page cache → block device
 
 ### 3.1 Open
 
-```sh
+```text
 open("/etc/passwd")
 → dentry lookup
 → 找到 inode
@@ -61,7 +61,7 @@ open("/etc/passwd")
 
 ### 3.2 Read
 
-```sh
+```text
 read(fd)
 → file_operations->read_iter()
 → page cache
@@ -70,7 +70,7 @@ read(fd)
 
 ### 3.3 Write
 
-```sh
+```text
 write(fd)
 → page cache (dirty page)
 → background flusher 寫回 block
@@ -85,7 +85,7 @@ Page cache 讓 filesystem 的讀寫高速化：
 - kernel 的 flush daemon 寫回磁碟  
 
 Page cache 也負責 mmap：
-```sh
+```text
 mmap() → share underlying page cache
 ```
 
@@ -104,7 +104,7 @@ rw
 2. 找到 block device  
 3. 讀取 super block  
 4. mount 上 VFS：  
-```sh
+```text
 mount_root()
 → vfs_kern_mount()
 → <fs_type>->mount()
@@ -112,7 +112,7 @@ mount_root()
 
 ### 5.1 initramfs 的位置
 
-```sh
+```text
 initramfs 解壓
 → /init 執行
 → pivot_root 或 switch_root 到真實 rootfs
@@ -138,7 +138,7 @@ initramfs 解壓
 ## 7. block layer 與 buffer / bio
 
 filesystem 不直接存取硬體，而透過 block layer：
-```sh
+```text
 readpage()
 → submit_bio()
 → block driver (mmc, nvme, sd)

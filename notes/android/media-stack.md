@@ -2,7 +2,7 @@
 
 ## 1. Android Media 架構總覽
 
-```yaml
+```text
 App
 ↓
 Framework API (MediaCodec / Camera2 / AudioTrack)
@@ -30,7 +30,7 @@ Codec / Camera / Audio HAL (HIDL/AIDL)
 
 ### 2.1 MediaCodec Pipeline
 
-```yaml
+```text
 App
 ↓ MediaCodec API
 Binder
@@ -56,7 +56,7 @@ Android 10 之後使用 **Codec2.0 (C2)** 架構取代 OMX。
 
 ### 2.2 Buffer Flow（解碼）
 
-```yaml
+```text
 Input bitstream → queueInputBuffer
 ↓
 Codec 解碼
@@ -80,7 +80,7 @@ SurfaceFlinger 合成顯示
 
 ### 3.1 Camera 整體流程（HAL v3）
 
-```yaml
+```text
 App (Camera2 API)
 ↓
 CameraManager
@@ -122,7 +122,7 @@ Output Stream
 
 ### 4.1 Audio 系統架構
 
-```yaml
+```text
 App
 ↓ (AudioTrack / AudioRecord / AAudio)
 AudioManager
@@ -160,7 +160,7 @@ Android 8+ 引入 **AAudio** 用於低延遲場景：
 
 ### 5.1 MediaServer 管線（音樂與影片播放）
 
-```yaml
+```text
 MediaPlayer
 ↓
 MediaExtractor → 解封裝（MP4/MKV/TS）
@@ -182,7 +182,7 @@ Extractor Service（Android 10+）拆成獨立進程：
 
 ### 6.1 Video Rendering
 
-```yaml
+```text
 解碼後 GraphicBuffer
 ↓
 SurfaceTexture

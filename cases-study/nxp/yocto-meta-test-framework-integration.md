@@ -21,7 +21,7 @@
 7.  **target 運行 testfw 驗證**
     
 整體架構：
-```sh
+```text
 meta-test-framework/
 ├── classes/
 │   └── testfw-image.bbclass
@@ -57,7 +57,7 @@ devtool add test-framework https://github.com/lc-wang/test-framework.git --versi
 ``` 
 
 產生的內容會被放在 workspace：
-```sh
+```text
 workspace/
 ├── recipes/test-framework/test-framework_git.bb
 ├── sources/test-framework/

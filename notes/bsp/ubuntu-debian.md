@@ -26,7 +26,7 @@ Ubuntu 與 Debian 皆基於：
 ## 2. Rootfs 結構（Debian/Ubuntu）
 
 典型 rootfs：
-```yaml
+```text
 rootfs/
 ├── bin/
 ├── sbin/
@@ -53,7 +53,7 @@ rootfs/
 
 ## 3. initramfs 與 rootfs 的差別
 
-```markdown
+```text
 initramfs
 ↓ (kernel 解壓)
 init
@@ -74,7 +74,7 @@ init
 update-initramfs -c -k <version>
 ```
 Ubuntu/Debian 在嵌入式 BSP 中常需手動修改：
-```yaml
+```text
 /etc/initramfs-tools/initramfs.conf
 /etc/initramfs-tools/modules
 ```
@@ -139,7 +139,7 @@ dpkg -i linux-headers-*.deb
 
 嵌入式 BSP bring-up 大多是：
 
-```markdown
+```text
 U-Boot
   ↓
 Kernel (Image.gz + dtb)
@@ -228,7 +228,7 @@ load nvme 0:1 ${kernel_addr_r} /boot/Image
 ## 9. Common Debug Techniques
 
 **檢查 rootfs 問題**
-```yaml
+```bash
 journalctl -xb
 systemctl --failed
 dmesg | grep mmc
@@ -236,7 +236,7 @@ dmesg | grep mmc
 **進 initramfs debug**
 GRUB 或 U-Boot：
 
-```ini
+```text
 break=mount
 ```
 Ubuntu 會 drop 到 busybox。

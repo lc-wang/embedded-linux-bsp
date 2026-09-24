@@ -25,7 +25,7 @@ Android HAL（Hardware Abstraction Layer）負責連接 **Framework ↔ 驅動�
 
 ### 2.1 架構圖
 
-```cscc
+```text
 Framework (Java/C++)
 ↓
 libhidl & hwservicemanager
@@ -70,7 +70,7 @@ AIDL 在 Android 12 後正式支援 **stable interface**，
 
 ### 3.1 架構圖
 
-```scss
+```text
 Framework (Java/C++)
    ↓
 libbinder (AIDL Stable)

@@ -50,7 +50,7 @@ Android 15 對 multi-display 的變動相當大，以下為與 Android 14 的差
 
 因為它完整觸發了 Android 正常旋轉流程：
 
-```sql
+```text
 wm → cmd window → WindowManagerService.setUserRotation
 → updateRotationUnchecked
 → DisplayRotation # per-display 修改
@@ -81,12 +81,17 @@ on boot_completed
 exit 127
 neverallow
 system_server_service denied
-``` 
-#### 原因 1：wm 需要 shell PATH，init 沒有
-#### 原因 2：wm 需要 binder IPC，init 執行時 system_server 還沒 ready
-#### 原因 3：exec 對象被 SELinux 阻擋
-#### 原因 4：Android 15 WMS 更嚴格，不接受 early rotation call
-#### 結論：
+```
+
+失敗原因：
+
+1.  wm 需要 shell PATH，init 沒有
+2.  wm 需要 binder IPC，init 執行時 system_server 還沒 ready
+3.  exec 對象被 SELinux 阻擋
+4.  Android 15 WMS 更嚴格，不接受 early rotation call
+
+#### 結論
+
 **init.rc 無法做 per-display rotation。**  
 唯一方法：**進 framework。**
 
@@ -109,7 +114,7 @@ system_server_service denied
 ### 2.6 Android 15 真正的 rotation 流程
 
 對外接顯示器：
-```scss
+```text
 WindowManagerService
     → DisplayContent
     → DisplayRotation
@@ -216,7 +221,7 @@ displayId=2 出現：
 ## 附錄
 
 ### A. 指令
-```sql
+```bash
 adb shell wm user-rotation -d 2 free
 adb shell wm user-rotation -d 2 lock 1
 adb shell dumpsys SurfaceFlinger > sf.txt

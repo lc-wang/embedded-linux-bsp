@@ -6,7 +6,7 @@
 
 ## 1. 開機流程總覽
 
-```yaml
+```text
 [Boot ROM]
 ↓
 [SPL] （Secondary Program Loader）
@@ -63,7 +63,7 @@ SPL 是精簡版 U-Boot，通常放在 boot 設備最前面幾 KB。
 
 ### 3.2 SPL 在專案中位置
 
-```yaml
+```text
 u-boot/
 ├── spl/
 └── arch/arm/mach-*/spl.c
@@ -96,7 +96,7 @@ U-Boot Proper 是完整 bootloader 主體。
 Bootloader 會將 DTB 載入記憶體後傳給 Kernel。
 
 流程：
-```yaml
+```text
 U-Boot
 ↓ load dtb
 ↓ fdt addr ${fdtaddr}
@@ -118,7 +118,7 @@ Kernel
 
 Bootloader 最終會跳轉到 kernel entry。
 入口點（ARM64）：
-```yaml
+```text
 arch/arm64/kernel/head.S
 ```
 Kernel 初始化步驟：
@@ -131,7 +131,7 @@ Kernel 初始化步驟：
 ## 7. Bootargs（Kernel Command Line）
 
 例：
-```yaml
+```text
 console=ttyS0,115200 root=/dev/mmcblk0p2 rw loglevel=4
 ```
 
@@ -151,25 +151,25 @@ console=ttyS0,115200 root=/dev/mmcblk0p2 rw loglevel=4
 
 ### 8.1 開啟 earlycon
 
-```shell
+```text
 earlycon=uart8250,mmio32,0xff1a0000
 ```
 
 ### 8.2 開啟 initcall debug
 
-```shell
+```text
 initcall_debug
 ```
 
 ### 8.3 顯示每個驅動 probe 時間
 
-```shell
+```text
 printk.devkmsg=on
 ```
 
 ### 8.4 若 Kernel crash
 
-```shell
+```bash
 dmesg -n 8
 echo c > /proc/sysrq-trigger
 ```

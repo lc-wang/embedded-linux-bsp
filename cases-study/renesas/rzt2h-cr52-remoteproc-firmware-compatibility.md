@@ -57,7 +57,7 @@ OpenAMP IPC 需要下列共享記憶體配置（以 RZ/T2H 為例）：
 #### 2.1.3 程式碼與資料段需符合 remoteproc 的 SYSRAM 記憶體布局
 
 OpenAMP 範例中，CR52 firmware 的記憶體布局位於 SYSRAM：
-```c
+```text
 .text     → 0x10060000
 .data     → 0x10062000
 .entry    → 0x10061000
@@ -163,7 +163,7 @@ rpmsg_lite_endpoint_t ept;
 #### 4.1.4 配合 Linux Device Tree 的 memory-region
 
 與 DTS/domains 中的記憶體配置一致，例如：
-```dts
+```text
 vdev0vring0 → 0xE1000000
 vdev0vring1 → 0xE1050000
 vdev0buffer → 0xE1200000

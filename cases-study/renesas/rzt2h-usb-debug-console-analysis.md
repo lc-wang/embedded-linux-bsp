@@ -78,7 +78,7 @@ Windows 裝置管理員顯示：
 ls /sys/class/udc # 92041000.usb
 ```
 Kernel config：
-```yaml
+```text
 CONFIG_USB_GADGET=y
 CONFIG_USB_G_SERIAL=m
 CONFIG_USB_F_ACM=m

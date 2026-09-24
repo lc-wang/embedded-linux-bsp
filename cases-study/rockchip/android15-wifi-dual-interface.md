@@ -281,6 +281,6 @@ m android.hardware.wifi-service -j
 | **Soong 變數檢查** | `grep -A5 wifi out/soong/soong.rk3588_board.variables` | 出現 `"hidl_feature_dual_interface": true` |
 | **HAL 編譯旗標確認** | `grep -r "WIFI_HIDL_FEATURE_DUAL_INTERFACE" out/soong/.intermediates/hardware/interfaces/wifi/aidl/default/` | 有 `-D` 宏出現 |
 | **build.prop 檢查** | `grep wifi out/target/product/rk3588_board/vendor/build.prop` | Wi-Fi 屬性列出 |
-| **runtime 驗證** | `adb shell getprop | grep wifi` | 顯示實際生效的 Wi-Fi 相關屬性 |
-| **HAL 狀態驗證** | `dumpsys wifi | grep Concurrency` | 顯示 `STA + AP  Concurrency Supported: true` |
+| **runtime 驗證** | `adb shell getprop \| grep wifi` | 顯示實際生效的 Wi-Fi 相關屬性 |
+| **HAL 狀態驗證** | `dumpsys wifi \| grep Concurrency` | 顯示 `STA + AP  Concurrency Supported: true` |
 | **快速清 cache 重建** | `rm -f out/soong/soong.rk3588_board*.variables && m android.hardware.wifi-service -j` | 重新生成 Soong 設定並重新編譯 Wi-Fi HAL |

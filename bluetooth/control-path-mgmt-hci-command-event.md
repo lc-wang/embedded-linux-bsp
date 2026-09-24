@@ -237,9 +237,11 @@ struct hci_dev {
 
 典型健康流程：
 
-`> HCI Command: Reset < HCI Event: Command Complete (Reset)
+```text
+> HCI Command: Reset < HCI Event: Command Complete (Reset)
 
-> HCI Command: Read  Local  Version < HCI Event: Command Complete` 
+> HCI Command: Read  Local  Version < HCI Event: Command Complete
+```
 
 異常流程（最常見）：
 
@@ -265,8 +267,10 @@ struct hci_dev {
     
 優先檢查：
 
-`drivers/bluetooth/hci_uart.c
-drivers/bluetooth/btusb.c` 
+```text
+drivers/bluetooth/hci_uart.c
+drivers/bluetooth/btusb.c
+```
 
 #### event 回來，但 status 非 0
 

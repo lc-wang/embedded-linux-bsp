@@ -177,7 +177,7 @@ perf report
 ## 10. 決策總結
 
 問題是否與時間順序有關？
-```yaml
+```text
 └─ 否 → 不要 trace
 
 └─ 是 → 事件 trace

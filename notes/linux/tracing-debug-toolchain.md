@@ -161,8 +161,10 @@ addr2line
 
 ### 5.5 simpleperf — Android native code 熱點
 
-`simpleperf record -p <pid>
-simpleperf report` 
+```bash
+simpleperf record -p <pid>
+simpleperf report
+```
 
 用途：
 
@@ -239,13 +241,17 @@ echo  'file drivers/net/wireless/* +p' \
 
 ### 8.1 perf record / report — CPU hotspot
 
-`perf record -a
-perf report` 
+```bash
+perf record -a
+perf report
+```
 
 ### 8.2 perf sched — runnable 卻沒跑
 
-`perf sched record -a
-perf sched latency` 
+```bash
+perf sched record -a
+perf sched latency
+```
 
 ### 8.3 perf irq — IRQ latency
 
@@ -312,8 +318,10 @@ cat /sys/kernel/debug/kmemleak
 
 ### 10.5 KASAN / UBSAN
 
-`CONFIG_KASAN=y
-CONFIG_UBSAN=y` 
+```text
+CONFIG_KASAN=y
+CONFIG_UBSAN=y
+```
 
 ## 11. Crash / Hang / Live Kernel Debug
 

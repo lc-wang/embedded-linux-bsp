@@ -56,7 +56,7 @@ EM7590 是 data-only（無語音）、且沒有廠商 Android HAL，所以這條
 | modem 控制 | **AT 指令**（`ttyUSB*`）：`AT!USBCOMP`、`AT+CGPADDR`、`AT+CGCONTRDP` | 切 composition、拿本次 IP / DNS |
 | QMI 撥號 | 自寫 **`qmistart2.c`**（NDK aarch64 static，raw-QMI，無 libqmi） | 直接對 `/dev/cdc-wdm0` 下 WDS Start-Network |
 | 框架 | `logcat`（`RILJ`/`DataNetwork`/`ConnectivityService`/`Telephony`）、`dumpsys connectivity`、`cmd connectivity`、`ndc` | RIL 有沒有回、NetworkAgent 有沒有註冊、預設網路是誰 |
-| sepolicy | `dmesg | grep avc`、`audit2allow`、`getenforce`/`setenforce` | 抓 denial、先 permissive 收斂再 enforcing |
+| sepolicy | `dmesg \| grep avc`、`audit2allow`、`getenforce`/`setenforce` | 抓 denial、先 permissive 收斂再 enforcing |
 | 最終判準 | `ping 8.8.8.8`（IP）、`ping google.com`（DNS） | **只有 ping 通才算 PASS** |
 
 ### 3.2 Phase 1 — kernel 驅動 + 手動 raw-QMI 撥號

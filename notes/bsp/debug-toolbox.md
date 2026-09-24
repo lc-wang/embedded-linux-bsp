@@ -33,7 +33,7 @@
 
 ## 2. Debug 層級模型
 
-```yaml
+```text
 [ User Space ] app / service / framework
 
 │
@@ -203,7 +203,7 @@ addr2line -e vmlinux 0xffffff...
 
 ## 10. Debug 決策樹
 
-```yaml
+```text
 現象 → 分類 → 最小工具 → 排除假設 → 縮小範圍 → 深入
 ```
 

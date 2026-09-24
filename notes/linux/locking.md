@@ -208,7 +208,7 @@ RCU 是 Linux 中最重要的 lock-free 讀取機制之一。
 -   大量讀取 + 低成本讀操作
 核心理念：
 
-```yaml
+```text
 Writer：複製 → 修改 → 替換 → 延遲釋放舊資料
 Reader：不加鎖直接讀
 ```

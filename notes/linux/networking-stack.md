@@ -14,7 +14,7 @@
 ## 1. Linux Network Stack 總覽
 
 網路資料流（TX path）：
-```yaml
+```text
 User space socket
 ↓
 Kernel socket layer
@@ -35,7 +35,7 @@ DMA → Hardware TX
 ```
 
 RX path 則反向：
-```yaml
+```text
 Hardware RX interrupt
 ↓
 NAPI poll
@@ -65,7 +65,7 @@ User space recv()
 - queue linkage
 
 示意圖：
-```yaml
+```text
 +-----------------------+
 | sk_buff metadata |
 +-----------------------+
@@ -117,7 +117,7 @@ ndo_start_xmit()
 ```
 TX 的入口點：
 
-```c
+```text
 SKB → ndo_start_xmit → Driver → DMA → HW
 ```
 
@@ -127,7 +127,7 @@ SKB → ndo_start_xmit → Driver → DMA → HW
 
 NAPI 方式：
 
-```markdown
+```text
 1. RX interrupt 到來
 2. Driver 禁掉 interrupt，進入 poll mode
 3. poll() 一次處理多個封包（batch）
@@ -143,7 +143,7 @@ NAPI 是 Wi-Fi / Ethernet 高效能的關鍵。
 
 ## 5. TX path（傳送流程）
 
-```yaml
+```text
 socket send()
   ↓
 tcp_sendmsg
@@ -177,7 +177,7 @@ netif_wake_queue(dev);
 
 ## 6. RX path（接收流程）
 
-```yaml
+```text
 NIC RX DMA
   ↓
 RX interrupt → NAPI poll
@@ -226,7 +226,7 @@ tc qdisc show dev eth0
 
 流程：
 
-```yaml
+```text
 PREROUTING
 INPUT
 FORWARD

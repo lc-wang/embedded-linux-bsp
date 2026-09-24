@@ -94,7 +94,7 @@ Left/Right PGA Mux = Differential
 -   或至少在類比前端與 Main Mic 匯流
     
 也就是：
-```yaml
+```text
 MIC_P / MIC_N
  ├─ 獨立 Main Mic
  └─ 耳麥 Mic（經 jack / 電阻 / AC-coupling） 

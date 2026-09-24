@@ -130,7 +130,7 @@ psci_cpu_suspend();
 | `/sys/power/wakeup_count` | 提供安全同步機制，避免 suspend 過程中新的喚醒事件遺漏。 |
 | `/sys/kernel/debug/pm_debug` | 檢查 suspend / resume 流程的執行狀態與失敗原因。 |
 | `/sys/kernel/debug/wakeup_sources` | 顯示所有喚醒來源與觸發統計。 |
-| `dmesg | grep PM:` | 查看 suspend / resume 過程中的核心 log。 |
+| `dmesg \| grep PM:` | 查看 suspend / resume 過程中的核心 log。 |
 | `trace-cmd record -e power:*` | 追蹤整個電源事件時序。 |
 | `powertop` | 分析系統耗電與喚醒頻率。 |
 

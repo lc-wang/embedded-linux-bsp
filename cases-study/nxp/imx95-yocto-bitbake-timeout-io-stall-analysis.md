@@ -136,10 +136,11 @@ SSTATE_DIR ?= "/mnt/yocto-nvme/sstate-imx95"
 
 ## 6. 結論與建議（最終建議）
 
-### 6.1 Yocto 放 NVMe
-### 6.2 TMPDIR / SSTATE_DIR 放 NVMe
-### 6.3 外接磁碟僅用於 source 勿用於 tmp/sstate
-### 6.4 thread 設為
+1.  Yocto 放 NVMe
+2.  TMPDIR / SSTATE_DIR 放 NVMe
+3.  外接磁碟僅用於 source 勿用於 tmp/sstate
+4.  thread 設為：
+
 ```bash
 BB_NUMBER_THREADS = "2"
 PARALLEL_MAKE = "-j 2"

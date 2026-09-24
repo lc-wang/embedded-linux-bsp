@@ -14,7 +14,7 @@
 ## 1. IRQ Subsystem 總覽
 
 Linux 將中斷分為三階段：
-```yaml
+```text
 硬體中斷 (HW Interrupt)
 ↓
 中斷控制器 (GIC)
@@ -37,7 +37,7 @@ interrupts = <42 IRQ_TYPE_LEVEL_HIGH>;
 ```
 
 映射流程：
-```yaml
+```text
 HW IRQ number (hwirq)
 ↓
 IRQ Domain
@@ -123,7 +123,7 @@ request_threaded_irq(irq, top_half, thread_fn,
 ```
 執行流程：
 
-```yaml
+```text
 HW IRQ
    ↓
 top_half() → 非常短，通常 return IRQ_WAKE_THREAD

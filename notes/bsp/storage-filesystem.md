@@ -19,7 +19,7 @@
 Android / Linux BSP 大多使用 GPT。
 
 範例：
-```yaml
+```text
 gpt layout:
 0: bootloader
 1: reserved
@@ -46,7 +46,7 @@ gpt layout:
 ## 3. Boot Image 結構（Android）
 
 Android 的 boot.img 格式（boot header v3 / v4）包含：
-```yaml
+```text
 boot.img
 ├ header
 ├ kernel (Image.gz)
@@ -125,7 +125,7 @@ Kernel 模組：
 
 ### 7.2 Kernel 指定 rootfs
 
-```yaml
+```text
 root=/dev/mmcblk0p2 rw rootwait
 ```
 
@@ -148,7 +148,7 @@ hexdump -C /dev/mmcblk0 | head
 
 ### 8.3 Kernel MMC log
 
-```yaml
+```bash
 dmesg | grep mmc
 ```
 

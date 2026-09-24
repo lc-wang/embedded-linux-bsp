@@ -2,7 +2,7 @@
 
 ## 1. Android 開機流程總覽
 
-```yaml
+```text
 Bootloader
 ↓
 Linux Kernel
@@ -54,7 +54,7 @@ Zygote 在啟動時會預載：
 
 ### 4.1 SystemServer 啟動流程
 
-```yaml
+```text
 StartBootstrapServices()
 StartCoreServices()
 StartOtherServices()
@@ -112,7 +112,7 @@ Dexopt 的影響主要在首次開機，但多數專案也會調整為：
 
 #### 啟動流程
 
-```yaml
+```text
 SurfaceFlinger start
 ↓
 HWC、Display 初始化
@@ -127,7 +127,7 @@ bootanimation 啟動（開機畫面）
 - SurfaceFlinger 尚未 ready  
 
 檢查：
-```yaml
+```bash
 dumpsys SurfaceFlinger --latency
 ```
 
@@ -154,7 +154,7 @@ Android Go（低階裝置）使用 **metadata prefetch** 加速啟動：
 
 ### 8.1 Init 卡住 Debug
 
-```yaml
+```bash
 dmesg -n 8
 dmesg | grep init
 logcat -b all
@@ -165,12 +165,12 @@ logcat -b all
 
 ### 8.2 SystemServer 卡住
 
-```yaml
+```bash
 logcat -b system
 logcat | grep SystemServerTiming
 ```
 或使用：
-```yaml
+```bash
 dumpsys activity service SystemServerTiming
 ```
 

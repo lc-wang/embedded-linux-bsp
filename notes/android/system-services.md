@@ -72,7 +72,7 @@ SystemServer 啟動時會依序呼叫 `startBootstrapServices()`、`startCoreSer
 
 ### 4.1 啟動流程簡圖
 
-```cscc
+```text
 SystemServer.main()
   ↓
 createSystemContext()
@@ -100,7 +100,7 @@ startOtherServices()
 -   App 透過 `Context.getSystemService()` 取得對應的 **Client 代理 (Proxy)**。
 -   所有 IPC 呼叫都經過 `/dev/binder` 進行跨程序通信。
 
-```scss
+```text
 App
   ↓ getSystemService("activity")
 SystemServer (ActivityManagerService)

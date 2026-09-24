@@ -5,7 +5,7 @@ App → BufferQueue → SurfaceFlinger → HWComposer (HWC) → DRM/KMS → Pane
 
 ## 1. 顯示系統總覽架構
 
-```yaml
+```text
 App (OpenGL/Canvas)
 ↓
 Surface / SurfaceControl
@@ -40,7 +40,7 @@ BufferQueue 是所有 Android 顯示資料流動的基礎。
 
 ### 2.2 buffer 狀態流轉
 
-```yaml
+```text
 dequeueBuffer
 write to GPU
 queueBuffer
@@ -96,7 +96,7 @@ VSYNC 控制整個顯示管線節奏。
 - 由硬體（display controller）產生 vsync interrupt
 
 流程：
-```yaml
+```text
 VSYNC interrupt
 ↓
 HWC callback setVsyncEnabled()
@@ -116,7 +116,7 @@ Layer 更新 / composition / present
 | **Cursor** | 游標 layer |
 
 HWC 會回報：
-```yaml
+```text
 HWC2_COMPOSITION_DEVICE
 HWC2_COMPOSITION_CLIENT
 ```
@@ -126,7 +126,7 @@ HWC2_COMPOSITION_CLIENT
 SurfaceFlinger 在進行 GPU 合成時使用 RenderEngine。
 
 Composition 流程：
-```yaml
+```text
 Layer buffer → (GL) RenderEngine → GPU composite → output buffer
 ```
 
@@ -137,7 +137,7 @@ Android 12+ 也可以用：
 ## 8. DRM / KMS（HWC backend → Linux display）
 
 HWC 最後會把合成好的 buffer 交給 DRM/KMS：
-```yaml
+```text
 HWC present()
 ↓
 drmModeAtomicCommit()
@@ -146,7 +146,7 @@ Plane / CRTC / Encoder / Connector
 ```
 
 如果畫面顯示異常，debug 路徑一般如下：
-```yaml
+```text
 SurfaceFlinger → HWC → DRM → Panel
 ```
 

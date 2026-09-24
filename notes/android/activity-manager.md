@@ -205,7 +205,7 @@ WMS 關心的是：
 ### 5.5 實際決策資料流（Visibility → Importance）
 
 以下是使用者切換 App 時，實際發生的流程：
-```yaml
+```text
 使用者切換畫面
 
 ↓
@@ -265,7 +265,7 @@ AMS 的責任不是維持 Task 與 Process 的一對一關係， 而是 **根據
 ### 6.2 可見 Task 如何影響 Process Importance
 
 實際決策流程如下：
-```yaml
+```text
 Task 變為可見（前景）
 
 ↓
@@ -281,7 +281,7 @@ AMS 提升 Task importance
 AMS 提升對應 process 的 OOM adj / 前景等級
 ```
 反之：
-```yaml
+```text
 Task 不可見（背景）
 
 ↓

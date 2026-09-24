@@ -71,21 +71,21 @@ K --> L["Boot Completed"]
 
 #### Yocto `.wic` 檢查
 
-```nginx
+```bash
 fdisk -l core-image*.wic
 ```
 
 → Start=4096、44536 
 
-```yaml
-xxd -s 0 -l 16`：
+```bash
+xxd -s 0 -l 16
 0x00000000:  fab8  0010 8ed0  bc00  ...
 ```
 
 → 前面不是 0，也不是 bl2_bp，表示 Yocto WIC **並沒有把 BL2_BP 放在 LBA0**。
 
 #### 自製 image（錯誤版本）
-```yaml
+```bash
 xxd -s 0 -l 16 ubuntu.img
 00000000: 0100 0000 0000 0000 ......
 ``` 
@@ -127,7 +127,7 @@ dd  if=bl2_bp_esd.bin of=$loop_dev conv=notrunc
 #### 問題 2：FIP offset 錯誤
 
 探勘 offset：
-```nginx
+```bash
 xxd -s $((768*512)) -l 16 core-image*.wic
 ```
 → 發現 FIP 在 LBA 768 → script 修正後正常。
@@ -135,12 +135,12 @@ xxd -s $((768*512)) -l 16 core-image*.wic
 #### 問題 3：你用錯 partition layout
 
 Yocto：
-```sql
+```text
 P1 start=4096
 P2 start=44536
 ```
 你最初用：
-```ini
+```text
 start=524288 
 ```
 → 完全錯 → kernel 找不到 rootfs。
@@ -192,7 +192,7 @@ start=524288
 ## 附錄（對照表、偏移計算、分析工具）
 
 ### A. Bootloader offset 計算
-```ini
+```text
 LBA1 = 1 * 512 = 0x200
 LBA768 = 768 * 512 = 0x60000
 ```

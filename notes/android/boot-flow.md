@@ -6,7 +6,7 @@
 
 ## 1. 開機流程總覽
 
-```cscc
+```text
 [Boot ROM]
 ↓
 [Bootloader (SPL → U-Boot)]
@@ -87,12 +87,14 @@ Init 是 Android user-space 的第一個進程（PID 1）。
 
 ### 4.1 範例流程
 
+```text
 /init.rc
 ├─ mount /dev /proc /sys
 ├─ start servicemanager
 ├─ start surfaceflinger
 ├─ start zygote
 └─ start logd
+```
 
 ### 4.2 常見指令
 
@@ -112,7 +114,7 @@ Zygote 是整個 Android Java 世界的根，
 | 主類別 | `ZygoteInit.java` | 建立 socket，等待 fork 請求 |
 
 流程：
-```cscc
+```text
 Init 啟動 Zygote → 建立 socket → 載入 framework 類別
 ↓
 等待 AMS 請求 → fork() → 新的 app process

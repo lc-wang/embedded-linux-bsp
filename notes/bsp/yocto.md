@@ -20,7 +20,7 @@ Yocto 不是 Linux 發行版，而是 **建置 Linux 發行版的框架**。
 
 ## 2. Yocto Build 流程
 
-```yaml
+```text
 bitbake <image>
 ↓
 Parse recipes / classes / conf
@@ -41,7 +41,7 @@ Generate image (wic / ext4 / sdcard.img)
 ## 3. Meta Layer 架構
 
 常見的 meta layers：
-```bash
+```text
 meta/
 meta-poky/
 meta-openembedded/
@@ -55,7 +55,7 @@ meta-mylayer/ ← 你自己的 layer
 
 ### 3.1 建議你的專案層級
 
-```yaml
+```text
 meta-mycompany/
 ├── recipes-core/
 ├── recipes-kernel/
@@ -82,7 +82,7 @@ Yocto 有三種 config 範疇：
 
 MACHINE = "rzt2h-evk"
 machine config：
-```yaml
+```text
 meta-renesas/conf/machine/rzt2h-evk.conf
 ```
 
@@ -95,7 +95,7 @@ meta-renesas/conf/machine/rzt2h-evk.conf
 - toolchain options
 
 例：
-```yaml
+```text
 DISTRO = "poky" 或 "mydistro"
 ```
 
@@ -107,7 +107,7 @@ DISTRO = "poky" 或 "mydistro"
 - 是否加入 python / ssh / weston
 
 例：
-```yaml
+```bash
 bitbake core-image-minimal
 bitbake core-image-weston
 bitbake my-image

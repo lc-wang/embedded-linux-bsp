@@ -7,11 +7,11 @@
 ## 2. 環境與前置條件（系統環境）
 
 RZT2H SBC 上運行：
-```yaml
+```text
 Ubuntu 24.04 LTS (Noble) 
 ```
 確認：
-```yaml
+```bash
 cat /etc/os-release 
 ```
 Host PC 也運行 ROS2，用 rqt 操作。
@@ -42,19 +42,19 @@ colcon version 0.16.x
 如果這行出現，表示 ROS2 workspace 就可以開始編譯。
 
 ## 4. 建立 ROS2 Workspace
-```yaml
+```bash
 mkdir -p ~/ros2_ws/src cd ~/ros2_ws 
 ```
 
 ## 5. `rzt2h_remoteproc` 套件建立流程
 
 建立 package：
-```yaml
+```bash
 cd ~/ros2_ws/src
 ros2 pkg create rzt2h_remoteproc --build-type ament_python
 ```
 建立 scripts 與 module：
-```yaml
+```text
 rzt2h_remoteproc/
   package.xml
   setup.py
@@ -123,11 +123,11 @@ ros2 run rzt2h_remoteproc cr52_remoteproc_service
 ## 8. Host PC 使用 rqt 操作 CR52
 
 在 Host PC：
-```yaml
+```bash
 rqt
 ```
 開啟：
-```yaml
+```text
 Plugins → Services → Service Caller 
 ```
 可以看到：

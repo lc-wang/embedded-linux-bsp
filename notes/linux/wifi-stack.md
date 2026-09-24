@@ -122,7 +122,7 @@ ieee80211_register_hw(hw);
 
 交互關係：
 
-```c
+```text
 iw / wpa_supplicant → nl80211 → cfg80211 → (mac80211) → driver
 ```
 

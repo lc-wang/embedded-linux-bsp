@@ -171,8 +171,10 @@ btmgmt power on
 
 ### 9.1 USB enumeration
 
-`lsusb
-lsusb -t` 
+```bash
+lsusb
+lsusb -t
+```
 
 ### 9.2 btusb log
 

@@ -101,7 +101,7 @@ struct workqueue_struct {
 
 ### 4.1 Tasklet 流程（SoftIRQ）
 
-```yaml
+```text
 IRQ Handler
     ↓ tasklet_schedule()
 raise TASKLET_SOFTIRQ
@@ -117,7 +117,7 @@ tasklet_action()
 
 ### 4.2 Workqueue 流程（kworker）
 
-```yaml
+```text
 IRQ Handler
     ↓ schedule_work()
 將 work 加入 workqueue

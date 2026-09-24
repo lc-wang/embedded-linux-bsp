@@ -25,12 +25,12 @@ rk808_pm_power_off_dummy
 ### 2.1 Linux Power-Off 的實際 Call Flow（RK3588）
 
 #### 2.1.1 Userspace → Kernel
-```yaml
+```text
 poweroff
  └─ systemd → reboot(LINUX_REBOOT_CMD_POWER_OFF)
 ```
 #### 2.1.2 Kernel 核心流程
-```yaml
+```text
 sys_reboot()
  └─ kernel_power_off()
      ├─ device_shutdown()
@@ -91,7 +91,7 @@ if ((rk806->pins->p) && (rk806->pins->power_off))
                           rk806->pins->power_off);
 ```
 #### 2.3.3 實際 Call Flow
-```yaml
+```text
 kernel_power_off()
  └─ device_shutdown()
      └─ regulator shutdown

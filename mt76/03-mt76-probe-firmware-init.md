@@ -55,7 +55,7 @@ mt76 從一開始就將「匯流排差異」封裝在 `mt76_bus_ops`。
 ### 2.2 mt76 core initialization（第二層）
 
 完成 bus probe 後，會進入 mt76 core 初始化流程：
-```yaml
+```text
 mt76_alloc_device()
   ├─ 初始化 spinlock / mutex
   ├─ 建立 workqueue
@@ -81,7 +81,7 @@ mt76 driver **沒有**直接操作 PHY，而是透過 MCU command。
 ### 3.2 firmware 檔案位置與命名
 
 Firmware 來自 `linux-firmware` 專案，常見位置：
-```yaml
+```text
 /lib/firmware/mediatek/
   ├─ mt7915_rom_patch.bin
   ├─ mt7915_ram.bin
@@ -104,7 +104,7 @@ request_firmware(&fw, fw_name, dev);
 2.  **RAM firmware**
     -   主執行邏輯
     -   支援 MCU command / events
-```yaml
+```text
 Host
  └─ upload ROM patch
      └─ reset MCU
@@ -117,7 +117,7 @@ Host
 ### 4.1 MCU 初始化順序
 
 以 mt7915 / mt7921 / mt7996 為例，流程大致為：
-```yaml
+```text
 1. MCU reset
 2. Firmware download
 3. MCU start

@@ -34,12 +34,12 @@ while (!flag) {}
 print(x);
 ```
 **以為**一定印出：
-```yaml
+```text
 1
 ```
 
 但在 ARM 上可能印出：
-```yaml
+```text
 0
 ```
 
@@ -54,12 +54,12 @@ ARM 的特性：
 - x86 比較強一致性，但 ARM weak model 允許更多 reorder  
 
 示例：
-```yaml
+```text
 STORE x=1
 STORE flag=1
 ```
 可能會變成：
-```yaml
+```text
 STORE flag=1
 STORE x=1
 ```
@@ -84,7 +84,7 @@ STORE x=1
 | **SMP barrier** | 防止在多核心間重排 | `smp_mb(), smp_rmb(), smp_wmb()` |
 
 記法：
-```yaml
+```text
 smp_mb() = multiprocessor full barrier
 ```
 
@@ -92,7 +92,7 @@ smp_mb() = multiprocessor full barrier
 
 ### 5.1 Full barrier：smp_mb()
 
-```yaml
+```c
 smp_mb();
 ```
 用途：
@@ -101,7 +101,7 @@ smp_mb();
 - 最嚴格的 barrier  
 
 典型使用：
-```yaml
+```c
 x = 1;
 smp_mb();
 flag = 1;
@@ -110,14 +110,14 @@ flag = 1;
 
 ### 5.2 Read barrier：smp_rmb()
 
-```yaml
+```c
 smp_rmb();
 ```
 用途：
 - 防止 read-read 或 read-write 重排
 
 例如：
-```yaml
+```c
 while (!flag)
 smp_rmb();
 
@@ -126,7 +126,7 @@ val = x;
 
 ### 5.3 Write barrier：smp_wmb()
 
-```yaml
+```c
 smp_wmb();
 ```
 用途：
@@ -134,7 +134,7 @@ smp_wmb();
 - 防止 write-write 或 write-read 重排
 
 例如（producer code）：
-```yaml
+```c
 buffer[i] = data;
 smp_wmb();
 ready[i] = 1;
@@ -143,13 +143,13 @@ ready[i] = 1;
 ## 6. Acquire / Release 語義（現代 Linux 建議用法）
 
 現代 Linux 更鼓勵使用：
-```yaml
+```text
 smp_store_release()
 smp_load_acquire()
 ```
 
 範例：
-```yaml
+```c
 smp_store_release(&flag, 1); // 確保 flag 前所有 store 都生效
 ...
 if (smp_load_acquire(&flag)) {
@@ -174,7 +174,7 @@ if (smp_load_acquire(&flag)) {
 | atomic_xxx_acquire_release | full barrier |
 
 例如：
-```yaml
+```c
 atomic_set_release(&flag, 1);
 ```
 代表：
@@ -200,7 +200,7 @@ atomic_set_release(&flag, 1);
 DMA 與 CPU 不共享 cache 一致性（除非硬體支援）。
 
 常見錯誤：
-```yaml
+```text
 cpu writes buffer
 dma reads buffer → 得到舊資料
 ```
@@ -210,7 +210,7 @@ dma reads buffer → 得到舊資料
 - DMA 在讀舊的 memory
 
 解法：
-```yaml
+```text
 dma_sync_single_for_device()
 dma_sync_single_for_cpu()
 ```
@@ -226,7 +226,7 @@ trace-cmd record -e kmem:* -e sched:* -e irq:*
 ### 10.2 KCSAN（Kernel Concurrency Sanitizer）
 
 Linux 支援：
-```yaml
+```text
 CONFIG_KCSAN=y
 ```
 可偵測 race condition。
@@ -236,7 +236,7 @@ CONFIG_KCSAN=y
 ### 11.1 Writer 先寫 flag，再寫 data
 
 錯誤：
-```yaml
+```c
 data = 123;
 flag = 1;
 ```
@@ -244,7 +244,7 @@ flag = 1;
 在 ARM 上可能 reorder。
 
 修正：
-```yaml
+```c
 data = 123;
 smp_wmb();
 flag = 1;
@@ -252,7 +252,7 @@ flag = 1;
 
 ### 11.2 Reader 看到 flag，但看不到資料
 
-```yaml
+```c
 while (!flag);
 
 print(data);
@@ -260,7 +260,7 @@ print(data);
 可能印出舊值。
 
 修正：
-```yaml
+```c
 while (!smp_load_acquire(&flag));
 print(data);
 ```

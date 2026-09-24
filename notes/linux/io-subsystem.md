@@ -13,7 +13,7 @@
 ## 1. I/O Path 總覽
 
 完整資料流程如下：
-```yaml
+```text
 User Space
 ↓
 VFS (read/write)
@@ -43,11 +43,11 @@ Storage Device
 ### 2.1 Page Cache
 
 Linux 將檔案讀取緩存在 Page Cache：
-```yaml
+```text
 read() → 若 cache 命中，直接回應 → 不會進入 storage
 ```
 可用：
-```yaml
+```bash
 cat /proc/meminfo | grep -i cache
 ```
 
@@ -97,7 +97,7 @@ blk-mq 支援：
 - 每 device 多個 HW queue
 
 流程：
-```yaml
+```text
 BIO
 ↓
 blk-mq → choose SW queue
@@ -175,7 +175,7 @@ Android 通常：
 
 ## 8. Read Path（流程）
 
-```yaml
+```text
 read()
 ↓
 Page Cache hit → 回傳
@@ -195,7 +195,7 @@ Page Cache → User Space
 
 ## 9. Write Path（流程）
 
-```yaml
+```text
 write()
 ↓
 寫入 Page Cache → Dirty

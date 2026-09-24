@@ -180,7 +180,7 @@ echo 0 > /dev/cpu_dma_latency
 | `/sys/kernel/debug/wakeup_sources` | 列出所有 wakeup source 及統計資訊 |
 | `powertop` | 分析功耗與喚醒事件頻率 |
 | `trace-cmd record -e power:*` | 追蹤 suspend/resume 事件時序 |
-| `dmesg | grep PM:` | 查看 suspend/resume 相關 kernel log |
+| `dmesg \| grep PM:` | 查看 suspend/resume 相關 kernel log |
 
 ## 11. 常見問題與排查（常見問題與調試思路）
 

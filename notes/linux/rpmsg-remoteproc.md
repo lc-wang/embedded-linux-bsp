@@ -40,7 +40,7 @@ RPMsg 是 remoteproc 上層的 IPC 機制，基於 virtio（虛擬裝置）實�
 
 ## 3. Remoteproc + RPMsg 架構
 
-```yaml
+```text
 User space
 ↓ (open /dev/rpmsgX)
 RPMsg char driver
@@ -186,7 +186,7 @@ dmesg | grep vring
 
 ## 11. Remoteproc Bring-up 流程
 
-```markdown
+```text
 1. 分割 reserved memory
 2. 寫 linker script 給 remote firmware
 3. 實作 resource_table

@@ -64,7 +64,7 @@ GND
 
 #### 3.1.1 啟用 SCI1 與 pinmux
 
-```yaml
+```dts
 sci1_pins: sci1 {
         pinmux = <RZT2H_PORT_PINMUX(11, 1, 0x14)>, /* SCI1_TXD */
                  <RZT2H_PORT_PINMUX(11, 0, 0x14)>; /* SCI1_RXD */
@@ -86,13 +86,13 @@ sci1_pins: sci1 {
 ### 3.2 Runtime Pinmux 驗證
 
 使用 debugfs 確認 pinmux 實際生效狀態：
-```yaml
+```bash
 mount -t debugfs none /sys/kernel/debug
 
 grep -R "P11_0\|P11_1" /sys/kernel/debug/pinctrl/*/pinmux-pins 
 ```
 輸出：
-```yaml
+```text
 pin 88 (P11_0): device 80005400.serial  function sci1 group sci1
 pin 89 (P11_1): device 80005400.serial  function sci1 group sci1 
 ```
@@ -110,7 +110,7 @@ pin 89 (P11_1): device 80005400.serial  function sci1 group sci1
 ## 4. Root Cause 分析
 
 在 EVB schematic 中可確認：
-```yaml
+```text
 P11_0_BSC_A5_LCDC_DATG0_PMOD2_RXD1
              │
         DIP-Switch-10pol-SMD (SW6)

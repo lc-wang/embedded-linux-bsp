@@ -27,7 +27,7 @@ Linux 主要使用 **multi-class scheduler**：
 Linux 以 CFS 為核心，每個 CPU 有獨立的 runqueue。
 
 排程流程：
-```yaml
+```text
 task wakeup
 ↓
 enqueue_task()
@@ -79,12 +79,12 @@ CFS 透過維護一棵 **紅黑樹（rb-tree）** 來管理所有 runnable tasks
 最左邊節點 = vruntime 最小 = 應優先執行
 
 執行步驟：
-```yaml
+```text
 pick_next_task()
 ← 取 rb-tree 最左節點
 ```
 Task 結束執行後會更新 vruntime：
-```yaml
+```text
 vruntime += actual_runtime * weight_factor
 ```
 
@@ -99,7 +99,7 @@ Linux 具有三大排程類別：
 | **SCHED_DEADLINE** | 嚴格 deadline | dl_rq |
 
 優先權順序：
-```yaml
+```text
 deadline > RT > CFS
 ```
 
@@ -108,7 +108,7 @@ deadline > RT > CFS
 新任務 woken up 時，有機會搶佔目前執行的 task。
 
 邏輯：
-```yaml
+```text
 if new->vruntime < curr->vruntime - margin
 preempt
 ```
@@ -143,7 +143,7 @@ taskset -c 1,2 ./myapp
 
 ### 7.2 cgroup 限制 CPU 使用率
 
-```yaml
+```bash
 systemd-run --scope -p CPUQuota=50% ./app
 ```
 Android 中：
@@ -169,13 +169,13 @@ Context switch 成本包括：
 ## 9. Scheduler 與 CPUFreq / Thermal 的關係
 
 Scheduler 會與 CPUFreq / thermal 整合：
-```yaml
+```text
 schedutil governor:
 Q = estimated cpu utilization
 → 選擇適合頻率
 ```
 Thermal throttling:
-```yaml
+```text
 thermal zone → cooling device → 降低 CPU OPP（頻率）
 scheduler → 使用較低 CPU capacity
 ```
@@ -212,7 +212,7 @@ cat /proc/sched_debug
 
 ### 10.5 ftrace（追蹤排程延遲）
 
-```yaml
+```bash
 echo 1 > /sys/kernel/debug/tracing/events/sched/sched_switch/enable
 cat /sys/kernel/debug/tracing/trace
 ```

@@ -19,7 +19,7 @@ DRM（Direct Rendering Manager）包含兩部分：
 | **KMS (Kernel Mode Setting)** | 設定解析度、刷新率、顯示 pipeline、plane 組態 |
 
 顯示系統 pipeline：
-```yaml
+```text
 Userspace (X11 / Wayland / Android SurfaceFlinger)
 ↓
 libdrm
@@ -46,7 +46,7 @@ KMS pipeline 是由數個物件組成的：
 | **Mode** | 解析度 / refresh rate（timing） |
 
 典型顯示拓撲：
-```yaml
+```text
 Plane → CRTC → Encoder → Connector → Panel
 ```
 
@@ -56,7 +56,7 @@ Atomic 模式：
 所有 KMS 狀態必須一次提交（atomic commit），保證畫面無撕裂、同步。
 
 使用方式：
-```yaml
+```text
 atomic_check() ← 驗證 state
 atomic_commit() ← 實際套用設定
 ```
@@ -177,7 +177,7 @@ clock (pixel clock)
 ```
 例如：
 
-```c
+```text
 800x600 @ 60Hz  → pixel clock = 40MHz
 ```
 Panel driver 的 get_modes() 負責產生 mode。
@@ -209,7 +209,7 @@ Android 使用 HWC（Hardware Composer）與 DRM 驅動整合。
 
 流程：
 
-```c
+```text
 SurfaceFlinger
    ↓
 HWC2
@@ -243,7 +243,7 @@ CONFIG_DRM_DEBUG_MODESET
 ```
 可看到：
 
-```yaml
+```text
 atomic commit:
    plane state:
    crtc state:

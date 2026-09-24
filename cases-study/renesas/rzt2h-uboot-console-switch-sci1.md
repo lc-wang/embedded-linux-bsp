@@ -56,15 +56,19 @@ sci1: serial@80005400 {
 
 #### 2.1.2 指定 serial0 alias
 
-`aliases {
+```dts
+aliases {
         serial0 = &sci1;
-};` 
+};
+```
 
 #### 2.1.3 啟用 SCI1
 
-`&sci1 {
+```dts
+&sci1 {
         status = "okay";
-};` 
+};
+```
 
 ### 2.2 問題現象
 

@@ -28,7 +28,7 @@ SPI 常見工程現實：
 
 ### 2.1 核心物件
 
-```yaml
+```text
 spi_controller (spi_master)
 │
 spi_device
@@ -41,7 +41,7 @@ spi_driver
 
 ### 2.2 資料實際怎麼送出去
 
-```yaml
+```text
 driver
 	└─ spi_sync()
 		└─ spi_controller->transfer_one()
@@ -90,7 +90,7 @@ driver
 
 ## 4. SPI Driver Bring-up 決策流程
 
-```yaml
+```text
 probe 進來了？
 	├─ 否 → DT / compatible / bus
 	└─ 是

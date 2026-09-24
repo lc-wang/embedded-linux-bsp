@@ -28,9 +28,11 @@
 
 建立位置：
 
-`/dev/gpiochip0
+```text
+/dev/gpiochip0
 /dev/gpiochip1
-...` 
+...
+```
 
 每一個 gpio controller 對應一個 gpiochip
 

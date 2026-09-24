@@ -7,7 +7,7 @@
 
 ## 1. 整體架構總覽
 
-```yaml
+```text
 Linux Kernel (evdev)
 ↓
 EventHub
@@ -36,7 +36,7 @@ Android 的 EventHub 用來輪詢所有 input 裝置。
 | 傳遞事件給 InputReader | 包含 type, code, value |
 
 程式位置：
-```yaml
+```text
 frameworks/native/services/inputflinger/EventHub.cpp
 ```
 
@@ -70,7 +70,7 @@ AMOTION_EVENT_ACTION_UP
 ```
 
 程式路徑：
-```yaml
+```text
 frameworks/native/services/inputflinger/InputReader.cpp
 ```
 
@@ -90,7 +90,7 @@ InputDispatcher 會將 InputReader 產生的 CookedEvent
 
 ### 4.2 事件分派邏輯
 
-```yaml
+```text
 觸控位置 → 查詢 WMS 中的 window region
 ↓
 找到 top-most window
@@ -103,14 +103,14 @@ InputDispatcher 會將 InputReader 產生的 CookedEvent
 Java 層的 InputManagerService 是整個 input 系統的管理者。
 
 流程：
-```java
+```text
 SystemServer.startOtherServices()
 → new InputManagerService()
 → nativeInit()
 → 啟動 InputReaderThread / InputDispatcherThread
 ```
 位置：
-```yaml
+```text
 frameworks/base/services/core/java/com/android/server/input/InputManagerService.java
 ```
 
@@ -129,13 +129,13 @@ InputDispatcher 透過 socketpair 形式的 **InputChannel**
 將事件送到 App 的主執行緒。
 
 App 端：
-```shell
+```text
 ActivityThread → ViewRootImpl → InputEventReceiver → View
 ```
 
 ### 6.1 InputChannel 橋接 IPC
 
-```shell
+```text
 InputDispatcher → InputChannel.write()
 App → InputChannel.read() via Looper
 ```
@@ -149,7 +149,7 @@ WMS（WindowManagerService）決定：
 - 是否需要攔截（如 lock screen、IME、dialog）
 
 事件流程整合如下：
-```yaml
+```text
 InputDispatcher
 ↓ (查詢視窗)
 WMS.findTouchedWindow()
@@ -171,7 +171,7 @@ InputDispatcher 會檢查 App 是否在時間內處理事件。
 | App switch | 10 秒 |
 
 當超時：
-```yaml
+```text
 InputDispatcher → reportANR()
 → AMS → 處理 ANR 對話框
 ```

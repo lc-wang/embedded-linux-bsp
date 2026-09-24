@@ -58,7 +58,7 @@ readelf -l firmware.elf
 視為 Secure-only 或未納入 translation table。
 
 因此 Linux 在 remoteproc 啟動 CR52 時：
-```bash
+```text
 ioremap(0xE0000000)
 → SError (permission denied / unmapped)
 → Kernel panic
