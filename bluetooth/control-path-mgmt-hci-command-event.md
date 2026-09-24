@@ -238,14 +238,16 @@ struct hci_dev {
 典型健康流程：
 
 ```text
-> HCI Command: Reset < HCI Event: Command Complete (Reset)
+< HCI Command: Reset
+> HCI Event: Command Complete (Reset)
 
-> HCI Command: Read  Local  Version < HCI Event: Command Complete
+< HCI Command: Read Local Version Information
+> HCI Event: Command Complete
 ```
 
 異常流程（最常見）：
 
-`> HCI Command: Reset (no event)` 
+`< HCI Command: Reset (no event)` 
 
 **這一刻就可以直接斷定：不是 BlueZ 的問題**
 

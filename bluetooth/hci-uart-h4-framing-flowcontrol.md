@@ -162,11 +162,11 @@ Process B: hci_uart (kernel)
     
 ### 5.2 btmon 的經典症狀
 
-`> HCI Command: Reset (no event forever)` 
+`< HCI Command: Reset (no event forever)` 
 
 或：
 
-`< HCI Event: Unknown (garbage)` 
+`> HCI Event: Unknown (garbage)` 
 
 **不是 controller 掛掉，是 UART 對話壞了**
 

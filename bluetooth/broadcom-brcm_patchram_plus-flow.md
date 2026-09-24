@@ -105,8 +105,8 @@ BlueZ
     
 btmon 觀察點：
 ```
-> HCI Command: Reset
-< HCI Event: Command Complete (Reset)
+< HCI Command: Reset
+> HCI Event: Command Complete (Reset)
 ```
 **如果這一步沒過，後面完全不用看**
 
@@ -183,8 +183,8 @@ brcm_patchram_plus 會：
 
 ### 6.3 btmon 中你會看到什麼
 ```
-> HCI Command: Broadcom Write RAM
-< HCI Event: Command Complete
+< HCI Command: Broadcom Write RAM
+> HCI Event: Command Complete
 (repeat many times)
 ```
 如果中途卡住：

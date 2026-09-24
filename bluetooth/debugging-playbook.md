@@ -93,7 +93,7 @@ btmgmt power on
 
 btmon：
 
-`> HCI Command: Reset (no event)` 
+`< HCI Command: Reset (no event)` 
 
 **100% 是 transport / firmware / UART 問題**
 

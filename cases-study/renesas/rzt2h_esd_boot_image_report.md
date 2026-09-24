@@ -78,7 +78,7 @@ fdisk -l core-image*.wic
 → Start=4096、44536 
 
 ```bash
-xxd -s 0 -l 16
+xxd -s 0 -l 16 core-image*.wic
 0x00000000:  fab8  0010 8ed0  bc00  ...
 ```
 
