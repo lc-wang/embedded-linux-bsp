@@ -1,4 +1,3 @@
-
 # GStreamer Architecture
 
 > 本章目標  
@@ -14,14 +13,11 @@ GStreamer 是 Linux multimedia stack 中最常見的 userspace framework，用�
     
 -   multimedia streaming
     
-
 在 Embedded Linux BSP 開發中，GStreamer 經常作為：
 
 userspace multimedia control layer
 
-----------
-
-# 1. GStreamer 核心概念
+## 1. GStreamer 核心概念
 
 GStreamer 由以下核心概念組成：
   
@@ -34,9 +30,7 @@ GStreamer 由以下核心概念組成：
 | Caps | 描述資料格式（data format） |  
 | Bus | 用於 event / message communication |
 
-----------
-
-# 2. GStreamer Pipeline
+## 2. GStreamer Pipeline
 
 GStreamer 使用 **pipeline 模型**來處理 multimedia data。
 
@@ -64,9 +58,9 @@ waylandsink
  ▼  
 Display
 ```
-----------
 
-# 3. Pipeline 架構
+## 3. Pipeline 架構
+
 ```
 Application  
  │  
@@ -86,10 +80,7 @@ Application
     
 -   消費資料
     
-
-----------
-
-# 4. Element
+## 4. Element
 
 Element 是 GStreamer 的基本處理單位。
 
@@ -101,9 +92,7 @@ Element 是 GStreamer 的基本處理單位。
 | Filter | 處理資料 |  
 | Sink | 消費資料 |
 
-----------
-
-## Source Element
+### 4.1 Source Element
 
 範例：
 ```
@@ -119,9 +108,8 @@ audiotestsrc
 ```
 v4l2src → 從 camera driver 取得 frame
 ```
-----------
 
-## Filter Element
+### 4.2 Filter Element
 
 範例：
 ```
@@ -139,9 +127,8 @@ RGB → YUV
 resolution change  
 frame rate change
 ```
-----------
 
-## Sink Element
+### 4.3 Sink Element
 
 範例：
 ```
@@ -159,9 +146,8 @@ autovideosink
 顯示畫面  
 寫入檔案
 ```
-----------
 
-# 5. Pad
+## 5. Pad
 
 Pad 是 element 的 **連接點**。
 
@@ -174,9 +160,8 @@ Pad 分為兩種：
 | Source pad | Output |  
 | Sink pad | Input |
 
-----------
+### 5.1 Pad 架構
 
-## Pad 架構
 ```
 element A            element B  
   
@@ -192,9 +177,8 @@ src pad
  ▼  
 sink pad
 ```
-----------
 
-# 6. Caps（Capabilities）
+## 6. Caps（Capabilities）
 
 Caps 描述 buffer 的 **格式資訊**。
 
@@ -219,9 +203,7 @@ element A → element B
 ```
 需要 format compatible。
 
-----------
-
-# 7. Buffer
+## 7. Buffer
 
 Buffer 是 pipeline 中傳遞的資料。
 
@@ -242,9 +224,8 @@ GstBuffer
  ▼  
 next element
 ```
-----------
 
-# 8. Memory 管理
+## 8. Memory 管理
 
 Buffer 內部包含 memory object：
 
@@ -252,8 +233,6 @@ GstMemory
 
 常見 memory type：
 
-
-  
 | Memory Type | 用途說明 |  
 |---------------|-----------------|  
 | System Memory | CPU 一般記憶體 |  
@@ -266,9 +245,7 @@ DMABUF
 ```
 以避免 copy。
 
-----------
-
-# 9. Pipeline 狀態機（State Machine）
+## 9. Pipeline 狀態機（State Machine）
 
 每個 pipeline 有四種狀態：
   
@@ -279,9 +256,8 @@ DMABUF
 | PAUSED | Pipeline 已準備好播放 |  
 | PLAYING | Pipeline 正在執行 |
 
-----------
+### 9.1 State Flow
 
-## State Flow
 ```
 NULL  
  │  
@@ -294,9 +270,8 @@ PAUSED
  ▼  
 PLAYING
 ```
-----------
 
-# 10. Data Flow（Push Model）
+## 10. Data Flow（Push Model）
 
 GStreamer 預設使用 **push model**：
 ```
@@ -315,9 +290,8 @@ filter
  ▼  
 sink
 ```
-----------
 
-# 11. 與 Kernel Subsystem 的關係
+## 11. 與 Kernel Subsystem 的關係
 
 常見 plugin 與 kernel mapping：
 
@@ -328,42 +302,35 @@ sink
 | kmssink | DRM/KMS |  
 | waylandsink | Wayland + DRM |
 
-----------
+## 12. Embedded Linux 常見 Pipeline
 
-# 12. Embedded Linux 常見 Pipeline
-
-----------
-
-## Camera preview
+### 12.1 Camera preview
 
 gst-launch-1.0 v4l2src ! kmssink
 
-----------
+### 12.2 Camera preview（Wayland）
 
-## Camera preview（Wayland）
 ```
 gst-launch-1.0 v4l2src ! videoconvert ! waylandsink
 ```
-----------
 
-## Video playback
+### 12.3 Video playback
+
 ```
 gst-launch-1.0 filesrc location=test.mp4 ! decodebin ! waylandsink
 ```
-----------
 
-## Hardware decode
+### 12.4 Hardware decode
+
 ```
 gst-launch-1.0 filesrc ! h264parse ! v4l2h264dec ! kmssink
 ```
-----------
 
-# 13. BSP Debug 時常見問題
+## 13. 常見問題與排查（BSP Debug 時常見問題）
 
 GStreamer 問題通常不是 GStreamer 本身。
 
 常見 root cause：
-
 
 | 問題 | Root Cause 說明 |  
 |----------------|------------------------------------|  
@@ -372,9 +339,7 @@ GStreamer 問題通常不是 GStreamer 本身。
 | pipeline hang | driver block / kernel pipeline 卡住 |  
 | wrong format | caps negotiation 失敗 |
 
-----------
-
-# 本章總結
+## 14. 本章總結
 
 GStreamer 核心架構：
 ```

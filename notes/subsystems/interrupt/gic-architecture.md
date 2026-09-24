@@ -1,7 +1,6 @@
-
 # GIC（Generic Interrupt Controller）架構解析
 
-# 1. GIC 在系統中的角色
+## 1. GIC 在系統中的角色
 
 Generic Interrupt Controller
 
@@ -20,9 +19,8 @@ Generic Interrupt Controller
 
 **最終都會進入 GIC，再送到 CPU**
 
-----------
+### 1.1 整體架構位置
 
-# 整體架構位置
 ```
 Peripheral (GPIO / UART / etc)  
  ↓  
@@ -42,34 +40,30 @@ Driver ISR
 ```
 GIC 是「硬體層最後一站」。
 
-----------
-
-# 2. GIC 的核心功能
+## 2. GIC 的核心功能
 
 GIC 負責：
 
-### Interrupt Routing
+### 2.1 Interrupt Routing
 
 -   決定 interrupt 要送到哪個 CPU core
 
-### Priority 管理
+### 2.2 Priority 管理
 
 -   interrupt priority（高優先先處理）
 
-### Mask / Enable
+### 2.3 Mask / Enable
 
 -   控制 interrupt 是否允許進 CPU
 
-### Trigger type
+### 2.4 Trigger type
 
 -   edge-triggered / level-triggered
 
-----------
+## 3. GIC 架構（GICv2 / GICv3）
 
-# 3. GIC 架構（GICv2 / GICv3）
+### 3.1 GICv2（較舊）
 
-
-## GICv2（較舊）
 ```
  ┌────────────┐  
  │  CPU IF    │  
@@ -81,9 +75,9 @@ GIC 負責：
          │  
  Interrupt sources
 ```
-----------
 
-## GICv3（現代 SoC）
+### 3.2 GICv3（現代 SoC）
+
 ```
  ┌────────────┐  
  │  CPU IF    │  
@@ -99,9 +93,8 @@ GIC 負責：
          │  
  Interrupt sources
 ```
-----------
 
-## 關鍵差異
+### 3.3 關鍵差異
 
 | 元件 | GICv2 | GICv3 |  
 |-----------------|-------|-------|  
@@ -110,12 +103,9 @@ GIC 負責：
 | scalability | 低 | 高 |  
 | multicore | 基本 | 強 |
 
-----------
+## 4. Interrupt 類型（SPI / PPI / SGI）
 
-# 4. Interrupt 類型（SPI / PPI / SGI）
-
-
-## SPI（Shared Peripheral Interrupt）
+### 4.1 SPI（Shared Peripheral Interrupt）
 
 SPI = 外部裝置 interrupt
 
@@ -127,9 +117,7 @@ SPI = 外部裝置 interrupt
 
 多 CPU 共享
 
-----------
-
-## PPI（Private Peripheral Interrupt）
+### 4.2 PPI（Private Peripheral Interrupt）
 
 PPI = CPU 私有 interrupt
 
@@ -139,9 +127,7 @@ PPI = CPU 私有 interrupt
 
 每個 CPU 獨立
 
-----------
-
-## SGI（Software Generated Interrupt）
+### 4.3 SGI（Software Generated Interrupt）
 
 SGI = software trigger interrupt
 
@@ -149,9 +135,7 @@ SGI = software trigger interrupt
 
 -   CPU 間 communication（IPI）
 
-----------
-
-## Summary
+### 4.4 Summary
 
 | 類型 | 用途 |  
 |------|--------------|  
@@ -159,9 +143,7 @@ SGI = software trigger interrupt
 | PPI | CPU 私有 |  
 | SGI | CPU 間 |
 
-----------
-
-# 5. GIC 中的 IRQ 編號
+## 5. GIC 中的 IRQ 編號
 
 GIC 內部有：
 ```
@@ -177,9 +159,7 @@ IRQ 123
 ```
 透過 irq_domain mapping 轉換
 
-----------
-
-# 6. GIC Device Tree 描述
+## 6. GIC Device Tree 描述
 
 典型 GICv3：
 ```
@@ -190,9 +170,8 @@ gic: interrupt-controller@f9000000 {
  reg = <...>;  
 };
 ```
-----------
 
-## #interrupt-cells = <3> 是什麼？
+### 6.1 #interrupt-cells = <3> 是什麼？
 
 格式：
 ```
@@ -209,9 +188,7 @@ interrupts = <GIC_SPI 45 IRQ_TYPE_LEVEL_HIGH>;
 | 45 | interrupt number |  
 | LEVEL_HIGH | trigger type |
 
-----------
-
-# 7. interrupt-parent 關係
+## 7. interrupt-parent 關係
 
 裝置：
 ```
@@ -224,9 +201,7 @@ uart0: serial@xxxx {
 
 -   interrupt 最終交給 GIC 處理
 
-----------
-
-# 8. Linux Kernel 中的 GIC driver
+## 8. Linux Kernel 中的 GIC driver
 
 核心檔案：
 ```
@@ -239,9 +214,8 @@ drivers/irqchip/irq-gic-v3.c
 -   註冊 interrupt handler
 -   與 CPU interface 溝通
 
-----------
+## 9. Interrupt 處理流程（Kernel）
 
-# 9. Interrupt 處理流程（Kernel）
 ```
 Hardware IRQ  
  ↓  
@@ -257,9 +231,7 @@ driver ISR
 ```
 所有 interrupt 都會經過這條路。
 
-----------
-
-# 10. 為什麼 一定要懂 GIC？
+## 10. 為什麼 一定要懂 GIC？
 
 因為以下全部會壞：
 
@@ -274,12 +246,9 @@ driver ISR
 
 GIC / IRQ mapping / trigger type
 
-----------
+## 11. 常見問題與排查
 
-# 常見錯誤
-
-
-## interrupt 沒觸發
+### 11.1 interrupt 沒觸發
 
 可能：
 
@@ -287,18 +256,14 @@ GIC / IRQ mapping / trigger type
 -   GIC 沒 enable
 -   routing 錯
 
-----------
-
-## interrupt storm
+### 11.2 interrupt storm
 
 原因：
 
 -   level trigger 沒 clear
 -   polarity 錯
 
-----------
-
-## 多核心問題
+### 11.3 多核心問題
 
 原因：
 

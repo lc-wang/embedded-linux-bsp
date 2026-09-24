@@ -2,9 +2,8 @@
 
 這份筆記整理 Linux kernel 驅動中常見的中斷相關知識與使用方式。
 
----
-
 ## 1. 什麼是中斷？
+
 - **中斷 (Interrupt)**：硬體在需要 CPU 注意時，向處理器發出訊號。  
 - **目的**：避免 CPU 忙等 (polling)，提高效能。  
 - **例子**：
@@ -13,17 +12,15 @@
   - WiFi 模組完成掃描
   - 計時器到期
 
----
-
 ## 2. Linux 中斷處理流程
+
 1. **硬體觸發中斷線 (IRQ)**  
 2. CPU 進入 **中斷上下文 (interrupt context)**  
 3. Kernel IRQ subsystem 呼叫對應的 handler (ISR)  
 4. 驅動程式處理事件，或排程工作到底半部 (bottom half)
 
----
-
 ## 3. 上半部 / 下半部
+
 - **上半部 (Top half)**  
   - 短小、快速  
   - 在 **中斷上下文** 中執行（不可睡眠）  
@@ -36,9 +33,8 @@
 - **tasklet**
 - **workqueue**
 
----
-
 ## 4. 註冊中斷 Handler
+
 ```c
 #include <linux/interrupt.h>
 
@@ -65,9 +61,9 @@ if (ret) {
 ```c
 free_irq(irq_number, dev_id);
 ```
----
 
 ## 5. IRQ Thread 化
+
 - 某些驅動不希望在硬中斷中處理太多事，可以使用 threaded IRQ。
 ```c
 request_threaded_irq(irq, my_isr, my_thread_fn,
@@ -76,9 +72,8 @@ request_threaded_irq(irq, my_isr, my_thread_fn,
 - my_isr：top half，若回傳 IRQ_WAKE_THREAD 會喚醒 thread
 - my_thread_fn：bottom half，可在 thread context 執行（可睡眠）
 
----
-
 ## 6. Device Tree 與 IRQ
+
 - 在 Device Tree 中描述中斷：
 
 ```c
@@ -94,8 +89,9 @@ my_device@0 {
 int irq = platform_get_irq(pdev, 0);
 request_irq(irq, my_isr, 0, dev_name(&pdev->dev), dev);
 ```
----
+
 ## 7. 常見 Debug 方法
+
 - 查看系統 IRQ 分佈：
 ```c
 cat /proc/interrupts
@@ -110,8 +106,8 @@ echo function > /sys/kernel/debug/tracing/current_tracer
 echo my_isr > /sys/kernel/debug/tracing/set_ftrace_filter
 ```
 
----
-## 8. 常見注意事項
+## 8. 常見問題與排查（常見注意事項）
+
 - ISR 不可睡眠（不可呼叫可能 block 的 API，如 msleep、mutex_lock）。
 - ISR 應短小，把耗時動作放到 workqueue 或 threaded IRQ。
 - 若裝置可能共享中斷，要用 IRQF_SHARED 並檢查來源。

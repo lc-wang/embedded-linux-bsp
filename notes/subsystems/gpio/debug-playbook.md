@@ -1,8 +1,6 @@
-
 # GPIO Debug Playbook
 
-
-# GPIO 問題的本質
+## 1. GPIO 問題的本質
 
 所有 GPIO 問題，本質只會是以下其中之一：
 
@@ -13,9 +11,8 @@
 5. regulator 沒 enable  
 6. interrupt domain 設錯
 
-----------
+## 2. 總體 Debug 流程
 
-# 總體 Debug 流程
 ```
 Step 1  → 確認 DT 正確  
 Step 2  → 確認 pinctrl mux  
@@ -26,11 +23,10 @@ Step 6  → 用示波器驗證
 Step 7  → trace driver 行為
 ```
 
-----------
+## 3. Case 1：Reset 拉不起來
 
-# Case 1：Reset 拉不起來
+### 3.1 Step 1 檢查 Device Tree
 
-## Step 1 檢查 Device Tree
 ```
 dtc -I fs /sys/firmware/devicetree/base
 ```
@@ -40,9 +36,7 @@ reset-gpios = <&gpio3 5 GPIO_ACTIVE_LOW>;
 ```
 是否存在。
 
-----------
-
-## Step 2 檢查是否 active-low 搞錯
+### 3.2 Step 2 檢查是否 active-low 搞錯
 
 用：
 ```
@@ -61,18 +55,16 @@ gpioset gpiochipX 5=0
 
 1 = physical low
 
-----------
+### 3.3 Step 3 檢查 pinctrl
 
-## Step 3 檢查 pinctrl
 ```
 ls /sys/kernel/debug/pinctrl/
 ```
 查看該 pin：
 
 -   是否 function = gpio
-    
+
 -   是否被其他 driver 佔用
-    
 
 如果 pin 還在：
 ```
@@ -80,9 +72,8 @@ i2c mode / pwm mode / dsi mode
 ```
 那 GPIO 一定無效。
 
-----------
+### 3.4 Step 4 檢查 hog
 
-## Step 4 檢查 hog
 ```
 cat /sys/kernel/debug/gpio
 ```
@@ -93,41 +84,33 @@ gpio-XX (panel-enable) hogged
 代表：
 
 -   user space 不能 request
-    
+
 -   driver 也不能 request
-    
 
-----------
-
-## Step 5 示波器驗證
+### 3.5 Step 5 示波器驗證
 
 不要相信軟體。
 
 實際量：
 
 -   是否真的變電平
-    
+
 -   是否 open drain
-    
+
 -   是否 drive strength 太低
-    
 
-----------
-
-# Case 2：WiFi Power 拉不起來
+## 4. Case 2：WiFi Power 拉不起來
 
 常見情況：
 
 -   regulator 沒 enable
-    
+
 -   power sequence 錯
-    
+
 -   mmc driver 先 claim GPIO
-    
 
-----------
+### 4.1 檢查 regulator
 
-## 檢查 regulator
 ```
 cat /sys/kernel/debug/regulator/regulator_summary
 ```
@@ -137,34 +120,31 @@ wifi_vdd disabled
 ```
 那 GPIO 拉高也沒用。
 
-----------
+## 5. Case 3：gpiomon 沒事件
 
-# Case 3：gpiomon 沒事件
+### 5.1 Step 1 確認 DT IRQ
 
-## Step 1 確認 DT IRQ
 ```
 interrupt-parent = <&gpio3>;  
 interrupts = <5 IRQ_TYPE_LEVEL_LOW>;
 ```
-----------
 
-## Step 2 檢查 controller 是否 interrupt-controller
+### 5.2 Step 2 檢查 controller 是否 interrupt-controller
+
 ```
 gpio-controller;  
 interrupt-controller;  
 #interrupt-cells = <2>;
 ```
-----------
 
-## Step 3 確認 /proc/interrupts
+### 5.3 Step 3 確認 /proc/interrupts
+
 ```
 cat /proc/interrupts
 ```
 看是否有對應 GPIO IRQ。
 
-----------
-
-## Step 4 確認 trigger type
+### 5.4 Step 4 確認 trigger type
 
 很多問題出在：
 ```
@@ -172,17 +152,15 @@ LEVEL_LOW vs EDGE_FALLING
 ```
 設定錯誤 → 永遠不觸發。
 
-----------
-
-# Case 4：GPIO 設了但硬體不動
+## 6. Case 4：GPIO 設了但硬體不動
 
 可能原因：
 
-### 1. pin 還在 alternate function
+### 6.1 pin 還在 alternate function
 
 最常見。
 
-### 2. open drain 沒 pull-up
+### 6.2 open drain 沒 pull-up
 
 如果：
 ```
@@ -192,9 +170,7 @@ GPIO_OPEN_DRAIN
 
 高電平永遠上不去。
 
-----------
-
-### 3. drive strength 太弱
+### 6.3 drive strength 太弱
 
 某些 SoC 預設：
 ```
@@ -202,13 +178,9 @@ GPIO_OPEN_DRAIN
 ```
 推不動外部電路。
 
-----------
+## 7. 進階 Debug：Trace Kernel
 
-# 進階 Debug：Trace Kernel
-
-----------
-
-## 查看 gpiod request
+### 7.1 查看 gpiod request
 
 加 dynamic debug：
 ```
@@ -219,18 +191,16 @@ echo  'file drivers/gpio/* +p' > /sys/kernel/debug/dynamic_debug/control
 gpiod_request  
 gpiod_direction_output
 ```
-----------
 
-## ftrace
+### 7.2 ftrace
+
 ```
 echo  function > /sys/kernel/debug/tracing/current_tracer  
 echo gpiod_set_value > set_ftrace_filter
 ```
 可以看到誰在操作 GPIO。
 
-----------
-
-# Case 5：Driver probe 失敗
+## 8. Case 5：Driver probe 失敗
 
 如果：
 ```
@@ -241,18 +211,14 @@ reset  =  devm_gpiod_get(dev, "reset", GPIOD_OUT_LOW);
 可能原因：
 
 -   reset-gpios 名字錯
-    
+
 -   #gpio-cells 錯
-    
+
 -   phandle 錯
-    
+
 -   GPIO controller 尚未 probe
-    
 
-----------
-
-# 標準 GPIO Bring-up Checklist
-
+## 9. 標準 GPIO Bring-up Checklist
 
 | 項目 | 檢查重點 |  
 |-----------------|--------------------------------------------|  
@@ -265,28 +231,23 @@ reset  =  devm_gpiod_get(dev, "reset", GPIOD_OUT_LOW);
 | interrupt | interrupt domain 與 parent 設定正確 |  
 | drive strength | 驅動強度足夠符合硬體需求 |
 
-----------
-
-# 總結
+## 10. 總結
 
 GPIO 問題 80% 不是 GPIO。
 
 而是：
 
 -   pinctrl
-    
+
 -   regulator
-    
+
 -   power sequence
-    
+
 -   clock enable
-    
+
 -   reset timing
-    
 
-----------
-
-# GPIO + Regulator + Reset Sequence 模型
+## 11. GPIO + Regulator + Reset Sequence 模型
 
 標準 reset 流程應該是：
 ```

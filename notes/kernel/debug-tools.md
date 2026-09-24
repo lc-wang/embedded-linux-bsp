@@ -1,17 +1,15 @@
-
 # Linux Kernel Debug Tools Overview
 
 本章整理 Linux Kernel 中常用的除錯工具與技術，  
 涵蓋從驅動開發、排查死鎖、性能分析到記憶體洩漏偵測等實用方法。  
 所有工具皆為內建或主流開源工具，適用於 Android / Linux BSP / 裸機環境。
 
----
-
 ## 1. printk 與 dmesg（最基本的 Debug）
 
 打印訊息仍然是 kernel 除錯的第一步。
 
-### 常用等級
+### 1.1 常用等級
+
 | 等級 | 說明 |
 | --- | --- |
 | `KERN_ERR` | 嚴重錯誤 |
@@ -19,12 +17,15 @@
 | `KERN_INFO` | 一般訊息 |
 | `KERN_DEBUG` | 除錯訊息 |
 
-### 查看 Kernel Log
+### 1.2 查看 Kernel Log
+
 ```bash
 dmesg | grep my_driver
 logcat -b kernel    # Android
 ```
+
 ## 2. debugfs
+
 提供大量 kernel 狀態與 debug 介面。
 
 掛載方式：
@@ -32,7 +33,7 @@ logcat -b kernel    # Android
 mount -t debugfs none /sys/kernel/debug
 ```
 
-### 常見 Debug 節點
+### 2.1 常見 Debug 節點
 
 | 路徑 | 功能 |
 |------|------|
@@ -42,6 +43,7 @@ mount -t debugfs none /sys/kernel/debug
 | `/sys/kernel/debug/regmap/` | 驅動中的 regmap 診斷 |
 
 ## 3. ftrace（最強大的內建追蹤器）
+
 可追蹤 function call、latency、sched、irq 等。
 
 啟用 function tracer：
@@ -60,7 +62,9 @@ trace-cmd（ftrace 封裝工具
 trace-cmd record -p function -l my_function
 trace-cmd report
 ```
+
 ## 4. perf（性能分析）
+
 可分析 CPU 使用率、callgraph、cache miss、hotspot。
 
 安裝（Android）：
@@ -74,7 +78,8 @@ perf top
 perf record -g -- my_app
 perf report
 ```
-### 常用事件
+
+### 4.1 常用事件
 
 | 事件 | 說明 |
 |-------|------|
@@ -84,6 +89,7 @@ perf report
 | `kmalloc` | 記憶體分配 hot spot |
 
 ## 5. lockdep（鎖定偵測）
+
 偵測 kernel deadlock / recursive lock / inconsistent lock order。
 
 啟用：
@@ -99,6 +105,7 @@ WARNING: possible recursive locking detected
 代表鎖使用順序錯誤。
 
 ## 6. kmemleak（記憶體洩漏偵測）
+
 類似 GC 標記，找出無法回收的 kernel 記憶體物件。
 
 啟用：
@@ -112,6 +119,7 @@ cat /sys/kernel/debug/kmemleak
 -   vmalloc memory leak
 
 ## 7. dynamic debug（控制 printk）
+
 只想動態開啟特定模組的 debug log 時使用。
 
 列出所有可調項目：
@@ -123,7 +131,9 @@ cat /sys/kernel/debug/dynamic_debug/control
 ```bash
 echo "file my_driver.c +p" > control
 ```
+
 ## 8. crash / kdump（分析 Kernel Panic Dump）
+
 觸發 kernel crash dump：
 
 ```bash
@@ -142,6 +152,7 @@ crash vmlinux vmcore
 -   locks
 
 ## 9. kgdb / gdbstub（Kernel 斷點）
+
 在嵌入式與 Android 上也可使用（串口 / USB）。
 
 啟用：
@@ -161,6 +172,7 @@ target remote /dev/ttyUSB0
 -   查看變數
 
 ## 10. 常用 Debug API
+
 | API | 功能 |
 |------|------|
 | `WARN()` | 顯示 warning 並 dump stack |
@@ -170,6 +182,7 @@ target remote /dev/ttyUSB0
 | `print_hex_dump()` | Dump buffer 內容 |
 
 ## 11. 何時使用什麼工具？
+
 | 問題類型 | 推薦工具 |
 |-----------|-----------|
 | Kernel panic / crash | crash, kdump |

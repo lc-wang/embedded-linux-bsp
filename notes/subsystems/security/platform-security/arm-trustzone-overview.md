@@ -1,7 +1,4 @@
-
 # ARM TrustZone Overview
-
-## 本章目的
 
 本章要把以下幾個概念串起來：
 
@@ -24,9 +21,7 @@ Linux / Android 為什麼不是系統中最高權限？
 Normal World 要怎麼呼叫 Secure World？
 ```
 
-----------
-
-## 一張圖先看懂
+## 1. 一張圖先看懂
 
 ```
 +------------------------------------------------+
@@ -65,14 +60,11 @@ OP-TEE 在 Secure World。
 兩邊透過 SMC 經過 EL3 切換。
 ```
 
-----------
-
-## 1. TrustZone 是什麼？
+## 2. TrustZone 是什麼？
 
 ARM TrustZone 是 ARM SoC 提供的硬體隔離機制。
 
 它把系統分成兩個世界：
-
 
 | World | 說明 | 常見內容 |  
 |-------|------|----------|  
@@ -86,9 +78,7 @@ Secure World 可以保護 key、secure storage、crypto service。
 Normal World 不能直接讀取 Secure World 的 memory 或 secure peripheral。
 ```
 
-----------
-
-## 2. 為什麼 BSP 工程師需要懂？
+## 3. 為什麼 BSP 工程師需要懂？
 
 因為在 ARM BSP / Android BSP 中，你會常看到：
 
@@ -115,14 +105,11 @@ secure storage
 為什麼 boot flow 要載入 bl31.bin / tee.bin？
 ```
 
-----------
-
-## 3. ARM Exception Level 對應
+## 4. ARM Exception Level 對應
 
 ARMv8-A 常見 Exception Level：
 
-
-### ARM Exception Level 與 TrustZone 對應
+### 4.1 ARM Exception Level 與 TrustZone 對應
 
 | Level | Normal World | Secure World / Firmware |
 |--------|--------------|--------------------------|
@@ -139,9 +126,7 @@ OP-TEE OS 通常跑在 Secure EL1。
 TF-A BL31 跑在 EL3。
 ```
 
-----------
-
-## 4. Boot Flow 裡 TrustZone 的位置
+## 5. Boot Flow 裡 TrustZone 的位置
 
 典型 ARM secure boot flow：
 
@@ -181,9 +166,7 @@ Linux / Android:
   Normal World OS
 ```
 
-----------
-
-## 5. SMC 是什麼？
+## 6. SMC 是什麼？
 
 SMC 是：
 
@@ -213,9 +196,7 @@ Trusted Application
 Normal World 呼叫 Secure World 的入口。
 ```
 
-----------
-
-## 6. Linux 呼叫 OP-TEE 的流程
+## 7. Linux 呼叫 OP-TEE 的流程
 
 以 Linux 使用 OP-TEE service 為例：
 
@@ -262,9 +243,7 @@ Trusted Application
 +-----------------------------+
 ```
 
-----------
-
-## 7. Secure Memory 是什麼？
+## 8. Secure Memory 是什麼？
 
 TrustZone 不只隔離 CPU 執行狀態，也常搭配 memory protection。
 
@@ -293,9 +272,7 @@ reserved-memory {
 no-map 代表 Linux 不應該把這段 memory map 起來使用。
 ```
 
-----------
-
-## 8. Secure Peripheral 是什麼？
+## 9. Secure Peripheral 是什麼？
 
 有些 SoC peripheral 可以設定成：
 
@@ -325,9 +302,7 @@ permission fault
 system hang
 ```
 
-----------
-
-## 9. OP-TEE 在 TrustZone 裡的角色
+## 10. OP-TEE 在 TrustZone 裡的角色
 
 OP-TEE 是 Secure World 裡的 TEE OS。
 
@@ -351,9 +326,7 @@ OP-TEE 是跑在 Secure World 的軟體。
 
 不要把兩者混成同一個東西。
 
-----------
-
-## 10. Android BSP 常見關聯
+## 11. Android BSP 常見關聯
 
 在 Android BSP 中，TrustZone 常出現在：
 
@@ -391,11 +364,9 @@ key 不一定會離開 Secure World。
 Normal World 只是要求 Secure World 幫忙做 crypto operation。
 ```
 
-----------
+## 12. BSP Debug：怎麼確認 OP-TEE / TrustZone 有起來？
 
-## 11. BSP Debug：怎麼確認 OP-TEE / TrustZone 有起來？
-
-### 看 kernel log
+### 12.1 看 kernel log
 
 ```
 dmesg | grep -i optee
@@ -410,9 +381,7 @@ optee: revision 3.x
 optee: initialized driver
 ```
 
-----------
-
-### 看 device node
+### 12.2 看 device node
 
 ```
 ls -l /dev/tee*
@@ -427,9 +396,7 @@ ls -l /dev/tee*
 
 代表 Linux OP-TEE driver 已建立 TEE device。
 
-----------
-
-### 看 reserved memory
+### 12.3 看 reserved memory
 
 ```
 dmesg | grep -i reserved
@@ -438,9 +405,7 @@ cat /proc/iomem
 
 確認 OP-TEE secure memory 是否被保留。
 
-----------
-
-### 看 kernel config
+### 12.4 看 kernel config
 
 ```
 zcat /proc/config.gz | grep OPTEE
@@ -453,11 +418,9 @@ CONFIG_TEE=y
 CONFIG_OPTEE=y
 ```
 
-----------
+## 13. 常見問題與排查
 
-## 12. 常見錯誤
-
-### 沒載入 OP-TEE image
+### 13.1 沒載入 OP-TEE image
 
 Boot flow 少載入 tee.bin / tee.elf：
 
@@ -472,9 +435,7 @@ Linux 找不到 OP-TEE。
 Android KeyMint / Gatekeeper 可能失敗。
 ```
 
-----------
-
-### reserved-memory 設錯
+### 13.2 reserved-memory 設錯
 
 secure memory 沒有保留，Linux 把 OP-TEE memory 拿去用。
 
@@ -487,9 +448,7 @@ SMC call failed
 kernel boot unstable
 ```
 
-----------
-
-### SMC conduit 不一致
+### 13.3 SMC conduit 不一致
 
 Linux 與 firmware 對 SMC / HVC conduit 認知不同。
 
@@ -500,9 +459,7 @@ optee: api uid mismatch
 optee: probing for conduit method failed
 ```
 
-----------
-
-### secure peripheral 被 Linux driver 直接操作
+### 13.4 secure peripheral 被 Linux driver 直接操作
 
 某些 register 被設成 secure access only。
 
@@ -514,9 +471,7 @@ permission fault
 hang
 ```
 
-----------
-
-### Android HAL 找不到 TEE backend
+### 13.5 Android HAL 找不到 TEE backend
 
 Android userspace HAL 啟動，但底層 TEE service 不存在。
 

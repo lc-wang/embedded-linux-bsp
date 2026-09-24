@@ -1,13 +1,10 @@
-
-## Ethernet Bring-up Flow
+# Ethernet Bring-up Flow
 
 本章節重點：
 
 -   從開機到 ping 成功的完整流程
 -   每個階段對應 kernel 行為
 -   每一步的檢查指令（debug checklist）
-
-----------
 
 ## 1. 整體時間軸
 
@@ -35,12 +32,9 @@ TX/RX ready
 Ping OK
 ```
 
-----------
+## 2. Step-by-step
 
-# 2. Step-by-step
-
-
-## Step 1：Driver probe
+### 2.1 Step 1：Driver probe
 
 ```
 kernel boot
@@ -48,30 +42,24 @@ kernel boot
 platform_driver → probe()
 ```
 
-### 應該發生
+#### 應該發生
 
 -   MAC register mapping
 -   DMA init
 -   MDIO bus init
 
-----------
-
-### 檢查
+#### 檢查
 
 ```
 dmesg | grep -i eth
 ```
 
-----------
-
-### 常見問題
+#### 常見問題
 
 -   driver 沒 bind
 -   clock / reset 沒開
 
-----------
-
-## Step 2：MDIO bus 初始化
+### 2.2 Step 2：MDIO bus 初始化
 
 ```
 MAC driver
@@ -79,24 +67,18 @@ MAC driver
 mdiobus_register()
 ```
 
-----------
-
-### 應該發生
+#### 應該發生
 
 -   掃描 PHY address
 -   建立 MDIO bus
 
-----------
-
-### 檢查
+#### 檢查
 
 ```
 dmesg | grep -i mdio
 ```
 
-----------
-
-### 問題
+#### 問題
 
 ```
 MDIO timeout
@@ -108,9 +90,7 @@ No PHY found
 -   DTS 錯
 -   clock 問題
 
-----------
-
-## Step 3：PHY attach
+### 2.3 Step 3：PHY attach
 
 ```
 phy_connect()
@@ -118,39 +98,29 @@ phy_connect()
 of_phy_connect()
 ```
 
-----------
-
-### 應該發生
+#### 應該發生
 
 -   找到 PHY
 -   建立 phy_device
 
-----------
-
-### 檢查
+#### 檢查
 
 ```
 dmesg | grep -i phy
 ```
 
-----------
-
-### 問題
+#### 問題
 
 -   phy-handle 錯
 -   address 錯
 
-----------
-
-## Step 4：register_netdev
+### 2.4 Step 4：register_netdev
 
 ```
 register_netdev(dev);
 ```
 
-----------
-
-### 應該發生
+#### 應該發生
 
 ```
 ip link
@@ -162,23 +132,17 @@ ip link
 eth0
 ```
 
-----------
-
-### 問題
+#### 問題
 
 -   沒有 eth0 → driver 問題
 
-----------
-
-## Step 5：ip link up
+### 2.5 Step 5：ip link up
 
 ```
 ip link set eth0 up
 ```
 
-----------
-
-### Kernel flow
+#### Kernel flow
 
 ```
 dev_open()
@@ -186,25 +150,19 @@ dev_open()
 ndo_open()
 ```
 
-----------
-
-### driver 應該做
+#### driver 應該做
 
 -   enable IRQ
 -   start DMA
 -   start PHY
 
-----------
-
-### 檢查
+#### 檢查
 
 ```
 dmesg
 ```
 
-----------
-
-## Step 6：PHY auto-negotiation
+### 2.6 Step 6：PHY auto-negotiation
 
 ```
 PHY
@@ -214,35 +172,27 @@ PHY
 決定 link
 ```
 
-----------
-
-### 檢查
+#### 檢查
 
 ```
 ethtool eth0
 ```
 
-----------
-
-### 正常
+#### 正常
 
 ```
 Link detected: yes
 Speed: 1000Mb/s
 ```
 
-----------
-
-### 問題
+#### 問題
 
 | 現象 | 原因 |  
 |--------------|-------------|  
 | link down | 線 / PHY |  
 | link up 不穩 | timing |
 
-----------
-
-## Step 7：Link Up → MAC enable
+### 2.7 Step 7：Link Up → MAC enable
 
 ```
 PHY → callback
@@ -252,46 +202,35 @@ MAC driver
 enable TX/RX
 ```
 
-----------
-
-### Kernel log
+#### Kernel log
 
 ```
 eth0: Link is Up - 1000Mbps/Full
 ```
 
-----------
+### 2.8 Step 8：封包測試
 
-## Step 8：封包測試
-
-
-### 基本測試
+#### 基本測試
 
 ```
 ping 8.8.8.8
 ```
 
-----------
-
-### deeper debug
+#### deeper debug
 
 ```
 tcpdump -i eth0
 ```
 
-----------
-
-### statistics
+#### statistics
 
 ```
 ethtool -S eth0
 ```
 
-----------
+## 3. 常見問題與排查（Debug Checklist）
 
-# 3. Debug Checklist
-
-## 情境 1：沒有 eth0
+### 3.1 情境 1：沒有 eth0
 
 檢查：
 
@@ -299,9 +238,7 @@ ethtool -S eth0
 dmesg | grep eth
 ```
 
-----------
-
-## 情境 2：No PHY found
+### 3.2 情境 2：No PHY found
 
 檢查：
 
@@ -309,9 +246,7 @@ dmesg | grep eth
 -   MDIO bus
 -   PHY address
 
-----------
-
-## 情境 3：link down
+### 3.3 情境 3：link down
 
 檢查：
 
@@ -319,9 +254,7 @@ dmesg | grep eth
 ethtool eth0
 ```
 
-----------
-
-## 情境 4：link up 但不通
+### 3.4 情境 4：link up 但不通
 
 90%：
 
@@ -329,9 +262,7 @@ ethtool eth0
 RGMII delay 問題
 ```
 
-----------
-
-## 情境 5：RX 沒有封包
+### 3.5 情境 5：RX 沒有封包
 
 檢查：
 
@@ -339,9 +270,7 @@ RGMII delay 問題
 -   NAPI
 -   descriptor
 
-----------
-
-## 情境 6：TX 卡住
+### 3.6 情境 6：TX 卡住
 
 檢查：
 
@@ -350,54 +279,7 @@ ndo_start_xmit 是否被呼叫
 queue 是否 stop
 ```
 
-----------
-
-# 4. Debug 指令整理
-
-
-## 基本
-
-```
-ip link
-ethtool eth0
-```
-
-----------
-
-## driver
-
-```
-ethtool -i eth0
-```
-
-----------
-
-## statistics
-
-```
-cat /proc/net/dev
-ethtool -S eth0
-```
-
-----------
-
-## PHY
-
-```
-mdio-tool dump eth0 1
-```
-
-----------
-
-## 封包
-
-```
-tcpdump -i eth0
-```
-
-----------
-
-# 5. BSP Debug 思維
+## 4. BSP Debug 思維
 
 這個 flow：
 
@@ -405,9 +287,7 @@ tcpdump -i eth0
 Driver → MDIO → PHY → Link → Packet
 ```
 
-----------
-
-## 快速定位
+### 4.1 快速定位
 
 | 現象 | 層 |  
 |----------------|-----------|  
@@ -417,12 +297,9 @@ Driver → MDIO → PHY → Link → Packet
 | link 上但不通 | RGMII |  
 | 有 TX 無 RX | MAC |
 
-----------
+## 5. 實戰技巧
 
-# 6. 實戰技巧
-
-
-## 強制 speed
+### 5.1 強制 speed
 
 ```
 ethtool -s eth0 speed 100 duplex full autoneg off
@@ -430,20 +307,50 @@ ethtool -s eth0 speed 100 duplex full autoneg off
 
 排除 negotiation 問題
 
-----------
-
-## 查看 carrier
+### 5.2 查看 carrier
 
 ```
 cat /sys/class/net/eth0/carrier
 ```
 
-----------
-
-## 查看 state
+### 5.3 查看 state
 
 ```
 cat /sys/class/net/eth0/operstate
 ```
 
+## 附錄
 
+### A. Debug 指令整理
+
+#### 基本
+
+```
+ip link
+ethtool eth0
+```
+
+#### driver
+
+```
+ethtool -i eth0
+```
+
+#### statistics
+
+```
+cat /proc/net/dev
+ethtool -S eth0
+```
+
+#### PHY
+
+```
+mdio-tool dump eth0 1
+```
+
+#### 封包
+
+```
+tcpdump -i eth0
+```

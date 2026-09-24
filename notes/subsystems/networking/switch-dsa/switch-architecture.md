@@ -1,5 +1,4 @@
-
-## Switch Architecture
+# Switch Architecture
 
 本章節重點：
 
@@ -7,8 +6,6 @@
 -   單一 MAC vs 多 port 架構差異
 -   CPU port / user port 是什麼
 -   Linux / DSA 之前與之後的差異
-
-----------
 
 ## 1. 單一 Ethernet
 
@@ -27,8 +24,6 @@ RJ45
 ```
 eth0
 ```
-
-----------
 
 ## 2. Switch 架構
 
@@ -49,13 +44,9 @@ CPU port
 +------------------+
 ```
 
-----------
-
 ## 3. Port 分類
 
-----------
-
-### CPU port
+### 3.1 CPU port
 
 ```
 Switch ↔ CPU 的連接
@@ -66,8 +57,7 @@ Switch ↔ CPU 的連接
 -   通常是 **RGMII / SGMII**
 -   只有一條
 
-
-### User port
+### 3.2 User port
 
 ```
 接 RJ45 / LAN port
@@ -78,11 +68,9 @@ Switch ↔ CPU 的連接
 -   有自己的 PHY（或內建 PHY）
 -   對應實體網路孔
 
-
 ## 4. 封包 flow
 
-
-### TX（CPU → LAN）
+### 4.1 TX（CPU → LAN）
 
 ```
 CPU (eth0)
@@ -100,9 +88,7 @@ PHY
 Wire
 ```
 
-----------
-
-### RX（LAN → CPU）
+### 4.2 RX（LAN → CPU）
 
 ```
 Wire
@@ -118,19 +104,15 @@ MAC
 CPU
 ```
 
-----------
-
-## 重點
+### 4.3 重點
 
 ```
 CPU 只看到一個 MAC（eth0）但實際有多個 port
 ```
 
-----------
+## 5. 沒有 DSA 的世界
 
-# 5. 沒有 DSA 的世界
-
-## 傳統做法（vendor driver）
+### 5.1 傳統做法（vendor driver）
 
 ```
 eth0 → 整個 switch
@@ -141,23 +123,17 @@ eth0 → 整個 switch
 -   看不到個別 port
 -   無法用標準工具（bridge / vlan）
 
-----------
-
 常見：
 
 ```
 ethsw / ethss driver
 ```
 
-----------
-
-# 6. 有 DSA 的世界
+## 6. 有 DSA 的世界
 
 Distributed Switch Architecture
 
-----------
-
-## 每個 port 都變 interface
+### 6.1 每個 port 都變 interface
 
 ```
 ip link
@@ -173,9 +149,7 @@ lan3
 lan4
 ```
 
-----------
-
-## 可以用標準 Linux 工具
+### 6.2 可以用標準 Linux 工具
 
 ```
 bridge
@@ -183,12 +157,9 @@ vlan
 tc
 ```
 
-----------
+## 7. DSA 核心概念
 
-# 7. DSA 核心概念
-
-
-## tagging
+### 7.1 tagging
 
 ```
 CPU ↔ Switch 的封包需要 tag
@@ -200,8 +171,7 @@ CPU ↔ Switch 的封包需要 tag
 告訴 switch 要去哪個 port
 ```
 
-
-## switch forwarding
+### 7.2 switch forwarding
 
 ```
 switch 內部會自己轉封包
@@ -209,8 +179,7 @@ switch 內部會自己轉封包
 
 CPU 不一定會看到所有流量
 
-
-## offloading
+### 7.3 offloading
 
 ```
 switch 幫你做 forwarding
@@ -218,13 +187,9 @@ switch 幫你做 forwarding
 
 CPU 不需要處理
 
-----------
+## 8. Bring-up 重點
 
-# 8. Bring-up 重點
-
-----------
-
-## CPU port 正常嗎？
+### 8.1 CPU port 正常嗎？
 
 這就是：
 
@@ -232,36 +197,27 @@ CPU 不需要處理
 eth0 要先正常
 ```
 
-----------
-
-## switch driver 有沒有起來？
+### 8.2 switch driver 有沒有起來？
 
 ```
 dmesg | grep dsa
 ```
 
-----------
-
-## port 有沒有出現？
+### 8.3 port 有沒有出現？
 
 ```
 ip link
 ```
 
-----------
-
-## link 狀態
+### 8.4 link 狀態
 
 ```
 ethtool lan1
 ```
 
-----------
+## 9. 常見問題與排查
 
-# 9. 常見問題
-
-
-## 只有 eth0 沒有 lan1~lan4
+### 9.1 只有 eth0 沒有 lan1~lan4
 
 原因：
 
@@ -269,7 +225,7 @@ ethtool lan1
 DSA 沒啟動或 DTS 沒設
 ```
 
-## lan port link up 但不通
+### 9.2 lan port link up 但不通
 
 可能：
 
@@ -277,7 +233,7 @@ DSA 沒啟動或 DTS 沒設
 CPU port timing（RGMII）
 ```
 
-## switch 完全沒反應
+### 9.3 switch 完全沒反應
 
 檢查：
 
@@ -285,13 +241,10 @@ CPU port timing（RGMII）
 SPI / MDIO / reset
 ```
 
-----------
-
-# 10. 理解
+## 10. 理解
 
 要想成：
 
 ```
 DSA = Ethernet + 多 PHY + switch forwarding
 ```
-

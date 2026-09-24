@@ -1,7 +1,4 @@
-
 # Firmware Update
-
-## 本章目的
 
 本章要把 firmware update 中常見的安全元件串起來：
 
@@ -29,9 +26,7 @@ firmware update 怎麼納入 Chain of Trust？
 
 Firmware update 是很多產品安全破口的來源。
 
-----------
-
-## 一張圖先看懂
+## 1. 一張圖先看懂
 
 ```
 [Update Package]
@@ -61,9 +56,7 @@ Firmware update 是很多產品安全破口的來源。
 Firmware update security = 簽章驗證 + 版本檢查 + 寫入保護 + 開機驗證 + 回復機制。
 ```
 
-----------
-
-## 1. 為什麼 Firmware Update 需要安全設計？
+## 2. 為什麼 Firmware Update 需要安全設計？
 
 Secure Boot 可以保護 boot path，但 firmware update 是另一條寫入系統的路徑。
 
@@ -97,9 +90,7 @@ update package 有沒有驗證？
 recovery / factory path 有沒有同樣保護？
 ```
 
-----------
-
-## 2. Firmware Update 在 Chain of Trust 的位置
+## 3. Firmware Update 在 Chain of Trust 的位置
 
 Boot chain 是：
 
@@ -149,9 +140,7 @@ Boot 時失敗
 Update path 寫入了不該被允許的 image
 ```
 
-----------
-
-## 3. Firmware Update 基本安全流程
+## 4. Firmware Update 基本安全流程
 
 建議把 update flow 拆成幾個 step：
 
@@ -184,9 +173,7 @@ Step 8: Commit or rollback
 [Commit]
 ```
 
-----------
-
-## 4. Update Package 應該保護什麼？
+## 5. Update Package 應該保護什麼？
 
 Update package 不應該只是壓縮檔。
 
@@ -232,9 +219,7 @@ signature 應該保護 manifest。
 manifest 應該保護每個 image hash。
 ```
 
-----------
-
-## 5. Signature Verification
+## 6. Signature Verification
 
 Update package 必須做簽章驗證。
 
@@ -270,9 +255,7 @@ Update flow：
 保留目前可開機版本
 ```
 
-----------
-
-## 6. Image Hash Verification
+## 7. Image Hash Verification
 
 只驗證 package signature 還不夠。
 
@@ -299,9 +282,7 @@ mismatch → reject
 避免 manifest 和 image 不一致
 ```
 
-----------
-
-## 7. Version Check / Rollback Check
+## 8. Version Check / Rollback Check
 
 Firmware update 必須檢查版本。
 
@@ -343,9 +324,7 @@ bootloader metadata
 不要寫入舊 image
 ```
 
-----------
-
-## 8. Rollback Protection 與 Firmware Update 的關係
+## 9. Rollback Protection 與 Firmware Update 的關係
 
 Rollback protection 通常有兩個時間點：
 
@@ -373,9 +352,7 @@ bootloader 也要檢查
 
 所以 bootloader 仍然需要做最後防線。
 
-----------
-
-## 9. A/B Update 是什麼？
+## 10. A/B Update 是什麼？
 
 A/B update 是常見安全更新設計。
 
@@ -415,9 +392,7 @@ Update target: slot B
 bootloader fallback to slot A
 ```
 
-----------
-
-## 10. A/B Update Flow
+## 11. A/B Update Flow
 
 ```
 [Running Slot A]
@@ -452,9 +427,7 @@ bootloader fallback to slot A
 
 這樣可以降低 update 中斷或 image 錯誤造成 brick 的風險。
 
-----------
-
-## 11. Recovery Path 也要保護
+## 12. Recovery Path 也要保護
 
 很多產品有 recovery mode，例如：
 
@@ -489,9 +462,7 @@ image hash
 debug unlock state
 ```
 
-----------
-
-## 12. Factory Update vs Field Update
+## 13. Factory Update vs Field Update
 
 Firmware update 可以分成：
 
@@ -507,9 +478,7 @@ Firmware update 可以分成：
 任何能寫入 firmware 的路徑都必須被控管。
 ```
 
-----------
-
-## 13. Update Key Management
+## 14. Update Key Management
 
 Firmware update 需要 signing key。
 
@@ -542,9 +511,7 @@ test key 和 production key 分開
 release image 必須可追蹤使用哪把 key 簽章
 ```
 
-----------
-
-## 14. Key Rotation / Key Revocation
+## 15. Key Rotation / Key Revocation
 
 如果 signing key 外洩，就需要撤銷舊 key。
 
@@ -574,9 +541,7 @@ bootloader trusted key list
 不要假設 production key 永遠不會出問題。
 ```
 
-----------
-
-## 15. Update Metadata
+## 16. Update Metadata
 
 Update metadata 很重要。
 
@@ -618,9 +583,7 @@ bootloader 選錯 slot
 已失敗 image 被標記成功
 ```
 
-----------
-
-## 16. Power Loss / Interrupted Update
+## 17. Power Loss / Interrupted Update
 
 Firmware update 必須考慮斷電。
 
@@ -653,9 +616,7 @@ eFuse / rollback counter 更新
 
 這些失敗可能導致 device brick。
 
-----------
-
-## 17. RootFS Verification
+## 18. RootFS Verification
 
 Firmware update 寫入 rootfs 後，boot 時仍然需要驗證。
 
@@ -692,9 +653,7 @@ RootFS verification 代表：
 
 兩者不同，最好都要有。
 
-----------
-
-## 18. Debug / Development Mode
+## 19. Debug / Development Mode
 
 開發階段常見需求：
 
@@ -726,11 +685,9 @@ fastboot 可以刷 unsigned image
 recovery 可以 sideload unsigned package
 ```
 
-----------
+## 20. BSP Debug：Update Security 檢查方向
 
-## 19. BSP Debug：Update Security 檢查方向
-
-### Step 1：確認 update package 是否驗證
+### 20.1 Step 1：確認 update package 是否驗證
 
 ```
 package 是否有 signature？
@@ -739,9 +696,7 @@ manifest 是否有被簽？
 image hash 是否有檢查？
 ```
 
-----------
-
-### Step 2：確認版本與 rollback
+### 20.2 Step 2：確認版本與 rollback
 
 ```
 package 是否有 security version？
@@ -751,9 +706,7 @@ boot time 是否也檢查版本？
 rollback counter 存在哪裡？
 ```
 
-----------
-
-### Step 3：確認寫入流程
+### 20.3 Step 3：確認寫入流程
 
 ```
 是否寫 inactive slot？
@@ -763,9 +716,7 @@ metadata 是否 atomic？
 boot 成功後才 mark successful？
 ```
 
-----------
-
-### Step 4：確認所有 update path
+### 20.4 Step 4：確認所有 update path
 
 ```
 OTA
@@ -786,11 +737,9 @@ UART download mode
 是否限制 debug state？
 ```
 
-----------
+## 21. 常見問題與排查
 
-## 20. 常見錯誤
-
-### 只有 OTA 驗證，Recovery 不驗證
+### 21.1 只有 OTA 驗證，Recovery 不驗證
 
 ```
 OTA package must be signed
@@ -803,9 +752,7 @@ Recovery accepts unsigned image
 攻擊者走 recovery path 繞過 OTA security。
 ```
 
-----------
-
-### 只檢查 version string
+### 21.2 只檢查 version string
 
 例如：
 
@@ -831,9 +778,7 @@ anti-rollback counter
 
 搭配。
 
-----------
-
-### 更新 rollback counter 太早
+### 21.3 更新 rollback counter 太早
 
 如果先更新 rollback counter，再寫 image，斷電可能造成：
 
@@ -849,9 +794,7 @@ counter 已經提高
 device brick
 ```
 
-----------
-
-### A/B slot 成功判斷太早
+### 21.4 A/B slot 成功判斷太早
 
 如果剛 boot 起來就 mark successful，但 service 還沒正常啟動，可能導致：
 
@@ -862,9 +805,7 @@ fallback 失效
 
 應該等 health check 通過。
 
-----------
-
-### Factory tool 可以刷任何 image
+### 21.5 Factory tool 可以刷任何 image
 
 工廠工具常有高權限。
 
@@ -879,9 +820,7 @@ fallback 失效
 
 production 前要特別檢查 factory flow。
 
-----------
-
-## 21. Firmware Update Security Checklist
+## 22. Firmware Update Security Checklist
 
 ```
 [ ] Update package has signature

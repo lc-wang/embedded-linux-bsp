@@ -1,4 +1,3 @@
-
 # Android Window Manager（WMS）系統解析
 
 > 本章定位：
@@ -10,8 +9,6 @@
 > -   能實際用於 debug：點不到、視窗異常、前後景判斷錯誤、input / 顯示問題
 >     
 
-----------
-
 ## 1. 為什麼 Android 需要 WindowManager
 
 在 Android 系統中：
@@ -19,7 +16,6 @@
 -   **AMS 決定誰重要**（process / task importance）
 -   **WMS 決定誰可見**（window / task visibility）
     
-
 這兩者不是重疊，而是**分工**。
 
 關鍵前提是：
@@ -27,8 +23,6 @@
 > **系統不可能根據「邏輯狀態」判斷 UX，只能根據「實際顯示結果」。**
 
 而「實際顯示結果」的唯一權威來源，就是 WMS。
-
-----------
 
 ## 2. WMS 在 system_server 中的位置
 
@@ -45,16 +39,12 @@ system_server
 -   維護「畫面上發生了什麼」的事實
 -   對其他 subsystem（AMS / Input）提供可見性資訊
     
-
 真正的繪製與合成：
 
 -   由 App / RenderThread
 -   由 SurfaceFlinger 負責
     
-
 **WMS 是「顯示事實管理者」，不是渲染者。**
-
-----------
 
 ## 3. Task：WMS 與 AMS 的共同抽象
 
@@ -69,8 +59,6 @@ system_server
 -   分割畫面 / PIP
 
 因此 Android 引入 **Task** 作為上層抽象。
-
-----------
 
 ### 3.2 WMS 中的 Task 與 WindowContainer
 
@@ -92,7 +80,6 @@ Display
      ├─ Window B
      └─ Window C
 ```
-----------
 
 ### 3.3 與 AMS 的對應關係
 
@@ -108,8 +95,6 @@ Display
 WMS 提供「可見性事實」，  
 AMS 根據這些事實做出系統決策。
 
-----------
-
 ## 4. Window 可見性如何影響系統決策
 
 ### 4.1 Visibility 是系統級訊號
@@ -119,16 +104,12 @@ AMS 根據這些事實做出系統決策。
 -   Window 是否可見 
 -   比 Activity lifecycle 更直接反映 UX
     
-
 例如：
 
 -   Activity technically resumed 
 -   但 window 被遮住
     
-
 對使用者來說，這仍然是「不可見」。
-
-----------
 
 ### 4.2 實際決策鏈
 
@@ -148,10 +129,7 @@ AMS 重新計算 Task / Process importance
 -   overlay window
 -   PIP
     
-
 都會影響 App 是否被視為前景。
-
-----------
 
 ## 5. WMS 與 Input 系統的關係
 
@@ -166,8 +144,6 @@ InputDispatcher 在派送事件前，必須知道：
 -   window 的實際位置
 -   z-order
 -   哪個 window 在最上層
-
-----------
 
 ### 5.2 Input routing 流程
 
@@ -186,9 +162,6 @@ InputDispatcher
 -   input 可能送錯 App
 -   或被判定為 timeout（Input ANR）
     
-
-----------
-
 ## 6. WMS 與 Graphics / SurfaceFlinger
 
 ### 6.1 WMS 不負責繪製
@@ -199,8 +172,6 @@ WMS 的責任是：
 -   決定 layer 的層級
     
 實際合成由 SurfaceFlinger 完成。
-
-----------
 
 ### 6.2 Task 與 Layer 的關係
 
@@ -214,9 +185,7 @@ WMS 提供：
     
 **Graphics pipeline 依賴 WMS 提供正確的畫面結構。**
 
-----------
-
-## 7. 常見 WMS 問題與 Debug 方向
+## 7. 常見問題與排查（常見 WMS 問題與 Debug 方向）
 
 ### 7.1 常見問題類型
 
@@ -225,8 +194,6 @@ WMS 提供：
 | 點不到畫面       | Window Z-order 錯誤               |
 | App 被當成背景   | Visibility 判斷錯誤               |
 | Input ANR        | Window state 更新延遲             |
-
-----------
 
 ### 7.2 Debug 工具
 

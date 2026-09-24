@@ -1,7 +1,4 @@
-
 # Secure Boot vs Trusted Boot
-
-## 本章目的
 
 本章要釐清幾個容易混在一起的名詞：
 
@@ -23,9 +20,7 @@ Attestation
 誰負責向外證明目前系統狀態？
 ```
 
-----------
-
-## 一張圖先看懂
+## 1. 一張圖先看懂
 
 ```
                  [Root of Trust]
@@ -52,10 +47,7 @@ Measured Boot 負責記錄實際載入內容。
 Attestation 負責證明目前系統狀態。
 ```
 
-----------
-
-
-## 1. 名詞速查表
+## 2. 名詞速查表
 
 | 名詞 | 中文理解 | 核心目的 | 常見技術 |
 |------|----------|----------|----------|
@@ -67,12 +59,9 @@ Attestation 負責證明目前系統狀態。
 | PCR | Platform Configuration Register | 保存 measurement 結果 | TPM PCR |
 | Event Log | 事件紀錄 | 解釋 PCR 是由哪些 measurement 組成 | TPM event log |
 
-----------
+## 3. 最大差異：Verify vs Measure
 
-## 2. 最大差異：Verify vs Measure
-
-
-## 最重要的差異
+### 3.1 最重要的差異
 
 | 項目 | Secure Boot / Verified Boot | Trusted Boot / Measured Boot |
 |------|-----------------------------|------------------------------|
@@ -93,9 +82,7 @@ Measured Boot:
   有載入 → 就記錄
 ```
 
-----------
-
-## 3. Secure Boot 是什麼？
+## 4. Secure Boot 是什麼？
 
 Secure Boot 的核心概念是：
 
@@ -128,9 +115,7 @@ Secure Boot 的核心概念是：
 
 依平台設計而定。
 
-----------
-
-## 4. Secure Boot 保護什麼？
+## 5. Secure Boot 保護什麼？
 
 Secure Boot / Verified Boot 可以保護：
 
@@ -152,9 +137,7 @@ firmware update package
 
 如果某個 image 沒有被驗證，它就是信任鏈的缺口。
 
-----------
-
-## 5. Secure Boot 不能解決什麼？
+## 6. Secure Boot 不能解決什麼？
 
 Secure Boot 不代表系統沒有漏洞。
 
@@ -180,9 +163,7 @@ firmware update verification
 debug lock
 ```
 
-----------
-
-## 6. Verified Boot 是什麼？
+## 7. Verified Boot 是什麼？
 
 Verified Boot 通常可以理解成：
 
@@ -221,9 +202,7 @@ Embedded Linux 也可以有類似概念：
 OS image / rootfs / partition 也要可信。
 ```
 
-----------
-
-## 7. Trusted Boot / Measured Boot 是什麼？
+## 8. Trusted Boot / Measured Boot 是什麼？
 
 Trusted Boot 常常透過 Measured Boot 實作。
 
@@ -261,9 +240,7 @@ Measured Boot 的核心概念是：
 Measured Boot 不一定阻止開機。它主要產生可被檢查的紀錄。
 ```
 
-----------
-
-## 8. PCR 是什麼？
+## 9. PCR 是什麼？
 
 PCR 是：
 
@@ -291,9 +268,7 @@ PCR_new = Hash(PCR_old || new_measurement)
 目前系統開機狀態的摘要
 ```
 
-----------
-
-## 9. Event Log 是什麼？
+## 10. Event Log 是什麼？
 
 PCR 只是一組最後結果。
 
@@ -328,9 +303,7 @@ PCR 不符合預期
 找出是哪個 image / config / cmdline 改變
 ```
 
-----------
-
-## 10. Attestation 是什麼？
+## 11. Attestation 是什麼？
 
 Attestation 是：
 
@@ -368,9 +341,7 @@ Allow / Deny / Limited mode
 確認 device 是否跑合法 firmware決定是否釋放 disk key決定是否允許連接 backend service決定是否進入 limited mode
 ```
 
-----------
-
-## 11. Secure Boot + Measured Boot 可以一起用嗎？
+## 12. Secure Boot + Measured Boot 可以一起用嗎？
 
 可以，而且實務上常常一起使用。
 
@@ -409,9 +380,7 @@ Measure 是 audit trail。
 Attestation 是 proof。
 ```
 
-----------
-
-## 12. Embedded Linux 常見對應
+## 13. Embedded Linux 常見對應
 
 Embedded Linux 常見組合：
 
@@ -449,9 +418,7 @@ update package 是否有簽章
 舊版 signed image 是否會被 rollback protection 擋下
 ```
 
-----------
-
-## 13. Android 常見對應
+## 14. Android 常見對應
 
 Android 常見組合：
 
@@ -491,11 +458,9 @@ dm-verity 是否 enforcing
 fastboot 是否允許 unsigned image
 ```
 
-----------
+## 15. 常見問題與排查
 
-## 14. 常見錯誤
-
-### 把 Secure Boot 和 Measured Boot 當成同一件事
+### 15.1 把 Secure Boot 和 Measured Boot 當成同一件事
 
 ```
 Secure Boot 是 verify。
@@ -504,9 +469,7 @@ Measured Boot 是 measure。
 
 兩者目的不同。
 
-----------
-
-### 有 Secure Boot，但 rootfs 沒驗證
+### 15.2 有 Secure Boot，但 rootfs 沒驗證
 
 ```
 Bootloader / kernel 都可信
@@ -519,9 +482,7 @@ Bootloader / kernel 都可信
 系統仍可能被植入 service / library / app。
 ```
 
-----------
-
-### 有 measurement，但沒有人檢查
+### 15.3 有 measurement，但沒有人檢查
 
 ```
 PCR 有值
@@ -535,9 +496,7 @@ event log 有資料
 只是記錄，沒有形成安全決策。
 ```
 
-----------
-
-### PCR 變了就直接判定被攻擊
+### 15.4 PCR 變了就直接判定被攻擊
 
 PCR 改變不一定代表被攻擊。
 
@@ -554,9 +513,7 @@ event log 順序改變
 
 所以要搭配 event log 分析。
 
-----------
-
-### 舊版 image 仍然可以開機
+### 15.5 舊版 image 仍然可以開機
 
 即使舊版 image 有合法簽章，也可能包含已知漏洞。
 
@@ -569,11 +526,9 @@ rollback index
 anti-rollback counter
 ```
 
-----------
+## 16. BSP Debug：Secure Boot 檢查方向
 
-## 15. BSP Debug：Secure Boot 檢查方向
-
-### Step 1：確認驗證鏈
+### 16.1 Step 1：確認驗證鏈
 
 ```
 BootROM 是否驗證 SPL / TF-A？
@@ -583,9 +538,7 @@ Kernel 是否驗證 rootfs？
 Update path 是否驗證 package？
 ```
 
-----------
-
-### Step 2：確認驗證範圍
+### 16.2 Step 2：確認驗證範圍
 
 ```
 kernel 是否被簽章
@@ -595,9 +548,7 @@ rootfs 是否有 dm-verity
 Android vbmeta chain 是否包含所有必要 partition
 ```
 
-----------
-
-### Step 3：確認失敗時行為
+### 16.3 Step 3：確認失敗時行為
 
 ```
 signature mismatch 時會停在哪裡？
@@ -606,20 +557,16 @@ signature mismatch 時會停在哪裡？
 會不會允許 fastboot flash unsigned image？
 ```
 
-----------
+## 17. BSP Debug：Measured Boot 檢查方向
 
-## 16. BSP Debug：Measured Boot 檢查方向
-
-### Step 1：確認 TPM / measurement backend
+### 17.1 Step 1：確認 TPM / measurement backend
 
 ```
 ls /sys/class/tpm/
 dmesg | grep -i tpm
 ```
 
-----------
-
-### Step 2：讀 PCR
+### 17.2 Step 2：讀 PCR
 
 ```
 tpm2_pcrread
@@ -632,9 +579,7 @@ tpm2_pcrread
 不同 boot image 是否造成 PCR 改變
 ```
 
-----------
-
-### Step 3：看 Event Log
+### 17.3 Step 3：看 Event Log
 
 常見路徑：
 
@@ -650,9 +595,7 @@ tpm2_pcrread
 確認 kernel / cmdline / initramfs 是否被量測
 ```
 
-----------
-
-### Step 4：確認 policy 是否存在
+### 17.4 Step 4：確認 policy 是否存在
 
 問自己：
 
@@ -664,10 +607,7 @@ tpm2_pcrread
 是否有 key sealing？
 ```
 
-----------
-
-
-## 17. 一張表總結
+## 18. 一張表總結
 
 | 問題 | Secure Boot | Measured Boot | Attestation |
 |------|-------------|----------------|-------------|
@@ -677,5 +617,3 @@ tpm2_pcrread
 | 主要資料 | signature / hash | PCR / event log | quote / certificate |
 | 常見元件 | BootROM、U-Boot、AVB | TPM、firmware、bootloader | TPM、TEE、remote server |
 | BSP 重點 | 驗證鏈完整性 | measurement 完整性 | policy / baseline |
-
-

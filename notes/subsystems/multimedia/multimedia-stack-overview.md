@@ -1,12 +1,9 @@
-
 # Multimedia Stack Overview
 
 > 本章目標：  
 > 建立 Embedded Linux Multimedia 的完整心智模型（Mental Model）
 
-----------
-
-# 1. 為什麼需要理解整個 Multimedia Stack？
+## 1. 為什麼需要理解整個 Multimedia Stack？
 
 在 Embedded BSP 開發中，常見問題：
 
@@ -22,14 +19,12 @@
     
 -   Wayland 有畫面但 kmssink 沒畫面
     
-
 這些問題的本質：
 
 **沒有完整理解 userspace → kernel → hardware 的資料流**
 
-----------
+## 2. 整體 Multimedia Stack 架構圖
 
-# 2. 整體 Multimedia Stack 架構圖
 ```
 ┌──────────────────────────────────┐  
 │            Application            │  
@@ -74,13 +69,10 @@
 │ Camera / ISP / VPU / Display IP │  
 └──────────────────────────────────┘
 ```
-----------
 
-# 3. 各層角色解析
+## 3. 各層角色解析
 
-----------
-
-## Application Layer
+### 3.1 Application Layer
 
 例如：
 
@@ -92,7 +84,6 @@
     
 -   GStreamer-based player
     
-
 負責：
 
 -   建立 pipeline
@@ -101,10 +92,7 @@
     
 -   決定資料流方向
     
-
-----------
-
-## GStreamer Layer
+### 3.2 GStreamer Layer
 
 核心負責：
 
@@ -116,17 +104,13 @@
     
 -   event 傳遞
     
-
 例如：
 
 gst-launch-1.0 v4l2src ! videoconvert ! waylandsink
 
-----------
+### 3.3 Plugin Layer（實際對接 kernel）
 
-## Plugin Layer（實際對接 kernel）
-
-
-### v4l2src
+#### v4l2src
 
 對應 kernel：
 ```
@@ -138,9 +122,8 @@ VIDIOC_REQBUFS
 VIDIOC_QBUF  
 VIDIOC_STREAMON
 ```
-----------
 
-### kmssink / waylandsink
+#### kmssink / waylandsink
 
 kmssink 直接對應：
 ```
@@ -150,15 +133,12 @@ waylandsink 對應：
 ```
 wayland compositor → DRM
 ```
-----------
 
-## Kernel Layer
+### 3.4 Kernel Layer
 
 三大 subsystem：
 
-----------
-
-### 1. V4L2
+#### V4L2
 
 用途：
 
@@ -168,14 +148,12 @@ wayland compositor → DRM
     
 -   memory-to-memory device
     
-
 source code：
 ```
 drivers/media/
 ```
-----------
 
-### 2. DRM
+#### DRM
 
 用途：
 
@@ -187,14 +165,12 @@ drivers/media/
     
 -   display pipeline
     
-
 source code：
 ```
 drivers/gpu/drm/
 ```
-----------
 
-### 3. DMA-BUF
+#### DMA-BUF
 
 用途：
 
@@ -202,14 +178,12 @@ drivers/gpu/drm/
     
 -   zero-copy pipeline
     
-
 source code：
 ```
 drivers/dma-buf/
 ```
-----------
 
-# 4. 真實資料流範例（Camera → Display）
+## 4. 真實資料流範例（Camera → Display）
 
 以下是一個真實 RK / i.MX pipeline：
 ```
@@ -242,9 +216,7 @@ Panel
 ✓ 使用 dmabuf  
 ✓ 直接 scanout
 
-----------
-
-# 5. 為什麼 工程師一定要理解這層？
+## 5. 為什麼 工程師一定要理解這層？
 
 因為你 debug 的不是：
 
@@ -262,14 +234,10 @@ Panel
     
 -   memory type 設錯
     
+## 6. Multimedia Stack 的三種典型 Pipeline
 
-----------
+### 6.1 Capture → Display
 
-# 6. Multimedia Stack 的三種典型 Pipeline
-
-----------
-
-## 1. Capture → Display
 ```
 v4l2src ! kmssink
 ```
@@ -279,10 +247,8 @@ v4l2src ! kmssink
     
 -   factory test
     
+### 6.2 Decode → Display
 
-----------
-
-## 2. Decode → Display
 ```
 filesrc ! h264parse ! v4l2h264dec ! kmssink
 ```
@@ -292,10 +258,8 @@ filesrc ! h264parse ! v4l2h264dec ! kmssink
     
 -   hardware decode
     
+### 6.3 Encode Pipeline
 
-----------
-
-## 3. Encode Pipeline
 ```
 v4l2src ! v4l2h264enc ! filesink
 ```
@@ -305,10 +269,7 @@ v4l2src ! v4l2h264enc ! filesink
     
 -   surveillance
     
-
-----------
-
-# 7. Mental Model
+## 7. Mental Model
 
 腦中要有這張圖：
 ```
@@ -326,12 +287,9 @@ Back to userspace
 
 任何 multimedia 問題都可以定位。
 
-----------
-
-# 本章總結
+## 8. 本章總結
 
 Multimedia Stack 核心組成：
-
 
 | Layer | Role 說明 |  
 |--------------|------------------------------------|  

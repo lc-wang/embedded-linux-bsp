@@ -1,4 +1,3 @@
-
 # Ubuntu / Debian BSP 實作與系統架構筆記
 
 本章整理 Ubuntu / Debian 在 BSP 開發中的必備知識，包括：
@@ -11,9 +10,7 @@
 - 常見 debug 技巧  
 - BSP bring-up 流程（Renesas / Rockchip / i.MX）  
 
----
-
-# 1. Ubuntu / Debian 系統架構
+## 1. Ubuntu / Debian 系統架構
 
 Ubuntu 與 Debian 皆基於：
 
@@ -26,9 +23,7 @@ Ubuntu 與 Debian 皆基於：
 | `/lib/modules/$(uname -r)` | kernel module 路徑 |
 | `/boot` | kernel + initrd + config |
 
----
-
-# 2. Rootfs 結構（Debian/Ubuntu）
+## 2. Rootfs 結構（Debian/Ubuntu）
 
 典型 rootfs：
 ```yaml
@@ -45,7 +40,8 @@ rootfs/
 ├── lib/modules/← kernel modules
 └── dev/ proc/ sys/ run/
 ```
-### BSP 最常改動的部位
+
+### 2.1 BSP 最常改動的部位
 
 | 位置 | 說明 |
 | --- | --- |
@@ -55,9 +51,8 @@ rootfs/
 | `/etc/modules-load.d` | 上層要自動載入的 module |
 | `/lib/firmware` | Wi-Fi / BT / ISP firmware |
 
----
+## 3. initramfs 與 rootfs 的差別
 
-# 3. initramfs 與 rootfs 的差別
 ```markdown
 initramfs
 ↓ (kernel 解壓)
@@ -66,14 +61,15 @@ init
 真正的 rootfs (/dev/mmcblk0p2, /dev/nvme0n1p2)
 ```
 
+### 3.1 initramfs 用途
 
-### initramfs 用途
 - 掛載真正 rootfs
 - 提供 early debug（busybox, sh）
 - LUKS、LVM、RAID
 - Kernel module 早期載入
 
-### 生成 initramfs
+### 3.2 生成 initramfs
+
 ```bash
 update-initramfs -c -k <version>
 ```
@@ -82,18 +78,20 @@ Ubuntu/Debian 在嵌入式 BSP 中常需手動修改：
 /etc/initramfs-tools/initramfs.conf
 /etc/initramfs-tools/modules
 ```
----
 
-# 4. systemd（PID 1）
+## 4. systemd（PID 1）
 
 systemd 是 Ubuntu/Debian 的核心 init system。
 
-### 檢查 boot 時序
+### 4.1 檢查 boot 時序
+
 ```bash
 systemd-analyze
 systemd-analyze blame
 ```
-### 加入自訂 service
+
+### 4.2 加入自訂 service
+
 ```bash
 /etc/systemd/system/myapp.service
 ```
@@ -111,7 +109,9 @@ Restart=on-failure
 [Install]
 WantedBy=multi-user.target
 ```
-# 5. Kernel .deb 打包與安裝
+
+## 5. Kernel .deb 打包與安裝
+
 Ubuntu/Debian 的 kernel 不使用原始 Image，而使用 .deb 套件。
 
 編譯並生成 .deb
@@ -129,12 +129,14 @@ linux-headers-<version>.deb
 dpkg -i linux-image-*.deb
 dpkg -i linux-headers-*.deb
 ```
-### 注意：
+
+### 5.1 注意：
 
 -   Kernel modules 在 `/lib/modules/<version>/`
 -   Bootloader 需能讀取 `/boot/vmlinuz-*`（GRUB / U-Boot）
 
-# 6. BSP Bring-up 流程（Ubuntu/Debian）
+## 6. BSP Bring-up 流程（Ubuntu/Debian）
+
 嵌入式 BSP bring-up 大多是：
 
 ```markdown
@@ -144,7 +146,8 @@ Kernel (Image.gz + dtb)
   ↓
 Ubuntu / Debian rootfs
 ```
-### 標準流程
+
+### 6.1 標準流程
 
 1.  **準備 rootfs**
 
@@ -179,14 +182,16 @@ mkfs.ext4 ubuntu.img
 mount -o loop ubuntu.img /mnt
 cp -a rootfs/* /mnt
 ```
-# 7. Network / Wi-Fi / BT Bring-up
+
+## 7. Network / Wi-Fi / BT Bring-up
 
 Ubuntu/Debian 使用：
 -   `systemd-networkd`
 -   netplan
 -   `/etc/network/interfaces`（legacy）
 
-### 以 eth0 為例：
+### 7.1 以 eth0 為例：
+
 `/etc/netplan/01-netcfg.yaml`：
 
 ```yaml
@@ -202,7 +207,9 @@ Wi-Fi（wpa_supplicant）：
 sudo wpa_passphrase ssid password > /etc/wpa_supplicant/wpa_supplicant.conf
 systemctl enable wpa_supplicant
 ```
-# 8. eMMC / SD / NVMe boot（U-Boot + Debian）
+
+## 8. eMMC / SD / NVMe boot（U-Boot + Debian）
+
 U-Boot example：
 
 ```bash
@@ -217,7 +224,9 @@ NVMe：
 nvme scan
 load nvme 0:1 ${kernel_addr_r} /boot/Image
 ```
-# 9. Common Debug Techniques
+
+## 9. Common Debug Techniques
+
 **檢查 rootfs 問題**
 ```yaml
 journalctl -xb
@@ -238,7 +247,7 @@ dmesg | grep firmware
 ls /lib/firmware
 ```
 
-# 10. 常見問題與排查
+## 10. 常見問題與排查
 
 | 問題 | 可能原因 | 解決方式 |
 |------|-----------|------------|
@@ -247,4 +256,3 @@ ls /lib/firmware
 | Wi-Fi 無法啟動 | firmware 不在 `/lib/firmware` | 放入 vendor 提供的 bin |
 | systemd 卡住 | 驅動 module 掛掉阻塞 | `systemd-analyze blame` |
 | SD boot err -110 | SDHCI timing 問題 | 調整 DTS bus-width / UHS |
-

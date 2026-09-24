@@ -1,4 +1,3 @@
-
 # Linux IRQ Subsystem 解析：GIC / IRQ Domain / SoftIRQ / Threaded IRQ
 
 本章介紹 Linux 中斷架構，包括：
@@ -12,9 +11,7 @@
 - interrupt affinity（綁定 CPU）
 - interrupt latency 與常見 debug 方法
 
----
-
-# 1. IRQ Subsystem 總覽
+## 1. IRQ Subsystem 總覽
 
 Linux 將中斷分為三階段：
 ```yaml
@@ -32,9 +29,7 @@ SoftIRQ / Tasklet / Workqueue (bottom half)
 - 硬中斷處理越快越好  
 - 耗時工作下推至 bottom-half  
 
----
-
-# 2. IRQ Number、IRQ Domain、hwirq
+## 2. IRQ Number、IRQ Domain、hwirq
 
 設備樹中描述：
 ```dts
@@ -62,9 +57,7 @@ struct irq_desc
 - RZ/V2H → GIC-600  
 - i.MX8 → GIC + local interrupt  
 
----
-
-# 3. GIC（Generic Interrupt Controller）
+## 3. GIC（Generic Interrupt Controller）
 
 ARM 常見中斷控制器：
 
@@ -82,9 +75,7 @@ GIC 的功能：
 - mask/unmask
 - 中斷確認 & 結束（EOI）
 
----
-
-# 4. request_irq 與中斷 Handler
+## 4. request_irq 與中斷 Handler
 
 一般驅動：
 
@@ -96,7 +87,7 @@ int request_irq(unsigned int irq,
         void *dev);
  ```
 
-### 常見 flags
+### 4.1 常見 flags
 
 | flag | 用途 |
 |------|------|
@@ -105,14 +96,14 @@ int request_irq(unsigned int irq,
 | IRQF_ONESHOT | threaded IRQ 搭配 |
 | IRQF_SHARED | 允許共享 IRQ |
 
-
 Handler 回傳：
 
 ```c
 IRQ_HANDLED
 IRQ_NONE
 ```
-# 5. Threaded IRQ
+
+## 5. Threaded IRQ
 
 Threaded IRQ = 將 interrupt handler 放到 kernel thread 執行。
 
@@ -123,7 +114,7 @@ Threaded IRQ = 將 interrupt handler 放到 kernel thread 執行。
 -   e-paper driver（IO sequence）
 -   I2C/SPI interrupt-based device
 -   Wi-Fi 驅動 often use multiple IRQ threads
-    
+
 示例
 
 ```c
@@ -140,7 +131,7 @@ top_half() → 非常短，通常 return IRQ_WAKE_THREAD
 thread_fn() 在 kthread 中執行，可睡眠
 ```
 
-# 6. SoftIRQ（底半部）
+## 6. SoftIRQ（底半部）
 
 SoftIRQ 類型：
 
@@ -152,7 +143,6 @@ SoftIRQ 類型：
 | SCHED | scheduler 負責切換 |
 | BLOCK | block I/O 底半部 |
 
-
 SoftIRQ 常以 ksoftirqd CPU thread 執行：
 
 ```sh
@@ -162,8 +152,7 @@ ksoftirqd/1
 ```
 若這些 thread 負載很高 → 網路延遲上升。
 
-
-# 7. Tasklet
+## 7. Tasklet
 
 Tasklet = SoftIRQ 的 API 包裝。
 
@@ -172,7 +161,8 @@ Tasklet = SoftIRQ 的 API 包裝。
 -   只能在同一 CPU 執行
 -   不可並行（disable local）
 
-# 8. Interrupt Affinity（綁定 CPU）
+## 8. Interrupt Affinity（綁定 CPU）
+
 例如：
 
 ```sh
@@ -186,19 +176,8 @@ echo 2 > /proc/irq/42/smp_affinity  # 綁核心 1
 -   display pipeline → 避免與 networking 共享 IRQ
 -   remoteproc IPI → 調整 latency
 
+## 9. 調試命令
 
-# 9. 常見中斷問題與排查
-
-| 問題 | 可能原因 | 解法 |
-|------|-----------|-------|
-| IRQ storm | handler 未處理 IRQ source | mask IRQ / clear status register |
-| IRQ 無響應 | GIC routing 錯 | 檢查 DTS interrupt-parent |
-| shared IRQ stuck | handler 回報 IRQ_NONE | 使用 IRQF_SHARED |
-| latency 高 | handler 太長 | threaded IRQ |
-| softirq 高負載 | networking RX volume 大 | 調整 NAPI |
-
-
-# 10. 調試命令
 查看所有 IRQ：
 ```sh
 cat /proc/interrupts
@@ -215,7 +194,8 @@ echo 1 > /sys/kernel/debug/tracing/events/irq/enable
 ```sh
 cat /proc/irq/*/smp_affinity
 ```
-# 11. 中斷延遲（IRQ latency）原因
+
+## 10. 中斷延遲（IRQ latency）原因
 
 -   CPU idle → 需要退出 WFI
 -   GIC routing 太複雜（尤其 GICv3） 
@@ -228,3 +208,13 @@ cat /proc/irq/*/smp_affinity
 -   將 IRQ 綁定到 performance core
 -   避免長時間關中斷（preempt off）
 -   改善 bottom-half 負載（NAPI、workqueue）
+
+## 11. 常見問題與排查（常見中斷問題與排查）
+
+| 問題 | 可能原因 | 解法 |
+|------|-----------|-------|
+| IRQ storm | handler 未處理 IRQ source | mask IRQ / clear status register |
+| IRQ 無響應 | GIC routing 錯 | 檢查 DTS interrupt-parent |
+| shared IRQ stuck | handler 回報 IRQ_NONE | 使用 IRQF_SHARED |
+| latency 高 | handler 太長 | threaded IRQ |
+| softirq 高負載 | networking RX volume 大 | 調整 NAPI |

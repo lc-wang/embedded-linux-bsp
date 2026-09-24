@@ -9,8 +9,6 @@
 > -   能實際用於 debug：沒聲音、爆音、聲音變慢/變快、suspend/resume 後失效
 >
 
-----------
-
 ## 1. 為什麼 Audio 是 BSP 最容易「怪怪的」介面
 
 Audio 在 BSP 世界有幾個致命特性：
@@ -20,8 +18,6 @@ Audio 在 BSP 世界有幾個致命特性：
 -   很多錯誤只在 runtime 或 suspend/resume 後出現
 
 **Audio 問題通常不是 codec driver bug，而是 clock / 同步關係錯誤。**
-
-----------
 
 ## 2. I2S Interface 的核心不是資料，而是 Clock
 
@@ -40,8 +36,6 @@ I2S 傳輸包含：
 -   clock rate
 -   clock 穩定度
 
-----------
-
 ### 2.2 Clock Master / Slave 關係
 
 在 Audio 系統中，必須明確一件事：
@@ -58,8 +52,6 @@ I2S 傳輸包含：
 -   聲音可能能播
 -   但會有 pitch error、drop、爆音
 
-----------
-
 ## 3. I2S Controller 與 Audio Codec 的分工
 
 ### 3.1 I2S Controller（SoC 端）
@@ -68,8 +60,6 @@ I2S 傳輸包含：
 -   控制資料格式（I2S / left-justified / DSP mode）
 -   通常高度依賴 PLL
 
-----------
-
 ### 3.2 Audio Codec（外掛裝置）
 
 -   依賴正確 clock 才能鎖定
@@ -77,11 +67,10 @@ I2S 傳輸包含：
 
 **Codec 沒 lock clock 時，通常不會明確報錯。**
 
-----------
-
 ## 4. Device Tree 中 Audio 最容易錯的地方
 
 ### 4.1 clock 與 PLL 設定
+
 -   clock source 選錯
 -   PLL rate 不符合 audio family（44.1k / 48k）
 
@@ -89,17 +78,16 @@ I2S 傳輸包含：
 
 -   聲音速度錯
 -   pitch 不對
-----------
 
 ### 4.2 DAI link 關係
+
 -   CPU DAI / Codec DAI 關係錯誤
 -   format / clock inversion 不一致
-----------
 
 ### 4.3 pinmux 與電氣問題
+
 -   I2S 腳位未正確 mux
 -   線長或 EMI 影響 clock
-----------
 
 ## 5. 為什麼 Audio 常在 Suspend / Resume 後壞掉
 
@@ -114,8 +102,6 @@ I2S 傳輸包含：
 
 **這是 BSP Audio 的經典問題。**
 
-----------
-
 ## 6. 為什麼「有聲音」不代表設定正確
 
 Audio 問題常見誤判：
@@ -126,38 +112,10 @@ Audio 問題常見誤判：
 -   clock 微小誤差
 -   長時間播放會累積成明顯問題
 
-----------
+## 7. Audio Debug Toolbox
 
-## 7. Debug Checklist（實戰導向）
+### 7.1 確認音效卡與 DAI 是否存在
 
-### 7.1 Clock
-
--   確認 MCLK / BCLK / LRCLK 是否存在
--   確認 rate 是否符合 codec datasheet
-
-----------
-
-### 7.2 DTS / DAI
--   檢查 DAI format
--   檢查 master/slave 設定
-----------
-
-### 7.3 Runtime 行為
--   長時間播放是否穩定
--   suspend/resume 後是否仍正常
-----------
-
-## 8. 常見錯誤歸因
-
-| 現象     | 常見誤判        | 真正原因          |
-|----------|-----------------|-------------------|
-| 沒聲音   | Codec driver    | Clock 未 lock     |
-| 爆音     | Buffer 問題     | PLL 不穩          |
-| 聲音快慢 | App 問題        | Rate mismatch     |
-----------
-## 9. Audio Debug Toolbox
-
-### 9.1 確認音效卡與 DAI 是否存在
 ```bash
 aplay -l
 arecord -l
@@ -169,9 +127,8 @@ arecord -l
 若這一步就不存在：
 -   問題通常在 **DAI link / DTS / driver probe**
     
-----------
+### 7.2 確認 Mixer / Path 是否正確
 
-### 9.2 確認 Mixer / Path 是否正確
 ```bash
 amixer
 ```
@@ -184,9 +141,9 @@ tinymix <id> <value>
 用途：
 -   確認 codec path 是否打開
 -   排除「有資料但被 mute」的情況
-----------
 
-### 9.3 固定條件播放測試
+### 7.3 固定條件播放測試
+
 ```bash
 aplay -D hw:0,0 test.wav
 ```
@@ -197,9 +154,8 @@ aplay -D hw:0,0 test.wav
 若此情況仍異常：
 -   問題多半在 **clock / PLL / DAI format**
 
-----------
+### 7.4 Clock / PLL 狀態檢查
 
-### 9.4 Clock / PLL 狀態檢查
 ```bash
 cat /sys/kernel/debug/clk/clk_summary
 ```
@@ -209,9 +165,8 @@ cat /sys/kernel/debug/clk/clk_summary
     
 Audio 問題第一時間一定要看這裡。
 
-----------
+### 7.5 Suspend / Resume Audio 檢查流程
 
-### 9.5 Suspend / Resume Audio 檢查流程
 ```bash
 aplay test.wav
 echo mem > /sys/power/state
@@ -223,9 +178,8 @@ aplay test.wav
 通常代表：
 -   PLL 未重新 lock
 -   codec 未重新初始化
-----------
 
-### 9.6 快速問題定位表
+### 7.6 快速問題定位表
 
 | 現象               | 最可能問題層級        |
 |--------------------|-----------------------|
@@ -235,3 +189,29 @@ aplay test.wav
 | 爆音 / 雜音        | PLL 不穩              |
 | Resume 後壞掉      | Clock / Codec reset   |
 
+## 8. 常見問題與排查
+
+### 8.1 Debug Checklist（實戰導向）
+
+#### Clock
+
+-   確認 MCLK / BCLK / LRCLK 是否存在
+-   確認 rate 是否符合 codec datasheet
+
+#### DTS / DAI
+
+-   檢查 DAI format
+-   檢查 master/slave 設定
+
+#### Runtime 行為
+
+-   長時間播放是否穩定
+-   suspend/resume 後是否仍正常
+
+### 8.2 常見錯誤歸因
+
+| 現象     | 常見誤判        | 真正原因          |
+|----------|-----------------|-------------------|
+| 沒聲音   | Codec driver    | Clock 未 lock     |
+| 爆音     | Buffer 問題     | PLL 不穩          |
+| 聲音快慢 | App 問題        | Rate mismatch     |

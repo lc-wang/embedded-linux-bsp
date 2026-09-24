@@ -1,11 +1,9 @@
-
 # Linux VFS & Filesystem Architecture
 
 本章介紹 Linux Virtual File System (VFS)、inode/dentry/page cache、mount 流程、系統啟動時的 rootfs 選擇機制、以及不同 filesystem 特性比較。亦包含實際 BSP / Android / Yocto 常遇到的 storage 問題分析方法。
 
----
+## 1. Linux VFS 架構
 
-# 1. Linux VFS 架構
 ```yaml
 VFS (Virtual File System) 是所有檔案系統的抽象層：
 
@@ -35,9 +33,7 @@ VFS 提供統一 API：
 - file_operations
 - inode operations
 
----
-
-# 2. 核心資料結構
+## 2. 核心資料結構
 
 | 結構 | 功能 |
 | --- | --- |
@@ -51,11 +47,11 @@ VFS 提供統一 API：
 ```yaml
 path → dentry lookup → inode → page cache → block device
 ```
----
 
-# 3. 檔案操作流程
+## 3. 檔案操作流程
 
 ### 3.1 Open
+
 ```sh
 open("/etc/passwd")
 → dentry lookup
@@ -64,6 +60,7 @@ open("/etc/passwd")
 ```
 
 ### 3.2 Read
+
 ```sh
 read(fd)
 → file_operations->read_iter()
@@ -72,14 +69,14 @@ read(fd)
 ```
 
 ### 3.3 Write
+
 ```sh
 write(fd)
 → page cache (dirty page)
 → background flusher 寫回 block
 ```
----
 
-# 4. Page Cache
+## 4. Page Cache
 
 Page cache 讓 filesystem 的讀寫高速化：
 
@@ -91,9 +88,8 @@ Page cache 也負責 mmap：
 ```sh
 mmap() → share underlying page cache
 ```
----
 
-# 5. Mount 與 Rootfs 選擇流程
+## 5. Mount 與 Rootfs 選擇流程
 
 Boot 時 kernel 根據 `root=` 參數選擇 rootfs：
 ```sh
@@ -114,16 +110,15 @@ mount_root()
 → <fs_type>->mount()
 ```
 
-### initramfs 的位置
+### 5.1 initramfs 的位置
+
 ```sh
 initramfs 解壓
 → /init 執行
 → pivot_root 或 switch_root 到真實 rootfs
 ```
 
----
-
-# 6. 常見檔案系統比較
+## 6. 常見檔案系統比較
 
 | FS | 優點 | 缺點 | 用途 |
 | --- | --- | --- | --- |
@@ -140,9 +135,7 @@ initramfs 解壓
 - Android：erofs / ext4 + super partition  
 - Debian：ext4 rootfs  
 
----
-
-# 7. block layer 與 buffer / bio
+## 7. block layer 與 buffer / bio
 
 filesystem 不直接存取硬體，而透過 block layer：
 ```sh
@@ -153,7 +146,7 @@ readpage()
 → page ready
 ```
 
-### bio 是 block I/O 的核心結構：
+### 7.1 bio 是 block I/O 的核心結構：
 
 ```c
 struct bio {
@@ -162,7 +155,9 @@ struct bio {
     ...
 };
 ```
-# 8. VFS 與裝置檔案
+
+## 8. VFS 與裝置檔案
+
 Linux 中一切皆檔案：
 
 | 路徑 | 說明 |
@@ -173,18 +168,17 @@ Linux 中一切皆檔案：
 | `/dev/dri/card0` | DRM primary device |
 | `/dev/rpmsg0` | RPMsg char device |
 
-
-
 它們不是 regular file，而是：
 
 -   character device
 -   block device
-    
+
 VFS 仍透過 file_operations 管理它們。
 
-# 9. 常見 Debug 方法
+## 9. 常見 Debug 方法
 
-### 查看 mount
+### 9.1 查看 mount
+
 ```sh
 mount
 cat /proc/mounts
@@ -209,7 +203,8 @@ trace-cmd report
 cat /proc/meminfo
 cat /proc/slabinfo
 ```
-# 10. 常見問題與排查
+
+## 10. 常見問題與排查
 
 | 問題 | 可能原因 | 解決方式 |
 |------|-----------|-----------|
@@ -218,4 +213,3 @@ cat /proc/slabinfo
 | Android system.img 掛載失敗 | erofs/squashfs format 錯 | 修正 `mkfs.erofs` / `mksquashfs` |
 | mount: wrong fs type | module 缺 | Kernel config 加上：`CONFIG_EXT4_FS=y` |
 | Boot 後掉到 initramfs | rootfs 分區代號錯 | 修正 `root=` 參數 |
-

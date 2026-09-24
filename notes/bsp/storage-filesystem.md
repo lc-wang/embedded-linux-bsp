@@ -1,12 +1,9 @@
-
 # Storage & Filesystem in Android/Linux BSP
 
 本章整理 Android 與 Linux BSP 中常見的儲存設備（eMMC、SD、SPI-NAND、NVMe）  
 以及分區格式、boot image 結構、GPT/MBR、U-Boot 與 Kernel 如何存取 storage。
 
----
-
-# 1. 常見儲存種類
+## 1. 常見儲存種類
 
 | 儲存 | 說明 | 常見平台 |
 | --- | --- | --- |
@@ -17,9 +14,7 @@
 | **SPI-NAND** | 大容量 NAND，包含 ECC | 工控板 |
 | **NVMe (PCIe SSD)** | 最高速，需 PCIe | RK3588/i.MX8 |
 
----
-
-# 2. Partition Layout（GPT）
+## 2. Partition Layout（GPT）
 
 Android / Linux BSP 大多使用 GPT。
 
@@ -37,7 +32,8 @@ gpt layout:
 8: userdata
 ```
 
-### 分區組成
+### 2.1 分區組成
+
 | 分區 | 功能 |
 | --- | --- |
 | **boot** | kernel + ramdisk |
@@ -47,9 +43,7 @@ gpt layout:
 | **vendor** | HAL、so library、firmware |
 | **userdata** | 使用者資料 |
 
----
-
-# 3. Boot Image 結構（Android）
+## 3. Boot Image 結構（Android）
 
 Android 的 boot.img 格式（boot header v3 / v4）包含：
 ```yaml
@@ -61,15 +55,13 @@ boot.img
 └ vendor_boot（Android 12+）
 ```
 
-### 為什麼 Android 12+ 需要 `vendor_boot`？
+### 3.1 為什麼 Android 12+ 需要 `vendor_boot`？
 
 - 強制 system/vendor 分離
 - vendor 需放自己的 ramdisk
 - system ramdisk 不可包含 vendor code
 
----
-
-# 4. U-Boot 與 Storage
+## 4. U-Boot 與 Storage
 
 U-Boot 常見儲存命令：
 
@@ -84,22 +76,23 @@ U-Boot 常見儲存命令：
 | `sf probe` | SPI flash |
 | `sf read` | SPI flash 讀取 |
 
-### 例：從 SD 讀取 kernel
+### 4.1 例：從 SD 讀取 kernel
+
 ```bash
 mmc dev 0
 fatload mmc 0:1 ${kernel_addr_r} Image
 ```
 
-### 例：NVMe Boot（RK3588）
+### 4.2 例：NVMe Boot（RK3588）
+
 ```bash
 nvme scan
 load mmc 0:1 ${fdt_addr_r} rk3588.dtb
 load nvme 0:1 ${kernel_addr_r} Image
 booti ${kernel_addr_r} - ${fdt_addr_r}
 ```
----
 
-# 5. Kernel 與储存驅動
+## 5. Kernel 與儲存驅動
 
 Kernel 模組：
 
@@ -110,9 +103,7 @@ Kernel 模組：
 | SPI Flash | MTD | `/drivers/mtd/spi-nor/` |
 | NAND Flash | MTD + ECC | `/drivers/mtd/nand/` |
 
----
-
-# 6. Filesystem 選擇
+## 6. Filesystem 選擇
 
 | FS | 優點 | 缺點 | 適用 |
 | --- | --- | --- | --- |
@@ -122,38 +113,41 @@ Kernel 模組：
 | **ubifs** | NAND 專用 | 僅 MTD | SPI-NAND |
 | **erofs** | fast + readonly | 不可寫 | Android system（Android 13+） |
 
----
+## 7. initramfs / rootfs / system.img
 
-# 7. initramfs / rootfs / system.img
+### 7.1 rootfs 種類
 
-### rootfs 種類
 | 類型 | 說明 |
 | --- | --- |
 | initramfs | 內建到 kernel 的壓縮 cpio |
 | system.img | Android system 分區 |
 | rootfs.tar.gz | Yocto、Debian 的 rootfs |
 
-### Kernel 指定 rootfs
+### 7.2 Kernel 指定 rootfs
+
 ```yaml
 root=/dev/mmcblk0p2 rw rootwait
 ```
----
 
-# 8. Storage Debug
+## 8. Storage Debug
 
-### 查看分區
+### 8.1 查看分區
+
 ```bash
 lsblk
 fdisk -l
 blkid
 ```
-### dump 開頭幾個 block
+
+### 8.2 dump 開頭幾個 block
+
 ```bash
 hexdump -C /dev/mmcblk0 | head
 ```
 （用來 debug SD boot 問題）
 
-### Kernel MMC log
+### 8.3 Kernel MMC log
+
 ```yaml
 dmesg | grep mmc
 ```
@@ -162,9 +156,7 @@ dmesg | grep mmc
 - `Card did not respond to voltage select (err -110)`
 - `mmc: timeout waiting for hardware interrupt`
 
----
-
-# 9. 常見問題與排查
+## 9. 常見問題與排查
 
 | 問題 | 可能原因 | 建議處理 |
 | --- | --- | --- |
@@ -173,4 +165,3 @@ dmesg | grep mmc
 | U-Boot load kernel 失敗 | offset 錯誤 | 查看 GPT 分區起始位置 |
 | Kernel 找不到 NVMe | PCIe reset 未拉高 | 檢查 device tree / power sequence |
 | random I/O 慢 | SD 卡品質差 | 換工控級 SD/eMMC |
-

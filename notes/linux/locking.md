@@ -1,4 +1,3 @@
-
 # Linux Locking / Synchronization Mechanisms 解析
 
 本章整理 Linux Kernel 中所有同步機制，涵蓋：
@@ -14,9 +13,7 @@
 - 何時該用哪一種鎖
 - 常見 deadlock 問題與排查方法
 
----
-
-# 1. 為何需要同步？
+## 1. 為何需要同步？
 
 Linux Kernel 是：
 
@@ -33,9 +30,7 @@ CPU1: x = x + 1
 
 避免競態條件的工具 → **locking primitives**。
 
----
-
-# 2. 鎖的分類總覽
+## 2. 鎖的分類總覽
 
 | 類型 | 可睡眠？ | 適用場景 |
 |------|---------|-----------|
@@ -50,9 +45,7 @@ CPU1: x = x + 1
 | **seqlock** | ✗ | 多讀多寫，讀者不鎖但需 retry |
 | **RCU** | ✗ | 高速讀取、延後釋放 |
 
----
-
-# 3. Spinlock
+## 3. Spinlock
 
 適用：
 
@@ -78,13 +71,13 @@ spin_unlock_irqrestore()
 
 interrupt handler 與普通 path 都會使用同一共享資料
 
-# 4. Mutex
+## 4. Mutex
 
 適用：
 -   可睡眠 context（不能在 IRQ）
 -   臨界區較長
 -   需要 blocking 行為
-    
+
 使用方法：
 ```c
 struct mutex lock;
@@ -95,7 +88,7 @@ mutex_unlock(&lock);
 ```
 若在中斷使用 → 會 kernel panic 或 WARN_ON。
 
-# 5. Semaphore（較舊，已逐漸被 mutex 取代）
+## 5. Semaphore（較舊，已逐漸被 mutex 取代）
 
 適用：
 -   需要計數型同步
@@ -106,7 +99,8 @@ down(&sem);
 /* critical */
 up(&sem);
 ```
-# 6. RW Semaphore（rwsem）
+
+## 6. RW Semaphore（rwsem）
 
 適用：
 
@@ -119,7 +113,8 @@ up_write()
 ```
 讀不互斥，寫需要獨佔。
 
-# 7. RW Lock（rwlock_t）
+## 7. RW Lock（rwlock_t）
+
 適用於 不可睡眠 的多讀少寫場景（與 rwsem 的差別：不可睡眠）
 
 ```c
@@ -132,12 +127,12 @@ write_lock()
 -   softirq
 -   fast path
 
-# 8. Atomic Operations（最快但最簡單）
+## 8. Atomic Operations（最快但最簡單）
 
 適用：
 -   單一整數（counter）  
 -   lock-free operation
-    
+
 示例：
 
 ```c
@@ -147,7 +142,7 @@ atomic_read(&v);
 ```
 不能保護複雜結構。
 
-# 9. Completion
+## 9. Completion
 
 適用：
 -   等待某事件完成（如 firmware loading, workqueue 完成）  
@@ -162,12 +157,11 @@ complete(&done);
 ```
 比 waitqueue 更簡單。
 
-# 10. Waitqueue
+## 10. Waitqueue
 
 適用：
 -   等待 condition 變為 true    
 -   實作阻塞式讀寫很常用
-    
 
 例
 ```c
@@ -177,7 +171,8 @@ wait_event_interruptible(wq, flag == 1);
 ```c
 wake_up(&wq);
 ```
-# 11. Seqcount / Seqlock
+
+## 11. Seqcount / Seqlock
 
 專門給：
 
@@ -203,7 +198,7 @@ reader:
 -   timekeeping 
 -   networking data path
 
-# 12. RCU（Read-Copy-Update）
+## 12. RCU（Read-Copy-Update）
 
 RCU 是 Linux 中最重要的 lock-free 讀取機制之一。
 適用：
@@ -234,7 +229,7 @@ synchronize_rcu()
 -   binder
 -   task structure traversal
 
-# 13. Interrupt Context vs Locking
+## 13. Interrupt Context vs Locking
 
 | 鎖類型 | IRQ context 可用？ |
 |--------|---------------------|
@@ -246,13 +241,12 @@ synchronize_rcu()
 | seqlock | ✓ |
 | RCU | ✓（讀取） |
 
-
-
 記憶方式：
 
 > IRQ context 只能用 non-sleeping primitives。
 
-# 14. 如何選擇正確的鎖？
+## 14. 如何選擇正確的鎖？
+
 ✓ 如果在 interrupt context → 用 spinlock
 ✓ 如果臨界區很短 → 用 spinlock
 ✓ 如果臨界區會睡眠 → 用 mutex
@@ -261,21 +255,9 @@ synchronize_rcu()
 ✓ 共享整數 → atomic
 ✓ 多 reader、writer 少 → 用 RCU
 ✓ 讀者不加鎖 + 容忍 retry → seqlock
-# 15. Deadlock 常見原因
 
-| 問題 | 說明 |
-|------|------|
-| A → B → A 迴圈 | 鎖順序錯誤 |
-| 同一鎖重複加鎖 | spinlock recursion |
-| 在 spinlock 中睡眠 | 常見錯誤 |
-| IRQ handler 取得已被 thread 鎖住的 spinlock | 需使用 irqsave |
-| RCU reader 持續太久 | writer 永遠無法釋放 |
+## 15. Debug 工具
 
-利用 lockdep 偵測：
-```sh
-echo 1 > /proc/sys/kernel/debug/lockdep
-```
-# 16. Debug 工具
 查看鎖等待
 ```sh
 echo w > /proc/sysrq-trigger
@@ -293,3 +275,18 @@ lockstat
 
 -   哪個鎖最常被 contention    
 -   誰等待時間最久
+
+## 16. 常見問題與排查（Deadlock 常見原因）
+
+| 問題 | 說明 |
+|------|------|
+| A → B → A 迴圈 | 鎖順序錯誤 |
+| 同一鎖重複加鎖 | spinlock recursion |
+| 在 spinlock 中睡眠 | 常見錯誤 |
+| IRQ handler 取得已被 thread 鎖住的 spinlock | 需使用 irqsave |
+| RCU reader 持續太久 | writer 永遠無法釋放 |
+
+利用 lockdep 偵測：
+```sh
+echo 1 > /proc/sys/kernel/debug/lockdep
+```

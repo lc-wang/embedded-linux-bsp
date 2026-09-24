@@ -1,5 +1,4 @@
-
-## net_device 與 Ethernet Driver（核心結構）
+# net_device 與 Ethernet Driver（核心結構）
 
 本章節重點：
 
@@ -7,8 +6,6 @@
 -   driver 如何註冊 network device
 -   `ifconfig up` / `ip link up` 背後發生什麼
 -   driver lifecycle（probe → up → down）
-
-----------
 
 ## 1. net_device 是什麼？
 
@@ -36,11 +33,9 @@ eth1
 
 背後都有一個 `net_device`
 
-----------
-
 ## 2. driver 如何建立 net_device
 
-### (1) 分配
+### 2.1 (1) 分配
 
 ```
 struct net_device *dev;
@@ -53,9 +48,7 @@ dev = alloc_etherdev(sizeof(struct priv_data));
 -   net_device
 -   private data（driver 自己用）
 
-----------
-
-### (2) 設定 ops
+### 2.2 (2) 設定 ops
 
 ```
 static const struct net_device_ops my_ops = {
@@ -67,9 +60,7 @@ static const struct net_device_ops my_ops = {
 dev->netdev_ops = &my_ops;
 ```
 
-----------
-
-### (3) 註冊
+### 2.3 (3) 註冊
 
 ```
 register_netdev(dev);
@@ -83,11 +74,9 @@ ip link
 
 就會看到 interface 出現
 
-----------
-
 ## 3. Driver Lifecycle
 
-### 整體流程
+### 3.1 整體流程
 
 ```
 probe()
@@ -108,8 +97,6 @@ start DMA / IRQ
   ↓
 network ready
 ```
-
-----------
 
 ## 4. `ip link up` 發生什麼？
 
@@ -139,9 +126,7 @@ static int my_open(struct net_device *dev)
 }
 ```
 
-----------
-
-### 重點
+### 4.1 重點
 
 ```
 netif_start_queue(dev);
@@ -152,8 +137,6 @@ netif_start_queue(dev);
 ```
 開始允許 TX
 ```
-
-----------
 
 ## 5. `ip link down`
 
@@ -181,8 +164,6 @@ static int my_stop(struct net_device *dev)
 }
 ```
 
-----------
-
 ## 6. TX entry point
 
 ```
@@ -207,8 +188,6 @@ copy skb → DMA buffer
 kick hardware
 ```
 
-----------
-
 ## 7. RX flow（driver 端）
 
 ```
@@ -220,8 +199,6 @@ build skb
   ↓
 netif_receive_skb()
 ```
-
-----------
 
 ## 8. private data（driver 自己的 state）
 
@@ -238,8 +215,6 @@ struct my_priv {
 ```
 struct my_priv *priv = netdev_priv(dev);
 ```
-
-----------
 
 ## 9. net_device 與 PHY 關係
 
@@ -263,94 +238,74 @@ phy_connect()
 of_phy_connect()
 ```
 
-----------
-
 ## 10. Debug 重點
 
-### 查看 interface
+### 10.1 查看 interface
 
 ```
 ip link
 ```
 
-----------
-
-### 查看 driver
+### 10.2 查看 driver
 
 ```
 ethtool -i eth0
 ```
 
-----------
-
-### TX/RX
+### 10.3 TX/RX
 
 ```
 cat /proc/net/dev
 ```
 
-----------
-
-### queue 狀態
+### 10.4 queue 狀態
 
 ```
 tc qdisc show dev eth0
 ```
 
-----------
+## 11. 常見問題與排查
 
-## 11. Checklist
+### 11.1 Checklist
 
-### probe 階段
+#### probe 階段
 
 -   register_netdev 成功？
 -   interface 有出現？
 
-----------
-
-### link up
+#### link up
 
 -   ndo_open 有被呼叫？
 -   IRQ 有 enable？
 -   DMA 有啟動？
 
-----------
-
-### TX
+#### TX
 
 -   ndo_start_xmit 有進？
 -   queue 有沒有停住？
 
-----------
-
-### RX
+#### RX
 
 -   IRQ / NAPI 有跑？
 -   有沒有 skb 上來？
 
-----------
+### 11.2 常見問題
 
-## 12. 常見問題
-
-### `ip link up` 沒反應
+#### `ip link up` 沒反應
 
 檢查：
 
 -   ndo_open 有沒有實作
 -   register_netdev 是否成功
 
-----------
-
-### 可以 up 但不能傳
+#### 可以 up 但不能傳
 
 檢查：
 
 -   netif_start_queue 有沒有呼叫
 -   ndo_start_xmit 是否被呼叫
 
-----------
-
-### 沒有 RX
+#### 沒有 RX
 
 檢查：
 
@@ -358,9 +313,7 @@ tc qdisc show dev eth0
 -   NAPI
 -   DMA descriptor
 
-----------
-
-## 13. Trace 
+## 12. Trace
 
 可以加 log：
 
@@ -374,4 +327,3 @@ pr_info("xmit called len=%u\n", skb->len);
 ```
 echo net_dev_xmit > /sys/kernel/debug/tracing/set_event
 ```
-

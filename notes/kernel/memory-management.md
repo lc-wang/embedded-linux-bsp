@@ -1,4 +1,3 @@
-
 # Linux Kernel Memory Management 概要
 
 這份筆記說明 Linux Kernel 記憶體管理的基礎概念，  
@@ -6,9 +5,8 @@
 以及 **user-space mmap 與 DMA 記憶體映射機制**。  
 理解這些是撰寫驅動與除錯 memory leak 的基礎。
 
----
-
 ## 1. 記憶體層級架構
+
 ``` cscc
 User Space (Virtual Memory)
 ↑ mmap / brk
@@ -18,18 +16,16 @@ Physical Memory
 ↑ page allocator / buddy system
 ```
 
-
 | 層級 | 常用 API | 說明 |
 | --- | --- | --- |
 | **User space** | `malloc()`, `mmap()` | 透過系統呼叫分配虛擬記憶體區域。 |
 | **Kernel space** | `kmalloc()`, `vmalloc()`, `alloc_pages()` | 內核分配記憶體的主要介面。 |
 | **Physical memory** | page allocator (Buddy System) | 管理實體頁框 (page frame)。 |
 
----
-
 ## 2. Page Allocator 與 Buddy System
 
-### Buddy System 基本原理
+### 2.1 Buddy System 基本原理
+
 Linux 將實體記憶體以 **4KB Page** 為單位管理，  
 當需要分配連續實體記憶體時，使用 **2ⁿ 頁合併** 的方式進行。
 
@@ -39,15 +35,14 @@ Linux 將實體記憶體以 **4KB Page** 為單位管理，
 | `__free_pages(struct page *page, unsigned int order)` | 釋放對應頁區 | 對應 alloc_pages 使用 |
 | `__get_free_page()` | 分配單一 page | 常用於驅動暫存區 |
 
-### GFP 標誌 (分配行為)
+### 2.2 GFP 標誌 (分配行為)
+
 | 標誌 | 意義 |
 | --- | --- |
 | `GFP_KERNEL` | 一般情況下的分配，可睡眠 |
 | `GFP_ATOMIC` | 中斷或不可睡眠環境使用 |
 | `GFP_DMA` | 分配可供 DMA 使用的區域 |
 | `GFP_HIGHUSER` | 分配可供 user-space 使用的高端記憶體頁 |
-
----
 
 ## 3. kmalloc vs vmalloc
 
@@ -63,8 +58,6 @@ Linux 將實體記憶體以 **4KB Page** 為單位管理，
 - `vmalloc()` 使用非連續物理記憶體，但虛擬位址連續。  
 - `alloc_pages()` 是更底層接口，直接與 page allocator 溝通。
 
----
-
 ## 4. User-space mmap 流程
 
 驅動程式若提供 mmap 功能，可讓應用程式直接訪問裝置記憶體。
@@ -78,7 +71,8 @@ do_mmap() / file_operations.mmap()
 remap_pfn_range() → 建立虛擬與實體頁映射
 ```
 
-### 驅動範例
+### 4.1 驅動範例
+
 ```c
 static int mydrv_mmap(struct file *filp, struct vm_area_struct *vma)
 {
@@ -94,15 +88,12 @@ static int mydrv_mmap(struct file *filp, struct vm_area_struct *vma)
 | `remap_pfn_range()` | 函式 | 將 **實體頁框（page frame）** 映射到 **使用者空間（user space）**。<br>通常在 `mmap()` 實作中使用，讓 user process 能存取 device memory 或 DMA buffer。 | 自製 character device / DRM driver 時實作 `fops->mmap()`，例如：將 framebuffer 或 e-ink panel buffer 提供給應用程式。 |
 | `vm_area_struct` | 結構體 | 描述 **使用者虛擬記憶體區段（VMA, Virtual Memory Area）**，包含該區段的起迄位址、權限、對應的 file operations 等。 | 在 `mmap()` 實作時，kernel 會提供一個指向該結構的指標，可用來設定區段屬性（如禁止 swap、cacheable / non-cacheable）。 |
 
-
 ## 5. DMA 與 Cache 一致性
 
 在進行 DMA（Direct Memory Access）操作時，必須確保 **CPU 與裝置對記憶體的快取資料一致**。  
 若未正確處理 cache，同一區域的資料可能在 CPU 與裝置之間不同步，導致資料錯亂。
 
----
-
-### 常用函式一覽
+### 5.1 常用函式一覽
 
 | 函式 | 功能 | 備註 |
 |:--|:--|:--|
@@ -111,9 +102,7 @@ static int mydrv_mmap(struct file *filp, struct vm_area_struct *vma)
 | `dma_sync_single_for_cpu()` | 在裝置完成寫入後，確保資料對 CPU 可見（cache flush）。 | 在 CPU 讀取前呼叫。 |
 | `dma_sync_single_for_device()` | 在 CPU 寫入後，確保資料對裝置可見（cache invalidate）。 | 在 DMA 傳輸前呼叫。 |
 
----
-
-### 範例：DMA 傳輸流程
+### 5.2 範例：DMA 傳輸流程
 
 ```c
 void *buf;
@@ -134,9 +123,7 @@ dma_sync_single_for_device(dev, dma_handle, BUF_SIZE, DMA_TO_DEVICE);
 
 在進行記憶體問題分析（如洩漏、fragmentation、異常分配）時，可利用以下 Kernel 內建的觀察工具與節點。
 
----
-
-### 常用工具與節點
+### 6.1 常用工具與節點
 
 | 工具 / 節點 | 功能說明 |
 |:--|:--|
@@ -147,9 +134,7 @@ dma_sync_single_for_device(dev, dma_handle, BUF_SIZE, DMA_TO_DEVICE);
 | `kmemleak` | Kernel 記憶體洩漏偵測工具，可模擬 garbage collector 行為偵測未釋放物件。 |
 | `ftrace` / `perf` | 追蹤與分析記憶體相關函式呼叫行為與效能熱點。 |
 
----
-
-### 啟用與使用範例
+### 6.2 啟用與使用範例
 
 **1. 啟用 page_owner**
 
@@ -175,8 +160,6 @@ cat /sys/kernel/debug/tracing/trace_pipe
 
 以下列出在 Linux Kernel 記憶體與 DMA 開發中常見的問題、可能原因與對應解決方式。
 
----
-
 | 問題 | 可能原因 | 建議處理方式 |
 |:--|:--|:--|
 | **kmalloc 回傳 NULL** | 記憶體碎片過多或使用錯誤的 `GFP` 標誌 | 改用 `vmalloc()`（適合大區塊），或檢查 `GFP_KERNEL` / `GFP_ATOMIC` 使用情境。 |
@@ -185,12 +168,13 @@ cat /sys/kernel/debug/tracing/trace_pipe
 | **Kernel OOM (Out of Memory)** | 記憶體分配過度或無法回收 | 透過 `/proc/meminfo` 或 `dmesg` 分析記憶體使用狀況，確認是否有 leak。 |
 | **page fault** | 存取無效虛擬位址 | 確認指標合法性、頁面是否被釋放或未映射到實體記憶體。 |
 
----
+### 7.1 附註
 
-### 附註
 - 若懷疑 **memory leak**，可啟用 `CONFIG_DEBUG_KMEMLEAK`。
 - 若懷疑 **fragmentation**，可觀察 `/proc/pagetypeinfo` 與 `buddyinfo`。
 - 若懷疑 **DMA mapping 問題**，建議開啟 `CONFIG_DMA_API_DEBUG` 以追蹤錯誤映射。
+
+## 附錄
 
 **延伸閱讀**
 

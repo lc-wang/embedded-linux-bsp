@@ -1,9 +1,6 @@
-
 # Device Tree GPIO Binding 深入解析
 
-----------
-
-# 1. 為什麼 GPIO 一定跟 Device Tree 綁在一起？
+## 1. 為什麼 GPIO 一定跟 Device Tree 綁在一起？
 
 在現代 ARM SoC（RK3588 / RZ/V2H / i.MX）上：
 
@@ -12,19 +9,16 @@
 原因：
 
 -   GPIO controller 由 DT 宣告
-    
+
 -   每個 peripheral 透過 phandle 取得 GPIO
-    
+
 -   flags 定義 active-level / open-drain / bias
-    
 
 沒有正確 DT：
 
 driver 根本拿不到 GPIO descriptor
 
-----------
-
-# 2. GPIO Controller 在 DT 中的樣子
+## 2. GPIO Controller 在 DT 中的樣子
 
 範例（Rockchip 類型）：
 ```
@@ -39,16 +33,13 @@ gpio0: gpio@fec20000 {
 ```
 關鍵屬性：
 
-
 | 屬性 | 意義說明 |  
 |------------------------|-----------------------------------------------|  
 | gpio-controller | 宣告此節點為 GPIO controller |  
 | #gpio-cells | 定義 GPIO phandle 所需參數數量 |  
 | interrupt-controller | 宣告此 GPIO controller 可提供 IRQ 功能 |
 
-----------
-
-# 3. GPIO Binding 基本格式
+## 3. GPIO Binding 基本格式
 
 標準格式：
 ```
@@ -60,16 +51,14 @@ reset-gpios = <&gpio3 5 GPIO_ACTIVE_LOW>;
 ```
 含義：
 
-
 | 參數 | 說明 |  
 |------------------|------------------------------------|  
 | &gpio3 | GPIO controller 的 phandle |  
 | 5 | GPIO line offset（在該 controller 中的編號） |  
 | GPIO_ACTIVE_LOW | GPIO active flag（低電位為 active） |
 
-----------
+## 4. flags 解釋
 
-# 4. flags 解釋
 DT 中第三個參數叫做 **flags**：
 
 reset-gpios = <&gpio3 5 GPIO_ACTIVE_LOW>;
@@ -78,9 +67,8 @@ reset-gpios = <&gpio3 5 GPIO_ACTIVE_LOW>;
 
 include/dt-bindings/gpio/gpio.h
 
-----------
+### 4.1 常見 Flags
 
-## 4.1 常見 Flags
 ```
 #define GPIO_ACTIVE_HIGH      0  
 #define GPIO_ACTIVE_LOW       1  
@@ -91,9 +79,7 @@ include/dt-bindings/gpio/gpio.h
 ```
 注意：不同 kernel 版本 bit 定義可能不同，但概念相同。
 
-----------
-
-## 4.2 GPIO_ACTIVE_LOW 是什麼？
+### 4.2 GPIO_ACTIVE_LOW 是什麼？
 
 這個 flag **只影響邏輯語意，不改變硬體模式**。
 
@@ -108,9 +94,7 @@ gpiod_set_value()
 ```
 做邏輯反轉。
 
-----------
-
-### 常見錯誤
+#### 常見錯誤
 
 很多人以為：
 ```
@@ -121,15 +105,12 @@ GPIO_ACTIVE_LOW = open drain
 Active-low 只是邏輯反轉，不會改變：
 
 -   驅動能力
-    
+
 -   電氣模式
-    
+
 -   是否為開漏
-    
 
-----------
-
-## 4.3 GPIO_OPEN_DRAIN 是什麼？
+### 4.3 GPIO_OPEN_DRAIN 是什麼？
 
 open drain 表示：
 
@@ -144,35 +125,29 @@ output-high → high-Z
 這通常用於：
 
 -   I2C
-    
+
 -   reset
-    
+
 -   power-good
-    
+
 -   shared line
-    
 
-----------
-
-## 4.4 flags vs pinctrl 的差異
+### 4.4 flags vs pinctrl 的差異
 
 很多 SoC：
 
 -   open drain 必須由 pinctrl 設定
-    
+
 -   pull-up/down 由 pinctrl 設定
-    
 
 DT flags 只是「宣告」，  
 真正是否生效要看：
 
 gpio controller driver 是否支援
-----------
 
-# 5. #gpio-cells 是什麼？
+## 5. #gpio-cells 是什麼？
 
-
-## 5.1 基本概念
+### 5.1 基本概念
 
 在 controller 中定義：
 ```
@@ -186,11 +161,11 @@ gpio controller driver 是否支援
 ```
 <&controller param1 param2>
 ```
-----------
 
-## 5.2 常見情況
+### 5.2 常見情況
 
-### Case A：2 cells
+#### Case A：2 cells
+
 ```
 #gpio-cells = <2>;
 ```
@@ -200,9 +175,7 @@ gpio controller driver 是否支援
 ```
 這是最常見格式。
 
-----------
-
-### Case B：3 cells
+#### Case B：3 cells
 
 某些 SoC 會：
 ```
@@ -216,18 +189,16 @@ gpio controller driver 是否支援
 ```
 <&gpio 2 5 GPIO_ACTIVE_LOW>
 ```
-----------
 
-## 5.3 為什麼不能假設固定格式？
+### 5.3 為什麼不能假設固定格式？
 
 因為：
 
 -   不同 SoC 設計不同
-    
+
 -   有些 controller 有多 bank
-    
+
 -   有些 controller 需要特殊參數
-    
 
 Kernel 解析時：
 ```
@@ -239,21 +210,17 @@ of_parse_phandle_with_args()
 ```
 解析數量。
 
-----------
-
-## 5.4 如果 #gpio-cells 錯了會發生什麼？
+### 5.4 如果 #gpio-cells 錯了會發生什麼？
 
 -   driver probe 失敗
-    
+
 -   gpiod_get() 失敗
-    
+
 -   無法解析 phandle
-    
+
 -   甚至 silent error
 
-----------
-
-# 6. GPIO Hog 機制
+## 6. GPIO Hog 機制
 
 DT 可直接 claim GPIO：
 ```
@@ -267,24 +234,20 @@ enable-hog {
 效果：
 
 -   開機自動設定
-    
+
 -   user space 無法 request
-    
+
 -   driver 也無法取得
-    
 
 常用於：
 
 -   電源 rail
-    
+
 -   背光 enable
-    
+
 -   reset default 狀態
-    
 
-----------
-
-# 7. reset-gpios / enable-gpios 命名規則
+## 7. reset-gpios / enable-gpios 命名規則
 
 標準 naming：
 ```
@@ -300,28 +263,23 @@ reset-gpios
 ```
 這是 descriptor model 的關鍵。
 
-----------
+## 8. interrupt-gpios 與 interrupt-controller
 
-# 8. interrupt-gpios 與 interrupt-controller
-
-
-## 8.1 GPIO 同時是 interrupt source
+### 8.1 GPIO 同時是 interrupt source
 
 當某 pin：
 
 -   既是 GPIO
-    
+
 -   又可觸發 IRQ
-    
 
 DT 需要描述：
 
 1. 該 controller 是 interrupt-controller  
 2. 該裝置的 interrupt 來源
 
-----------
+### 8.2 Controller 宣告
 
-## 8.2 Controller 宣告
 ```
 gpio3: gpio@xxxx {  
  gpio-controller;  
@@ -333,9 +291,7 @@ gpio3: gpio@xxxx {
 
 > 此 GPIO controller 同時是 IRQ controller
 
-----------
-
-## 8.3 裝置使用 interrupt-parent
+### 8.3 裝置使用 interrupt-parent
 
 標準寫法：
 ```
@@ -352,9 +308,8 @@ interrupts = <5 IRQ_TYPE_LEVEL_LOW>;
 ```
 <offset trigger-type>
 ```
-----------
 
-## 8.4 interrupt-gpios 是什麼？
+### 8.4 interrupt-gpios 是什麼？
 
 某些 binding 允許簡寫：
 ```
@@ -363,17 +318,15 @@ interrupt-gpios = <&gpio3 5 GPIO_ACTIVE_LOW>;
 這種寫法：
 
 -   driver 內部會轉成 gpiod + IRQ
-    
+
 -   不是通用標準
-    
+
 -   依 binding 定義而定
-    
 
 注意：不等於 interrupt-parent
 
-----------
+### 8.5 完整 IRQ flow
 
-## 8.5 完整 IRQ flow
 ```
 Hardware edge  
  ↓  
@@ -388,43 +341,34 @@ driver ISR
 如果：
 
 -   沒設 interrupt-controller
-    
+
 -   #interrupt-cells 錯誤
-    
+
 -   IRQ_TYPE 錯誤
-    
 
 gpiomon 永遠不會觸發
-    
 
-----------
-
-# 9. 與 pinctrl 的關係
-
+## 9. 與 pinctrl 的關係
 
 GPIO = 控制電平  
 pinctrl = 控制 pin 功能 + 電氣特性
 
-----------
-
-## 9.1 Pin mux 問題
+### 9.1 Pin mux 問題
 
 如果 pin 沒被 mux 成 gpio：
 
 -   設定方向無效
-    
+
 -   set_value 無效
-    
+
 -   gpiod 正常但硬體不動
-    
 
 例如：
 
 該 pin 仍在 I2C mode
 
-----------
+### 9.2 pinctrl 設定範例
 
-## 9.2 pinctrl 設定範例
 ```
 panel_pins: panel-pins {  
  pins = "GPIO3_B5";  
@@ -437,15 +381,13 @@ panel_pins: panel-pins {
 pinctrl-names = "default";  
 pinctrl-0 = <&panel_pins>;
 ```
-----------
 
-## 9.3 為什麼 GPIO flags 不等於 pinctrl？
+### 9.3 為什麼 GPIO flags 不等於 pinctrl？
 
 flags 是「邏輯層」  
 pinctrl 是「電氣層」
 
 例如：
-
 
 | 功能 | flags 支援 | pinctrl 支援 |  
 |-----------------|------------|--------------|  
@@ -454,28 +396,23 @@ pinctrl 是「電氣層」
 | pull-up | ✗ | ✓ |  
 | drive strength | ✗ | ✓ |
 
-----------
+### 9.4 錯誤案例
 
-## 9.4 錯誤案例
-
-### 情境：
+#### 情境：
 
 reset 拉不起來
 
 實際原因：
 
 -   pinctrl 沒 mux
-    
+
 -   pin 被 bridge driver 佔用
-    
+
 -   bias 設錯
-    
+
 -   drive strength 太低
-    
 
-----------
-
-## 9.5 Debug pinctrl
+### 9.5 Debug pinctrl
 
 查看：
 ```
@@ -484,14 +421,12 @@ reset 拉不起來
 可看：
 
 -   mux state
-    
+
 -   owner
-    
+
 -   function
 
-----------
-
-# 10. Open Drain + Pull-up
+## 10. Open Drain + Pull-up
 
 正確寫法：
 ```
@@ -512,9 +447,7 @@ GPIO_ACTIVE_LOW = open drain
 ```
 完全錯誤。
 
-----------
-
-# 11. 多 GPIO 定義
+## 11. 多 GPIO 定義
 
 支援 multi-line：
 ```
@@ -525,11 +458,8 @@ driver 可：
 ```
 devm_gpiod_get_array();
 ```
-----------
 
-
-
-# 12.Debug 指令
+## 12. Debug 指令
 
 Dump DT：
 ```
@@ -543,10 +473,8 @@ cat /proc/device-tree/xxx
 ```
 cat /sys/kernel/debug/gpio
 ```
-----------
 
-# 13. 常見錯誤觀念
-
+## 13. 常見問題與排查（常見錯誤觀念）
 
 | 錯誤觀念 | 正確理解 |  
 |------------------------------------|-----------------------------------------------|  

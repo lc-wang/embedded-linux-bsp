@@ -1,5 +1,5 @@
-
 # Linux I/O Subsystem 全解析
+
 本章介紹 Linux block I/O 子系統，包括：
 
 - VFS → Page Cache → BIO → Block Layer → Request Queue → Driver → Device
@@ -10,9 +10,7 @@
 - eMMC、NVMe、UFS 等裝置差異
 - 常見效能瓶頸與 debug 技巧
 
----
-
-# 1. I/O Path 總覽
+## 1. I/O Path 總覽
 
 完整資料流程如下：
 ```yaml
@@ -40,11 +38,9 @@ Storage Device
 - **中層：Block Layer（BIO / blk-mq / rq）**
 - **底層：Driver / HW**
 
----
+## 2. Page Cache 與 Writeback
 
-# 2. Page Cache 與 Writeback
-
-## 2.1 Page Cache
+### 2.1 Page Cache
 
 Linux 將檔案讀取緩存在 Page Cache：
 ```yaml
@@ -55,7 +51,7 @@ read() → 若 cache 命中，直接回應 → 不會進入 storage
 cat /proc/meminfo | grep -i cache
 ```
 
-## 2.2 Writeback（Dirty pages）
+### 2.2 Writeback（Dirty pages）
 
 寫入行為分成兩種：
 
@@ -69,9 +65,8 @@ Dirty page 清理：
 /proc/sys/vm/dirty_ratio
 /proc/sys/vm/dirty_background_ratio
 ```
----
 
-# 3. BIO（Block I/O）
+## 3. BIO（Block I/O）
 
 當資料需要真正落盤，就會建立一個 BIO：
 ```c
@@ -87,9 +82,7 @@ sector_t bi_sector; // 起始 sector
 - 傳遞 I/O 請求到 block layer
 - 透過 merge/coalesce 來減少命令量
 
----
-
-# 4. Block Layer（blk-mq）
+## 4. Block Layer（blk-mq）
 
 現代 Linux 使用 **blk-mq（multi-queue）架構**。
 
@@ -115,9 +108,8 @@ dispatch to HW queue
 ↓
 driver send command
 ```
----
 
-# 5. Request Queue（RQ）
+## 5. Request Queue（RQ）
 
 每個 block device（例如 `/dev/mmcblk0`, `/dev/nvme0n1`）都有一個 request queue。
 
@@ -137,9 +129,7 @@ ls /sys/block/mmcblk0/queue
 | logical_block_size | 裝置區塊大小 |
 | max_sectors_kb | 單次 I/O 限制 |
 
----
-
-# 6. I/O Scheduler（排程器）
+## 6. I/O Scheduler（排程器）
 
 功用：
 
@@ -147,13 +137,13 @@ ls /sys/block/mmcblk0/queue
 - 減少 seek time（對 HDD 特別重要）
 - 對 mobile 平台可改善延遲
 
-## 6.1 noop（適合快閃裝置）
+### 6.1 noop（適合快閃裝置）
 
 不排序、不合併 → 直接丟給 driver
 
 eMMC / UFS / NVMe 常用。
 
-## 6.2 deadline / mq-deadline
+### 6.2 deadline / mq-deadline
 
 確保：
 
@@ -162,16 +152,14 @@ eMMC / UFS / NVMe 常用。
 
 適合 Android 開機加速。
 
-## 6.3 bfq（Budget Fair Queueing）
+### 6.3 bfq（Budget Fair Queueing）
 
 適合：
 
 - 互動式裝置（Android/手機）
 - 多應用同時讀寫
 
----
-
-# 7. Storage Device 差異
+## 7. Storage Device 差異
 
 | 裝置 | 特點 | queue |
 |------|------|-------|
@@ -185,9 +173,8 @@ Android 通常：
 - `/data` → f2fs + UFS  
 - `/system` → erofs / ext4（唯讀）  
 
----
+## 8. Read Path（流程）
 
-# 8. Read Path（流程）
 ```yaml
 read()
 ↓
@@ -205,9 +192,9 @@ Device DMA 回傳資料
 ↓
 Page Cache → User Space
 ```
----
 
-# 9. Write Path（流程）
+## 9. Write Path（流程）
+
 ```yaml
 write()
 ↓
@@ -227,11 +214,10 @@ Write 常被延遲因為：
 - Writeback congestion  
 - device 不支援 parallel write  
 
----
+## 10. I/O Latency 與 Performance Debug
 
-# 10. I/O Latency 與 Performance Debug
+### 10.1 查看 I/O 統計
 
-### 查看 I/O 統計
 ```sh
 iostat -x 1
 ```
@@ -241,30 +227,34 @@ iostat -x 1
 - await（重要！）  
 - svctm  
 
-### 查看 block device 隊列
+### 10.2 查看 block device 隊列
+
 ```sh
 cat /sys/block/mmcblk0/queue/nr_requests
 ```
 
-### Android Trace（systrace）
+### 10.3 Android Trace（systrace）
 
 看 block I/O 延遲：
 ```sh
 block:block_rq_issue
 block:block_rq_complete
 ```
-### 使用 ftrace
+
+### 10.4 使用 ftrace
+
 ```sh
 echo 1 > /sys/kernel/debug/tracing/events/block/enable
 cat trace
 ```
-### Page Cache 檢查
+
+### 10.5 Page Cache 檢查
+
 ```sh
 cat /proc/meminfo | grep Dirty
 ```
----
 
-# 11. 常見效能問題與解法
+## 11. 常見問題與排查（常見效能問題與解法）
 
 | 問題 | 根因 | 解法 |
 |------|-------|------|

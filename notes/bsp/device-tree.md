@@ -1,11 +1,10 @@
+# Device Tree Overview
 
-# Device Tree Overview 
 這份筆記整理 Linux Device Tree（裝置樹）架構與使用方式。  
 目標是理解 DTS 的語法結構、kernel 匹配機制、overlay 與 debug 方法。
 
---- 
-
 ## 1. Device Tree 是什麼？
+
 - **Device Tree (DT)** 是一種描述硬體配置的資料結構。  
 - 主要設計目標：讓 kernel 不需重新編譯即可支援不同硬體平台。  
 - 由 **ARM / PowerPC** 平台發展，現已廣泛用於 SoC 系統。
@@ -16,8 +15,7 @@
 | `.dtsi` | Device Tree Include – 共用設定 (類似 C header) |
 | `.dtb` | Device Tree Blob – 編譯後二進位，供 kernel 使用 |
 | `.overlay` | Device Tree Overlay – 動態覆蓋、修改部分節點 |
----
- ## 2. DTS 與 Kernel 的關係`` 
+
 ## 2. DTS 與 Kernel 的關係
 
 Board.dts  
@@ -28,12 +26,9 @@ U-Boot / Bootloader
   ↓  
 傳遞給 Kernel  
 
-
 - Kernel 開機時由 bootloader 傳入 `.dtb`。  
 - 驅動透過 `of_match_table` 依照 `compatible` 屬性進行匹配。  
 - 不同平台可共用同一套驅動，只需不同 `.dts`。
-
----
 
 ## 3. DTS 基本語法
 
@@ -70,8 +65,6 @@ U-Boot / Bootloader
 | `status` | `"okay"` / `"disabled"` |
 | `label:` | 可被 phandle 參考的標籤 |
 
-----------
-
 ## 4. phandle 與引用
 
 -   **phandle** 是 DT 裡的「指標」，用來參照其他節點。
@@ -91,13 +84,11 @@ led@0 {
 
 > `&led_controller` → 指向該節點 phandle，驅動解析時可直接存取。
 
-----------
-
 ## 5. 驅動匹配機制
 
 驅動與 Device Tree 的連結依靠 `compatible` 屬性。
 
-### 驅動範例
+### 5.1 驅動範例
 
 ```c
 static  const  struct  of_device_id  myled_of_match[] = {
@@ -117,11 +108,9 @@ module_platform_driver(myled_driver);
 
 當 kernel 掃描到符合的節點，會自動呼叫對應的 `probe()`。
 
-----------
-
 ## 6. include / overlay / alias
 
-### (1) include
+### 6.1 include
 
 -   共用設定放在 `.dtsi`，供多個板子引用。
 ```dts    
@@ -129,8 +118,7 @@ module_platform_driver(myled_driver);
 #include "rk3588-board.dtsi"
 ```    
     
-
-### (2) overlay
+### 6.2 overlay
 
 -   用於動態修改部分節點（例如外接裝置）。
 ```dts
@@ -149,7 +137,7 @@ module_platform_driver(myled_driver);
     };
 ```
 
-### (3) alias
+### 6.3 alias
 
 -   提供簡短名稱，常見於 `/aliases` 節點：
 ```dts
@@ -159,11 +147,7 @@ aliases {
 };
 ``` 
     
-
-----------
-
 ## 7. 常見屬性 (Properties)
-
 
 | 屬性 | 說明 |
 | --- | --- |
@@ -176,8 +160,6 @@ aliases {
 | `power-domains` | 指定裝置所屬電源域 |
 | `vcc-supply` | 參照電源管理節點 |
 | `status` | `"okay"`, `"disabled"`, `"reserved"` |
-----------
-
 
 ## 8. 驗證與調試
 
@@ -190,10 +172,8 @@ aliases {
 | `fdtdump xxx.dtb` | 解析 DTB 結構並輸出詳細節點資訊。 |
 | `of_unittest.c` | Kernel 內建的 Device Tree 單元測試程式，用於驗證核心解析邏輯。 |
 | `ftrace` (`trace_event=of_*`) | 追蹤 Device Tree 解析與節點建立過程。 |
-----------
 
-
-## 9. 常見錯誤與排查
+## 9. 常見問題與排查
 
 | 問題 | 可能原因 | 修正建議 |
 | --- | --- | --- |
@@ -212,7 +192,6 @@ make dt_binding_check
 #反編譯目前正在使用的 DTB
 dtc -I dtb -O dts -o running.dts /sys/firmware/fdt
 ```
-----------
 
 ## 10. 學習建議
 
@@ -222,9 +201,9 @@ dtc -I dtb -O dts -o running.dts /sys/firmware/fdt
 4.  熟悉 phandle 與 cross-reference 的使用。
 5.  了解 binding 文件格式與 YAML 驗證 (`make dt_binding_check`)。
 
-----------
+## 附錄
 
-**延伸閱讀**
+### A. 延伸閱讀
 
 -   `Documentation/devicetree/usage-model.rst`
 -   `Documentation/devicetree/bindings/`

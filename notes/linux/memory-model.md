@@ -1,4 +1,3 @@
-
 # Linux Memory Model / SMP Ordering / Barrier / Acquire-Release 解析
 
 本章介紹 Linux 在多核心（SMP）架構下的記憶體一致性模型，包括：
@@ -14,9 +13,7 @@
 - 驅動中常見 memory ordering bug
 - debug 工具與如何分析 ordering 問題
 
----
-
-# 1. 為何需要 Memory Ordering？
+## 1. 為何需要 Memory Ordering？
 
 在 multi-core 系統中：
 
@@ -48,9 +45,7 @@ print(x);
 
 因為 CPU0 很可能「先寫 flag，再寫 x」。
 
----
-
-# 2. CPU Reorder（硬體重排）
+## 2. CPU Reorder（硬體重排）
 
 ARM 的特性：
 
@@ -70,9 +65,7 @@ STORE x=1
 ```
 這就是 memory barrier 的用途。
 
----
-
-# 3. Compiler Reorder（編譯器重排）
+## 3. Compiler Reorder（編譯器重排）
 
 編譯器基於最佳化也會：
 
@@ -82,9 +75,7 @@ STORE x=1
 
 防止方式：`barrier()` 或 volatile（但 volatile 在 kernel 幾乎不用）
 
----
-
-# 4. Memory Barrier 類型
+## 4. Memory Barrier 類型
 
 | 類型 | 作用範圍 | 使用方式 |
 |------|----------|-----------|
@@ -96,11 +87,11 @@ STORE x=1
 ```yaml
 smp_mb() = multiprocessor full barrier
 ```
----
 
-# 5. Linux memory barrier API
+## 5. Linux memory barrier API
 
-## 5.1 Full barrier：smp_mb()
+### 5.1 Full barrier：smp_mb()
+
 ```yaml
 smp_mb();
 ```
@@ -117,9 +108,8 @@ flag = 1;
 ```
 保證寫 x 必定先發生。
 
----
+### 5.2 Read barrier：smp_rmb()
 
-## 5.2 Read barrier：smp_rmb()
 ```yaml
 smp_rmb();
 ```
@@ -133,9 +123,9 @@ smp_rmb();
 
 val = x;
 ```
----
 
-## 5.3 Write barrier：smp_wmb()
+### 5.3 Write barrier：smp_wmb()
+
 ```yaml
 smp_wmb();
 ```
@@ -149,9 +139,8 @@ buffer[i] = data;
 smp_wmb();
 ready[i] = 1;
 ```
----
 
-# 6. Acquire / Release 語義（現代 Linux 建議用法）
+## 6. Acquire / Release 語義（現代 Linux 建議用法）
 
 現代 Linux 更鼓勵使用：
 ```yaml
@@ -172,9 +161,7 @@ if (smp_load_acquire(&flag)) {
 - 比 smp_mb() 更便宜  
 - 語意更清楚  
 
----
-
-# 7. Atomic Operation Memory Ordering
+## 7. Atomic Operation Memory Ordering
 
 原子操作也具有 ordering：
 
@@ -194,9 +181,7 @@ atomic_set_release(&flag, 1);
 
 > 此 store 之前的所有 memory write 不得被 reorder 到此 store 之後。
 
----
-
-# 8. Lock 的隱含 Barrier
+## 8. Lock 的隱含 Barrier
 
 以下操作天然包含 full barrier：
 
@@ -210,55 +195,7 @@ atomic_set_release(&flag, 1);
 
 因此如果你 already 在 lock/unlock 中，不需要額外 smp_mb()。
 
----
-
-# 9. 常見錯誤
-
-## 9.1 Writer 先寫 flag，再寫 data
-
-錯誤：
-```yaml
-data = 123;
-flag = 1;
-```
-
-在 ARM 上可能 reorder。
-
-修正：
-```yaml
-data = 123;
-smp_wmb();
-flag = 1;
-```
-
----
-
-## 9.2 Reader 看到 flag，但看不到資料
-```yaml
-while (!flag);
-
-print(data);
-```
-可能印出舊值。
-
-修正：
-```yaml
-while (!smp_load_acquire(&flag));
-print(data);
-```
----
-
-## 9.3 multi-producer multi-consumer queue 發生 race
-
-解法：
-
-- 使用 RCU  
-- 或使用 seqcount/seqlock  
-- 或使用 atomic acquire/release  
-
----
-
-# 10. 與 DMA 的 Memory Ordering
+## 9. 與 DMA 的 Memory Ordering
 
 DMA 與 CPU 不共享 cache 一致性（除非硬體支援）。
 
@@ -277,16 +214,16 @@ dma reads buffer → 得到舊資料
 dma_sync_single_for_device()
 dma_sync_single_for_cpu()
 ```
----
 
-# 11. Debug Memory Ordering
+## 10. Debug Memory Ordering
 
-### ftrace（追蹤 load/store）
+### 10.1 ftrace（追蹤 load/store）
+
 ```sh
 trace-cmd record -e kmem:* -e sched:* -e irq:*
 ```
 
-### KCSAN（Kernel Concurrency Sanitizer）
+### 10.2 KCSAN（Kernel Concurrency Sanitizer）
 
 Linux 支援：
 ```yaml
@@ -294,3 +231,44 @@ CONFIG_KCSAN=y
 ```
 可偵測 race condition。
 
+## 11. 常見問題與排查
+
+### 11.1 Writer 先寫 flag，再寫 data
+
+錯誤：
+```yaml
+data = 123;
+flag = 1;
+```
+
+在 ARM 上可能 reorder。
+
+修正：
+```yaml
+data = 123;
+smp_wmb();
+flag = 1;
+```
+
+### 11.2 Reader 看到 flag，但看不到資料
+
+```yaml
+while (!flag);
+
+print(data);
+```
+可能印出舊值。
+
+修正：
+```yaml
+while (!smp_load_acquire(&flag));
+print(data);
+```
+
+### 11.3 multi-producer multi-consumer queue 發生 race
+
+解法：
+
+- 使用 RCU  
+- 或使用 seqcount/seqlock  
+- 或使用 atomic acquire/release  

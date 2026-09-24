@@ -1,4 +1,3 @@
-
 # Linux DRM/KMS 架構與顯示驅動開發指南
 
 本章介紹 Linux 顯示子系統（DRM / KMS）的整體架構、典型資料流、重要物件、
@@ -10,9 +9,7 @@
 - TinyDRM / simpledrm / panel driver 開發  
 - Android / Wayland / X11 顯示整合  
 
----
-
-# 1. DRM 與 KMS 架構概述
+## 1. DRM 與 KMS 架構概述
 
 DRM（Direct Rendering Manager）包含兩部分：
 
@@ -35,9 +32,8 @@ Display controller hardware
 ↓
 Panel / HDMI / DSI / e-paper
 ```
----
 
-# 2. KMS Pipeline 元件
+## 2. KMS Pipeline 元件
 
 KMS pipeline 是由數個物件組成的：
 
@@ -53,9 +49,8 @@ KMS pipeline 是由數個物件組成的：
 ```yaml
 Plane → CRTC → Encoder → Connector → Panel
 ```
----
 
-# 3. Atomic Mode Setting
+## 3. Atomic Mode Setting
 
 Atomic 模式：  
 所有 KMS 狀態必須一次提交（atomic commit），保證畫面無撕裂、同步。
@@ -74,9 +69,7 @@ Atomic state 組成：
 | `plane_state` | fb, format, src/dst rect |
 | `connector_state` | dpms, link status |
 
----
-
-# 4. Framebuffer 與 GEM/SHMEM
+## 4. Framebuffer 與 GEM/SHMEM
 
 Userspace 將影像 buffer（例如 SurfaceFlinger）傳給 kernel ：
 
@@ -93,9 +86,7 @@ DRM 常用 buffer 管理：
 | **SHMEM GEM** | 使用 shmem 作後端，簡單有效 |
 | **dma-buf** | 跨模組共享 buffer（GPU → VOP → Display Controller） |
 
----
-
-# 5. Panel Driver
+## 5. Panel Driver
 
 Panel driver 通常代表一個實體 panel（DPI、DSI、e-paper）。
 
@@ -116,7 +107,6 @@ Panel driver 提供：
 -   backlight 控制（可選） 
 -   reset / power sequence
 -   mode timing（`drm_mode_duplicate` 或固定 table）
-    
 
 Pixpaper driver 走：
 
@@ -125,7 +115,8 @@ Pixpaper driver 走：
 -   polling flush mechanism
 -   no continuous refresh（e-ink 特有行為）
 - 
-# 6. SimpleDRM / Simple Display Pipe
+
+## 6. SimpleDRM / Simple Display Pipe
 
 Tiny panel 或 e-paper 常用：
 
@@ -138,21 +129,19 @@ drm_simple_display_pipe_init()
 -   1 個 plane    
 -   1 個 CRTC 
 -   連接指定 panel
-    
 
 適合：
 
 -   e-paper
 -   monochrome LCD
 -   simple RGB panel
-    
 
 不適合：
 
 -   多 plane overlay
 -   GPU compositing
 
-# 7. DRM 驅動常見結構
+## 7. DRM 驅動常見結構
 
 主結構：
 
@@ -173,7 +162,8 @@ drm_mode_config_init()
 drm_simple_display_pipe_init()
 drm_dev_register()
 ```
-# 8. 顯示時序與 Mode 設定
+
+## 8. 顯示時序與 Mode 設定
 
 Mode 設定包含：
 
@@ -192,8 +182,7 @@ clock (pixel clock)
 ```
 Panel driver 的 get_modes() 負責產生 mode。
 
-
-# 9. VBLANK 與 Page Flip
+## 9. VBLANK 與 Page Flip
 
 顯示更新通常發生在 VBLANK（垂直消影）期間。
 
@@ -214,7 +203,7 @@ Kernel → 呼叫 CRTC 的：
 ```
 E-paper 沒有 real-time vblank → 需自行模擬。
 
-# 10. DRM 與 Android 整合（SurfaceFlinger）
+## 10. DRM 與 Android 整合（SurfaceFlinger）
 
 Android 使用 HWC（Hardware Composer）與 DRM 驅動整合。
 
@@ -230,10 +219,9 @@ DRM backend (gralloc, drm_hwcomposer)
 DRM KMS
 ```
 
+## 11. Debug 方法
 
-# 11. Debug 方法
-
-### 列出 DRM 裝置
+### 11.1 列出 DRM 裝置
 
 ```sh
 ls /sys/class/drm/
@@ -261,7 +249,8 @@ atomic commit:
    crtc state:
    connector state:
 ```
-# 12. 常見錯誤與排查
+
+## 12. 常見問題與排查
 
 | 錯誤 | 原因 | 解法 |
 |------|------|------|
@@ -270,5 +259,3 @@ atomic commit:
 | screen stuck | atomic_flush 未更新 plane fb | 填入 drm_crtc_state->event |
 | image shifted | sync timing 錯誤 | 修 hsync/vsync/porch |
 | flicker | pixel clock 選錯 | 計算 pixel clock 或用 panel 固定值 |
-
-

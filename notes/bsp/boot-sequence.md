@@ -1,13 +1,11 @@
-
 # SoC Boot Sequence
 
 本章深入說明 SoC 開機流程，從 Boot ROM 到 Kernel 的每個階段，  
 包含 Bootloader 的分層、裝置啟動來源（Boot Media）、DTB 載入與傳遞等。  
 此流程為 Android / Linux BSP bring-up 的基礎。
 
----
-
 ## 1. 開機流程總覽
+
 ```yaml
 [Boot ROM]
 ↓
@@ -30,19 +28,19 @@
 | Kernel | OS | 硬體初始化、啟動 init |
 | Init | User-space | 啟動 zygote/system server |
 
----
-
 ## 2. Boot ROM（第一階段）
 
 Boot ROM 是 SoC 燒在晶片內的固定程式，無法修改。
 
-### 主要工作
+### 2.1 主要工作
+
 - 認證並讀取下一階段程式（SPL）
 - 決定啟動來源（boot media）
 - 設定暫存器、基礎 clock
 - 讀取 eFuse / OTP（安全啟動用）
 
-### 常見 Boot Media
+### 2.2 常見 Boot Media
+
 | Boot Media | 說明 |
 | --- | --- |
 | eMMC / SD | 最常見 |
@@ -50,13 +48,12 @@ Boot ROM 是 SoC 燒在晶片內的固定程式，無法修改。
 | USB OTG | Recovery / Download mode |
 | UART | ROM bootloader 開發模式 |
 
----
-
 ## 3. SPL（Secondary Program Loader）
 
 SPL 是精簡版 U-Boot，通常放在 boot 設備最前面幾 KB。
 
-### 任務
+### 3.1 任務
+
 | 功能 | 說明 |
 | --- | --- |
 | 初始化 DDR | **最重要**：讓系統擁有可用 RAM |
@@ -64,26 +61,28 @@ SPL 是精簡版 U-Boot，通常放在 boot 設備最前面幾 KB。
 | 初始化最基本的串口 | 輸出 boot log |
 | 載入 U-Boot Proper | 從儲存裝置載入至 DDR |
 
-### SPL 在專案中位置
+### 3.2 SPL 在專案中位置
+
 ```yaml
 u-boot/
 ├── spl/
 └── arch/arm/mach-*/spl.c
 ```
----
 
 ## 4. U-Boot Proper（完整 Bootloader）
 
 U-Boot Proper 是完整 bootloader 主體。
 
-### 主要工作
+### 4.1 主要工作
+
 - 解析 bootcmd
 - 初始化各類裝置（MMC、USB、ETH）
 - 載入 kernel、DTB、ramdisk
 - 設定 bootargs（傳給 kernel）
 - 跳轉至 kernel entrypoint
 
-### 常用環境變數
+### 4.2 常用環境變數
+
 | 名稱 | 功能 |
 | --- | --- |
 | `bootargs` | Kernel cmdline |
@@ -91,8 +90,6 @@ U-Boot Proper 是完整 bootloader 主體。
 | `kernel_addr_r` | Kernel load address |
 | `initrd_addr_r` | initramfs load address |
 | `bootcmd` | 啟動邏輯主流程 |
-
----
 
 ## 5. DTB（Device Tree Blob）載入流程
 
@@ -108,15 +105,14 @@ U-Boot
 Kernel
 ```
 
-### Kernel 接受 DTB 時的行為
+### 5.1 Kernel 接受 DTB 時的行為
+
 - 驗證 **magic number**
 - 建立 device node
 - 建立 platform_device、匹配 platform_driver
 - 設定 memory map
 - 設定 reserved-memory
 - 匹配 `compatible` → probe 驅動
-
----
 
 ## 6. Kernel 啟動階段（與 Bootloader 連接）
 
@@ -131,8 +127,6 @@ Kernel 初始化步驟：
 3. 初始化 CPU、scheduler  
 4. 掛載 initramfs  
 5. 啟動第一個 user-space 程式：`/init`
-
----
 
 ## 7. Bootargs（Kernel Command Line）
 
@@ -153,30 +147,32 @@ console=ttyS0,115200 root=/dev/mmcblk0p2 rw loglevel=4
 
 這些參數在 **boot hang / early crash** 排查時非常重要。
 
----
-
 ## 8. U-Boot → Kernel Debug 方法
 
-### 1. 開啟 earlycon
+### 8.1 開啟 earlycon
+
 ```shell
 earlycon=uart8250,mmio32,0xff1a0000
 ```
-### 2. 開啟 initcall debug
+
+### 8.2 開啟 initcall debug
+
 ```shell
 initcall_debug
 ```
 
-### 3. 顯示每個驅動 probe 時間
+### 8.3 顯示每個驅動 probe 時間
+
 ```shell
 printk.devkmsg=on
 ```
 
-### 4. 若 Kernel crash
+### 8.4 若 Kernel crash
+
 ```shell
 dmesg -n 8
 echo c > /proc/sysrq-trigger
 ```
----
 
 ## 9. 常見問題與排查
 
@@ -189,10 +185,10 @@ echo c > /proc/sysrq-trigger
 | 停在 early boot | 未開 earlycon | 加入 `earlycon` bootarg |
 | Kernel probe driver 失敗 | device tree `compatible` 不匹配 | 檢查驅動 of_match_table |
 
----
+## 附錄
 
-**延伸閱讀**
+### A. 延伸閱讀
+
 - U-Boot 官方文件: https://u-boot.readthedocs.io  
 - Linux ARM64 Booting: `Documentation/arm64/booting.rst`  
 - Device Tree Spec v0.4  
-

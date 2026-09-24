@@ -1,11 +1,8 @@
-
 # SPI Interface Bring-up & Debug Playbook
 
 > 目的：
 > 
 > -   將 **SPI 從 Linux bus 架構 → Device Tree → driver → 實際硬體訊號** 串成一條可 debug 的工程路徑
-
-----------
 
 ## 1. SPI 在 BSP 中的角色定位
 
@@ -27,11 +24,10 @@ SPI 常見工程現實：
 
 > _driver 看起來完全正常，但裝置永遠沒反應_
 
-----------
-
 ## 2. Linux SPI 架構
 
 ### 2.1 核心物件
+
 ```yaml
 spi_controller (spi_master)
 │
@@ -44,6 +40,7 @@ spi_driver
 -   `spi_driver`：你寫的 driver    
 
 ### 2.2 資料實際怎麼送出去
+
 ```yaml
 driver
 	└─ spi_sync()
@@ -56,13 +53,12 @@ driver
 -   transfer 是 sync 還是 async
 -   clock mode / frequency 在哪裡決定    
 
-----------
-
 ## 3. Device Tree
 
 > **SPI 問題，永遠先從 DT 看**。
 
 ### 3.1 Bus 與 Device 的基本結構
+
 ```dts
 &spi2 {
 	status = "okay";
@@ -80,8 +76,8 @@ driver
 	};
 };
 ```
-### 3.2 常見致命錯誤清單
 
+### 3.2 常見致命錯誤清單
 
 | 錯誤項目                     | 典型現象描述                                   |
 |------------------------------|------------------------------------------------|
@@ -92,9 +88,8 @@ driver
 
 **DT 錯誤 = 100% driver debug 浪費時間**。
 
-----------
-
 ## 4. SPI Driver Bring-up 決策流程
+
 ```yaml
 probe 進來了？
 	├─ 否 → DT / compatible / bus
@@ -108,8 +103,6 @@ probe 進來了？
 **關鍵心法**：
 
 > SPI bring-up 是「**同步驗證軟體與硬體**」，不是單純 debug code。
-
-----------
 
 ## 5. SPI Debug Toolbox
 
@@ -139,10 +132,7 @@ echo spi_* > set_ftrace_filter
 -   clock 是否穩定
 -   data 是否對齊 clock edge
     
-
 **只看 log，不看訊號 = SPI debug 一定失敗**。
-
-----------
 
 ## 6. Case Study：SPI 電子紙面板
 
@@ -160,13 +150,10 @@ echo spi_* > set_ftrace_filter
 | 第一張正常，之後卡住     | Busy pin 未正確等待          |
 | 黑白正常、灰階不正確     | LUT / Pass 執行順序錯誤      |
 
-
 ### 6.3 關鍵工程決策
 
 -   SPI 正確 ≠ 顯示正確    
 -   顯示問題多半是 **狀態機與 timing**
-
-----------
 
 ## 7. 敘事
 

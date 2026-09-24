@@ -1,11 +1,8 @@
-
 # DAI Link 與 Machine Driver 深度解析
 
 > ASoC 聲卡如何被「組裝」出來
 
-----------
-
-# 1. 先建立整體視角
+## 1. 先建立整體視角
 
 在 SoC 音訊世界中：
 ```
@@ -21,9 +18,7 @@ ASoC 的任務就是：
 
 `snd_soc_dai_link` 
 
-----------
-
-# 2. DAI 是什麼？
+## 2. DAI 是什麼？
 
 DAI = Digital Audio Interface
 
@@ -32,17 +27,15 @@ DAI = Digital Audio Interface
 例如：
 
 -   I2S
-    
+
 -   TDM
-    
+
 -   PCM
-    
+
 -   PDM
-    
 
-----------
+### 2.1 DAI 在 Kernel 中
 
-## DAI 在 Kernel 中
 ```
 struct snd_soc_dai {
     const char *name;
@@ -57,9 +50,8 @@ struct snd_soc_dai {
 rockchip_i2s.c   → 註冊 CPU DAI
 wm8960.c         → 註冊 Codec DAI
 ```
-----------
 
-# 3. snd_soc_dai_link
+## 3. snd_soc_dai_link
 
 這是 ASoC 的「連線定義」。
 ```
@@ -76,9 +68,8 @@ struct snd_soc_dai_link {
     unsigned int dai_fmt;
 };
 ```
-----------
 
-## 它做了什麼？
+### 3.1 它做了什麼？
 
 它描述：
 
@@ -87,17 +78,14 @@ struct snd_soc_dai_link {
 包含：
 
 -   誰是 master
-    
+
 -   clock format
-    
+
 -   I2S / left-justified
-    
+
 -   bit clock polarity
-    
 
-----------
-
-# 4. Machine Driver 是什麼？
+## 4. Machine Driver 是什麼？
 
 Machine driver 是：
 
@@ -109,24 +97,20 @@ sound/soc/rockchip/
 sound/soc/fsl/
 sound/soc/renesas/
 ```
-----------
 
-## Machine driver 負責：
+### 4.1 Machine driver 負責：
 
 -   定義 dai_link
-    
+
 -   註冊 snd_soc_card
-    
+
 -   設定 routing
-    
+
 -   設定 clock
-    
+
 -   定義 DAPM widgets
-    
 
-----------
-
-# 5. 實際註冊流程
+## 5. 實際註冊流程
 
 當系統 boot 時：
 ```
@@ -136,9 +120,8 @@ Machine driver probe
 ```
 最關鍵是 machine driver。
 
-----------
+### 5.1 Machine driver 範例
 
-## Machine driver 範例
 ```
 static  struct  snd_soc_dai_link  my_dai_link = {
     .name = "I2S-Codec",
@@ -152,9 +135,9 @@ static  struct  snd_soc_dai_link  my_dai_link = {
                SND_SOC_DAIFMT_CBS_CFS,
 };
 ```
-----------
 
-## 註冊 card
+### 5.2 註冊 card
+
 ```
 static  struct  snd_soc_card  my_card = {
     .name = "MySoundCard",
@@ -167,9 +150,7 @@ static  struct  snd_soc_card  my_card = {
 
 `snd_soc_register_card(&my_card);` 
 
-----------
-
-# 6. Probe call flow
+## 6. Probe call flow
 
 當 machine driver 呼叫：
 
@@ -184,9 +165,9 @@ snd_soc_bind_card()
 找到 Codec DAI
 建立 snd_soc_pcm_runtime
 ```
-----------
 
-# 7. snd_soc_pcm_runtime 是什麼？
+## 7. snd_soc_pcm_runtime 是什麼？
+
 ```
 struct snd_soc_pcm_runtime {
     struct snd_soc_dai *cpu_dai;
@@ -208,9 +189,8 @@ snd_soc_pcm_ops
   ↓
 codec_dai->ops
 ```
-----------
 
-# 8. DTS 如何影響 Machine Driver
+## 8. DTS 如何影響 Machine Driver
 
 在 modern kernel，
 
@@ -237,15 +217,12 @@ sound {
 simple-audio-card driver 會：
 
 -   parse DT
-    
+
 -   建立 dai_link
-    
+
 -   註冊 card
-    
 
-----------
-
-# 9. ASoC 真正運作流程
+## 9. ASoC 真正運作流程
 
 播放時完整流程：
 ```
@@ -264,9 +241,10 @@ codec 接收 bit clock
   ↓
 DAC 輸出聲音
 ```
-----------
 
-# 10. BSP Debug 時你真正要檢查什麼？
+## 10. 常見問題與排查
+
+### 10.1 BSP Debug 時你真正要檢查什麼？
 
 如果沒有聲音：
 
@@ -281,24 +259,18 @@ DAC 輸出聲音
 ```
 不是只看 PCM。
 
-----------
+### 10.2 常見錯誤案例
 
-# 11. 常見錯誤案例
-
-### cpu_dai_name 不匹配
+#### cpu_dai_name 不匹配
 
 dmesg：
 
 `ASoC:  no  DAI  found` 
 
-----------
-
-### codec_name 錯
+#### codec_name 錯
 
 `ASoC: CODEC not registered` 
 
-----------
-
-### dai_fmt 不對
+#### dai_fmt 不對
 
 聲音是雜音或完全沒聲音。

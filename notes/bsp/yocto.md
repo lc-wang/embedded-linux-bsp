@@ -1,11 +1,8 @@
-
 # Yocto Project：架構與 BSP 整合指南
 
 本章整理 Yocto Project 的完整架構、build 原理、BSP 整合方式、配方編寫、image 建置流程，以及常見 debug 技巧。
 
----
-
-# 1. Yocto 架構總覽
+## 1. Yocto 架構總覽
 
 Yocto 不是 Linux 發行版，而是 **建置 Linux 發行版的框架**。
 
@@ -21,9 +18,8 @@ Yocto 不是 Linux 發行版，而是 **建置 Linux 發行版的框架**。
 | **Classes (.bbclass)** | 可重複利用的功能（如 autotools、systemd） |
 | **Configuration (.conf)** | 設定 distro、machine、image type |
 
----
+## 2. Yocto Build 流程
 
-# 2. Yocto Build 流程
 ```yaml
 bitbake <image>
 ↓
@@ -41,9 +37,8 @@ Rootfs assemble
 ↓
 Generate image (wic / ext4 / sdcard.img)
 ```
----
 
-# 3. Meta Layer 架構
+## 3. Meta Layer 架構
 
 常見的 meta layers：
 ```bash
@@ -57,7 +52,9 @@ meta-<vendor>/ ← vendor BSP: nxp, renesas, rockchip
 meta-device/
 meta-mylayer/ ← 你自己的 layer
 ```
-### 建議你的專案層級
+
+### 3.1 建議你的專案層級
+
 ```yaml
 meta-mycompany/
 ├── recipes-core/
@@ -67,13 +64,12 @@ meta-mycompany/
 ├── recipes-security/
 └── conf/layer.conf
 ```
----
 
-# 4. Machine / Distro / Image 角色
+## 4. Machine / Distro / Image 角色
 
 Yocto 有三種 config 範疇：
 
-## 4.1 MACHINE（硬體平台設定）
+### 4.1 MACHINE（硬體平台設定）
 
 定義：
 - kernel config
@@ -89,9 +85,8 @@ machine config：
 ```yaml
 meta-renesas/conf/machine/rzt2h-evk.conf
 ```
----
 
-## 4.2 DISTRO（發行版設定）
+### 4.2 DISTRO（發行版設定）
 
 定義：
 - systemd vs sysvinit
@@ -103,9 +98,8 @@ meta-renesas/conf/machine/rzt2h-evk.conf
 ```yaml
 DISTRO = "poky" 或 "mydistro"
 ```
----
 
-## 4.3 IMAGE（rootfs / OS 設定）
+### 4.3 IMAGE（rootfs / OS 設定）
 
 定義：
 - 內建工具
@@ -118,9 +112,8 @@ bitbake core-image-minimal
 bitbake core-image-weston
 bitbake my-image
 ```
----
 
-# 5. Recipe 基本架構
+## 5. Recipe 基本架構
 
 範例：`hello.bb`
 
@@ -139,7 +132,8 @@ do_install() {
     install -m 0755 hello ${D}${bindir}
 }
 ```
-### 常用變數
+
+### 5.1 常用變數
 
 | 變數 | 說明 |
 |------|------|
@@ -151,10 +145,10 @@ do_install() {
 | `${bindir}` | /usr/bin |
 | `${sysconfdir}` |  |
 
+## 6. Kernel / U-Boot 整合
 
+### 6.1 Kernel Recipe
 
-# 6. Kernel / U-Boot 整合
-## 6.1 Kernel Recipe
 路徑：
 
 ```bash
@@ -173,7 +167,9 @@ recipes-kernel/linux/linux-renesas.bb
 SRC_URI = "git://github.com/renesas/linux.git;branch=v6.1"
 KERNEL_DEVICETREE = "r9a09g077.dtb"
 ```
-## 6.2 U-Boot Recipe
+
+### 6.2 U-Boot Recipe
+
 ```bash
 recipes-bsp/u-boot/u-boot-renesas.bb
 ```
@@ -183,13 +179,16 @@ recipes-bsp/u-boot/u-boot-renesas.bb
 UBOOT_CONFIG = "rzt2h"
 SRC_URI = "git://..."
 ```
-# 7. RootFS 與 Image
+
+## 7. RootFS 與 Image
+
 Build 產出的檔案位於：
 
 ```bash
 build/tmp/deploy/images/<machine>/
 ```
-### 常見輸出
+
+### 7.1 常見輸出
 
 | 檔案 | 功能 |
 |------|------|
@@ -199,9 +198,10 @@ build/tmp/deploy/images/<machine>/
 | `u-boot.bin` | bootloader |
 | `*.dtb` | device tree |
 
+## 8. Yocto Debug 技巧
 
-# 8. Yocto Debug 技巧
-## 8.1 查看 task log
+### 8.1 查看 task log
+
 ```bash
 bitbake -c menuconfig virtual/kernel
 bitbake -c cleansstate <recipe>
@@ -212,18 +212,22 @@ log 位於：
 ```bash
 build/tmp/work/<machine>/<recipe>/temp/log.do_compile
 ```
-## 8.2 查看依賴圖
+
+### 8.2 查看依賴圖
+
 ```bash
 bitbake -g core-image-minimal
 cat task-depends.dot
 ```
-## 8.3 重新編譯某個 recipe
+
+### 8.3 重新編譯某個 recipe
+
 ```bash
 bitbake -c clean <recipe>
 bitbake <recipe>
 ```
 
-# 9. 常見問題與排查
+## 9. 常見問題與排查
 
 | 問題 | 原因 | 修正方式 |
 |------|-------|-----------|
@@ -232,4 +236,3 @@ bitbake <recipe>
 | rootfs 編譯缺少檔案 | `DEPENDS` 未設定 | 在 recipe 補上 |
 | build 過慢 | sstate-cache 未啟用 | 設定 `SSTATE_MIRRORS` |
 | initramfs 無法 boot | rootfs type 錯誤 | 修正 `IMAGE_FSTYPES` |
-

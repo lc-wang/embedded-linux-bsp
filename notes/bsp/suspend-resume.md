@@ -1,11 +1,8 @@
+# BSP 層的 Suspend / Resume 機制
 
-
-# BSP 層的 Suspend / Resume 機制 
 這份筆記整理 Linux BSP 層在 suspend/resume 流程中的角色與設計要點，  
 說明 SoC、Bootloader、Kernel、Driver 各層如何協同達成系統低功耗運作。
 
----
- 
 ## 1. Suspend / Resume 分層架構
 
 | 層級 | 功能角色 | 範例元件 |
@@ -16,15 +13,14 @@
 | **BSP / SoC Layer** | 控制時鐘、電源域、PMIC、DDR self-refresh | Clock / Regulator / PMIC / SCU |
 | **Bootloader / Firmware** | 提供 early resume、DDR 初始化、secure entry | U-Boot SPL、ARM Trusted Firmware (ATF) |
 
---- 
-## 2. Suspend 模式類型 | 模式 | 說明 | 電源狀態 |
+## 2. Suspend 模式類型
+
+| 模式 | 說明 | 電源狀態 |
 | --- | --- | --- |
 | **Freeze** | 只停用 user space，CPU idle；最輕量級 suspend | CPU 停止執行，RAM 保持 |
 | **Suspend-to-RAM (mem)** | 進入深度睡眠，大多數裝置關閉 | CPU/外設斷電，DDR 自刷新 |
 | **Hibernate (suspend-to-disk)** | 儲存系統狀態到磁碟，再關機 | 全部斷電，重新上電時恢復 |
 | **Runtime PM** | 單一裝置級別的動態休眠 | 僅該裝置關閉電源 |
-
---- 
 
 ## 3. 系統 Suspend 流程（SoC 視角）
 
@@ -46,8 +42,8 @@ SoC 進入低功耗模式（ARM WFI / WFE）
   ↓  
 回到正常運作
 
-
 ## 4. BSP 層任務
+
 BSP 層負責將 SoC 硬體的「低功耗能力」與 Kernel 的 PM framework 整合。
 
 | 模組 | 任務 | 相關檔案 |
@@ -57,8 +53,6 @@ BSP 層負責將 SoC 硬體的「低功耗能力」與 Kernel 的 PM framework �
 | **Regulator** | 控制 PMIC 電壓供應 | `drivers/regulator/` |
 | **SCU / PMIC 通訊** | BSP 特定控制介面（如 I2C/IPC 寫入暫存器） | `arch/arm64/mach-*/pm.c` |
 | **Wakeup Controller** | 管理可喚醒的中斷來源 | `drivers/base/power/wakeup.c` |
-
----
 
 ## 5. 驅動層 Callback 範例
 
@@ -99,7 +93,6 @@ static struct platform_driver mydevice_driver = {
     },
 };
 ```
-----------
 
 ## 6. Wakeup Source (喚醒來源)
 
@@ -110,8 +103,6 @@ static struct platform_driver mydevice_driver = {
     `pm_wakeup_event(dev, 0);` 
 -   查看目前喚醒統計：
     `cat /sys/kernel/debug/wakeup_sources` 
-----------
-
 
 ## 7. Bootloader 的角色
 
@@ -124,16 +115,12 @@ static struct platform_driver mydevice_driver = {
 | **U-Boot** | 可在 resume 階段重新初始化 PMIC 或 DDR。 | `arch/arm/mach-*/lowlevel_init.S` |
 | **Kernel** | 透過 PSCI 或 firmware 介面呼叫 SoC 低功耗函式。 | `drivers/firmware/psci/psci.c` |
 
----
+### 7.1 常見接口
 
-### 常見接口
 ```c
 psci_system_suspend();
 psci_cpu_suspend();
 ```
-
-----------
-
 
 ## 8. Debug 工具與節點
 
@@ -147,10 +134,18 @@ psci_cpu_suspend();
 | `trace-cmd record -e power:*` | 追蹤整個電源事件時序。 |
 | `powertop` | 分析系統耗電與喚醒頻率。 |
 
-----------
+## 9. 驗證步驟與實務建議
 
-
-## 9. 常見問題與排查
+1.  使用 `echo mem > /sys/power/state` 測試系統 suspend。
+2.  觀察 dmesg，確認各 driver suspend/resume 是否成功。
+3.  使用 `powertop` 檢查功耗是否下降。
+4.  確認 wakeup 來源能正常喚醒（例如 GPIO、RTC）。
+5.  若有 ATF，確認 PSCI call 成功執行。
+6.  驅動層測試：
+    -   加入 `pr_info()` 於 `.suspend()` / `.resume()` 驗證執行順序。
+    -   驗證 clock/regulator 是否如預期關閉與開啟。
+        
+## 10. 常見問題與排查
 
 | 問題 | 可能原因 | 解決建議 |
 | --- | --- | --- |
@@ -170,23 +165,11 @@ cat /sys/kernel/debug/devices_deferred
 # 查看所有可喚醒裝置
 cat /sys/kernel/debug/wakeup_sources
 ```
-----------
 
-## 10. 驗證步驟與實務建議
+## 附錄
 
-1.  使用 `echo mem > /sys/power/state` 測試系統 suspend。
-2.  觀察 dmesg，確認各 driver suspend/resume 是否成功。
-3.  使用 `powertop` 檢查功耗是否下降。
-4.  確認 wakeup 來源能正常喚醒（例如 GPIO、RTC）。
-5.  若有 ATF，確認 PSCI call 成功執行。
-6.  驅動層測試：
-    -   加入 `pr_info()` 於 `.suspend()` / `.resume()` 驗證執行順序。
-    -   驗證 clock/regulator 是否如預期關閉與開啟。
-        
+### A. 延伸閱讀
 
-----------
-
-**延伸閱讀**
 -   `Documentation/power/suspend-and-hibernate.rst`
 -   `Documentation/power/runtime_pm.rst`
 -   `drivers/base/power/`

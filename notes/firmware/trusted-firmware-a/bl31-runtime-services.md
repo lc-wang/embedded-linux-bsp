@@ -1,9 +1,4 @@
-
 # Trusted Firmware-A BL31 Runtime Services 架構解析
-
----
-
-## 1. 前言
 
 在 TF-A 的多階段架構中，  
 **BL31 是唯一「長期常駐」且「持續參與系統運作」的韌體階段**。
@@ -21,9 +16,7 @@
 - 為何所有 non-secure world 的控制權都必須經過 BL31
 - BL31 與 console、MMU、PSCI 的關係
 
----
-
-## 2. BL31 在 Boot Flow 中的位置
+## 1. BL31 在 Boot Flow 中的位置
 
 回顧整體流程：
 ```
@@ -45,9 +38,7 @@ BL33 ── U-Boot / OS
 關鍵差異在於：
 > **BL31 不只是過渡階段，而是 secure world 的常駐控制核心。**
 
----
-
-## 3. BL31 的核心角色總覽
+## 2. BL31 的核心角色總覽
 
 BL31 同時扮演三個角色：
 
@@ -57,9 +48,7 @@ BL31 同時扮演三個角色：
 
 這三個角色構成 TF-A 的核心價值。
 
----
-
-## 4. 什麼是 EL3 Secure Monitor？
+## 3. 什麼是 EL3 Secure Monitor？
 
 在 ARMv8-A 架構中：
 
@@ -76,9 +65,7 @@ EL3 的特性：
 
 BL31 正是執行於 **EL3** 的韌體。
 
----
-
-## 5. Runtime Service 的概念
+## 4. Runtime Service 的概念
 
 在 TF-A 中，runtime service 指的是：
 
@@ -91,15 +78,11 @@ BL31 正是執行於 **EL3** 的韌體。
 - trusted OS interface（BL32 存在時）
 - platform-specific secure service
 
----
-
-## 6. SMC（Secure Monitor Call）基本模型
+## 5. SMC（Secure Monitor Call）基本模型
 
 Non-secure world（例如 Linux kernel）透過：
 
 SMC instruction
-
-
 
 請求 BL31 提供服務。
 
@@ -118,9 +101,7 @@ BL31 (EL3)
 Return to non-secure world
 ```
 
----
-
-## 7. Runtime Service Dispatcher 架構
+## 6. Runtime Service Dispatcher 架構
 
 BL31 內部維護一組 runtime service registry：
 
@@ -133,9 +114,7 @@ BL31 內部維護一組 runtime service registry：
 - 不實作所有功能
 - 而是作為 **secure service 的 dispatcher**
 
----
-
-## 8. PSCI：最重要的 Runtime Service
+## 7. PSCI：最重要的 Runtime Service
 
 PSCI（Power State Coordination Interface）是：
 
@@ -149,9 +128,7 @@ PSCI（Power State Coordination Interface）是：
 
 因此 PSCI 必須由 BL31 提供。
 
----
-
-## 9. BL31 與 BL33（U-Boot / OS）的關係
+## 8. BL31 與 BL33（U-Boot / OS）的關係
 
 BL31 與 BL33 的關係並非「上下層程式」，
 而是：
@@ -164,9 +141,7 @@ BL33：
 - 無法直接操作 secure 資源
 - 必須透過 SMC 呼叫 BL31
 
----
-
-## 10. 為何 BL31 必須先於 BL33 啟動？
+## 9. 為何 BL31 必須先於 BL33 啟動？
 
 原因包括：
 
@@ -180,11 +155,7 @@ BL33：
 
 > **BL33 永遠不可能繞過 BL31 直接啟動。**
 
----
-
-## 11. BL31 的記憶體與 MMU 特性
-
-
+## 10. BL31 的記憶體與 MMU 特性
 
 - BL31 有獨立的 MMU 與 page table
 - secure memory 與 non-secure memory 嚴格區分
@@ -195,11 +166,7 @@ BL33：
 - non-secure world 無法竄改 BL31
 - runtime service 具備完整隔離性
 
----
-
-## 12. BL31 與 Console 的角色
-
-
+## 11. BL31 與 Console 的角色
 
 - BL31 會重新註冊 console
 - console framework 僅存在於 BL31 image
@@ -211,9 +178,7 @@ BL31 console 的主要用途是：
 - early PSCI / SMC 問題分析
 - secure world exception 輸出
 
----
-
-## 13. BL31 的生命週期特性
+## 12. BL31 的生命週期特性
 
 與 BL2 最大的不同在於：
 
@@ -228,9 +193,7 @@ BL31 console 的主要用途是：
 
 > **BL31 的穩定性直接影響整個系統的可靠性。**
 
----
-
-## 14. 常見 BL31 相關問題
+## 13. 常見問題與排查（常見 BL31 相關問題）
 
 實務上常見的 BL31 問題包括：
 
@@ -247,4 +210,3 @@ BL31 console 的主要用途是：
 - platform-specific secure code
 
 有關。
-

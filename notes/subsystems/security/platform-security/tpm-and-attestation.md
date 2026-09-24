@@ -1,7 +1,4 @@
-
 # TPM and Attestation
-
-## 本章目的
 
 本章要把以下幾個概念串起來：
 
@@ -27,9 +24,7 @@ Remote Attestation 怎麼判斷 device 是否可信？
 
 這一章是理解 Measured Boot、Remote Attestation、Key Sealing 的基礎。
 
-----------
-
-## 一張圖先看懂
+## 1. 一張圖先看懂
 
 ```
 [Bootloader / Firmware]
@@ -57,9 +52,7 @@ Event Log 負責解釋 measurement。
 Attestation 負責證明目前 device state。
 ```
 
-----------
-
-## 1. TPM 是什麼？
+## 2. TPM 是什麼？
 
 TPM 是：
 
@@ -100,9 +93,7 @@ Disk key sealing
 Device identity
 ```
 
-----------
-
-## 2. TPM 和 Secure Boot 的差異
+## 3. TPM 和 Secure Boot 的差異
 
 TPM 主要不是拿來「擋 image 執行」。
 
@@ -114,7 +105,6 @@ TPM 主要不是拿來「擋 image 執行」。
 讓本機或遠端驗證目前系統狀態
 ```
 
-
 | 項目 | Secure Boot | TPM / Measured Boot |  
 |------|-------------|---------------------|  
 | 核心動作 | verify | measure |  
@@ -123,9 +113,7 @@ TPM 主要不是拿來「擋 image 執行」。
 | 產物 | pass / fail | PCR / event log |  
 | 後續用途 | 建立執行信任鏈 | attestation / key sealing |
 
-----------
-
-## 3. PCR 是什麼？
+## 4. PCR 是什麼？
 
 PCR 是：
 
@@ -162,9 +150,7 @@ PCR_new = Hash(PCR_old || measurement)
 這台 device 目前開機路徑的摘要
 ```
 
-----------
-
-## 4. PCR Extend Flow
+## 5. PCR Extend Flow
 
 Measured Boot 中常見流程：
 
@@ -213,9 +199,7 @@ PCR 保存的是累積結果。
 Event Log 保存的是每一次 measurement 的明細。
 ```
 
-----------
-
-## 5. Event Log 是什麼？
+## 6. Event Log 是什麼？
 
 PCR 只有最後的 hash 結果。
 
@@ -251,9 +235,7 @@ Event Log:
   產生這個摘要的明細
 ```
 
-----------
-
-## 6. 為什麼只有 PCR 不夠？
+## 7. 為什麼只有 PCR 不夠？
 
 假設 PCR 值變了：
 
@@ -289,9 +271,7 @@ compare digest
 find changed component
 ```
 
-----------
-
-## 7. Measured Boot 基本流程
+## 8. Measured Boot 基本流程
 
 完整一點的 measured boot flow：
 
@@ -322,9 +302,7 @@ Measured Boot 不一定阻止開機。
 
 是否要拒絕服務，要看後面的 policy。
 
-----------
-
-## 8. Attestation 是什麼？
+## 9. Attestation 是什麼？
 
 Attestation 是：
 
@@ -347,9 +325,7 @@ Attestation 的目標不是單純讀 PCR，而是：
 用 TPM 簽出一份可信證明。
 ```
 
-----------
-
-## 9. TPM Quote 是什麼？
+## 10. TPM Quote 是什麼？
 
 TPM Quote 是 attestation 的核心動作之一。
 
@@ -379,9 +355,7 @@ Quote 可以證明 PCR 值來自 TPM。
 Nonce 可以防止 replay old quote。
 ```
 
-----------
-
-## 10. Remote Attestation Flow
+## 11. Remote Attestation Flow
 
 典型 remote attestation：
 
@@ -425,9 +399,7 @@ enter limited mode
 trigger remediation
 ```
 
-----------
-
-## 11. Known-good Baseline 是什麼？
+## 12. Known-good Baseline 是什麼？
 
 Known-good baseline 是：
 
@@ -455,9 +427,7 @@ Product A firmware v1.2 security fix
 
 每個版本可能都有不同 baseline。
 
-----------
-
-## 12. Key Sealing 是什麼？
+## 13. Key Sealing 是什麼？
 
 Key Sealing 是 TPM 另一個常見用途。
 
@@ -499,9 +469,7 @@ flow：
 而是讓 key 只在特定 boot state 下能被取出。
 ```
 
-----------
-
-## 13. TPM 在 Embedded Linux 的位置
+## 14. TPM 在 Embedded Linux 的位置
 
 Embedded Linux 常見架構：
 
@@ -539,11 +507,9 @@ perform quote
 seal / unseal secret
 ```
 
-----------
+## 15. Linux TPM Debug
 
-## 14. Linux TPM Debug
-
-### Step 1：確認 TPM device
+### 15.1 Step 1：確認 TPM device
 
 ```
 ls -l /dev/tpm*
@@ -558,15 +524,12 @@ ls /sys/class/tpm/
 /sys/class/tpm/tpm0
 ```
 
-
 | Node | 說明 |  
 |------|------|  
 | `/dev/tpm0` | TPM character device |  
 | `/dev/tpmrm0` | TPM resource manager device，通常 userspace 工具較常用 |
 
-----------
-
-### Step 2：看 kernel log
+### 15.2 Step 2：看 kernel log
 
 ```
 dmesg | grep -i tpm
@@ -589,9 +552,7 @@ IRQ / reset GPIO
 clock / regulator
 ```
 
-----------
-
-### Step 3：讀 PCR
+### 15.3 Step 3：讀 PCR
 
 ```
 tpm2_pcrread
@@ -605,9 +566,7 @@ tpm2_pcrread
 比較不同 boot image 對 PCR 的影響
 ```
 
-----------
-
-### Step 4：讀 Event Log
+### 15.4 Step 4：讀 Event Log
 
 常見路徑：
 
@@ -629,9 +588,7 @@ tpm2_eventlog /sys/kernel/security/tpm0/binary_bios_measurements
 找出 PCR mismatch 原因
 ```
 
-----------
-
-### Step 5：產生 Quote
+### 15.5 Step 5：產生 Quote
 
 概念指令：
 
@@ -648,9 +605,7 @@ tpm2_quote
 
 實務上通常會由 attestation agent 管理 nonce、AIK、certificate、quote 格式。
 
-----------
-
-## 15. Device Tree / Driver 注意事項
+## 16. Device Tree / Driver 注意事項
 
 如果是 discrete TPM，BSP 常見要確認：
 
@@ -693,11 +648,9 @@ regulator
 interrupt routing
 ```
 
-----------
+## 17. 常見問題與排查（Attestation 常見錯誤）
 
-## 16. Attestation 常見錯誤
-
-### 有 PCR，但沒有 Event Log
+### 17.1 有 PCR，但沒有 Event Log
 
 結果：
 
@@ -714,9 +667,7 @@ interrupt routing
 確認 event log 有被傳給 verifier
 ```
 
-----------
-
-### 有 Event Log，但沒有 Policy
+### 17.2 有 Event Log，但沒有 Policy
 
 結果：
 
@@ -733,9 +684,7 @@ remote verifier
 key sealing policy
 ```
 
-----------
-
-### PCR 每次開機都不同
+### 17.3 PCR 每次開機都不同
 
 可能原因：
 
@@ -756,9 +705,7 @@ Debug 方式：
 確認該 event 是否應該被納入 policy
 ```
 
-----------
-
-### Quote 沒有 nonce
+### 17.4 Quote 沒有 nonce
 
 如果 quote 沒有 challenge nonce，可能被 replay。
 
@@ -770,9 +717,7 @@ device quote 時包含 nonce
 verifier 檢查 nonce 是否一致
 ```
 
-----------
-
-### Baseline 沒有版本管理
+### 17.5 Baseline 沒有版本管理
 
 Firmware update 後 PCR 合理變化。
 
@@ -794,10 +739,8 @@ security patch level
 
 一起管理。
 
-----------
+## 18. TPM vs OP-TEE 的差異
 
-
-## 17. TPM vs OP-TEE 的差異  
   
 TPM 和 OP-TEE 都跟平台安全有關，但角色不同。  
   
@@ -817,9 +760,7 @@ TPM 偏向記錄與證明平台狀態。
 OP-TEE 偏向提供 Secure World runtime 與安全服務。
 ```
 
-----------
-
-## 18. BSP Checklist
+## 19. BSP Checklist
 
 ```
 [ ] TPM hardware / fTPM implementation is identified

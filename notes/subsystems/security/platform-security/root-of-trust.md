@@ -1,7 +1,4 @@
-
 # Root of Trust
-
-## 本章目的
 
 本章要先建立 Platform Security 最核心的概念：
 
@@ -21,9 +18,7 @@ Secure Storage
 key / counter / secure storage 為什麼不能只放在 rootfs？
 ```
 
-----------
-
-## 一張圖先看懂
+## 1. 一張圖先看懂
 
 ```
 [Power On]
@@ -54,9 +49,7 @@ Root of Trust 是信任鏈的起點。
 Chain of Trust 是一層驗證下一層。
 ```
 
-----------
-
-## 1. Root of Trust 是什麼？
+## 2. Root of Trust 是什麼？
 
 Root of Trust 可以理解成：
 
@@ -88,10 +81,7 @@ BootROM 內建驗證邏輯
 eFuse / OTP 保存 public key hash 或 secure boot 狀態
 ```
 
-----------
-
-
-## 2. 名詞速查表
+## 3. 名詞速查表
 
 | 名詞 | 中文理解 | BSP 工程上可以怎麼理解 |
 |------|----------|------------------------|
@@ -108,9 +98,7 @@ eFuse / OTP 保存 public key hash 或 secure boot 狀態
 | OP-TEE | Open Portable TEE | 跑在 TrustZone secure world 的 TEE OS |
 | Rollback Protection | 防降版保護 | 防止刷回舊版有漏洞 image |
 
-----------
-
-## 3. Root of Trust 在 Boot Flow 的位置
+## 4. Root of Trust 在 Boot Flow 的位置
 
 一般 BSP boot flow 可能長這樣：
 
@@ -150,9 +138,7 @@ security boot flow:
   重點是每一層是不是可信
 ```
 
-----------
-
-## 4. Root of Trust 的三種角色
+## 5. Root of Trust 的三種角色
 
 Root of Trust 通常可以分成三類。
 
@@ -162,9 +148,7 @@ Root of Trust for Measurement
 Root of Trust for Storage
 ```
 
-----------
-
-### 4.1 Verification：負責驗證
+### 5.1 Verification：負責驗證
 
 用途：
 
@@ -202,9 +186,7 @@ BootROM 使用 eFuse 裡的 key hash
 
 依 SoC 設計而定。
 
-----------
-
-### 4.2 Measurement：負責記錄
+### 5.2 Measurement：負責記錄
 
 用途：
 
@@ -237,9 +219,7 @@ Measured Boot 不一定會擋開機。
 它主要是留下紀錄，讓後續可以做 attestation。
 ```
 
-----------
-
-### 4.3 Storage：負責保護資料
+### 5.3 Storage：負責保護資料
 
 用途：
 
@@ -274,9 +254,7 @@ Secure Element
 key / counter / secret 不應該只放在普通 rootfs。
 ```
 
-----------
-
-## 5. Chain of Trust 怎麼建立？
+## 6. Chain of Trust 怎麼建立？
 
 Root of Trust 只是起點。
 
@@ -312,9 +290,7 @@ Kernel 驗證 RootFS
 Update system 驗證 firmware package
 ```
 
-----------
-
-## 6. BootROM + eFuse 的典型 Secure Boot Flow
+## 7. BootROM + eFuse 的典型 Secure Boot Flow
 
 這是 BSP 最常遇到的模型。
 
@@ -356,9 +332,7 @@ public key hash mismatch
 unsigned image 不應該再被允許執行
 ```
 
-----------
-
-## 7. 為什麼 DTB / initramfs 也要保護？
+## 8. 為什麼 DTB / initramfs 也要保護？
 
 很多人只注意 kernel image，但在 BSP 裡：
 
@@ -370,9 +344,7 @@ kernel cmdline
 
 也都可能影響系統安全。
 
-----------
-
-### DTB 可以改變什麼？
+### 8.1 DTB 可以改變什麼？
 
 DTB 可以影響：
 
@@ -391,9 +363,7 @@ kernel bootargs
 攻擊者可能不改 kernel code，只改 DTB 就改變系統行為。
 ```
 
-----------
-
-### initramfs 可以改變什麼？
+### 8.2 initramfs 可以改變什麼？
 
 initramfs 可能包含：
 
@@ -411,11 +381,9 @@ firmware loading logic
 攻擊者可能在真正 rootfs mount 前就介入開機流程。
 ```
 
-----------
+## 9. Root of Trust 常見中斷點
 
-## 8. Root of Trust 常見中斷點
-
-### 只驗證 bootloader，沒驗證 kernel
+### 9.1 只驗證 bootloader，沒驗證 kernel
 
 ```
 BootROM → SPL verified
@@ -429,9 +397,7 @@ U-Boot → Kernel not verified
 攻擊者仍可替換 kernel。
 ```
 
-----------
-
-### kernel 有簽，但 DTB 沒簽
+### 9.2 kernel 有簽，但 DTB 沒簽
 
 ```
 U-Boot verifies Image
@@ -444,9 +410,7 @@ U-Boot loads unsigned board.dtb
 攻擊者可以透過 DTB 改 bootargs / reserved-memory / device status。
 ```
 
-----------
-
-### rootfs 沒有驗證
+### 9.3 rootfs 沒有驗證
 
 ```
 Kernel is trusted
@@ -464,9 +428,7 @@ application
 
 仍可能被替換。
 
-----------
-
-### update package 沒有驗證
+### 9.4 update package 沒有驗證
 
 ```
 Normal boot path is secure
@@ -479,9 +441,7 @@ Firmware update path accepts unsigned package
 攻擊者可以透過 update path 寫入惡意 image。
 ```
 
-----------
-
-### 沒有 rollback protection
+### 9.5 沒有 rollback protection
 
 ```
 v2 修掉安全漏洞
@@ -495,11 +455,9 @@ device 允許刷回 v1
 攻擊者可以刷回舊版漏洞 image。
 ```
 
-----------
+## 10. BSP Debug / Review 重點
 
-## 9. BSP Debug / Review 重點
-
-### Step 1：確認 Root of Trust 在哪裡
+### 10.1 Step 1：確認 Root of Trust 在哪裡
 
 先問：
 
@@ -518,9 +476,7 @@ eFuse / OTP
 SoC vendor secure boot mechanism
 ```
 
-----------
-
-### Step 2：確認誰驗證誰
+### 10.2 Step 2：確認誰驗證誰
 
 畫出自己的平台 flow：
 
@@ -544,9 +500,7 @@ RootFS
 下一層 image 是否完整包含在驗證範圍？
 ```
 
-----------
-
-### Step 3：確認 key / fuse 狀態
+### 10.3 Step 3：確認 key / fuse 狀態
 
 檢查：
 
@@ -566,9 +520,7 @@ eFuse / OTP 通常不可逆。
 
 所以 production 前一定要確認流程。
 
-----------
-
-### Step 4：確認 rootfs / partition 保護
+### 10.4 Step 4：確認 rootfs / partition 保護
 
 Embedded Linux 常見：
 
@@ -590,19 +542,15 @@ rollback index
 locked bootloader
 ```
 
-----------
+## 11. 常見問題與排查（常見錯誤觀念）
 
-## 10. 常見錯誤觀念
-
-### Secure Boot enable 就代表整台機器安全
+### 11.1 Secure Boot enable 就代表整台機器安全
 
 不一定。
 
 如果只驗證第一階段 bootloader，後面 kernel / rootfs 沒驗證，信任鏈還是中斷。
 
-----------
-
-### Kernel signed 就夠了
+### 11.2 Kernel signed 就夠了
 
 不夠。
 
@@ -615,9 +563,7 @@ rootfs 是否驗證
 update package 是否驗證
 ```
 
-----------
-
-### key 可以放在 rootfs
+### 11.3 key 可以放在 rootfs
 
 不建議。
 
@@ -633,9 +579,7 @@ Secure Element
 eFuse / OTP
 ```
 
-----------
-
-### eFuse 可以先燒再說
+### 11.4 eFuse 可以先燒再說
 
 非常危險。
 
@@ -648,9 +592,8 @@ eFuse / OTP
 rollback index 設錯
 test key 被燒成 production key
 ```
-----------
 
-## 11. BSP Checklist
+## 12. BSP Checklist
 
 ```
 [ ] SoC BootROM secure boot capability is known

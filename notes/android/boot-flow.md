@@ -1,11 +1,8 @@
-
 # Android 開機流程總覽 (Boot Flow)
 
 本章說明 Android 從上電後至 Framework 啟動的整個流程，  
 涵蓋 **Bootloader → Kernel → Init → Zygote → SystemServer → App** 的階段。  
 理解這條鏈是分析啟動錯誤與系統 bring-up 的基礎。
-
----
 
 ## 1. 開機流程總覽
 
@@ -35,8 +32,6 @@
 | SystemServer | `services.jar` | 啟動所有系統服務 |
 | App Process | Android 應用層 | 與 Framework IPC 互動 |
 
----
-
 ## 2. Bootloader 階段
 
 Bootloader 通常分為兩階段：  
@@ -60,8 +55,6 @@ Bootloader 常見設定檔：
 - `fdtaddr`：DTB 地址  
 - `initrd`：initramfs 所在位置  
 
----
-
 ## 3. Kernel 階段
 
 Kernel 啟動後的主要工作如下：
@@ -79,7 +72,6 @@ Kernel 啟動後的主要工作如下：
 [ 0.000000] Booting Linux on physical CPU
 [ 0.123456] Run /init as init process
 ```
----
 
 ## 4. Init 階段與 rc system
 
@@ -93,7 +85,8 @@ Init 是 Android user-space 的第一個進程（PID 1）。
 | `/vendor/etc/init/*.rc` | vendor 分區服務 |
 | `/system/core/init/` | 原始碼位置 |
 
-### 範例流程
+### 4.1 範例流程
+
 /init.rc
 ├─ mount /dev /proc /sys
 ├─ start servicemanager
@@ -101,12 +94,11 @@ Init 是 Android user-space 的第一個進程（PID 1）。
 ├─ start zygote
 └─ start logd
 
-### 常見指令
+### 4.2 常見指令
+
 - `service <name> <path>`：定義服務啟動命令  
 - `on boot`：開機觸發事件  
 - `setprop`：設定屬性值  
-
----
 
 ## 5. Zygote 啟動流程
 
@@ -138,10 +130,10 @@ public static void main(String argv[]) {
 }
 ```
 
-6. SystemServer 啟動流程
+## 6. SystemServer 啟動流程
+
 Zygote fork 出的 SystemServer 負責啟動整個 Framework 層服務。
 它位於 `frameworks/base/services/java/com/android/server/SystemServer.java。`
-
 
 流程概覽：
 
@@ -170,7 +162,6 @@ Looper.loop()
 -   **Bootstrap 階段**：啟動 ActivityManagerService (AMS)、PackageManagerService (PMS)、PowerManagerService 等最關鍵元件。
 -   **Core 階段**：確保系統可正常管理電池、使用統計與性能監控。
 -   **Other 階段**：啟動 UI、音訊、輸入等與使用者互動的服務。
-
 
 ## 7. App 啟動與 Binder 連線
 
@@ -202,8 +193,6 @@ attachApplication()
     
 -   `Instrumentation` 用於控制應用啟動與測試（例如單元測試框架會覆蓋它）。
 
-
-
 ## 8. Debug 與分析方法
 
 | 工具 / 節點 | 功能 |
@@ -214,7 +203,6 @@ attachApplication()
 | `ps -A \| grep zygote` | 檢查 Zygote 是否啟動與進程 ID。 |
 | `service list` | 檢查 SystemServer 服務註冊狀態。 |
 | `systrace` / `perf trace` | 追蹤開機過程中的性能瓶頸與系統事件時序。 |
-
 
 ## 9. 常見問題與排查
 
@@ -241,7 +229,10 @@ ls -l /dev/binder
 logcat -b system | grep SystemServer
 
 ```
-**延伸閱讀**
+
+## 附錄
+
+### A. 延伸閱讀
 
 -   `system/core/init/`
 -   `frameworks/base/core/java/com/android/internal/os/ZygoteInit.java`

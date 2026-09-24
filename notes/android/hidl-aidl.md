@@ -1,11 +1,8 @@
-
 # Android HAL IPC：HIDL 與 AIDL (Stable) 比較
 
 這份筆記整理 Android HAL 層 IPC 的演進，  
 從 **HIDL (HAL Interface Definition Language)** 到 **AIDL (stable)** 的轉換，  
 說明 HAL 層如何透過 Binder 機制與 Framework 溝通。
-
----
 
 ## 1. 背景與設計目標
 
@@ -24,11 +21,10 @@ Android HAL（Hardware Abstraction Layer）負責連接 **Framework ↔ 驅動�
 - 提供介面版本管理與向後相容性  
 - 確保 vendor 不需與 framework 同步更新即可運作  
 
----
-
 ## 2. HIDL 架構與運作原理
 
-### 架構圖
+### 2.1 架構圖
+
 ```cscc
 Framework (Java/C++)
 ↓
@@ -46,9 +42,8 @@ Vendor HAL Daemon (C++)
 | `/dev/hwbinder` | 驅動節點 | HIDL 專用 Binder 驅動 |
 | HAL Daemon | Server 端 | 實作 HAL 邏輯，接受 framework 呼叫 |
 
----
+### 2.2 範例：定義 HIDL 介面
 
-### 範例：定義 HIDL 介面
 ```hidl
 IExample.hal
 package vendor.example.hardware.example@1.0;
@@ -57,7 +52,6 @@ interface IExample {
     oneway void helloWorld(string name);
 };
 ```
-
 
 編譯後產生：
 
@@ -69,14 +63,13 @@ interface IExample {
 2.  Framework client 呼叫 `getService()` 取得介面。
 3.  Binder 透過 `/dev/hwbinder` 傳遞交易。
 
-
-
 ## 3. AIDL (Stable) 架構與特點
 
 AIDL 在 Android 12 後正式支援 **stable interface**，  
 取代 HIDL 成為統一的 HAL IPC 解決方案。
 
-### 架構圖
+### 3.1 架構圖
+
 ```scss
 Framework (Java/C++)
    ↓
@@ -94,9 +87,8 @@ Vendor HAL Daemon (C++)
 | **vndservicemanager** | Vendor 層註冊中心 | 管理所有 AIDL HAL 服務的註冊與查詢。 |
 | **.aidl interface** | 介面定義 | 定義穩定的 HAL API 與版本，支援跨分區更新。 |
 
+### 3.2 範例：AIDL Stable 介面
 
-
-範例：AIDL Stable 介面
 ```aidl
 // IExample.aidl
 package vendor.example.hardware.example;
@@ -150,7 +142,7 @@ aidl_interface {
 
 ## 5. Interface 定義與整合
 
-### Android.bp 範例
+### 5.1 Android.bp 範例
 
 ```bp
 aidl_interface {
@@ -167,7 +159,9 @@ aidl_interface {
     },
 }
 ```
-### 啟動與註冊流程
+
+### 5.2 啟動與註冊流程
+
 1.  HAL Daemon 啟動後呼叫 `IExample::addService()`。   
 2.  `vndservicemanager` 登錄 HAL。
 3.  Framework 使用 `IExample::getService()` 取得連線。
@@ -192,8 +186,7 @@ aidl_interface {
 -   若要查看 binder 通道是否建立：
     `adb shell ls -l /dev/*binder*`
 
-
-## 7. 常見問題與最佳實踐
+## 7. 常見問題與排查（常見問題與最佳實踐）
 
 | 問題 | 可能原因 | 修正建議 |
 | --- | --- | --- |
@@ -214,18 +207,19 @@ adb shell vndservicemanager --list
 ```
 -   若 AIDL HAL 轉換後 crash，可比較 `.aidl` 與原 `.hal` 的參數型別差異。
 
-
 ## 8. 學習建議
+
 1.  使用 `lshal` 比對 HIDL 與 AIDL HAL 的差異。
 2.  嘗試撰寫一個最小 HAL 專案（AIDL 版）並測試 IPC。
 3.  閱讀範例：`hardware/interfaces/` 與 `aidl/` 目錄。
 4.  在 `vndservicemanager` 啟動後觀察 `/dev/vndbinder` 活動。
 5.  分析從 Framework 呼叫 HAL 的 binder transaction 流程。
 
-**延伸閱讀**
+## 附錄
+
+### A. 延伸閱讀
 
 -   `hardware/interfaces/`（HIDL 原始碼）
 -   `aidl/`（AIDL stable 原始碼）
 -   Google: Convert HALs from HIDL to AIDL
 -   `system/tools/aidl`
-

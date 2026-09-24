@@ -1,4 +1,3 @@
-
 # Linux Scheduler（排程器）解析：CFS / RT / Deadline / RQ / Load Balance
 
 本章介紹 Linux 行程排程器的整體架構及運作機制，包含：
@@ -14,9 +13,7 @@
 
 適用於 BSP、效能調校、低延遲應用、Android SoC 調校。
 
----
-
-# 1. Scheduler 總覽
+## 1. Scheduler 總覽
 
 Linux 主要使用 **multi-class scheduler**：
 
@@ -42,9 +39,7 @@ pick_next_task()
 context switch
 ```
 
----
-
-# 2. Runqueue（RQ）
+## 2. Runqueue（RQ）
 
 每個 CPU 有一個 `struct rq`：
 ```c
@@ -66,9 +61,7 @@ RQ 內容：
 - load / utilization 計算
 - CPU usage 統計
 
----
-
-# 3. CFS（Completely Fair Scheduler）
+## 3. CFS（Completely Fair Scheduler）
 
 CFS 的核心理念：
 
@@ -76,7 +69,7 @@ CFS 的核心理念：
 
 公平的衡量方式：**vruntime（虛擬執行時間）**
 
-## 3.1 vruntime（最重要概念）
+### 3.1 vruntime（最重要概念）
 
 執行越久 → vruntime 增加越多
 nice 值越低（優先權高）→ vruntime 增加越慢
@@ -94,9 +87,8 @@ Task 結束執行後會更新 vruntime：
 ```yaml
 vruntime += actual_runtime * weight_factor
 ```
----
 
-# 4. 調度類型 (Sched Class)
+## 4. 調度類型 (Sched Class)
 
 Linux 具有三大排程類別：
 
@@ -110,9 +102,8 @@ Linux 具有三大排程類別：
 ```yaml
 deadline > RT > CFS
 ```
----
 
-# 5. Wakeup Preemption（喚醒搶佔）
+## 5. Wakeup Preemption（喚醒搶佔）
 
 新任務 woken up 時，有機會搶佔目前執行的 task。
 
@@ -123,9 +114,7 @@ preempt
 ```
 讓 wakeup 更 reactive（改善系統互動性）。
 
----
-
-# 6. Load Balancing（多核心負載分散）
+## 6. Load Balancing（多核心負載分散）
 
 適用於 multi-core SoC（你常用的 RK3588 / RZ/T2H / i.MX8）。
 
@@ -143,26 +132,24 @@ Load balance 會在：
 
 執行。
 
+## 7. Affinity / cgroup CPU 限制
 
-# 7. Affinity / cgroup CPU 限制
-
-### CPU affinity
+### 7.1 CPU affinity
 
 強制任務只能在特定 CPU 跑：
 ```sh
 taskset -c 1,2 ./myapp
 ```
 
-### cgroup 限制 CPU 使用率
+### 7.2 cgroup 限制 CPU 使用率
+
 ```yaml
 systemd-run --scope -p CPUQuota=50% ./app
 ```
 Android 中：
 - foreground / background 也透過 cgroup 調度
 
----
-
-# 8. Context Switch
+## 8. Context Switch
 
 Context switch 發生於：
 
@@ -179,9 +166,7 @@ Context switch 成本包括：
 
 因此太高的 switch rate → 效能下降。
 
----
-
-# 9. Scheduler 與 CPUFreq / Thermal 的關係
+## 9. Scheduler 與 CPUFreq / Thermal 的關係
 
 Scheduler 會與 CPUFreq / thermal 整合：
 ```yaml
@@ -196,41 +181,43 @@ scheduler → 使用較低 CPU capacity
 ```
 Android 特別依賴 scheduler + cpufreq + thermal 的互動。
 
----
+## 10. 常見 Debug 工具
 
-# 10. 常見 Debug 工具
+### 10.1 查看任務排程狀態
 
-### 查看任務排程狀態
 ```sh
 ps -eo pid,cls,pri,rtprio,ni,stat,comm
 ```
 
-### 追蹤 scheduler events（強力）
+### 10.2 追蹤 scheduler events（強力）
+
 ```sh
 trace-cmd record -e sched_switch -e sched_wakeup
 trace-cmd report
 ```
 
-### 檢查 CPU 利用率
+### 10.3 檢查 CPU 利用率
+
 ```sh
 top
 htop
 perf top
 ```
 
-### 檢查 runqueue 狀況
+### 10.4 檢查 runqueue 狀況
+
 ```sh
 cat /proc/sched_debug
 ```
 
-### ftrace（追蹤排程延遲）
+### 10.5 ftrace（追蹤排程延遲）
+
 ```yaml
 echo 1 > /sys/kernel/debug/tracing/events/sched/sched_switch/enable
 cat /sys/kernel/debug/tracing/trace
 ```
----
 
-# 11. 常見問題與排查
+## 11. 常見問題與排查
 
 | 問題 | 可能原因 | 解決方式 |
 | --- | --- | --- |
@@ -239,4 +226,3 @@ cat /sys/kernel/debug/tracing/trace
 | 頻率低、效能差 | schedutil + thermal throttle | 查看 thermal zone log |
 | Latency 高 | RT task 搶占 CFS | 檢查 SCHED_FIFO 程序 |
 | 多核效能未跑滿 | load balance 不佳 | CPU topology / sched_domain 問題 |
-

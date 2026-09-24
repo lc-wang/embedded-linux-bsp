@@ -1,7 +1,4 @@
-
 # OP-TEE Architecture
-
-## 本章目的
 
 本章要把以下幾個元件串起來：
 
@@ -28,9 +25,7 @@ secure storage 為什麼不是單純寫檔案？
 
 這一章是理解 Android KeyMint、Gatekeeper、RPMB、secure storage 的基礎。
 
-----------
-
-## 一張圖先看懂
+## 1. 一張圖先看懂
 
 ```
 Normal World
@@ -71,9 +66,7 @@ Secure World
 Normal World 透過 /dev/tee0 → OP-TEE driver → SMC 進入 Secure World。
 ```
 
-----------
-
-## 1. OP-TEE 是什麼？
+## 2. OP-TEE 是什麼？
 
 OP-TEE 是：
 
@@ -107,9 +100,7 @@ RPMB access
 Android KeyMint / Gatekeeper backend
 ```
 
-----------
-
-## 2. OP-TEE 在 Boot Flow 的位置
+## 3. OP-TEE 在 Boot Flow 的位置
 
 典型 ARM 平台 boot flow：
 
@@ -148,9 +139,7 @@ OP-TEE 必須在 Linux 之前被載入。
 Linux 之後只是透過 SMC 呼叫已經存在的 OP-TEE。
 ```
 
-----------
-
-## 3. OP-TEE 不是 Root of Trust 本身
+## 4. OP-TEE 不是 Root of Trust 本身
 
 OP-TEE 很重要，但不要把它誤解成最底層的 Root of Trust。
 
@@ -177,9 +166,7 @@ OP-TEE 是否可信，
 Secure World 裡跑的東西也不一定可信。
 ```
 
-----------
-
-## 4. Normal World 呼叫 OP-TEE 的流程
+## 5. Normal World 呼叫 OP-TEE 的流程
 
 以 Linux userspace 呼叫 Trusted Application 為例：
 
@@ -224,9 +211,7 @@ Normal World 不直接執行 TA。
 它只是透過 TEE driver 發 request。
 ```
 
-----------
-
-## 5. `/dev/tee0` 和 `/dev/teepriv0`
+## 6. `/dev/tee0` 和 `/dev/teepriv0`
 
 Linux OP-TEE driver probe 成功後，通常會看到：
 
@@ -241,7 +226,6 @@ ls -l /dev/tee*
 ```
 
 常見理解：
-
 
 | Device node | 用途 |  
 |-------------|------|  
@@ -266,9 +250,7 @@ tee-supplicant
 OP-TEE driver
 ```
 
-----------
-
-## 6. tee-supplicant 是什麼？
+## 7. tee-supplicant 是什麼？
 
 tee-supplicant 是 Normal World userspace daemon。
 
@@ -305,9 +287,7 @@ tee-supplicant
 OP-TEE OS
 ```
 
-----------
-
-## 7. tee-supplicant Flow
+## 8. tee-supplicant Flow
 
 以 secure storage 存檔為例：
 
@@ -350,9 +330,7 @@ tee-supplicant 看到的是 encrypted object。
 真正的 key operation 應該留在 Secure World。
 ```
 
-----------
-
-## 8. Trusted Application 是什麼？
+## 9. Trusted Application 是什麼？
 
 Trusted Application，簡稱 TA。
 
@@ -382,9 +360,7 @@ Trusted Application
 return result
 ```
 
-----------
-
-## 9. Client App / TA 基本模型
+## 10. Client App / TA 基本模型
 
 Normal World client app 通常會做：
 
@@ -418,9 +394,7 @@ TA 是 Secure World。
 兩者中間透過 TEE Client API 與 OP-TEE driver 溝通。
 ```
 
-----------
-
-## 10. Secure Storage 是什麼？
+## 11. Secure Storage 是什麼？
 
 Secure Storage 是 OP-TEE 常見功能之一。
 
@@ -450,9 +424,7 @@ anti-rollback
 device binding
 ```
 
-----------
-
-## 11. REE FS vs RPMB Secure Storage
+## 12. REE FS vs RPMB Secure Storage
 
 OP-TEE secure storage 常見 backend：
 
@@ -461,9 +433,7 @@ REE filesystem
 RPMB
 ```
 
-----------
-
-### REE filesystem
+### 12.1 REE filesystem
 
 REE 是 Rich Execution Environment，也就是 Normal World。
 
@@ -490,9 +460,7 @@ anti-rollback 能力較弱
 依賴 Normal World storage
 ```
 
-----------
-
-### RPMB
+### 12.2 RPMB
 
 RPMB 是 Replay Protected Memory Block。
 
@@ -521,9 +489,7 @@ replay protection
 BSP bring-up 較複雜
 ```
 
-----------
-
-## 12. OP-TEE 與 RPMB 的關係
+## 13. OP-TEE 與 RPMB 的關係
 
 RPMB 通常不是直接給 Linux app 任意操作。
 
@@ -550,9 +516,7 @@ Normal World 可以協助傳輸 RPMB command，
 但不應該掌握 RPMB key。
 ```
 
-----------
-
-## 13. Android BSP 常見對應
+## 14. Android BSP 常見對應
 
 在 Android 中，OP-TEE 常作為下列 HAL 的安全後端：
 
@@ -594,9 +558,7 @@ tee-supplicant 沒啟動
 OP-TEE memory reserve 錯誤
 ```
 
-----------
-
-## 14. Linux Kernel 相關元件
+## 15. Linux Kernel 相關元件
 
 Linux kernel 中常見路徑：
 
@@ -631,11 +593,9 @@ method = "smc" 或 "hvc" 要和 firmware conduit 一致。
 
 如果 Linux 期待 SMC，但 firmware 使用 HVC，可能會導致 OP-TEE probe 失敗。
 
-----------
+## 16. BSP Debug：確認 OP-TEE 是否正常
 
-## 15. BSP Debug：確認 OP-TEE 是否正常
-
-### Step 1：看 kernel log
+### 16.1 Step 1：看 kernel log
 
 ```
 dmesg | grep -i optee
@@ -650,9 +610,7 @@ optee: revision 3.x
 optee: initialized driver
 ```
 
-----------
-
-### Step 2：看 device node
+### 16.2 Step 2：看 device node
 
 ```
 ls -l /dev/tee*
@@ -674,9 +632,7 @@ OP-TEE image 可能沒被載入
 SMC conduit 可能不一致
 ```
 
-----------
-
-### Step 3：確認 tee-supplicant
+### 16.3 Step 3：確認 tee-supplicant
 
 ```
 ps | grep tee-supplicant
@@ -692,9 +648,7 @@ RPMB access
 Android KeyMint / Gatekeeper flow
 ```
 
-----------
-
-### Step 4：確認 reserved memory
+### 16.4 Step 4：確認 reserved memory
 
 ```
 dmesg | grep -i reserved
@@ -703,9 +657,7 @@ cat /proc/iomem
 
 確認 OP-TEE secure memory 沒被 Linux 當成一般 RAM 使用。
 
-----------
-
-### Step 5：確認 kernel config
+### 16.5 Step 5：確認 kernel config
 
 ```
 zcat /proc/config.gz | grep -E "TEE|OPTEE"
@@ -718,11 +670,11 @@ CONFIG_TEE=y
 CONFIG_OPTEE=y
 ```
 
-----------
+## 17. 常見問題與排查
 
-## 16. 常見錯誤
+### 17.1 常見錯誤
 
-### OP-TEE image 沒被載入
+#### OP-TEE image 沒被載入
 
 Boot flow 少了 tee.bin / tee.elf。
 
@@ -734,9 +686,7 @@ Linux 找不到 OP-TEE
 KeyMint / Gatekeeper 失敗
 ```
 
-----------
-
-### Device Tree firmware node 錯
+#### Device Tree firmware node 錯
 
 例如缺少：
 
@@ -755,9 +705,7 @@ firmware {
 Linux OP-TEE driver 不知道如何呼叫 secure world。
 ```
 
-----------
-
-### SMC / HVC method 不一致
+#### SMC / HVC method 不一致
 
 Device Tree 寫：
 
@@ -776,9 +724,7 @@ api uid mismatch
 system hang
 ```
 
-----------
-
-### reserved-memory 設錯
+#### reserved-memory 設錯
 
 OP-TEE 使用的 secure memory 沒有保留，或大小 / base address 錯誤。
 
@@ -791,9 +737,7 @@ random boot failure
 secure service unstable
 ```
 
-----------
-
-### tee-supplicant 沒啟動
+#### tee-supplicant 沒啟動
 
 結果可能是：
 
@@ -804,9 +748,7 @@ RPMB access failed
 KeyMint / Gatekeeper failed
 ```
 
-----------
-
-### RPMB key 沒 provision
+#### RPMB key 沒 provision
 
 如果 secure storage backend 使用 RPMB，但 RPMB key 沒正確燒錄。
 
@@ -819,9 +761,7 @@ rollback counter unavailable
 Android keystore / KeyMint issue
 ```
 
-----------
-
-## 17. OP-TEE Debug Checklist
+### 17.2 OP-TEE Debug Checklist
 
 ```
 [ ] OP-TEE image is included in boot flow

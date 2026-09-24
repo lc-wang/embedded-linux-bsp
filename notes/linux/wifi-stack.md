@@ -1,12 +1,10 @@
-
 # Linux WiFi Stack Overview
 
 這份筆記整理 Linux 無線網路 (WiFi) 子系統架構，包含 cfg80211 / mac80211、nl80211、以及 user space (wpa_supplicant) 的交互流程。
 目標是理解 WiFi driver 的位置與資料流。
 
----
-
 ## 1. 整體架構
+
 ```c
    +--------------------------+
    |       User Space         |
@@ -33,9 +31,9 @@
 - **cfg80211 ⇆ nl80211 (user space)**：user space 發送命令（scan/connect），kernel 回傳事件（scan result、connect result）。  
 - **cfg80211 ⇆ mac80211**：mac80211 呼叫 cfg80211 回報事件，cfg80211 呼叫 mac80211 控制行為（ex: start/stop）。  
 - **mac80211 ⇆ vendor driver / hw**：驅動上報狀態、傳送封包到硬體。  
----
 
 ## 2. cfg80211
+
 - **位於** `net/wireless/`。
 - 提供 WiFi 子系統的統一介面，負責：
   - 與 user space 通訊 (nl80211)
@@ -57,6 +55,7 @@ static const struct cfg80211_ops mywifi_ops = {
   ```
 
 ## 3. nl80211
+
 - netlink-based user space interface，定義 WiFi 命令與事件格式。
 
 - 位於 net/wireless/nl80211.c。
@@ -78,6 +77,7 @@ iw dev wlan0 connect mySSID
 ```
 
 ## 4. mac80211
+
   - **通用 802.11 軟體層框架。**
 
 - 提供完整的 WiFi MAC 層協定邏輯 (association, authentication, management frame)。
@@ -101,8 +101,6 @@ ieee80211_register_hw(hw);
 
 ## 5. Fullmac vs Softmac 驅動比較
 
-## 5. Fullmac vs Softmac 驅動比較
-
 | 項目 | Fullmac Driver | Softmac Driver |
 | --- | --- | --- |
 | **MAC 層實作位置** | Firmware (硬體端實作 MAC 協定) | Host 端的 mac80211 處理 MAC 邏輯 |
@@ -112,8 +110,8 @@ ieee80211_register_hw(hw);
 | **缺點** | Firmware 封閉、可調性差 | 驅動較複雜、要處理 MAC 細節 |
 | **典型應用** | 手機、封閉型 IoT、量產品模組 | 桌機、筆電、嵌入式 Linux、開發板 |
 
-
 ## 6. user space 工具
+
 - wpa_supplicant：STA 模式下負責 WPA/WPA2 認證。
 
 - hostapd：AP 模式的 counterpart。
@@ -129,6 +127,7 @@ iw / wpa_supplicant → nl80211 → cfg80211 → (mac80211) → driver
 ```
 
 ## 7. 事件流程範例：WiFi 連線
+
 ``` pgsql
 User (wpa_supplicant)
    │
@@ -151,7 +150,9 @@ cfg80211 通知 user space 事件 (NL80211_CMD_CONNECT_RESULT)
    ▼
 wpa_supplicant 更新狀態 / DHCP
 ```
+
 ## 8. 常見 Debug 工具
+
 | 工具 | 用途 |
 | --- | --- |
 | `iw` | 執行掃描、連線、斷線等基本操作 |
@@ -161,7 +162,8 @@ wpa_supplicant 更新狀態 / DHCP
 | `trace-cmd` | 追蹤 mac80211 / cfg80211 函式呼叫流程 |
 | `debugfs` (`/sys/kernel/debug/ieee80211/phy0/`) | 觀察 rate control、station info、統計資訊 |
 
-## 9. 常見 Debug case
+## 9. 常見問題與排查（常見 Debug case）
+
 - 問題：無法連線
 → 檢查 dmesg 中是否有 "assoc failed"、"timeout"。
 → 確認 firmware 是否載入 (/lib/firmware/)。
@@ -175,6 +177,7 @@ wpa_supplicant 更新狀態 / DHCP
 → 比對 RSSI, power save, beacon miss log。
 
 ## 10. 學習建議
+
 - 在開發板上使用 iw / wpa_cli 熟悉 nl80211 行為。
 
 - 用 trace-cmd 觀察 cfg80211_scan → mac80211 → driver 流程。

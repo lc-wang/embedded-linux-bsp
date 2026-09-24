@@ -1,12 +1,9 @@
-
 # Yocto BSP Workflow
 
 > 目的：
 > 
 > -   建立一套「**修改有沒有真的進 image？**」的工程判斷流程  
 > -   把 bitbake / layer / devtool 變成 **可預期、可 debug 的工具**
-
-----------
 
 ## 1. Yocto 在 BSP 工程中的真實角色
 
@@ -16,13 +13,10 @@ Yocto 對 BSP 工程師來說，不是包裝工具，而是：
 -   變更仲裁者（多個 layer 同時存在）
 -   Debug 放大鏡（讓錯誤被隱藏或放大）
     
-
 **工程現實**：
 
 -   功能異常 ≠ code 有問題
 -   很多時候是 **recipe / layer priority / override**
-
-----------
 
 ## 2. Layer 模型：一切從這裡開始
 
@@ -37,13 +31,10 @@ bitbake-layers show-layers
 -   BSP layer 是否真的覆蓋 vendor layer
 -   bbappend 有沒有被吃到
     
-
 > **工程原則**：
 > 
 > -   不知道哪個 layer 生效，就不要 debug code
 >     
-
-----------
 
 ### 2.2 bbappend 是最容易「看起來存在，其實沒用」的東西
 
@@ -53,18 +44,15 @@ bitbake-layers show-layers
 -   layer priority 太低
 -   FILESEXTRAPATHS 沒加
     
-
 快速驗證：
 
 ```bash
 bitbake -e virtual/kernel | grep ^FILE
 ```
 
-----------
-
 ## 3. BSP 工程中三種「正確修改路徑」
 
-### 路徑 A：devtool modify（短期 debug）
+### 3.1 路徑 A：devtool modify（短期 debug）
 
 適用：
 
@@ -81,9 +69,7 @@ devtool modify virtual/kernel
 -   立即可用 
 -   **不適合長期存在**
     
-----------
-
-### 路徑 B：bbappend + patch（正式修改）
+### 3.2 路徑 B：bbappend + patch（正式修改）
 
 適用：
 
@@ -95,9 +81,7 @@ devtool modify virtual/kernel
 -   patch 必須可重現
 -   recipe 不應 hardcode path
     
-----------
-
-### 路徑 C：external src（大型專案）
+### 3.3 路徑 C：external src（大型專案）
 
 適用：
 
@@ -107,9 +91,8 @@ devtool modify virtual/kernel
 風險：
 -   image 可重現性下降
    
-----------
-
 ## 4. Debug 決策流程
+
 ```
 行為不符預期
   ├─ 確認 image 是否 rebuild
@@ -124,9 +107,8 @@ devtool modify virtual/kernel
 ```bash
 strings tmp/deploy/images/*/Image | grep your_string
 ```
-----------
 
-## 5. Kernel / U-Boot 專用 Debug 
+## 5. Kernel / U-Boot 專用 Debug
 
 ### 5.1 Kernel
 
@@ -139,7 +121,6 @@ bitbake -e virtual/kernel | grep ^SRC_URI
 -   patch 是否真的被套用
 -   是否被其他 layer 覆蓋
     
-
 ### 5.2 U-Boot
 
 -   常見錯誤：改了 board 但 image 沒變
@@ -150,9 +131,7 @@ bitbake -e virtual/kernel | grep ^SRC_URI
 strings u-boot.bin | grep board_name
 ```
 
-----------
-
-## 6. 常見工程錯覺與誤判
+## 6. 常見問題與排查（常見工程錯覺與誤判）
 
 | 現象             | 常見誤判      | 真正原因                 |
 |------------------|---------------|--------------------------|
@@ -160,9 +139,7 @@ strings u-boot.bin | grep board_name
 | 行為回到舊版     | git reset     | Layer priority 錯誤      |
 | Patch 有套但無效 | Compiler bug  | SRCREV 指向錯誤          |
 
-----------
-
-## 8. 敘事
+## 7. 敘事
 
 > 「Yocto 的問題一定先確認 layer 與 recipe 是否真的生效，  
 > 在確定 image 內容正確之前，我不會直接懷疑 kernel code。」

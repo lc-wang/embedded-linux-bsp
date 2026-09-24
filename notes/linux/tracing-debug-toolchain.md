@@ -1,7 +1,6 @@
-
 # Linux / Android Tracing & Debug Toolchain
 
-## 0. 為什麼是 Toolchain，而不是 Tool List
+## 1. 為什麼是 Toolchain，而不是 Tool List
 
 實務上的 debug 從來不是：
 
@@ -17,9 +16,7 @@
 
 因此本章以 **工程決策模型（Engineering Decision Model）** 組織。
 
----
-
-## 1. Debug 工具全景地圖（System View）
+## 2. Debug 工具全景地圖（System View）
 
 ```text
 Userspace behavior
@@ -64,8 +61,8 @@ Crash / Hang / Live kernel
  ```
 第一步不是開工具，而是定位層級。
 
+## 3. 工程決策模型：問題 → 層級 → 工具
 
-## 2. 工程決策模型：問題 → 層級 → 工具
 ```
 App 卡住、無 crash
 → strace / logcat / atrace
@@ -90,11 +87,10 @@ random kernel crash
 ```
 這張對照表就是 **debug 的入口點**。
 
-----------
+## 4. Toolchain 接力流程（Debug Flow）
 
-## 3. Toolchain 接力流程（Debug Flow）
+### 4.1 範例：Wi-Fi 偶發 connect timeout
 
-### 範例：Wi-Fi 偶發 connect timeout
 ```
 strace
  → ioctl 阻塞
@@ -113,72 +109,57 @@ addr2line
 ```
 **重點不是工具，而是「順序」。**
 
-----------
+## 5. Userspace / Android Debug
 
-## 4. Userspace / Android Debug
-
-### strace — App / HAL 為什麼卡住？
+### 5.1 strace — App / HAL 為什麼卡住？
 
 **使用時機**
 
 -   無 crash、畫面 freeze
-    
+
 -   CPU usage 不高
-    
 
 `strace -tt -T -f -p <pid>` 
 
 判斷：
 
 -   `futex()` → scheduler / locking
-    
+
 -   `ioctl()` → driver / Binder
-    
 
 若卡在 ioctl，下一步進 **Syscall / Kernel 邊界**
 
-----------
-
-### ltrace — 排除 userspace library 問題
+### 5.2 ltrace — 排除 userspace library 問題
 
 `ltrace -tt -T -p <pid>` 
 
 用途：
 
 -   驗證是否卡在 libc / vendor lib
-    
+
 -   先證明「不是 kernel」
-    
 
-----------
-
-### logcat — Android service / Binder 行為
+### 5.3 logcat — Android service / Binder 行為
 
 `logcat -b system -b main -v time` 
 
 用途：
 
 -   ANR
-    
+
 -   Binder transaction timeout
-    
 
-----------
-
-### atrace / systrace — Framework 與 scheduler 互動
+### 5.4 atrace / systrace — Framework 與 scheduler 互動
 
 `atrace -b 4096 -t 10 sched freq idle binder_driver` 
 
 用途：
 
 -   Binder thread starvation
-    
+
 -   scheduler latency
-    
 
-----------
-
-### simpleperf — Android native code 熱點
+### 5.5 simpleperf — Android native code 熱點
 
 `simpleperf record -p <pid>
 simpleperf report` 
@@ -186,28 +167,23 @@ simpleperf report`
 用途：
 
 -   userspace hotspot
-    
+
 -   不干擾 kernel
-    
 
-----------
+## 6. Syscall / IPC Boundary Debug
 
-## 5. Syscall / IPC Boundary Debug
-
-### perf trace — syscall latency 分佈
+### 6.1 perf trace — syscall latency 分佈
 
 `perf trace -p <pid>` 
 
 用途：
 
 -   比 strace 低干擾
-    
+
 -   看 syscall timing 是否異常
-    
 
-----------
+### 6.2 Binder tracepoints — Binder transaction 追蹤
 
-### Binder tracepoints — Binder transaction 追蹤
 ```
 echo 1 > /sys/kernel/debug/tracing/events/binder/enable 
 cat /sys/kernel/debug/tracing/trace_pipe
@@ -215,41 +191,36 @@ cat /sys/kernel/debug/tracing/trace_pipe
 用途：
 
 -   Binder call 是否送出 / 回來
-    
+
 -   Android framework debug 核心工具
-    
 
-----------
+## 7. Kernel Control Path Debug
 
-## 6. Kernel Control Path Debug
+### 7.1 ftrace (function) — code 是否被呼叫
 
-### ftrace (function) — code 是否被呼叫
 ```
 echo  function > /sys/kernel/debug/tracing/current_tracer 
 echo my_driver_* > /sys/kernel/debug/tracing/set_ftrace_filter
 ```
-----------
 
-### ftrace (function_graph) — 哪個 callback 卡住
+### 7.2 ftrace (function_graph) — 哪個 callback 卡住
 
 `echo function_graph > /sys/kernel/debug/tracing/current_tracer` 
 
 常用於：
 
 -   probe
-    
+
 -   suspend / resume
-    
 
-----------
+### 7.3 tracepoints — 精準觀察 subsystem
 
-### tracepoints — 精準觀察 subsystem
 ```
 echo 1 > /sys/kernel/debug/tracing/events/sched/sched_switch/enable
 ```
-----------
 
-### dynamic_debug — 精準開 log
+### 7.4 dynamic_debug — 精準開 log
+
 ```
 echo  'file drivers/net/wireless/* +p' \
  > /sys/kernel/debug/dynamic_debug/control 
@@ -257,163 +228,121 @@ echo  'file drivers/net/wireless/* +p' \
 用途：
 
 -   避免 printk flood
-    
+
 -   bring-up 必備
-    
 
-----------
-
-### printk / trace_printk — early boot / 無 tracing
+### 7.5 printk / trace_printk — early boot / 無 tracing
 
 `trace_printk("reach here\n");` 
 
-----------
+## 8. Performance / Latency Analysis
 
-## 7. Performance / Latency Analysis
-
-### perf record / report — CPU hotspot
+### 8.1 perf record / report — CPU hotspot
 
 `perf record -a
 perf report` 
 
-----------
-
-### perf sched — runnable 卻沒跑
+### 8.2 perf sched — runnable 卻沒跑
 
 `perf sched record -a
 perf sched latency` 
 
-----------
-
-### perf irq — IRQ latency
+### 8.3 perf irq — IRQ latency
 
 `perf record -e irq:irq_handler_entry -a` 
 
-----------
-
-### eBPF — runtime probe
+### 8.4 eBPF — runtime probe
 
 `bpftool prog list` 
 
-----------
+### 8.5 bpftrace — 快速一次性分析
 
-### bpftrace — 快速一次性分析
 ```
 bpftrace -e 'tracepoint:sched:sched_switch { @[comm] = count(); }'
 ```
-----------
 
-### BCC tools — 現成工具
+### 8.6 BCC tools — 現成工具
 
 `runqlat` 
 
-----------
+## 9. Scheduler / IRQ / Locking Analysis
 
-## 8. Scheduler / IRQ / Locking Analysis
+### 9.1 sched_switch / sched_wakeup
 
-### sched_switch / sched_wakeup
 ```
 echo 1 > /sys/kernel/debug/tracing/events/sched/sched_switch/enable 
 ```
-----------
 
-### irqsoff — IRQ 被關太久
+### 9.2 irqsoff — IRQ 被關太久
 
 `echo irqsoff > /sys/kernel/debug/tracing/current_tracer` 
 
-----------
-
-### preemptoff — preempt latency
+### 9.3 preemptoff — preempt latency
 
 `echo preemptoff > /sys/kernel/debug/tracing/current_tracer` 
 
-----------
-
-### lockdep — 死鎖 / lock inversion
+### 9.4 lockdep — 死鎖 / lock inversion
 
 `echo 1 > /proc/sys/kernel/lockdep` 
 
-----------
-
-### RT throttling
+### 9.5 RT throttling
 
 `cat /proc/sys/kernel/sched_rt_runtime_us` 
 
-----------
+## 10. Memory / Resource Debug
 
-## 9. Memory / Resource Debug
-
-### vmstat
+### 10.1 vmstat
 
 `vmstat 1` 
 
-----------
-
-### slabtop
+### 10.2 slabtop
 
 `slabtop` 
 
-----------
-
-### PSI — resource stall
+### 10.3 PSI — resource stall
 
 `cat /proc/pressure/cpu cat /proc/pressure/memory` 
 
-----------
+### 10.4 kmemleak
 
-### kmemleak
 ```
 echo scan > /sys/kernel/debug/kmemleak 
 cat /sys/kernel/debug/kmemleak
 ```
-----------
 
-### KASAN / UBSAN
+### 10.5 KASAN / UBSAN
 
 `CONFIG_KASAN=y
 CONFIG_UBSAN=y` 
 
-----------
+## 11. Crash / Hang / Live Kernel Debug
 
-## 10. Crash / Hang / Live Kernel Debug
-
-### addr2line
+### 11.1 addr2line
 
 `addr2line -e vmlinux <addr>` 
 
-----------
-
-### objdump / nm
+### 11.2 objdump / nm
 
 `nm vmlinux | grep <symbol>` 
 
-----------
-
-### crash utility
+### 11.3 crash utility
 
 `crash vmlinux vmcore` 
 
-----------
-
-### GDB
+### 11.4 GDB
 
 `gdb vmlinux` 
 
-----------
-
-### KGDB — 最後手段
+### 11.5 KGDB — 最後手段
 
 `echo g > /proc/sysrq-trigger` 
 
-----------
-
-### netconsole — serial 也掛了
+### 11.6 netconsole — serial 也掛了
 
 `modprobe netconsole netconsole=@/,@<host-ip>/` 
 
-----------
+### 11.7 magic SysRq
 
-### magic SysRq
 ```
 echo t > /proc/sysrq-trigger 
 echo w > /proc/sysrq-trigger

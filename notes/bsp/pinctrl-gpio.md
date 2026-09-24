@@ -1,4 +1,3 @@
-
 # BSP Pin Control & GPIO（腳位複用與控制整合實務）
 
 > 本章定位：
@@ -10,8 +9,6 @@
 > -   能實際用於 debug：I2C 掃不到、IRQ 不觸發、Audio 沒聲音、wakeup 失效
 >     
 
-----------
-
 ## 1. 為什麼 Pin Control 是 BSP 的高風險區
 
 在 BSP bring-up 中，pinctrl 是**出錯率極高、但又最容易被忽略**的一層：
@@ -20,8 +17,6 @@
 -   問題常表現為「完全沒反應」，而不是明確錯誤
 
 **pinctrl 問題通常不會讓 probe 失敗，但會讓功能失效。**
-
-----------
 
 ## 2. Pin Control 與 GPIO 的責任邊界
 
@@ -35,8 +30,6 @@ pinctrl 負責：
 
 > 這個 pin 現在「是什麼功能、怎麼接電氣」。
 
-----------
-
 ### 2.2 GPIO 是「邏輯控制」
 
 GPIO 負責：
@@ -48,8 +41,6 @@ GPIO 負責：
 > pin 已經被正確設定成 GPIO 功能。
 
 **GPIO API 正確，不代表 pinctrl 設定正確。**
-
-----------
 
 ## 3. DTS 中 pinctrl 的基本結構
 
@@ -74,8 +65,6 @@ GPIO 負責：
 
 關鍵不是語法，而是**狀態的切換時機**。
 
-----------
-
 ## 4. pinctrl state 與生命週期
 
 ### 4.1 default / sleep state
@@ -91,8 +80,6 @@ GPIO 負責：
 若 sleep state 缺失：
 -   resume 後功能可能異常
 
-----------
-
 ### 4.2 runtime 切換
 
 部分裝置：
@@ -102,8 +89,6 @@ GPIO 負責：
 -   功耗異常
 -   偶發功能失效
 
-----------
-
 ## 5. 常見 BSP 失敗模式
 
 ### 5.1 I2C 掃不到裝置
@@ -112,23 +97,17 @@ GPIO 負責：
 -   SDA / SCL 沒被 mux 成 I2C 
 -   pull-up 設定錯誤
     
-----------
-
 ### 5.2 IRQ 永遠不觸發
 
 可能原因：
 -   pin 被設定成 output
 -   沒有正確設定 input / pull
 
-----------
-
 ### 5.3 Audio 沒聲音
 
 可能原因：
 -   I2S pin 沒被切到 audio function   
 -   sleep state 切換錯誤
-
-----------
 
 ## 6. pinctrl 與 suspend / resume
 
@@ -139,8 +118,6 @@ suspend/resume 期間：
 若 sleep state 不完整：
 -   resume 後裝置「看起來活著，但實際不工作」
     
-----------
-
 ## 7. Pin Control Debug Toolbox
 
 ### 7.1 檢查 pinctrl 是否套用成功
@@ -154,7 +131,6 @@ ls /sys/kernel/debug/pinctrl/
 ```bash
 cat /sys/kernel/debug/pinctrl/*/pinmux-pins
 ```
-----------
 
 ### 7.2 檢查 pin 的目前狀態
 
@@ -167,8 +143,6 @@ cat /sys/kernel/debug/pinctrl/*/pins
 -   pin 是否被 claimed
 -   目前 function 為何
     
-----------
-
 ### 7.3 GPIO 層確認
 
 ```bash
@@ -180,8 +154,6 @@ gpioget
 若 GPIO 操作正常但功能不對：
 -   幾乎一定是 pinctrl 問題
 
-----------
-
 ### 7.4 suspend / resume 專用檢查
 
 ```bash
@@ -190,13 +162,10 @@ echo mem > /sys/power/state
 
 resume 後再次檢查 pin 狀態，確認是否切回 default。
 
-----------
-
-## 8. 常見誤判與 Debug
+## 8. 常見問題與排查（常見誤判與 Debug）
 
 | 現象           | 常見誤判      | 真正原因        |
 |----------------|---------------|-----------------|
 | GPIO API 正常  | Driver bug    | Pinmux 錯誤     |
 | Probe 成功     | 硬體 OK       | Pin state 錯誤  |
 | Resume 壞掉    | PM 問題       | Sleep pinctrl   |
-

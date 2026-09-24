@@ -1,10 +1,7 @@
-
 # Android System Services Overview
 
 這份筆記整理 Android Framework 層中 **SystemServer、ServiceManager、各系統服務 (System Services)** 的啟動與註冊流程。  
 目標是理解 Android 啟動後如何建立 Binder IPC 架構，並讓 App 端能透過 AIDL 存取系統資源。
-
----
 
 ## 1. 系統啟動總覽
 
@@ -17,8 +14,6 @@ Android 開機流程可簡化為以下五階段：
 | **3. Init** | `/system/core/init` | 啟動 `zygote`、`servicemanager`、`surfaceflinger` 等核心程序 |
 | **4. Zygote** | `app_process` | 啟動 SystemServer（Java Framework 主程序） |
 | **5. SystemServer** | `system/framework/services.jar` | 啟動並註冊所有 System Services |
-
----
 
 ## 2. Zygote → SystemServer 啟動流程
 
@@ -43,7 +38,8 @@ public static void main(String argv[]) {
 
 ## 3. ServiceManager 與 SystemServiceRegistry
 
-### ServiceManager
+### 3.1 ServiceManager
+
 -   位於 **native 層**，負責維護所有系統服務的 Binder 註冊表。
 -   Java 層的服務會透過 JNI 呼叫到 `ServiceManager.cpp`。
 主要函式：
@@ -56,8 +52,8 @@ sp<IServiceManager> defaultServiceManager() {
 }
 ```
 
+### 3.2 SystemServiceRegistry
 
-### SystemServiceRegistry
 -   Java 層的登錄機制，負責把服務名稱與對應的 Java 介面綁定。
 範例：
 
@@ -74,7 +70,8 @@ registerService(Context.WINDOW_SERVICE, WindowManager.class,
 
 SystemServer 啟動時會依序呼叫 `startBootstrapServices()`、`startCoreServices()`、`startOtherServices()`。
 
-### 啟動流程簡圖
+### 4.1 啟動流程簡圖
+
 ```cscc
 SystemServer.main()
   ↓
@@ -89,14 +86,13 @@ startOtherServices()
 進入 Looper.loop()
 ```
 
-### 常見啟動階段對照
+### 4.2 常見啟動階段對照
 
 | 階段 | 範例服務 | 功能 |
 | --- | --- | --- |
 | **Bootstrap** | Installer, PowerManager, ActivityManager | 最早啟動，確保系統核心穩定性與基本功能可用。 |
 | **Core** | BatteryService, UsageStatsService | Framework 核心服務，負責資源與行為統計。 |
 | **Other** | WindowManager, InputManager, AudioService | 與應用層直接互動，提供使用者可見的系統功能。 |
-
 
 ## 5. Binder IPC 在 Framework 層的角色
 
@@ -128,8 +124,6 @@ ServiceManager
 -   `/dev/binder` 是 kernel 層驅動節點，處理跨進程資料傳遞。
 -   `IServiceManager` 是所有服務的中心登錄點，用於查找與註冊 Binder handle。
 
-
-
 ## 6. 常見系統服務實例
 
 | 服務名稱 | 類別 | 功能摘要 |
@@ -141,8 +135,7 @@ ServiceManager
 | **AudioService** | `AudioService.java` | 控制音訊路徑、音量以及輸入輸出裝置。 |
 | **InputManagerService** | `InputManagerService.java` | 處理觸控、滑鼠與鍵盤輸入事件。 |
 
-
-## 8. 常見問題與排查
+## 7. 常見問題與排查
 
 | 問題 | 可能原因 | 修正建議 |
 | --- | --- | --- |
@@ -152,17 +145,18 @@ ServiceManager
 | `SecurityException` | 權限或 SELinux policy 不符 | 檢查 `.te`、`service_contexts`、`AndroidManifest.xml`。 |
 | `Permission Denied`（AIDL 呼叫） | service 或 client 權限設定錯誤 | 加上 `android:permission` 屬性或修改 SELinux policy。 |
 
+## 8. 學習建議
 
-
-## 9. 學習與觀察建議
 1.  閱讀 `frameworks/base/services/java/com/android/server/SystemServer.java`。
 2.  使用 `dumpsys activity services` 檢查服務啟動順序。
 3.  嘗試新增一個自訂 SystemService（繼承 `SystemService` 類別）。
 4.  觀察 `SystemServiceRegistry.java` 如何登錄服務名稱與介面。
 5.  使用 `strace` 或 `perf trace -e binder:*` 觀察 SystemServer 與 Binder 驅動互動。
 
+## 附錄
 
-**延伸閱讀**
+### A. 延伸閱讀
+
 -   AOSP: `frameworks/base/services/java/com/android/server/SystemServer.java`   
 -   AOSP: `frameworks/native/libs/binder/`  
 -   Android Developers – System Services

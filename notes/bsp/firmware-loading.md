@@ -1,4 +1,3 @@
-
 # BSP Firmware Loading（韌體載入與整合實務）
 
 > 本章定位：
@@ -9,8 +8,6 @@
 >     
 > -   能實際用於 debug：firmware 找不到、版本不對、載入時序錯誤
 >     
-
-----------
 
 ## 1. 為什麼 Firmware 是 BSP Bring-up 的最後一塊拼圖
 
@@ -28,8 +25,6 @@
 
 **很多裝置「真正跑起來」的前提，是 firmware 成功載入。**
 
-----------
-
 ## 2. Linux Firmware Framework 的角色
 
 Linux 對 firmware 的基本假設是：
@@ -42,8 +37,6 @@ Linux 對 firmware 的基本假設是：
 -   userspace helper（udev / systemd）
 -   `/lib/firmware` 檔案系統
     
-----------
-
 ## 3. Firmware 載入的實際流程
 
 ```text
@@ -63,9 +56,6 @@ firmware 傳回 kernel
 -   firmware 載入是 **同步或非同步**
 -   依賴 userspace 是否 ready
     
-
-----------
-
 ## 4. 為什麼 Firmware 常造成 Probe 卡住
 
 ### 4.1 userspace 尚未 ready
@@ -74,12 +64,9 @@ firmware 傳回 kernel
 -   rootfs 尚未 mount
 -   udev 尚未啟動
     
-
 此時 request_firmware 可能：
 -   block    
 -   timeout
-
-----------
 
 ### 4.2 Firmware 檔案不存在或路徑錯誤
 
@@ -91,8 +78,6 @@ firmware 傳回 kernel
 -   driver probe 失敗  
 -   裝置功能受限
     
-----------
-
 ## 5. Device Tree 與 Firmware 名稱
 
 ### 5.1 DTS 的責任
@@ -100,19 +85,14 @@ firmware 傳回 kernel
 DTS 常用來：
 -   指定 firmware 名稱
     
-
 但 DTS：
 -   不負責 firmware 是否存在
 -   不保證載入成功
-
-----------
 
 ### 5.2 常見陷阱
 
 -   firmware 名稱與實際檔名不一致
 -   DTS 更新後忘記更新 rootfs
-
-----------
 
 ## 6. Firmware 與 Suspend / Resume
 
@@ -125,8 +105,6 @@ DTS 常用來：
     
 **這是 BSP 常見但容易被忽略的問題。**
 
-----------
-
 ## 7. Firmware Debug Toolbox
 
 ### 7.1 確認 firmware 是否存在
@@ -135,7 +113,6 @@ DTS 常用來：
 ls /lib/firmware
 ls /lib/firmware/<vendor>/
 ```
-----------
 
 ### 7.2 觀察 kernel 訊息
 
@@ -147,7 +124,6 @@ dmesg | grep -i firmware
 
 -   firmware: failed to load 
 -   Direct firmware load failed
-----------
 
 ### 7.3 驗證載入時序
 
@@ -160,8 +136,6 @@ cat /proc/cmdline
 -   使用 initramfs
 -   rootfs 掛載過晚
     
-----------
-
 ### 7.4 手動觸發載入
 
 ```bash
@@ -170,9 +144,7 @@ echo 1 > /sys/module/firmware_class/parameters/path
 
 或重新 bind driver 觀察行為。
 
-----------
-
-## 8. 常見誤判與責任歸屬
+## 8. 常見問題與排查（常見誤判與責任歸屬）
 
 | 現象           | 常見誤判      | 真正原因               |
 |----------------|---------------|------------------------|

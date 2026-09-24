@@ -1,8 +1,6 @@
-
 # IRQ Domain 與 Interrupt Mapping 深入解析
 
-
-# 1. 為什麼需要 irq_domain？
+## 1. 為什麼需要 irq_domain？
 
 在硬體世界：
 
@@ -17,9 +15,8 @@
 
 這個轉換機制就是 **irq_domain**
 
-----------
+### 1.1 核心概念
 
-# 核心概念
 ```
 hwirq (hardware IRQ)  
  ↓  
@@ -27,9 +24,8 @@ irq_domain
  ↓  
 virq (Linux IRQ)
 ```
-----------
 
-# 2. 三種 IRQ number
+## 2. 三種 IRQ number
 
 | 名稱           | 說明                  | 例子         |
 |----------------|-----------------------|--------------|
@@ -37,7 +33,8 @@ virq (Linux IRQ)
 | parent hwirq   | 上層 controller IRQ   | GIC SPI 45   |
 | virq           | Linux IRQ             | 123          |
 
-## 實際例子
+### 2.1 實際例子
+
 ```
 GPIO3_5 → hwirq = 5
          ↓
@@ -47,30 +44,27 @@ GIC SPI = 45
          ↓
 Linux virq = 123
 ```
-----------
 
-# 3. irq_domain 的作用
+## 3. irq_domain 的作用
 
 irq_domain 負責：
 
-### 編號轉換
+### 3.1 編號轉換
 
 -   hwirq → virq
 
-### hierarchical mapping
+### 3.2 hierarchical mapping
 
 -   多層 controller 串接（GPIO → GIC）
 
-### irq_chip 綁定
+### 3.3 irq_chip 綁定
 
 -   設定 handler / mask / ack
 
-----------
+## 4. IRQ Domain 類型
 
-# 4. IRQ Domain 類型
+### 4.1 linear domain
 
-
-## linear domain
 ```
 irq_domain_add_linear()
 ```
@@ -79,9 +73,8 @@ irq_domain_add_linear()
 -   hwirq 是連續數字
 -   例如 GPIO controller
 
-----------
+### 4.2 tree domain
 
-## tree domain
 ```
 irq_domain_add_tree()
 ```
@@ -90,9 +83,8 @@ irq_domain_add_tree()
 -   hwirq 不連續
 -   需要動態 mapping
 
-----------
+### 4.3 hierarchical domain
 
-## hierarchical domain
 ```
 irq_domain_create_hierarchy()
 ```
@@ -102,9 +94,9 @@ GPIO → GIC
 PCIe → GIC  
 MSI → GIC
 ```
-----------
 
-# 5. Hierarchical IRQ Flow
+## 5. Hierarchical IRQ Flow
+
 ```
 Device IRQ  
  ↓  
@@ -118,11 +110,10 @@ CPU
 ```
 每一層都有自己的 irq_domain
 
-----------
+## 6. GPIO interrupt mapping
 
-# 6. GPIO interrupt mapping
+### 6.1 Step 1 GPIO driver 建立 irq_domain
 
-## Step 1 GPIO driver 建立 irq_domain
 ```
 gpiochip_irqchip_add()
 ```
@@ -130,9 +121,9 @@ gpiochip_irqchip_add()
 ```
 irq_domain_add_linear()
 ```
-----------
 
-## Step 2 建立 parent 關係
+### 6.2 Step 2 建立 parent 關係
+
 ```
 irq_set_parent()
 ```
@@ -140,9 +131,8 @@ irq_set_parent()
 ```
 interrupt-parent (DT)
 ```
-----------
 
-## Step 3 mapping 發生
+### 6.3 Step 3 mapping 發生
 
 當 driver：
 ```
@@ -156,12 +146,11 @@ irq_create_mapping()
 ```
 hwirq → virq
 ```
-----------
 
-# 7. Device Tree 與 irq_domain
+## 7. Device Tree 與 irq_domain
 
+### 7.1 GIC 定義
 
-## GIC 定義
 ```
 gic: interrupt-controller@xxxx {  
 compatible = "arm,gic-v3";  
@@ -169,9 +158,9 @@ interrupt-controller;
 #interrupt-cells = <3>;  
 };
 ```
-----------
 
-## GPIO controller
+### 7.2 GPIO controller
+
 ```
 gpio3: gpio@xxxx {  
 gpio-controller;  
@@ -182,9 +171,9 @@ interrupt-parent = <&gic>;
 interrupts = <GIC_SPI 89 IRQ_TYPE_LEVEL_HIGH>;  
 };
 ```
-----------
 
-## Device 使用
+### 7.3 Device 使用
+
 ```
 interrupt-parent = <&gpio3>;  
 interrupts = <5 IRQ_TYPE_EDGE_FALLING>;
@@ -194,62 +183,57 @@ interrupts = <5 IRQ_TYPE_EDGE_FALLING>;
 1.  GPIO domain 解析
 2.  再 mapping 到 GIC
 
-----------
+## 8. Kernel 中的關鍵函式
 
-# 8. Kernel 中的關鍵函式
+### 8.1 建立 mapping
 
-
-## 建立 mapping
 ```
 irq_create_mapping(domain, hwirq);
 ```
-----------
 
-## handler 呼叫
+### 8.2 handler 呼叫
+
 ```
 generic_handle_irq(virq);
 ```
-----------
 
-## domain translate
+### 8.3 domain translate
+
 ```
 domain->ops->map()  
 domain->ops->xlate()
 ```
-----------
 
-# 9. Debug irq_domain
+## 9. Debug irq_domain
 
+### 9.1 看 virq
 
-## 1. 看 virq
 ```
 cat /proc/interrupts
 ```
-----------
 
-## 2. 看 mapping
+### 9.2 看 mapping
+
 ```
 cat /sys/kernel/debug/irq/irqs/<irq>
 ```
-----------
 
-## 3. 看 domain
+### 9.3 看 domain
+
 ```
 cat /sys/kernel/debug/irq_domain/*
 ```
 
-----------
+### 9.4 trace mapping
 
-## 4. trace mapping
 ```
 echo  function > /sys/kernel/debug/tracing/current_tracer  
 echo irq_create_mapping > set_ftrace_filter
 ```
-----------
 
-# 常見錯誤
+## 10. 常見問題與排查
 
-## IRQ 永遠不觸發
+### 10.1 IRQ 永遠不觸發
 
 可能：
 
@@ -257,26 +241,20 @@ echo irq_create_mapping > set_ftrace_filter
 -   interrupt-parent 錯
 -   #interrupt-cells 錯
 
-----------
-
-## request_irq 失敗
+### 10.2 request_irq 失敗
 
 可能：
 
 -   mapping 不存在
 -   IRQ number 無效
 
-----------
-
-## gpiomon 沒反應
+### 10.3 gpiomon 沒反應
 
 原因：
 
 GPIO → GIC mapping 沒建立
 
-----------
-
-## IRQ number mismatch
+### 10.4 IRQ number mismatch
 
 看到：
 ```
@@ -285,9 +263,8 @@ GIC 45
 ```
 正常（virq ≠ hwirq）
 
-----------
+## 11. IRQ Flow
 
-# 10. IRQ Flow
 ```
 Hardware IRQ  
  ↓  
@@ -301,9 +278,8 @@ generic_handle_irq()
  ↓  
 driver ISR
 ```
-----------
 
-# Stacked IRQ Domain
+## 12. Stacked IRQ Domain
 
 有些情況：
 ```
@@ -314,5 +290,3 @@ MSI → PCIe → GIC
 GPIO expander → I2C → GPIO → GIC
 ```
 會有多層 domain
-
-

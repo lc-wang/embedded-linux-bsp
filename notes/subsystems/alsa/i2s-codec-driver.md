@@ -1,11 +1,8 @@
-
 # I2S 與 Codec Driver 深度解析
 
 > 從 snd_soc_dai_ops 到 clock 設定與 hw_params
 
-----------
-
-# 1. ASoC Driver 分層回顧
+## 1. ASoC Driver 分層回顧
 
 之前我們講到：
 ```
@@ -18,9 +15,8 @@ Codec driver
 CPU DAI driver
 Codec driver
 ```
-----------
 
-# 2. CPU DAI Driver 是什麼？
+## 2. CPU DAI Driver 是什麼？
 
 CPU DAI driver 通常是：
 
@@ -35,19 +31,16 @@ sound/soc/renesas/rcar/
 它負責：
 
 -   控制 I2S register
-    
+
 -   設定 clock
-    
+
 -   啟動 DMA
-    
+
 -   設定 frame format
-    
+
 -   設定 sample rate
-    
 
-----------
-
-# 3. 核心結構：snd_soc_dai_driver
+## 3. 核心結構：snd_soc_dai_driver
 
 在 CPU driver 中你會看到：
 ```
@@ -63,9 +56,9 @@ static  struct  snd_soc_dai_driver  rockchip_i2s_dai = {
     .ops = &rockchip_i2s_dai_ops,
 };
 ```
-----------
 
-# 4. snd_soc_dai_ops
+## 4. snd_soc_dai_ops
+
 ```
 struct snd_soc_dai_ops {
     int (*startup)(...);
@@ -77,9 +70,7 @@ struct snd_soc_dai_ops {
 ```
 這是 driver 真正運作的地方。
 
-----------
-
-# 5. 播放完整 call flow
+## 5. 播放完整 call flow
 
 播放時會發生：
 ```
@@ -97,9 +88,8 @@ snd_soc_dai_trigger()
 cpu_dai->ops->trigger()
 codec_dai->ops->trigger()
 ```
-----------
 
-# 6. hw_params 在做什麼？
+## 6. hw_params 在做什麼？
 
 這是最重要的函式。
 
@@ -118,17 +108,14 @@ static int rockchip_i2s_hw_params(...)
 它負責：
 
 -   設定 sample rate
-    
+
 -   設定 bit width
-    
+
 -   設定 DMA buffer
-    
+
 -   設定 I2S frame format
-    
 
-----------
-
-# 7. I2S Clock 計算
+## 7. I2S Clock 計算
 
 I2S clock 組成：
 ```
@@ -146,18 +133,15 @@ BCLK = Sample Rate × Channels × BitWidth
 例如：
 
 -   48kHz
-    
+
 -   2 channel
-    
+
 -   16 bit
-    
 
 `BCLK = 48000 × 2 × 16
      = 1.536 MHz` 
 
-----------
-
-# 8. Master / Slave 問題
+## 8. Master / Slave 問題
 
 在 DAI link 中：
 
@@ -166,22 +150,18 @@ BCLK = Sample Rate × Channels × BitWidth
 表示：
 
 -   CPU bit clock slave
-    
+
 -   CPU frame slave
-    
 
 如果設定錯誤：
 
 -   聲音變雜音
-    
+
 -   完全沒聲音
-    
+
 -   clock 不同步
-    
 
-----------
-
-# 9. Codec Driver 是什麼？
+## 9. Codec Driver 是什麼？
 
 Codec driver 通常：
 
@@ -195,17 +175,15 @@ rt5651.c
 它負責：
 
 -   設定 DAC / ADC register
-    
+
 -   設定 mixer
-    
+
 -   設定 bias
-    
+
 -   定義 DAPM widgets
-    
 
-----------
+## 10. Codec Driver 結構
 
-# 10. Codec Driver 結構
 ```
 static struct snd_soc_component_driver soc_codec_dev_wm8960 = {
     .dapm_widgets = wm8960_dapm_widgets,
@@ -219,9 +197,8 @@ static struct snd_soc_dai_driver wm8960_dai = {
     .ops = &wm8960_dai_ops,
 };
 ```
-----------
 
-# 11. codec hw_params 在做什麼？
+## 11. codec hw_params 在做什麼？
 
 典型：
 ```
@@ -235,72 +212,64 @@ static int wm8960_hw_params(...)
 Codec 可能需要：
 
 -   設定 PLL
-    
+
 -   設定 internal clock divider
-    
+
 -   設定 oversampling
-    
 
-----------
-
-# 12. CPU DAI vs Codec DAI 誰是 clock master？
+## 12. CPU DAI vs Codec DAI 誰是 clock master？
 
 三種常見模式：
 
-### 1. CPU master
+### 12.1 CPU master
 
 CPU 提供 BCLK + LRCLK
 
-### 2. Codec master
+### 12.2 Codec master
 
 Codec 提供 BCLK
 
-### 3. External clock
+### 12.3 External clock
 
 例如 audio PLL
 
-----------
-
-# 13. 為什麼聲音會變成雜音？
+## 13. 為什麼聲音會變成雜音？
 
 通常原因：
 
 -   sample rate mismatch
-    
+
 -   BCLK 設錯
-    
+
 -   bit width mismatch
-    
+
 -   codec internal PLL 設錯
-    
 
 這些都發生在：
 
 `hw_params` 
 
-----------
+## 14. 常見問題與排查
 
-# 14. BSP Debug Clock Checklist
+### 14.1 BSP Debug Clock Checklist
 
-### Step 1
+#### Step 1
 
 `示波器量 BCLK` 
 
-### Step 2
+#### Step 2
 
 `量 LRCLK` 
 
-### Step 3
+#### Step 3
 
 `確認 sample rate` 
 
-### Step 4
+#### Step 4
 
 `確認 dai_fmt` 
 
-----------
-
-# 15. Driver 初始化流程
+## 15. Driver 初始化流程
 
 Probe 時：
 ```
@@ -316,9 +285,9 @@ i2c_probe
   ↓
 snd_soc_register_component()
 ```
-----------
 
-# 16. 完整播放流程
+## 16. 完整播放流程
+
 ```
 Machine driver 建立 link
   ↓
@@ -340,9 +309,8 @@ codec 開 DAC
   ↓
 speaker 輸出
 ```
-----------
 
-# 17. 心智模型總結
+## 17. 心智模型總結
 
 ASoC driver 成功條件：
 

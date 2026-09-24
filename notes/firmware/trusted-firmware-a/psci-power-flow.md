@@ -1,8 +1,4 @@
-
 # Trusted Firmware-A PSCI Power Flow 架構解析
-
-
-## 1. 前言
 
 在 Trusted Firmware-A（TF-A）所提供的所有 runtime services 中，  
 **PSCI（Power State Coordination Interface）是最核心、也最不可或缺的一項。**
@@ -26,9 +22,7 @@
 - Secure / Non-secure world 的責任分工
 - 為何 power 問題幾乎一定要 debug BL31
 
----
-
-## 2. 什麼是 PSCI？
+## 1. 什麼是 PSCI？
 
 PSCI 是 ARM 定義的一套標準介面，用於：
 
@@ -40,9 +34,7 @@ PSCI 是 ARM 定義的一套標準介面，用於：
 - 但 OS 不應直接操作 secure / platform 資源
 - 因此由 EL3（BL31）作為唯一仲裁者
 
----
-
-## 3. PSCI 在整體架構中的位置
+## 2. PSCI 在整體架構中的位置
 
 整體關係如下：
 ```
@@ -61,9 +53,7 @@ SoC power / clock / reset controller
 
 > **Non-secure world 永遠不直接碰 power controller。**
 
----
-
-## 4. PSCI 與 SMC 的關係
+## 3. PSCI 與 SMC 的關係
 
 PSCI 是透過 **SMC（Secure Monitor Call）** 進入 BL31。
 
@@ -82,9 +72,7 @@ platform power implementation
 
 BL31 會根據 SMC ID 判斷該呼叫是否屬於 PSCI，並進行分派。
 
----
-
-## 5. PSCI 支援的基本功能
+## 4. PSCI 支援的基本功能
 
 常見 PSCI function 包括：
 
@@ -96,9 +84,7 @@ BL31 會根據 SMC ID 判斷該呼叫是否屬於 PSCI，並進行分派。
 
 不同平台可支援的功能組合可能不同，但 API 定義是標準化的。
 
----
-
-## 6. 為什麼 CPU Power 必須由 BL31 處理？
+## 5. 為什麼 CPU Power 必須由 BL31 處理？
 
 原因包括：
 
@@ -111,9 +97,7 @@ BL31 會根據 SMC ID 判斷該呼叫是否屬於 PSCI，並進行分派。
 
 > **只有 EL3 才能安全地協調 CPU power 狀態。**
 
----
-
-## 7. PSCI 的責任分層模型
+## 6. PSCI 的責任分層模型
 
 PSCI 的實作可分為三層：
 ```
@@ -133,9 +117,7 @@ SoC hardware control
 TF-A 本身負責前兩層，
 最底層的實作由 platform code 提供。
 
----
-
-## 8. CPU_ON 的典型流程
+## 7. CPU_ON 的典型流程
 
 以 CPU_ON 為例，流程概念如下：
 ```
@@ -161,9 +143,7 @@ SoC power controller
 - entry point 通常是 secondary CPU boot code
 - secure / non-secure 狀態由 BL31 決定
 
----
-
-## 9. Secondary CPU 為何一定從 BL31 進入？
+## 8. Secondary CPU 為何一定從 BL31 進入？
 
 Secondary CPU 啟動時：
 
@@ -181,17 +161,15 @@ power on
 
 而不是直接跳進 kernel。
 
----
+## 9. CPU_OFF / CPU_SUSPEND 的差異
 
-## 10. CPU_OFF / CPU_SUSPEND 的差異
-
-### CPU_OFF
+### 9.1 CPU_OFF
 
 - CPU 完全關閉
 - context 不保留
 - 再次啟動需 CPU_ON
 
-### CPU_SUSPEND
+### 9.2 CPU_SUSPEND
 
 - CPU 進入低功耗狀態
 - context 可能被保存
@@ -202,9 +180,7 @@ BL31 必須確保：
 - secure context 正確保存 / 還原
 - non-secure world 無法破壞流程
 
----
-
-## 11. System Power State（SYSTEM_OFF / RESET）
+## 10. System Power State（SYSTEM_OFF / RESET）
 
 SYSTEM_OFF / RESET 代表：
 
@@ -226,9 +202,7 @@ Hardware reset
 
 此類操作**必須由 secure world 控制**。
 
----
-
-## 12. PSCI 與 BL31 Console 的關係
+## 11. PSCI 與 BL31 Console 的關係
 
 在實務 debug 中：
 
@@ -244,9 +218,7 @@ BL31 console 常用於：
 - 確認 power ops 是否執行
 - 分辨是 OS 問題或 platform 問題
 
----
-
-## 13. 常見 PSCI 問題類型
+## 12. 常見問題與排查（常見 PSCI 問題類型）
 
 實務上最常見的問題包括：
 
@@ -261,6 +233,3 @@ BL31 console 常用於：
 - BL31 platform power ops
 - power controller driver
 - memory / MMU context 保存
-
----
-

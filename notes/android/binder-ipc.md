@@ -1,10 +1,7 @@
-
 # Android Binder IPC 機制
 
 這份筆記說明 Android IPC（Inter-Process Communication）的核心機制 —— **Binder**。  
 它是 Android Framework、System Server、HAL 與應用程式之間的主要通訊管道。
-
----
 
 ## 1. Binder 架構概覽
 
@@ -26,7 +23,6 @@ Server (Service)
 | **User Space - Framework** | Java Binder / AIDL | 提供高層抽象（`IBinder`、`ServiceManager`） |
 | **User Space - Native** | libbinder.so | C++ API 封裝、序列化與交易發送 |
 | **Kernel Space** | binder.ko | Binder 核心驅動，負責 IPC 傳輸、引用計數與 thread 管理 |
----
 
 ## 2. Binder 核心元件
 
@@ -39,8 +35,6 @@ Server (Service)
 | **ProcessState / IPCThreadState** | libbinder | 管理 thread 與 Binder driver 溝通 |
 | **BinderTransactionData** | Kernel 結構 | 描述單次交易的內容與目標 |
 | **flat_binder_object** | Kernel 結構 | 表示一個 binder handler 或 file descriptor |
-
----
 
 ## 3. Binder Driver 核心資料流
 
@@ -58,7 +52,7 @@ Binder Driver
   ↓
 完成後回傳 binder_reply 給 client
 
-### 核心結構體
+### 3.1 核心結構體
 
 | 結構體 | 主要用途 |
 | --- | --- |
@@ -68,6 +62,7 @@ Binder Driver
 | `binder_node` / `binder_ref` | 用於跨程序的物件引用與生命週期管理。 |
 
 ## 4. 服務註冊與查找流程
+
 System Server 啟動 → 建立 ServiceManager
   ↓
 每個服務（如 ActivityManagerService）註冊自己：
@@ -78,7 +73,8 @@ Client 透過 getService("activity") 查詢 binder 引用
 ServiceManager 回傳目標 binder 的 handle
   ↓
 Client 持有 proxy (BpBinder)，透過 ioctl 與 Server 通訊
-### 操作與對應函式
+
+### 4.1 操作與對應函式
 
 | 操作 | 主要函式 | 備註 |
 | --- | --- | --- |
@@ -86,8 +82,6 @@ Client 持有 proxy (BpBinder)，透過 ioctl 與 Server 通訊
 | **查詢服務** | `getService()` → `binder_ioctl()` | Client 端向 ServiceManager 查詢服務 |
 | **IPC 呼叫** | `transact(code, data, reply)` | 以 transaction 為單位的 IPC 傳輸 |
 | **回應處理** | `onTransact()` / `reply.read*()` | Server 端回傳結果給 Client |
-
----
 
 **補充說明**
 - `ServiceManager` 是所有 Binder 服務的中央登錄機制。  
@@ -97,7 +91,9 @@ Client 持有 proxy (BpBinder)，透過 ioctl 與 Server 通訊
 service list
 dumpsys -l
 ```
+
 ## 5. Binder 通訊方向與記憶體映射
+
 Binder 透過共享記憶體 (mmap)與 `copy_from_user` / `copy_to_user`
 進行資料傳輸。  
 以下是整個傳輸路徑概覽:
@@ -114,9 +110,7 @@ Server thread 被喚醒，binder_read() 取出資料並反序列化
 ↓
 Server 處理後以 binder_reply 回傳結果給 Client
 
----
-
-### 傳輸階段對照表
+### 5.1 傳輸階段對照表
 
 | 階段 | 動作 | 備註 |
 | --- | --- | --- |
@@ -126,8 +120,6 @@ Server 處理後以 binder_reply 回傳結果給 Client
 | **Server 收到資料** | `binder_read()` 取出、反序列化 | 交由對應的 onTransact() 處理 |
 | **回傳結果** | `binder_reply()` → Client | 將處理結果返回給請求端 |
 
----
-
 **補充說明**
 - 每個進程在第一次使用 Binder 時，會 mmap 一段共享記憶體（通常 1MB）。  
 - Binder Driver 在不同進程間進行 **零拷貝共享傳輸**，只在必要時使用 `copy_from_user` / `copy_to_user`。  
@@ -135,14 +127,14 @@ Server 處理後以 binder_reply 回傳結果給 Client
 ```bash
 cat /proc/<pid>/maps | grep binder
 ```
+
 ## 6. AIDL / HIDL 與 Native Binder
+
 Android Binder IPC 在不同層級有多種實作方式。  
 它們的共通點是都透過 **Binder driver** 傳遞資料，  
 差異在於語言層級、生成工具與使用場景。
 
----
-
-### Binder IPC 類型比較
+### 6.1 Binder IPC 類型比較
 
 | 類型 | 使用層級 | 範例 | 特點 |
 | --- | --- | --- | --- |
@@ -151,9 +143,8 @@ Android Binder IPC 在不同層級有多種實作方式。
 | **AIDL (stable)** | HAL 層 (Android 12+) | `aidl_interface` in Soong | 新版取代 HIDL，支援版本穩定性與 backward 兼容。 |
 | **Native Binder (C++)** | System / Daemon 層 | `BpBinder`, `BBinder` | 直接使用 libbinder API 實作 client / server。 |
 
----
+### 6.2 AIDL 範例
 
-### AIDL 範例
 ```c
 IHelloService.aidl
 package com.example.hello;
@@ -169,9 +160,10 @@ interface IHelloService {
 | --- | --- |
 | `IHelloService` | 介面定義，描述可呼叫的方法。 |
 | `Stub` | Server 端實作，繼承自 `Binder`，負責接收與處理 transaction。 |
-| `Proxy` | Client 端代理，透過 `transact()` 將資料傳給 Server。 |----------
+| `Proxy` | Client 端代理，透過 `transact()` 將資料傳給 Server。 |
 
-### Native Binder (C++) 範例
+### 6.3 Native Binder (C++) 範例
+
 ```c
 server.cpp
 class HelloService : public BBinder {
@@ -191,15 +183,12 @@ binder->transact(0, data, &reply);
 ALOGI("%s", String8(reply.readString16()).string());
 ```
 
-----------
-
 **補充說明**
 
 -   **AIDL (stable)** 已取代 HIDL 成為新版 HAL IPC 標準。
 -   **Native Binder** 仍廣泛用於 system service、daemon，例如 `surfaceflinger`、`audioserver`。
 -   Framework Java Binder 與 native Binder 之間可以互通，透過同一個 `/dev/binder` 驅動。
 -   所有 IPC 都會經過 **ServiceManager** 註冊與查詢。
-
 
 ## 7. 常見 Debug 工具與節點
 
@@ -213,7 +202,6 @@ ALOGI("%s", String8(reply.readString16()).string());
 | `binder-stats` / `binder-proc` | 顯示 binder driver 的內部統計（交易數量、錯誤等）。 |
 | `strace -p <pid>` | 追蹤特定進程對 `/dev/binder` 的 ioctl 呼叫。 |
 | `perf trace -e binder:*` | 追蹤 Binder 事件（transaction、reply、thread activity）。 |
-
 
 ## 8. 常見問題與排查
 
@@ -240,7 +228,8 @@ cat /sys/kernel/debug/binder/proc/<pid>
 service list
 ```
 
-## 9. 學習與觀察建議
+## 9. 學習建議
+
 -   在裝置上執行：
 
 ```bash
@@ -255,7 +244,10 @@ dumpsys -l
     -   User space: `frameworks/native/libs/binder/`
 -   手寫一個簡單的 native binder 範例（client/server pair）以實際理解 transaction。
 
-**延伸閱讀**
+## 附錄
+
+### A. 延伸閱讀
+
 -   AOSP: `frameworks/native/libs/binder/`
 -   Kernel: `drivers/android/binder.c`
 -   `Documentation/dev-tools/binderfs.rst`

@@ -1,4 +1,3 @@
-
 # Linux Bus Subsystems（匯流排子系統）
 
 > 本章定位：
@@ -10,8 +9,6 @@
 > -   能實際用於 debug：driver 不 probe、順序錯誤、DTS 看起來對但裝置不起來
 >     
 
-----------
-
 ## 1. 為什麼要理解 Bus Subsystem
 
 在 Linux 中，driver **不是直接跟硬體綁定**，而是透過 bus 進行配對。
@@ -20,13 +17,10 @@
 
 -   driver bug 
 -   DTS 寫錯
-    
 
 但實際上常常是：
 
 > **對 bus 的角色與限制理解不足。**
-
-----------
 
 ## 2. Bus 在 Driver Model 中的角色
 
@@ -46,8 +40,6 @@ Bus 的責任不是資料傳輸細節，而是：
 
 **Bus 是 driver model 的調度層。**
 
-----------
-
 ## 3. Platform Bus：SoC 世界的核心
 
 ### 3.1 Platform bus 是什麼
@@ -55,7 +47,6 @@ Bus 的責任不是資料傳輸細節，而是：
 -   不可熱插拔
 -   裝置來自 DTS / ACPI
 -   幾乎所有 SoC IP 都掛在 platform bus
-    
 
 常見裝置：
 
@@ -63,8 +54,6 @@ Bus 的責任不是資料傳輸細節，而是：
 -   I2C controller
 -   SPI controller
 -   display / multimedia IP
-
-----------
 
 ### 3.2 Platform driver 的特性
 
@@ -74,8 +63,6 @@ Bus 的責任不是資料傳輸細節，而是：
 
 **大多數 BSP 問題都發生在 platform bus。**
 
-----------
-
 ## 4. PCI Bus：枚舉與資源分配
 
 ### 4.1 PCI 的關鍵特性
@@ -84,18 +71,13 @@ Bus 的責任不是資料傳輸細節，而是：
 -   kernel 枚舉裝置
 -   BAR / IRQ 由系統分配
 
-----------
-
 ### 4.2 PCI driver 行為特徵
 
 -   probe 順序相對穩定 
 -   資源衝突較少
 -   熱插拔支援良好
-    
 
 **PCI 問題多半不是 DTS，而是 driver 或 firmware。**
-
-----------
 
 ## 5. USB Bus：動態與使用者空間互動
 
@@ -105,15 +87,11 @@ Bus 的責任不是資料傳輸細節，而是：
 -   裝置在 runtime 出現
 -   user space 影響大
 
-----------
-
 ### 5.2 USB driver debug 心法
 
 -   確認 enumeration 是否完成
 -   區分 host / gadget 模式
 -   注意 power / reset 行為
-
-----------
 
 ## 6. I2C / SPI Bus：控制器與裝置的分離
 
@@ -124,8 +102,6 @@ Bus 的責任不是資料傳輸細節，而是：
 -   controller 本身是 platform device
 -   外掛裝置掛在 controller 之下
 
-----------
-
 ### 6.2 DTS 常見錯誤
 
 -   address / chip-select 錯誤
@@ -134,22 +110,18 @@ Bus 的責任不是資料傳輸細節，而是：
 
 **裝置不起來，多半是 bus 描述問題。**
 
-----------
-
 ## 7. Bus 與 Power / Reset / Clock 的關係
 
 -   bus 本身不管理 power 
 -   但會決定裝置何時 probe
-    
+
 如果：
 -   clock 尚未 ready
 -   reset 尚未 release
 
 probe 就會失敗或 defer。
 
-----------
-
-## 8. 常見 BSP 問題分類
+## 8. 常見問題與排查（常見 BSP 問題分類）
 
 | 現象             | 可能原因                              |
 |------------------|---------------------------------------|

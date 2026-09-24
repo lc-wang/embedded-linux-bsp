@@ -1,10 +1,10 @@
-# U-Boot Overview and Boot Flow 
+# U-Boot Overview and Boot Flow
+
 這份筆記整理 U-Boot (Universal Bootloader) 的主要架構與啟動流程，  
 說明 U-Boot 在 BSP 中的角色、常見命令、環境變數與 Kernel 交互方式。
 
----
-
 ## 1. 什麼是 U-Boot？
+
 - **U-Boot (Das U-Boot)** 是開源的嵌入式系統 bootloader。  
 - 負責 SoC 啟動後的第一階段初始化與作業系統載入。  
 - 支援多平台 (ARM / RISC-V / PowerPC / x86)。  
@@ -15,8 +15,6 @@
 | **SPL (Secondary Program Loader)** | 初始化記憶體 (DDR)、時鐘、PMIC |
 | **U-Boot Proper** | 提供命令列介面、載入 Kernel 或其他 OS |
 | **OS (Kernel)** | 接手系統控制，進入正常運行狀態 |
-
---- 
 
 ## 2. 啟動流程總覽
 
@@ -34,8 +32,8 @@ U-Boot 的啟動流程如下：
   ↓  
 [Linux Kernel Start]
 
---- 
 ## 3. SPL (Secondary Program Loader)
+
 - 位於 `spl/` 目錄，為精簡版 U-Boot。  
 - 功能：初始化最基本的硬體環境，使 U-Boot Proper 能運行。  
 - 常見任務：
@@ -48,8 +46,9 @@ U-Boot 的啟動流程如下：
 spl/u-boot-spl.bin  
 spl/u-boot-spl.elf
 ```
- --- 
- ## 4. U-Boot Proper
+
+## 4. U-Boot Proper
+
 U-Boot 主體程式，提供完整命令列與網路支援。
 
 | 功能 | 說明 |
@@ -59,7 +58,7 @@ U-Boot 主體程式，提供完整命令列與網路支援。
 | 檔案系統 | 支援 FAT, EXT4, UBIFS 等 |
 | 驅動模型 | 使用 Driver Model (DM) 與 Device Tree 初始化設備 |
 | 開機控制 | 透過 bootcmd、bootargs 控制 Kernel 啟動行為 | 
----
+
 ## 5. 重要環境變數
 
 | 變數 | 說明 |
@@ -72,7 +71,7 @@ U-Boot 主體程式，提供完整命令列與網路支援。
 | `fdtfile` | 指定要使用的 Device Tree 檔案 |
 | `ethaddr` | 以太網卡 MAC 位址 |
 | `stdin/stdout/stderr` | 控制輸入/輸出設備 (如串口、顯示) |
- ---
+
 ## 6. 常見指令
 
 | 指令 | 功能說明 |
@@ -87,9 +86,9 @@ U-Boot 主體程式，提供完整命令列與網路支援。
 | `bootm` | 啟動 legacy uImage (舊格式) |
 | `fatls / ext4ls` | 列出檔案系統內容 |
 | `help` | 顯示所有可用命令 |
- --- 
 
 ## 7. Device Tree 與 Kernel 傳遞
+
 - U-Boot 通常負責將 **Kernel Image** 與 **Device Tree (DTB)** 一起載入記憶體，  
 然後將兩者地址傳給 Kernel。
 - 典型流程：
@@ -101,9 +100,8 @@ booti ${kernel_addr_r} - ${fdt_addr_r}
 ```
 - 若使用 Android 平台，會改由 **boot.img** 與 **boot header** 控制。
 
-----------
-
 ## 8. Boot 流程控制實例
+
 ```bash
 # 顯示預設 boot 流程
 printenv bootcmd
@@ -114,9 +112,6 @@ setenv bootcmd 'mmc dev 0; load mmc 0:1 ${kernel_addr_r} Image; \
                 booti ${kernel_addr_r} - ${fdt_addr_r}'
 saveenv
 ```
-
-----------
-
 
 ## 9. U-Boot 與 Kernel 的互動
 
@@ -129,9 +124,6 @@ saveenv
 | **Firmware 介面** | 舊版平台使用 ATAGS，新版平台採用 Device Tree。 |
 | **Secure Boot 支援** | 可搭配 ARM TrustZone 驗證 Kernel 映像簽章。 |
 | **Android 特殊流程** | Android 平台以 `boot.img` 格式封裝 Kernel + ramdisk + header，由 bootloader 解析後載入。 |
-
-----------
-
 
 ## 10. 常見調試技巧
 
@@ -147,8 +139,6 @@ saveenv
 | `env default -a` | 重設所有環境變數為預設值（避免錯誤設定）。 |
 | `help` / `help <cmd>` | 查詢指令用途與參數說明。 |
 
-----------
-
 ## 11. 學習建議
 
 1.  在開發板上練習手動 boot：
@@ -162,10 +152,9 @@ booti ${kernel_addr_r} - ${fdt_addr_r}
 4.  編譯自定義 U-Boot，加入你自己的命令 (`cmd_*.c`)。
 5.  深入了解 SPL → U-Boot Proper → Kernel 的銜接。
     
+## 附錄
 
-----------
-
-**延伸閱讀**
+### A. 延伸閱讀
 
 -   [U-Boot 官方文件](https://u-boot.readthedocs.io/en/latest/)
 -   `Documentation/arm64/booting.txt`

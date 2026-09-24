@@ -1,5 +1,4 @@
-
-## MAC / PHY / MDIO 架構與運作
+# MAC / PHY / MDIO 架構與運作
 
 本章節重點：
 
@@ -8,8 +7,6 @@
 -   phylib 如何管理 PHY
 -   link up / negotiation flow
 -   bring-up 與 debug 方法
-
-----------
 
 ## 1. Ethernet 硬體分層
 
@@ -23,11 +20,9 @@ PHY (physical layer chip)
 RJ45 / cable
 ```
 
-----------
-
 ## 2. MAC vs PHY 分工
 
-### MAC（Media Access Controller）
+### 2.1 MAC（Media Access Controller）
 
 寫 driver 的地方（stmmac / fec）
 
@@ -40,9 +35,7 @@ descriptor ring
 interrupt
 ```
 
-----------
-
-### PHY（Physical Layer）
+### 2.2 PHY（Physical Layer）
 
 外部晶片（Realtek / Marvell / TI）
 
@@ -55,15 +48,14 @@ speed / duplex
 cable detection
 ```
 
-----------
-
 ## 3. MAC 與 PHY 的連線（phy-mode）
+
 ```
 phy-mode 決定 MAC 與 PHY 之間「如何傳輸資料」
 ```
 
-### 常見模式：  
-  
+### 3.1 常見模式：
+
 | 模式 | 說明 | 速度 | 使用場景 |  
 |-------|-------------------------|----------|----------------------|  
 | MII | 傳統 parallel bus | 100 Mbps | 舊設備 |  
@@ -71,17 +63,15 @@ phy-mode 決定 MAC 與 PHY 之間「如何傳輸資料」
 | RGMII | Reduced Gigabit | 1 Gbps | 最常見（SoC） |  
 | SGMII | Serial（SerDes） | 1 Gbps+ | 高速 / switch |
 
-### 各模式直覺理解
+### 3.2 各模式直覺理解
 
-### MII
+#### MII
 
 ```
 很多線（data + clock）簡單但腳位多
 ```
 
-----------
-
-### RMII
+#### RMII
 
 ```
 減少腳位（2-bit data）需要 reference clock（50MHz）
@@ -92,9 +82,7 @@ phy-mode 決定 MAC 與 PHY 之間「如何傳輸資料」
 -   MCU
 -   低成本平台
 
-----------
-
-### RGMII
+#### RGMII
 
 ```
 4-bit data（DDR）125MHz clock
@@ -111,9 +99,8 @@ phy-mode 決定 MAC 與 PHY 之間「如何傳輸資料」
 ```
 clock 與 data 需要 delay（skew）
 ```
-----------
 
-### SGMII
+#### SGMII
 
 ```
 高速 serial（類似 PCIe）
@@ -124,7 +111,6 @@ clock 與 data 需要 delay（skew）
 -   switch
 -   high-speed PHY
 -   DSA CPU port
-----------
 
 DTS：
 
@@ -137,8 +123,6 @@ phy-mode = "rgmii";
 ```
 link up 但不能傳或 完全沒有 link
 ```
-
-----------
 
 ## 4. MDIO 是什麼？
 
@@ -157,27 +141,22 @@ PHY register
 控制 link / speed / status
 ```
 
-----------
-
-### MDIO 類似：
+### 4.1 MDIO 類似：
 
 ```
 "Ethernet 專用的 I2C"
 ```
 
-----------
-
 ## 5. PHY Register（Clause 22）
-  
+
 | Register | 功能 |  
 |----------|---------------------|  
 | 0 | BMCR（control） |  
 | 1 | BMSR（status） |  
 | 4 | Advertisement |  
 | 5 | Link partner |
-----------
 
-### 範例：讀 PHY
+### 5.1 範例：讀 PHY
 
 ```
 mdio-tool read eth0 1 0
@@ -189,8 +168,6 @@ mdio-tool read eth0 1 0
 ethtool eth0
 ```
 
-----------
-
 ## 6. phylib（Linux PHY framework）
 
 ```
@@ -201,9 +178,7 @@ phylib
 PHY driver
 ```
 
-----------
-
-### driver 通常做：
+### 6.1 driver 通常做：
 
 ```
 phy_connect(dev, phy_name, handler, flags, interface);
@@ -215,9 +190,7 @@ phy_connect(dev, phy_name, handler, flags, interface);
 of_phy_connect()
 ```
 
-----------
-
-### phylib 負責：
+### 6.2 phylib 負責：
 
 ```
 auto negotiation
@@ -225,8 +198,6 @@ link state machine
 speed/duplex update
 callback driver
 ```
-
-----------
 
 ## 7. Link up flow
 
@@ -240,9 +211,7 @@ callback driver
 7. MAC enable TX/RX
 ```
 
-----------
-
-### Kernel log
+### 7.1 Kernel log
 
 ```
 dmesg | grep eth
@@ -253,8 +222,6 @@ dmesg | grep eth
 ```
 eth0: Link is Up - 1000Mbps/Full
 ```
-
-----------
 
 ## 8. PHY state machine
 
@@ -268,15 +235,11 @@ AN（auto-negotiation）
 RUNNING
 ```
 
-----------
-
-### kernel 內部：
+### 8.1 kernel 內部：
 
 ```
 phy_state_machine()
 ```
-
-----------
 
 ## 9. DTS 描述
 
@@ -294,15 +257,11 @@ mdio {
 };
 ```
 
-----------
-
-### 重點
+### 9.1 重點
 
 ```
 reg = <1>  → PHY address
 ```
-
-----------
 
 ## 10. Bring-up Flow
 
@@ -315,54 +274,41 @@ reg = <1>  → PHY address
 6. link up
 ```
 
-----------
-
 ## 11. Debug Playbook
 
-### PHY 有沒有抓到？
+### 11.1 PHY 有沒有抓到？
 
 ```
 dmesg | grep phy
 ```
 
-----------
-
-### MDIO 有沒有動？
+### 11.2 MDIO 有沒有動？
 
 ```
 dmesg | grep mdio
 ```
 
-----------
-
-### link 狀態
+### 11.3 link 狀態
 
 ```
 ethtool eth0
 ```
 
-----------
-
-### PHY register
+### 11.4 PHY register
 
 ```
 mdio-tool dump eth0 1
 ```
 
-----------
-
-### driver
+### 11.5 driver
 
 ```
 ethtool -i eth0
 ```
 
-----------
+## 12. 常見問題與排查
 
-## 12. 常見錯誤
-
-
-### 沒有 PHY
+### 12.1 沒有 PHY
 
 ```
 No PHY found
@@ -374,9 +320,7 @@ No PHY found
 -   MDIO bus
 -   PHY address
 
-----------
-
-### link down
+### 12.2 link down
 
 檢查：
 
@@ -386,9 +330,7 @@ switch
 PHY power/reset
 ```
 
-----------
-
-### link up 但不通
+### 12.3 link up 但不通
 
 90% 是：
 
@@ -397,9 +339,7 @@ phy-mode 錯
 RGMII delay 沒設
 ```
 
-----------
-
-### intermittent link
+### 12.4 intermittent link
 
 檢查：
 
@@ -408,8 +348,6 @@ clock
 reset timing
 power
 ```
-
-----------
 
 ## 13. debug 觀點
 
@@ -421,9 +359,7 @@ debug 時要分清：
 還是 MDIO？
 ```
 
-----------
-
-### 判斷方式：
+### 13.1 判斷方式：
 
 | 現象 | 問題層 |  
 |------------------|---------------|  
@@ -431,4 +367,3 @@ debug 時要分清：
 | PHY 抓不到 | MDIO |  
 | link 不上 | PHY |  
 | link 上但不通 | MAC / phy-mode|
-

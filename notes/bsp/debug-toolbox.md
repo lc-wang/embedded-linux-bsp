@@ -1,4 +1,3 @@
-
 # Kernel Debug Toolbox
 
 > 目的：提供一個**可反覆套用**的 Kernel Debug 入口，讓工程師在 bring-up、線上異常、效能退化時，**用最少成本選對工具、走對路徑**。
@@ -12,9 +11,9 @@
 > -   每一步都要能**否定假設**（debug 是排除法）
 >     
 
-----------
-## 0. 快速入口
-### 現象 → 第一工具
+## 1. 快速入口
+
+### 1.1 現象 → 第一工具
 
 | 現象                     | 第一工具                 | 為什麼                                     |
 |--------------------------|--------------------------|--------------------------------------------|
@@ -32,10 +31,8 @@
 > -   不要沒證據就懷疑硬體
 >     
 
-----------
+## 2. Debug 層級模型
 
-
-## 1. Debug 層級模型
 ```yaml
 [ User Space ] app / service / framework
 
@@ -60,11 +57,9 @@
 -   上層症狀 ≠ 下層錯誤 
 -   Kernel debug 的第一步是：**定位哪一層在違反合約**
     
-----------
+## 3. Logging：最低成本、但要節制
 
-## 2. Logging：最低成本、但要節制
-
-### 2.1 printk / dmesg（Baseline）
+### 3.1 printk / dmesg（Baseline）
 
 -   適用：功能是否走到、錯誤碼、一次性事件
 -   風險：
@@ -78,28 +73,26 @@ dmesg -wT
 -   只在關鍵路徑打
 -   一律加明確 prefix（driver / module）
     
-
-### 2.2 Dynamic Debug（取代亂加 printk）
+### 3.2 Dynamic Debug（取代亂加 printk）
 
 -   適用：driver / subsystem   
 -   優點：runtime 開關、不需重編
     
+#### 查詢可用點
 
-# 查詢可用點
 ```bash
 ls /sys/kernel/debug/dynamic_debug/
 ```
   
+#### 針對檔案開
 
-# 針對檔案開
 ```bash
 echo 'file drivers/foo/bar.c +p' > /sys/kernel/debug/dynamic_debug/control
 ```
-----------
 
-## 3. Trace：當需要「時間順序」
+## 4. Trace：當需要「時間順序」
 
-### 3.1 ftrace / tracefs（核心工具）
+### 4.1 ftrace / tracefs（核心工具）
 
 **什麼時候一定要用 ftrace？**
 
@@ -110,6 +103,7 @@ echo 'file drivers/foo/bar.c +p' > /sys/kernel/debug/dynamic_debug/control
 ```bash
 mount -t tracefs nodev /sys/kernel/tracing
 ```
+
 #### 常用 tracer
 
 -   `function_graph`：看 call flow
@@ -124,11 +118,10 @@ echo do_suspend+0 > set_ftrace_filter
 > 
 > -   **先縮範圍，再開 tracer**
 > -   trace buffer 不是越大越好
-----------
 
-## 4. Crash / Reboot
+## 5. Crash / Reboot
 
-### 4.1 pstore / ramoops（必開）
+### 5.1 pstore / ramoops（必開）
 
 -   適用：reboot / panic / watchdog
 -   原理：把 crash log 存在 RAM
@@ -140,19 +133,22 @@ ls /sys/fs/pstore/
 -   panic vs reboot
 -   last message 在哪個 subsystem  
 
-### 4.2 Magic SysRq（還活著時）
+### 5.2 Magic SysRq（還活著時）
+
 ```bash
 echo 1 > /proc/sys/kernel/sysrq
 ```
-# dump task state
+
+#### dump task state
+
 ```bash
 echo t > /proc/sysrq-trigger
 ```
-----------
 
-## 5. Performance
+## 6. Performance
 
-### 5.1 perf（CPU / Cache / Lock）
+### 6.1 perf（CPU / Cache / Lock）
+
 ```bash
 perf top
 
@@ -165,16 +161,15 @@ perf report
 -   CPU idle ≠ 沒問題  
 -   要搭配 scheduler trace
     
+### 6.2 PSI（Resource Pressure）
 
-### 5.2 PSI（Resource Pressure）
 ```bash
 cat /proc/pressure/memory
 
 cat /proc/pressure/cpu
 ```
-----------
 
-## 6. Memory：不是只有 OOM
+## 7. Memory：不是只有 OOM
 
 -   `/proc/meminfo`
 -   `/sys/fs/cgroup/*/memory.*`
@@ -185,11 +180,10 @@ cat /proc/pressure/cpu
 -   reclaim 發生在哪一層
    -   是 kernel pressure 還是 Android policy
     
-----------
+## 8. Symbol / Address
 
-## 7. Symbol / Address
+### 8.1 kallsyms / vmlinux
 
-### 7.1 kallsyms / vmlinux
 ```bash
 cat /proc/kallsyms | grep foo
 
@@ -198,9 +192,7 @@ addr2line -e vmlinux 0xffffff...
 -   沒 vmlinux = debug 斷腿    
 -   記得保留 build artifacts
 
-----------
-
-## 8. 硬體輔助
+## 9. 硬體輔助
 
 -   GPIO toggle（驗證路徑有沒有跑到） 
 -   Scope / LA（驗證 timing / power）
@@ -209,12 +201,12 @@ addr2line -e vmlinux 0xffffff...
 > 
 > -   軟體證據不足才動硬體
 
-## 9. Debug 決策樹
+## 10. Debug 決策樹
+
 ```yaml
 現象 → 分類 → 最小工具 → 排除假設 → 縮小範圍 → 深入
 ```
-----------
 
-## 10. 敘事
+## 11. 敘事
 
 > 「會先判斷是 functional 還是 timing 問題， functional 用 dynamic debug， timing 直接上 ftrace， reboot 則一定先看 pstore， 避免一開始就改 code。」
