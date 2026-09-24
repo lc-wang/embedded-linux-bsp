@@ -31,14 +31,14 @@ SYSCALL_DEFINE3(finit_module)
 ```
 finit_module()
 └─ load_module()
-├─ layout_and_allocate()
-├─ copy_module_from_user()
-├─ simplify_symbols()
-├─ resolve_symbols()
-├─ module_finalize()
-└─ do_init_module()
-└─ do_one_initcall()
-└─ hello_init()
+   ├─ layout_and_allocate()
+   ├─ copy_module_from_user()
+   ├─ simplify_symbols()
+   ├─ resolve_symbols()
+   ├─ module_finalize()
+   └─ do_init_module()
+      └─ do_one_initcall()
+         └─ hello_init()
 ```
 
 ## 4. 為什麼所有 driver 都長一樣？

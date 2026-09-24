@@ -136,8 +136,10 @@ PCIe 是 **DMA-based ring architecture**：
 
 ### 3.2 PCIe 資料流概觀
 
-`Host memory  (TX/RX rings) ⇄ DMA
-Dongle firmware` 
+```
+Host memory  (TX/RX rings) ⇄ DMA
+Dongle firmware
+```
 
 -   TX：填 ring entry → doorbell
     
