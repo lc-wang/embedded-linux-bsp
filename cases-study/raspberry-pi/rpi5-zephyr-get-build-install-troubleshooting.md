@@ -6,8 +6,6 @@
 
 本文以 BSP / Embedded Linux 工程師視角整理，重點不是 Zephyr API 教學，而是如何把 Zephyr 在 Raspberry Pi 5 上實際跑起來。
 
-----------
-
 ## 2. 環境與前置條件
 
 ### 2.1 Host
@@ -46,8 +44,6 @@ zephyr/
 
 ```
 
-----------
-
 ## 3. 安裝 Host 端相依套件
 
 ```bash
@@ -78,8 +74,6 @@ sudo apt update
 sudo apt install python3.12 python3.12-venv python3.12-dev
 
 ```
-
-----------
 
 ## 4. 建立 Python venv 與安裝 west
 
@@ -115,8 +109,6 @@ Python 3.12.x
 
 ```
 
-----------
-
 ## 5. 取得 Zephyr source tree
 
 Zephyr 不建議只用 `git clone` 主 repo，因為它需要許多 modules。建議使用 `west init` / `west update`。
@@ -146,8 +138,6 @@ cd zephyr
 pip install -r scripts/requirements.txt
 
 ```
-
-----------
 
 ## 6. 安裝 Zephyr SDK
 
@@ -212,8 +202,6 @@ sudo udevadm control --reload
 
 > Note: SDK 0.17.x 的路徑是 `sysroots/...`，SDK 1.0.x 的 host tools 路徑可能是 `hosttools/sysroots/...`。實際請以解壓後目錄為準。
 
-----------
-
 ## 7. Build Raspberry Pi 5 hello_world
 
 進入 Zephyr repo：
@@ -265,8 +253,6 @@ Raspberry Pi 5 firmware 開機時會載入：
 zephyr.bin
 
 ```
-
-----------
 
 ## 8. 安裝到 microSD boot partition
 
@@ -359,8 +345,6 @@ cat /mnt/SDK1/config.txt
 
 > `cmdline.txt` 主要是 Linux kernel 使用。Zephyr boot 時主要由 Raspberry Pi firmware 根據 `config.txt` 載入 `zephyr.bin`。
 
-----------
-
 ## 9. 驗證
 
 ### 9.1 執行 blinky 驗證 Zephyr boot flow
@@ -387,8 +371,6 @@ Raspberry Pi firmware 成功載入 zephyr.bin
 Zephyr runtime 成功執行
 
 ```
-
-----------
 
 ### 9.2 目前結論
 
@@ -421,8 +403,6 @@ Raspberry Pi 5 的 GPIO14/GPIO15 屬於 RP1 I/O controller UART0，
 也就是 Pi 5 專用 debug UART connector。
 
 ```
-
-----------
 
 ## 10. 常見問題與排查（Troubleshooting）
 
@@ -472,8 +452,6 @@ pip install -r scripts/requirements.txt
 
 ```
 
-----------
-
 ### 10.2 Python version too old
 
 錯誤：
@@ -503,8 +481,6 @@ pip install -r zephyr/scripts/requirements.txt
 
 ```
 
-----------
-
 ### 10.3 Could not find Zephyr-sdk
 
 錯誤：
@@ -533,8 +509,6 @@ Install host tools [y/n]? y
 Register Zephyr SDK CMake package [y/n]? y
 
 ```
-
-----------
 
 ### 10.4 Zephyr SDK version incompatible
 
@@ -575,8 +549,6 @@ cd zephyr-sdk-1.0.0-rc1
 
 ```
 
-----------
-
 ### 10.5 Devicetree overlay file exists but build says No such file
 
 錯誤：
@@ -611,8 +583,6 @@ west build -p always -b rpi_5 samples/hello_world \
   -DDTC_OVERLAY_FILE=~/zephyr/zephyr/app-overlays/rpi5-gpio-uart.overlay
 
 ```
-
-----------
 
 ### 10.6 GPIO14/GPIO15 沒有 hello_world console output
 
@@ -658,8 +628,6 @@ zephyr,console = &uart10;
 3. 若要使用 GPIO14/GPIO15，需要補 RP1 UART0 的 Zephyr devicetree / driver support
 
 ```
-
-----------
 
 ### 10.7 Serial console 注意事項
 
@@ -773,8 +741,6 @@ Zephyr:
 
 所以 `enable_uart=1` 與 `dtoverlay=disable-bt` 能讓 Debian/Linux 使用 GPIO14/GPIO15，但不會自動讓 Zephyr console 改到 GPIO14/GPIO15。
 
-----------
-
 ## 附錄
 
 ### A. 切回 Raspberry Pi OS / Debian
@@ -805,8 +771,6 @@ dtoverlay=disable-bt
 console=serial0,115200 console=tty1 root=PARTUUID=45110d0a-02 rootfstype=ext4 fsck.repair=yes rootwait
 
 ```
-
-----------
 
 ### B. 常用指令摘要
 

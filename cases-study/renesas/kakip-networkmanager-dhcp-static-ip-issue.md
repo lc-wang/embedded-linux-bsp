@@ -18,9 +18,6 @@ Kakip 開發板接上 switch 後，網路介面 `end0` 無法取得 lab network 
     
 -   ping gateway 失敗
     
-
-----------
-
 ### 1.2 問題現象
 
 #### 1.2.1 IP 狀態
@@ -39,7 +36,6 @@ $ ip route
     
 -   ✗ 無 gateway
     
-
 #### 1.2.3 ARP / Neighbor
 ```
 $ ip neigh
@@ -58,7 +54,6 @@ $ ping 198.51.100.1
 
 Destination Host Unreachable
 ```
-----------
 
 ## 2. 系統環境
 
@@ -78,9 +73,6 @@ Destination Host Unreachable
         
     -   `udhcpc` ✗
         
-
-----------
-
 ## 3. 除錯過程
 
 ### 3.1 實體網路確認
@@ -102,8 +94,6 @@ TX packets: normal
 ```
 ✓ PHY 正常 ✓ RJ45 正常 ✓ switch port 有流量
 
-----------
-
 ### 3.2 問題分析
 
 #### 3.2.1 關鍵線索
@@ -118,14 +108,12 @@ ipv4.method: manual
 
 ipv4.addresses: 198.51.100.10/24
 ```
-----------
 
 ## 4. Root Cause 分析（根本原因）
 
 > **NetworkManager 被設定為 Static IP（manual），導致 DHCP 完全沒有啟動。**
 
 因此出現以下連鎖問題：
-
 
 | 現象                     | 原因說明                           |
 |--------------------------|------------------------------------|
@@ -134,9 +122,6 @@ ipv4.addresses: 198.51.100.10/24
 | ARP 表為空               | IP 不屬於實際 L2 網段              |
 | ping 失敗                | 與實際 Switch / VLAN 不相符        |
 | 無法取得 192.0.2.x       | DHCP client 根本未執行             |
-
-
-----------
 
 ## 5. 解決方案
 
@@ -152,7 +137,6 @@ ipv4.gateway "" \
 
 ipv4.dns ""
 ```
-----------
 
 ### 5.2 重新啟用連線
 ```
@@ -160,7 +144,6 @@ sudo nmcli connection down "有線接続 1"
 
 sudo nmcli connection up "有線接続 1"
 ```
-----------
 
 ### 5.3 驗證結果
 ```
@@ -176,8 +159,6 @@ default via 192.0.2.1 dev end0
 ```
 ✓ 成功取得 DHCP IP
 
-----------
-
 ## 6. 結論與建議
 
 ### 6.1 最終狀態
@@ -190,9 +171,6 @@ default via 192.0.2.1 dev end0
     
 -   Gateway、ARP、routing table 全部正常
     
-
-----------
-
 ### 6.2 問題總結
 
 #### 不是以下問題：
@@ -207,7 +185,6 @@ default via 192.0.2.1 dev end0
     
 -   ✗ 非 DHCP server 故障
     
-
 #### 真正原因：
 
 > **NetworkManager connection profile 被設定為 static IP（manual）。**

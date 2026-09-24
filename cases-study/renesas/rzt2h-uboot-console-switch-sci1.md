@@ -12,7 +12,6 @@
     
 -   U-Boot
     
-
 皆預設使用 **SCI0** 作為開機序列主控台（boot console）。
 
 然而在實際硬體設計上：
@@ -21,10 +20,7 @@
     
 -   Debug UART 實際連接於 **SCI1**
     
-
 因此需將 **U-Boot console 由 SCI0 改為 SCI1**，以便在 TF-A 後仍可持續看到 UART 訊息。
-
-----------
 
 ### 1.2 修改目標
 
@@ -35,8 +31,6 @@
 | TX pin          | P27_5         | P11_1         |
 | RX pin          | P27_4         | P11_0         |
 | U-Boot console  | ttySC0        | ttySC1        |
-
-----------
 
 ## 2. 除錯過程
 
@@ -60,23 +54,17 @@ sci1: serial@80005400 {
 };
 ```
 
-----------
-
 #### 2.1.2 指定 serial0 alias
 
 `aliases {
         serial0 = &sci1;
 };` 
 
-----------
-
 #### 2.1.3 啟用 SCI1
 
 `&sci1 {
         status = "okay";
 };` 
-
-----------
 
 ### 2.2 問題現象
 
@@ -86,8 +74,6 @@ sci1: serial@80005400 {
     
 -   進入 U-Boot 後 **完全沒有任何 UART 訊息**
 
-----------
-
 ## 3. Root Cause 分析
 
 ### 3.1 問題根因分析
@@ -95,8 +81,6 @@ sci1: serial@80005400 {
 #### 3.1.1 關鍵原因：
 
 **U-Boot serial driver 並不支援該 compatible 字串。**
-
-----------
 
 #### 3.1.2 實際使用的 driver
 
@@ -112,8 +96,6 @@ sci1: serial@80005400 {
 "renesas,rsci"
 ```
 
-----------
-
 #### 3.1.3 SCI1 DTS 使用的 compatible
 
 ```
@@ -123,8 +105,6 @@ sci1: serial@80005400 {
 
 上述兩者 **皆未被 serial_sh driver 支援**。
 
-----------
-
 #### 3.1.4 結果
 
 -   SCI1 節點存在
@@ -133,7 +113,6 @@ sci1: serial@80005400 {
     
 -   clock / reg 正確
     
-
 但：
 
 > **U-Boot 找不到可 bind 的 serial driver**
@@ -145,8 +124,6 @@ console = none
 ```
 
 導致 UART 無任何輸出。
-
-----------
 
 ### 3.2 為什麼 SCI0 一開始可以正常工作？
 
@@ -160,8 +137,6 @@ sci0: serial@80005000 {
 此 compatible **正好被 serial_sh driver 支援**。
 
 SCI1 若未使用相同 compatible，U-Boot 將完全無法識別。
-
-----------
 
 ## 4. 解決方案（正確修正方式）
 
@@ -184,8 +159,6 @@ sci1: serial@80005400 {
         status = "disabled";
 };
 ```
-
-----------
 
 ### 4.2 修改後結果
 

@@ -16,8 +16,6 @@
         
     -   修正顏色後：顯示比例被拉伸（aspect ratio 不正確）
 
-----------
-
 ## 2. 系統環境
 
 -   SoC：Rockchip RK3588
@@ -30,9 +28,6 @@
     
 -   測試影片：H.264 MP4 (BT.709, limited range)
     
-
-----------
-
 ## 3. 除錯過程
 
 ### 3.1 問題一：Kiosk mode 下畫面顏色偏暗
@@ -54,7 +49,6 @@ gst-launch-1.0 filesrc location=./480p_demo.mp4 ! \
     
 -   但整體亮度偏低、畫面發暗
     
-
 ### 3.2 問題二：嘗試 RGB / full-range 導致黑畫面
 
 #### 3.2.1 嘗試的 pipeline
@@ -73,7 +67,6 @@ gst-launch-1.0 filesrc location=./480p_demo.mp4 ! \
     
 -   顯示比例異常
     
-
 ### 3.3 問題三：顯示比例（Aspect Ratio）不正確
 
 #### 3.3.1 現象
@@ -84,9 +77,6 @@ gst-launch-1.0 filesrc location=./480p_demo.mp4 ! \
     
 -   原始比例未被保留
     
-
-----------
-
 ## 4. Root Cause 分析
 
 ### 4.1 問題一：成因分析
@@ -107,7 +97,6 @@ gst-launch-1.0 filesrc location=./480p_demo.mp4 ! \
         
     -   **不保證套用 gamma / color correction**
         
-
 結果為：
 
 > limited-range YUV buffer 被直接輸出，視覺上呈現為整體偏暗。
@@ -128,7 +117,6 @@ gst-launch-1.0 filesrc location=./480p_demo.mp4 ! \
         
     -   plane fallback 行為不完整
         
-
 此行為在 desktop mode 下可能被 compositor 掩蓋，但在 kiosk mode 會直接暴露。
 
 ### 4.3 問題三：原因分析
@@ -143,9 +131,6 @@ gst-launch-1.0 filesrc location=./480p_demo.mp4 ! \
         
 -   Desktop mode 則由 compositor 負責比例處理，因此行為不同。
     
-
-----------
-
 ## 5. 解決方案
 
 ### 5.1 顏色修正的正確做法
@@ -168,12 +153,10 @@ gst-launch-1.0 filesrc location=./480p_demo.mp4 ! \
     
 -   符合 DRM overlay plane 的實際支援能力
     
-
 結果：
 
 -   kiosk mode 下顏色顯示正常
     
-
 ### 5.2 問題三：正確解法
 
 #### 5.2.1 使用 videobox 預先處理比例

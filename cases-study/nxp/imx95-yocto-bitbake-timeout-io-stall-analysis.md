@@ -77,7 +77,6 @@ Yocto 需要：
 -   產生 sysroot staging
 -   將編譯結果同步進 tmp/work 與 sstate
     
-
 **這些是最不適合放在外接 HDD/SSD（尤其是 USB 3.x 接口）的位置**  
 → 會造成非常明顯的 I/O stall。
 

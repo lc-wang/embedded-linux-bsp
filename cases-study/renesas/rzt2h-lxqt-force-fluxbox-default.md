@@ -12,7 +12,6 @@
     
 -   Display manager 使用 **SLiM（autologin）**
     
-
 但在 **第一次開機登入時**，畫面會出現：
 
 `Please select  a window manager` 
@@ -27,7 +26,6 @@
     
 -   Others
     
-
 此選擇視窗在 production image 與部署情境中不可接受，必須：
 
 > 開機即自動進入 **LXQt + fluxbox**  
@@ -37,8 +35,6 @@
 
 在第一次登入 LXQt 時，系統顯示 window manager chooser。  
 若未設定預設 WM，LXQt 會要求使用者手動選擇一次。
-
-----------
 
 ## 2. 解決方案
 
@@ -63,23 +59,17 @@ EOF
     
 -   ✓ 對所有使用者生效（system default）
     
-
-----------
-
 ### 2.2 為什麼這個解法有效
 
 LXQt session 在啟動時會讀取系統設定：
 
 -   `/etc/xdg/lxqt/session.conf`
     
-
 若其中包含：
 
 `[General]  window_manager=fluxbox` 
 
 LXQt 就能直接決定 WM，不會進入「請使用者選擇」的流程。
-
-----------
 
 ### 2.3 實作注意事項（避免復發）
 
@@ -92,17 +82,13 @@ LXQt 就能直接決定 WM，不會進入「請使用者選擇」的流程。
     
 -   `sync` 後再寫入（確保落盤）
     
-
 #### 2.3.2 不要刪除 fluxbox 的 session 檔（建議）
 
 為了避免系統缺少必要的 desktop/session 定義，建議**不要刪除**：
 
 -   `/usr/share/xsessions/fluxbox.desktop`
     
-
 （除非你確定 system 流程完全不依賴它）
-
-----------
 
 ### 2.4 驗證方式
 
@@ -116,18 +102,14 @@ LXQt 就能直接決定 WM，不會進入「請使用者選擇」的流程。
 
 並確認登入時不再出現選擇視窗。
 
-----------
-
 ## 3. 結論與建議
 
 透過在 image 端建立：
 
 -   `/etc/xdg/lxqt/session.conf`
     
-
 並指定：
 
 -   `window_manager=fluxbox`
     
-
 即可確保 LXQt 在第一次開機登入時直接使用 fluxbox，不需使用者手動選擇。

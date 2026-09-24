@@ -21,7 +21,6 @@
 -   BL2_BP 實際寫在 **LBA 1 開始，而非 LBA 0**
 -   FIP 必須寫在 **LBA 768**
 -   FAT / EXT4 partition 位置需與 WIC 完全一致
-----------
 
 ## 2. 除錯過程
 
@@ -38,8 +37,6 @@ RZ/T2H eSD boot 的 boot chain：
 | FIP | 768 | 768 × 512 = 0x60000 | 固定位置，由 TF-A 設定 |
 
 **ROM 不從 LBA0 開始載入 BootParam！而是從 LBA1載入 BootParam。**
-
-----------
 
 ### 2.2 RZ/T2H Boot Flow（eSD Boot）
 
@@ -58,10 +55,8 @@ I --> J["Load Linux Kernel/Image"]
 J --> K["Mount rootfs from ext4 partition"]
 K --> L["Boot Completed"]
 ```
-----------
 
 ### 2.3 Yocto WIC Layout 深入分析
-
 
 #### 實際輸出 `.wic` 結構（使用 `wic ls`）
 
@@ -71,7 +66,6 @@ K --> L["Boot Completed"]
 | rawcopy #2 (FIP) | 768 | variable | raw |
 | p1 | 4096 | 19.7M | FAT32 |
 | p2 | 44536 | 約 1.6G | EXT4 |
-----------
 
 ### 2.4 使用 fdisk / wic / xxd 比對 Yocto 與自製 image
 
@@ -87,7 +81,6 @@ fdisk -l core-image*.wic`
 xxd -s 0 -l 16`：
 0x00000000:  fab8  0010 8ed0  bc00  ...
 ```
-
 
 → 前面不是 0，也不是 bl2_bp，表示 Yocto WIC **並沒有把 BL2_BP 放在 LBA0**。
 
@@ -117,8 +110,6 @@ xxd -s $((1*512)) -l 16 wic.img
 ✓ BootParam 起始 LBA = **1**  
 ✓ LBA0 不是 bootloader，而是 WIC header
 
-----------
-
 ### 2.5 Debug Problem Timeline
 
 #### 問題 1：不能開機（因為 BL2_BP 寫錯 offset）
@@ -133,9 +124,6 @@ dd  if=bl2_bp_esd.bin of=$loop_dev conv=notrunc
 -   Yocto `.wic` 有 WIC metadata header → 前面不是 empty
 -   ROM 不從 LBA0 boot，從 **LBA1** boot
     
-
-----------
-
 #### 問題 2：FIP offset 錯誤
 
 探勘 offset：
@@ -143,8 +131,6 @@ dd  if=bl2_bp_esd.bin of=$loop_dev conv=notrunc
 xxd -s $((768*512)) -l 16 core-image*.wic`
 ```
 → 發現 FIP 在 LBA 768 → script 修正後正常。
-
-----------
 
 #### 問題 3：你用錯 partition layout
 
@@ -159,19 +145,13 @@ start=524288
 ```
 → 完全錯 → kernel 找不到 rootfs。
 
-----------
-
 #### 問題 4：rootfs 抽 tar 時空間不足
 
 因為 P2 開太小（用 6GB image 但 rootfs 沒對齊），後來你調整 P2 start 沒問題。
 
-----------
-
 #### 問題 5：mount 後 umount 失敗（busy）
 
 修正 trap/dir remove 後解決。
-
-----------
 
 ## 3. Root Cause 分析（最終 Root Cause 與結論）
 
@@ -181,7 +161,6 @@ start=524288
 > ROM 只從 LBA1 讀 BootParam → LBA0 完全無作用。
 
 ### 3.2 Partition layout 需完全符合 Yocto：
-
 
 | Partition | Start | Type |
 |-----------|--------|------|
@@ -194,8 +173,6 @@ start=524288
 |-----------|------|
 | BootParam × 7 + BL2 | 1 |
 | FIP | 768 |
-
-----------
 
 ## 4. 解決方案（正確可開機的 image 製作流程）
 
@@ -211,21 +188,16 @@ start=524288
 8.  Mount P2 → extract rootfs
 9.  Copy kernel/dtb/modules
 10.  losetup detach
-----------
 
 ## 附錄（對照表、偏移計算、分析工具）
-
-----------
 
 ### A. Bootloader offset 計算
 ```ini
 LBA1 = 1 * 512 = 0x200
 LBA768 = 768 * 512 = 0x60000
 ```
-----------
 
 ### B. 分析工具指令
-
 
 | 功能 | 指令 |
 |------|------|

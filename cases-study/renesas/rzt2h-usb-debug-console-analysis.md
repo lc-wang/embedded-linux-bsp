@@ -8,8 +8,6 @@
 -   板上多個 USB port（CN34 / CN33 / CN79）是否可作為 debug console
 -   為何部分 USB port 無法在 Windows 枚舉為 COM port
 
-----------
-
 ## 2. 分析過程
 
 ### 2.1 Linux Console 軟體設定確認
@@ -38,13 +36,10 @@ sci0_pins: sci0 {
 -   `ttySC0` 為 active console
 -   對應 `SCIF@0x80005000`
     
-
 `cat /sys/class/tty/console/active # tty0 ttySC0` 
 
 **結論**  
 Linux kernel console 使用 **SCI0 / ttySC0**。
-
-----------
 
 ### 2.2 CN34（FT2232）Debug Console 分析
 
@@ -72,11 +67,8 @@ Windows 裝置管理員顯示：
 | PC        | FT2232 枚舉為 COM port                |
 | Runtime   | ttySC0 可互動                          |
 
-
 **結論**  
 **CN34 = 主 UART Debug Console（Early boot 可用）**
-
-----------
 
 ### 2.3 USB Gadget（g_serial）軟體能力驗證
 
@@ -107,8 +99,6 @@ ls /dev/ttyGS0
 **結論**  
 Linux USB gadget serial 功能正常
 
-----------
-
 ### 2.4 CN33（USB OTG）為何無法枚舉？
 
 #### 2.4.1 現象
@@ -137,11 +127,8 @@ CN33 為 **USB OTG port**，關鍵硬體條件：
 -   SoC 未進入 Device mode
 -   即使 gadget ready，PC 端也不會枚舉
     
-
 **結論**  
 CN33 在目前硬體設定下 **不適合作為 debug console**
-
-----------
 
 ### 2.5 CN79（USB Device）實測結果
 
@@ -166,8 +153,6 @@ Windows PuTTY / TeraTerm：
 **結論**  
 **CN79 = 可用 USB Device Debug Console（Linux runtime）**
 
-----------
-
 ## 3. 結論與建議
 
 ### 3.1 最終建議配置（Best Practice）
@@ -177,8 +162,6 @@ Windows PuTTY / TeraTerm：
 | CN34 (FT2232)    | 主 console / early boot / panic   | ttySC0   |
 | CN79 (USB Device)| 第二 console / runtime debug      | ttyGS0   |
 | CN33 (USB OTG)   | 需調整 ID / trace                 | 不建議   |
-
-----------
 
 ## 附錄
 

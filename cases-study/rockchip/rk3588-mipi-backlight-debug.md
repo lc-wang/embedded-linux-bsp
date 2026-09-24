@@ -22,9 +22,6 @@
         
 -   **亮度無法隨數值平滑變化（只有 ON / OFF）**
     
-
-----------
-
 ## 2. 系統環境
 
 -   平台：**Rockchip RK3588**
@@ -47,9 +44,6 @@
         
     -   `pwm-backlight`
         
-
-----------
-
 ## 3. 除錯過程
 
 ### 3.1 初步假設與排除方向
@@ -64,14 +58,10 @@
     
 -   ✗ panel driver（simple-panel / vendor panel）不相容
     
-
 最終證實為：
 
 -   ✓ **單一板子的板級硬體問題（Bad board）**
     
-
-----------
-
 ### 3.2 實際除錯流程
 
 #### 3.2.1 Backlight sysfs 確認
@@ -97,8 +87,6 @@ cat /sys/class/backlight/backlight/actual_brightness
 
 結果：  
 → sysfs 行為正常，數值可寫、可讀。
-
-----------
 
 #### 3.2.2 PWM framework 狀態確認（debugfs）
 
@@ -131,8 +119,6 @@ cat /sys/kernel/debug/pwm | sed -n '/backlight *):/,+0p'
 → **PWM period / duty 確實隨亮度改變**  
 → 排除 PWM framework / pwm-backlight driver 未動作的可能性。
 
-----------
-
 #### 3.2.3 PWM 是否已被 driver 佔用（export 測試）
 ```
 ls /sys/class/pwm/
@@ -147,8 +133,6 @@ echo 0 > /sys/class/pwm/pwmchip0/export
 
 → 表示 PWM 已被 backlight driver request（符合預期）。
 
-----------
-
 #### 3.2.4 Device Tree 路徑確認
 
 確認 DT 內有 backlight 與 panel node：
@@ -156,7 +140,6 @@ echo 0 > /sys/class/pwm/pwmchip0/export
 grep -R backlight /proc/device-tree -n
 grep -R panel /proc/device-tree -n
 ```
-----------
 
 #### 3.2.5 PWM pinmux 驗證
 
@@ -176,9 +159,6 @@ grep -R panel /proc/device-tree -n
     
 -   排除「PWM 只在 controller 內變化，實體腳位仍是 GPIO」的問題
     
-
-----------
-
 #### 3.2.6 低頻 PWM 驗證（100Hz Flicker Test）
 
 為了肉眼觀察 PWM 是否真正影響背光，暫時將 PWM 設為低頻：
@@ -195,10 +175,7 @@ grep -R panel /proc/device-tree -n
     
 -   實際亮度仍只有 ON / OFF
     
-
 → 高度懷疑 **板級硬體或訊號路徑問題**
-
-----------
 
 ### 3.3 關鍵實驗：更換板子
 
@@ -210,7 +187,6 @@ grep -R panel /proc/device-tree -n
     
 -   相同 panel
     
-
 僅更換 **另一片RK3588 板子**。
 
 結果：
@@ -219,9 +195,6 @@ grep -R panel /proc/device-tree -n
     
 -   新板 ✓：亮度可正常平滑調整
     
-
-----------
-
 ## 4. Root Cause 分析
 
 > **此問題並非 Linux driver、DTS、PWM 設定或 pinmux 問題。**
@@ -241,9 +214,6 @@ grep -R panel /proc/device-tree -n
     
 -   BOM 或 routing 差異
     
-
-----------
-
 ## 5. 結論與建議（經驗與教訓）
 
 ### 5.1 `debug/pwm` 正常 ≠ 實體腳位真的在 PWM
@@ -268,10 +238,7 @@ PWM controller 狀態正確，不代表訊號一定到達背光 IC。
     
 -   實際亮度只有 ON / OFF
     
-
 → **直接換板或量測背光 CTRL 腳**
-
-----------
 
 ## 附錄
 

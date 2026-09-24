@@ -18,7 +18,6 @@ Card did not respond to voltage select! : -110
 -   無法載入 kernel image
 -   無法啟動系統
     
-
 本問題表面上看似：
 
 -   DTS pinctrl / 電壓
@@ -26,10 +25,7 @@ Card did not respond to voltage select! : -110
 -   OCR / HCS 問題
 -   SD 卡容量差異（16GB vs 32GB）
     
-
 但實際根因 **與上述全部無關**。
-
-----------
 
 ### 1.2 現象與可重現流程
 
@@ -42,8 +38,6 @@ Card did not respond to voltage select! : -110
 
 > 注意：  
 > 這一點在 Debug 初期造成誤導，但後續調查證明這只是 **副作用**，非真正 root cause。
-
-----------
 
 #### 1.2.2 mmc 指令測試結果
 
@@ -64,13 +58,9 @@ Card did not respond to voltage select! : -110
 ```
 兩個控制器都顯示 **freq = 0 MHz** 並 timeout。
 
-----------
-
 ## 2. 除錯過程
 
 本問題的 Debug 非常不直覺，歷經下列階段。
-
-----------
 
 ### 2.1 DTS 層面驗證
 
@@ -90,8 +80,6 @@ Card did not respond to voltage select! : -110
 
 → **DTS 並不是造成 -110 的根因**
 
-----------
-
 ### 2.2 mmc OCR、HCS 測試
 
 我們曾修改這行：
@@ -103,10 +91,7 @@ mmc->ocr &= ~(OCR_HCS | OCR_S18R);
 -   SDSC 舊卡 fail
 -   SDHC 卡正常
     
-
 但在刪除這行後，**問題依然存在** → 排除 OCR 根因。
-
-----------
 
 ### 2.3 硬體端（pinmux/power）測試
 
@@ -121,8 +106,6 @@ vqmmc-supply = <&reg_3p3v>;
 -   卡完全無回應  
 
 排除 pinmux/電源根因。
-
-----------
 
 ## 3. Root Cause 分析
 
@@ -151,8 +134,6 @@ ed302f38a8e28604fc13e9af5e8fd9eecc3101a6  "mmc: sh_sdhi: Fix fail to boot sd car
 2.  mdelay(6)
 3.  SD_PWEN ON
 
-----------
-
 ### 3.2 為什麼這會造成 -110？
 
 #### 3.2.1 16GB 疑似「舊版 SDHC」不接受這種強制 power-cycle
@@ -179,8 +160,6 @@ Card did not respond to voltage select : -110
 
 證明卡本身對此強制 power-cycle 不兼容，而不是單純 timing 不足。
 
-----------
-
 ## 4. 解決方案
 
 ### 4.1 解法：Revert 整個 commit
@@ -198,8 +177,6 @@ git revert ed302f38a8e28604fc13e9af5e8fd9eecc3101a6
 -   所有容量都可正常 boot
 -   `mmc dev 0` / `mmc dev 1` 均正常進入 25MHz legacy mode
 
-----------
-
 ### 4.2 實際修復 commit（摘要）
 
 ```bash
@@ -215,8 +192,6 @@ Revert 部分包含：
 -   移除 SDHI_SD_STATUS 暫存器定義    
 -   移除 `SD_STATUS_SD_PWEN` bit 操作
 -   移除強制 power-cycle
-
-----------
 
 ### 4.3 最終驗證（成功）
 

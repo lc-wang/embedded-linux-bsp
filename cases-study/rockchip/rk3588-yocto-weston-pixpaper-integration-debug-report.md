@@ -10,7 +10,6 @@
 ```
 Wayland → Weston → DRM → SPI → Pixpaper → e-ink display
 ```
-----------
 
 ### 1.2 問題：Weston 無法顯示於 pixpaper
 
@@ -30,8 +29,6 @@ Weston 選擇 card1 (GPU)，而非 pixpaper card0。
 結果：
 
 pixpaper 無畫面
-
-----------
 
 ## 2. 系統環境
 
@@ -65,8 +62,6 @@ card1-HDMI-A-2
 ```
 確認 pixpaper connector 存在。
 
-----------
-
 ## 3. 除錯過程
 
 ### 3.1 Driver functional verification（KMS 基本功能驗證）
@@ -91,9 +86,6 @@ Pixpaper successfully displays test pattern
     
 -   SPI transfer functional
     
-
-----------
-
 ### 3.2 Debug Step 1 — 確認 DRM connector 狀態
 
 指令：
@@ -113,8 +105,6 @@ enabled: disabled
 connector 正常  
 但未被 compositor 使用
 
-----------
-
 ### 3.3 Debug Step 2 — 確認 DRM pipeline 狀態
 
 指令：
@@ -129,8 +119,6 @@ crtc active=0
 分析：
 
 Weston 未使用 pixpaper DRM device
-
-----------
 
 ### 3.4 Debug Step 3 — 強制 Weston 使用 pixpaper device（第一次嘗試）
 
@@ -147,7 +135,6 @@ weston \
 ```
 ERROR: could not open DRM device '/dev/dri/card0'
 ```
-----------
 
 ### 3.5 Debug Step 4 — 使用 strace 分析 Weston
 
@@ -185,8 +172,6 @@ Weston 將：
 Weston drm-device 參數需要 device name（card0）  
 而非 device path（/dev/dri/card0）
 
-----------
-
 ## 4. Root Cause 分析（Root Cause Summary）
 
 問題原因：
@@ -202,7 +187,6 @@ drm-device 參數使用錯誤格式
 ```
 --drm-device=card0
 ```
-----------
 
 ## 5. 解決方案
 
@@ -225,7 +209,6 @@ using card0
 DRM: head 'SPI-1' found  
 Output 'SPI-1' enabled with mode 800x480
 ```
-----------
 
 ### 5.2 驗證結果
 
@@ -238,8 +221,6 @@ cat /sys/class/drm/card0-SPI-1/enabled
 enabled
 ```
 確認 atomic commit 成功。
-
-----------
 
 ### 5.3 為何需要 pixman renderer
 
@@ -255,8 +236,6 @@ CPU → DRM framebuffer → pixpaper
 ```
 適用於 e-ink。
 
-----------
-
 ### 5.4 最終成功指令
 ```
 weston \  
@@ -266,7 +245,6 @@ weston \
   --tty=1 \  
   --debug
 ```
-----------
 
 ### 5.5 最終 DRM pipeline
 ```
@@ -284,7 +262,6 @@ SPI transfer
  ↓  
 e-ink refresh
 ```
-----------
 
 ## 附錄
 

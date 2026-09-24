@@ -284,4 +284,3 @@ m android.hardware.wifi-service -j
 | **runtime 驗證** | `adb shell getprop | grep wifi` | 顯示實際生效的 Wi-Fi 相關屬性 |
 | **HAL 狀態驗證** | `dumpsys wifi | grep Concurrency` | 顯示 `STA + AP  Concurrency Supported: true` |
 | **快速清 cache 重建** | `rm -f out/soong/soong.rk3588_board*.variables && m android.hardware.wifi-service -j` | 重新生成 Soong 設定並重新編譯 Wi-Fi HAL |
-

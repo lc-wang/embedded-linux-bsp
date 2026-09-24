@@ -16,8 +16,6 @@ xhci-hcd 15860000.usb: WARN: HC couldn't access mem fast enough for slot 1 ep 2
 - xHCI controller 發生 DMA stall
 - 影響 USB2 裝置的傳輸效能
 
----
-
 ### 1.2 問題現象
 
 #### 1.2.1 Kernel 警告訊息
@@ -34,8 +32,6 @@ xhci-hcd 15860000.usb: WARN: HC couldn't access mem fast enough for slot 1 ep 2
 | Kernel 持續出現 WARN | HC 無法在期限內完成操作 |
 | USB2 傳輸效能異常 | 記憶體頻寬供應不足 |
 
----
-
 ## 2. 系統環境
 
 - Board：Kakip
@@ -43,8 +39,6 @@ xhci-hcd 15860000.usb: WARN: HC couldn't access mem fast enough for slot 1 ep 2
 - Firmware：Trusted Firmware-A（TF-A）
 - 記憶體類型：LPDDR4
 - 受影響介面：USB2（xhci-hcd @ 15860000.usb）
-
----
 
 ## 3. 除錯過程
 
@@ -54,8 +48,6 @@ xhci-hcd 15860000.usb: WARN: HC couldn't access mem fast enough for slot 1 ep 2
 ✓ 相機裝置可被識別（`lsusb` 可見）
 ✓ 非 cable 問題
 ✓ 非 USB2 hub / switch 問題
-
----
 
 ### 3.2 問題分析
 
@@ -80,8 +72,6 @@ plat/renesas/rz/soc/v2h/drivers/ddr/ddr_param_def_lpddr4.c
 {0x02d0, 0x01010101},   // ✗ 延遲設定錯誤
 ```
 
----
-
 ## 4. Root Cause 分析（根本原因）
 
 > **LPDDR4 記憶體控制器（MC）的 timing 與 scheduling 參數設定不當，導致記憶體頻寬不足以支援 USB2 DMA 傳輸，進而造成 xHCI controller stall。**
@@ -94,8 +84,6 @@ plat/renesas/rz/soc/v2h/drivers/ddr/ddr_param_def_lpddr4.c
 | DMA stall | 記憶體頻寬不足以即時供應 USB2 請求 |
 | 頻寬不足 | DDR MC 的 timing/scheduling 參數設定錯誤 |
 | 參數錯誤 | `param_setup_mc[]` 中多個 register 值不正確 |
-
----
 
 ## 5. 解決方案
 
@@ -126,8 +114,6 @@ plat/renesas/rz/soc/v2h/drivers/ddr/ddr_param_def_lpddr4.c
 - ✓ USB2 相機可正常運作，無 DMA stall
 - ✓ USB2 傳輸效能恢復正常
 
----
-
 ## 6. 結論與建議
 
 ### 6.1 最終狀態
@@ -135,8 +121,6 @@ plat/renesas/rz/soc/v2h/drivers/ddr/ddr_param_def_lpddr4.c
 - LPDDR4 記憶體控制器 timing 參數已修正
 - USB2 DMA 傳輸可正常取得足夠記憶體頻寬
 - xHCI controller 不再發生 stall
-
----
 
 ### 6.2 問題總結
 

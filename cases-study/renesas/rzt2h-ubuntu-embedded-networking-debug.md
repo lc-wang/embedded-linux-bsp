@@ -16,15 +16,12 @@
     
 -   重開機後網路行為不一致
     
-
 常見現象如下：
 
 ```bash
 ping 8.8.8.8        ✗ 不穩定
 ping www.google.com ✗ 一定失敗
 ```
-
-----------
 
 ### 1.1 問題發生時的網路狀態
 
@@ -47,8 +44,6 @@ default via 192.0.2.1 dev eth0  ✓
 ```
 
 上述 routing table 對於正常上網而言是 **錯誤狀態**。
-
-----------
 
 ## 2. 除錯過程
 
@@ -78,8 +73,6 @@ default dev eth1
     
 -   外部網路永遠無法連線
 
-----------
-
 #### 2.1.2 avahi 啟用 IPv4 Link-Local
 
 avahi-daemon 會自動啟用：
@@ -93,8 +86,6 @@ avahi-daemon 會自動啟用：
 -   kernel routing table 被污染
     
 -   link up / down 時反覆新增與刪除 route
-
-----------
 
 #### 2.1.3 DNS 被 connman 接管
 
@@ -112,14 +103,11 @@ nameserver ::1
     
 -   systemd-resolved 已停用
     
-
 因此所有 DNS 查詢全部失敗：
 
 ```bash
 Temporary failure in name resolution
 ```
-
-----------
 
 ### 2.2 為何手動修正無法持久
 
@@ -137,8 +125,6 @@ echo "nameserver 8.8.8.8" > /etc/resolv.conf
 -   avahi 重新啟用 IPv4LL
     
 -   resolv.conf 被再次覆寫
-
-----------
 
 ### 2.3 關鍵發現：rootfs build 與 runtime 的差異
 
@@ -160,8 +146,6 @@ Loaded: loaded (/usr/lib/systemd/system/connman.service)
 
 重新燒錄 rootfs 後，systemd override 才真正生效。
 
-----------
-
 ## 3. Root Cause 分析（多重因素）
 
 此問題並非單一 bug，而是 **多個 network manager 同時啟動所造成的競爭問題**。
@@ -176,7 +160,6 @@ Loaded: loaded (/usr/lib/systemd/system/connman.service)
 | systemd-resolved     | 部分停用     |
 | udhcpc               | 已安裝       |
 
-
 以上元件同時操作：
 
 -   routing table
@@ -185,10 +168,7 @@ Loaded: loaded (/usr/lib/systemd/system/connman.service)
     
 -   DNS
     
-
 導致網路狀態無法穩定。
-
-----------
 
 ## 4. 解決方案
 
@@ -218,8 +198,6 @@ Static DNS (/etc/resolv.conf)
     
 -   systemd-resolved
 
-----------
-
 ### 4.2 最終實作方式（rootfs 階段）
 
 #### 4.2.1 移除衝突套件
@@ -230,15 +208,11 @@ apt-get -y purge avahi-daemon avahi-autoipd
 apt-get -y autoremove --purge
 ```
 
-----------
-
 #### 4.2.2 防止被相依套件拉回
 
 ```bash
 apt-mark hold connman connman-client avahi-daemon avahi-autoipd
 ```
-
-----------
 
 #### 4.2.3 systemd 最底層 hard mask
 
@@ -254,8 +228,6 @@ ln -sf /dev/null /etc/systemd/system/avahi-daemon.socket
 
 此方式即使在 chroot 環境中也一定生效。
 
-----------
-
 #### 4.2.4 關閉 systemd-resolved
 
 ```bash
@@ -263,8 +235,6 @@ systemctl stop systemd-resolved.service || true
 systemctl disable systemd-resolved.service || true
 systemctl mask systemd-resolved.service || true
 ```
-
-----------
 
 #### 4.2.5 固定 DNS 設定
 
@@ -281,8 +251,6 @@ nameserver 1.1.1.1
 [main]
 dns=none
 ```
-
-----------
 
 ### 4.3 最終系統狀態
 
@@ -311,8 +279,6 @@ ping 8.8.8.8        ✓
 ping www.google.com ✓
 ```
 
-----------
-
 ## 5. 結論與建議
 
 ### 5.1 重要經驗整理
@@ -329,21 +295,15 @@ ping www.google.com ✓
     
 -   udhcpc
 
-----------
-
 #### 5.1.2 `default dev ethX` 是致命 routing
 
 此 routing 會導致 kernel 對所有 IP 直接 ARP，外網一定失敗。
-
-----------
 
 #### 5.1.3 rootfs 階段 systemctl 並不可靠
 
 -   `systemctl disable` 在 chroot 常失效
     
 -   `/etc/systemd/system/*.service -> /dev/null` 才是真正的 mask
-
-----------
 
 #### 5.1.4 DNS 問題 ≠ 網路問題
 
@@ -355,8 +315,6 @@ ping domain FAIL
 ```
 
 代表 DNS stack 有問題，而非 Ethernet driver。
-
-----------
 
 ### 5.2 最終架構圖
 

@@ -20,8 +20,6 @@ rk808_pm_power_off_dummy
 ```
 然而，實際執行流程中 **並未進入 rk808_pm_power_off_dummy**，因此 RK808 dummy poweroff **不構成此次問題核心**。
 
-----------
-
 ## 2. 分析過程
 
 ### 2.1 Linux Power-Off 的實際 Call Flow（RK3588）
@@ -49,9 +47,6 @@ sys_reboot()
     
 -   最終行為會 **退回 restart path**
     
-
-----------
-
 ### 2.2 RK806 在 Driver 架構中的定位
 
 #### 2.2.1 RK806 Driver 類型
@@ -63,7 +58,6 @@ RK806 屬於新世代 Rockchip PMIC family，與 RK808 / RK809 在設計與角�
 | RK808 | I2C | Legacy MFD                     | 可選 system-power-controller           |
 | RK809 | I2C | Legacy MFD                     | 可選 system-power-controller           |
 | RK806 | SPI | New-gen MFD + Regulator driver | 被動電源元件（不主導系統 Poweroff）   |
-
 
 #### 2.2.2 RK806 不註冊 pm_power_off
 
@@ -81,9 +75,6 @@ static  const  struct  of_device_id  rk806_of_match[] = {
     
 -   RK806 不會主動決定 poweroff 行為
     
-
-----------
-
 ### 2.3 RK806 的真實 Power-Off Call Flow
 
 #### 2.3.1 DTS 定義（關鍵）
@@ -110,8 +101,6 @@ kernel_power_off()
 ```
 注意：**到這裡為止，kernel 的責任結束**
 
-----------
-
 ### 2.4 Kernel 與 Hardware 的責任邊界
 
 #### Kernel 保證的事情
@@ -120,7 +109,6 @@ kernel_power_off()
     
 -   將 PMIC 控制腳位切換到 power-off 狀態
     
-
 #### Kernel 不知道的事情
 
 -   PWRDN 是 active-high 還是 active-low
@@ -131,10 +119,7 @@ kernel_power_off()
     
 -   是否 SoC 本身仍有 reset source
     
-
 **是否真的斷電 = 硬體設計責任**
-
-----------
 
 ### 2.5 ftrace：用來確認「有沒有走到那裡」
 
@@ -150,10 +135,7 @@ echo  function > /sys/kernel/tracing/current_tracer echo rk806 > /sys/kernel/tra
     
 -   trace buffer 尚未 flush
     
-
 **這不是 ftrace 無效，而是 poweroff 特性**
-
-----------
 
 ### 2.6 printk vs pr_emerg vs pstore
 
@@ -163,7 +145,6 @@ echo  function > /sys/kernel/tracing/current_tracer echo rk806 > /sys/kernel/tra
     
 -   poweroff 時 **極可能來不及輸出**
     
-
 #### 2.6.2 pr_emerg 的意義
 
 `pr_emerg("rk806: entering power-off\n");` 
@@ -174,7 +155,6 @@ echo  function > /sys/kernel/tracing/current_tracer echo rk806 > /sys/kernel/tra
     
 -   但 **仍不保證保存**
     
-
 #### 2.6.3 pstore
 
 ##### 啟用條件
@@ -183,7 +163,6 @@ echo  function > /sys/kernel/tracing/current_tracer echo rk806 > /sys/kernel/tra
     
 -   `CONFIG_PSTORE_RAM` 或 EFI backend
     
-
 ##### 使用方式
 
 `ls /sys/fs/pstore` 
@@ -196,10 +175,7 @@ echo  function > /sys/kernel/tracing/current_tracer echo rk806 > /sys/kernel/tra
     
 -   poweroff 前最後訊息
     
-
 **pstore 是唯一能跨 reboot 保存證據的工具**
-
-----------
 
 ### 2.7 dynamic_debug 為什麼幫助有限
 
@@ -215,9 +191,6 @@ echo  function > /sys/kernel/tracing/current_tracer echo rk806 > /sys/kernel/tra
         
     -   regulator enable/disable
         
-
-----------
-
 ### 2.8 kallsyms / vmlinux / faddr2line
 
 #### 2.8.1 kallsyms
@@ -236,9 +209,6 @@ aarch64-linux-gnu-addr2line -e vmlinux ffffffc0xxxxxxxx
     
 -   驗證實際執行位置
     
-
-----------
-
 ## 3. Root Cause 分析（為什麼會「Poweroff → Reboot」）
 
 ### 3.1 合法推論鏈
@@ -253,10 +223,7 @@ aarch64-linux-gnu-addr2line -e vmlinux ffffffc0xxxxxxxx
     
 5.  表現為「reboot」
     
-
 **Kernel 已完成它該做的事**
-
-----------
 
 ## 4. 結論與建議
 
@@ -274,7 +241,6 @@ aarch64-linux-gnu-addr2line -e vmlinux ffffffc0xxxxxxxx
 
 ### 4.2 RK808 vs RK806：世代差異總結
 
-
 #### 4.2.1 RK806 Driver 類型
 
 RK806 屬於新世代 Rockchip PMIC family，與 RK808 / RK809 在設計與角色上有本質差異：
@@ -284,5 +250,3 @@ RK806 屬於新世代 Rockchip PMIC family，與 RK808 / RK809 在設計與角�
 | RK808 | I2C | Legacy MFD                     | 可選 system-power-controller           |
 | RK809 | I2C | Legacy MFD                     | 可選 system-power-controller           |
 | RK806 | SPI | New-gen MFD + Regulator driver | 被動電源元件（不主導系統 Poweroff）   |
-
-

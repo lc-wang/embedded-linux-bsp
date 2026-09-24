@@ -20,7 +20,6 @@
 6.  **bitbake core-image-testfw**
 7.  **target 運行 testfw 驗證**
     
-
 整體架構：
 ```sh
 meta-test-framework/

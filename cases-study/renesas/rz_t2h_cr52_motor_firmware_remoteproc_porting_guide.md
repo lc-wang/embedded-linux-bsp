@@ -9,7 +9,6 @@
 -   保留原廠 Motor Control 全功能（PWM + DSM + Encoder + UART 命令介面）
 -   讓 CR52 韌體改成 **由 Linux remoteproc 啟動**   
 -   不破壞 Linux（避免 MMC -84 / EXT4 error / 卡死）
-----------
 
 ## 2. 環境與前置條件（專案說明）
 
@@ -21,8 +20,6 @@
     -   `cr52_0` 對應的 `/sys/class/remoteproc/remoteproc0` 介面
 -   本手冊所有修改，**請在複製後的新專案上做**，不要破壞原始版本。
     
-----------
-
 ## 3. 用 e² studio 建立「Remoteproc 版」專案
 
 1.  在 e² studio 專案視窗中：
@@ -32,8 +29,6 @@
 2.  輸入新名稱（建議）：
     -   `RZT2H_INVBLV_SPM_ENCD_FOC_E2S_V100_remoteproc` 
 3.  確認新專案可以直接 Build 成功（此時還不是 remoteproc-safe，只是確認環境正常）。
-
-----------
 
 ## 4. 修改 Linker Script：改成 CR52 SRAM + remoteproc 入口
 
@@ -133,8 +128,6 @@ SECTIONS
     -   指定為：`script/rzt2h_cr52_remoteproc.ld`      
 4.  套用（Apply），關閉視窗。
     
-----------
-
 ## 5. 移除「自帶 reset / clock 設定」的啟動碼
 
 ### 5.1 停用 startup / crt 檔案
@@ -151,17 +144,13 @@ remoteproc 會：
 -   `startup.c` 或 `startup_core.c`
 -   任何 `*_start.c` / `vector_table.c` 若是自行重設 stack / reset handler 的，也需確認。
     
-
 對這些檔案：
 
 1.  右鍵檔案 → **Properties**
 2.  `C/C++ Build` → **Settings** → 勾選 **Exclude from build**
 3.  對 Debug / Release configuration 都做一次確認。
     
-
 > 如果有 `.s` / `.asm` 的啟動碼檔案，也同樣排除。
-
-
 
 ## 6. 修改 hal_entry.c：接管 main 流程給 remoteproc
 
@@ -211,8 +200,6 @@ void hal_entry(void)
 > -   不在這裡處理中斷控制，只保留邏輯主迴圈。
 >     
 
-----------
-
 ## 7. 修改 R_Systeminit()：保留 Motor、避免 Linux Crash
 
 ### 7.1 原始版本會做的事
@@ -224,7 +211,6 @@ void hal_entry(void)
 -   `R_XSPI_OSPI_Open()` / `ospi_set_DTR_OPI_Mode_enable()`
 -   `EI()` / `DI()` 等
     
-
 這些對於「Linux 早就初始化好的 SoC」來說，**都是高風險操作**。
 
 ### 7.2 Remoteproc-safe 版
@@ -312,8 +298,6 @@ void R_Systeminit(void)
 ```
 > 建議在函式前面加註解：「此版本用於 Linux remoteproc，不可再做 clock/reset/pinmux」。
 
-----------
-
 ## 8. 修改 m_rzt.c：m_startup_remoteproc_safe()
 
 ### 8.1 目的
@@ -324,7 +308,6 @@ void R_Systeminit(void)
     -   只做「motor 控制必要的資料結構初始化」
     -   呼叫 `setup_motor()`、`setup_encoder()`
         
-
 ### 8.2 建議實作骨架
 
 在 `m_rzt.c` 裡增加：
@@ -390,8 +373,6 @@ void m_startup_remoteproc_safe(void)
 > -   所有 direct register mapping（GPT、MTU）都沿用原專案，不額外更動。
 >     
 
-----------
-
 ## 9. Build 專案並輸出 ELF
 
 1.  在 e² studio 選擇新專案 `*_remoteproc`   
@@ -400,9 +381,6 @@ void m_startup_remoteproc_safe(void)
     -   `RZT2H_INVBLV_SPM_ENCD_FOC_E2S_V100_remoteproc.elf`
 4.  將該檔拷貝到 Linux 板子（例如 `/lib/firmware`或）。
     
-
-----------
-
 ## 10. 驗證（Linux 端操作 remoteproc）
 
 ### 10.1 啟動 CR52 韌體
@@ -437,7 +415,6 @@ Linux 上讀值：
 sudo devmem2 0x10070020
 # 連續讀，看到數字一直增加 => CR52 正常跑
 ```
-----------
 
 ## 11. 常見問題與排查
 

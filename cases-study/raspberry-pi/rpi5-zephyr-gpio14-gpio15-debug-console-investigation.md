@@ -27,8 +27,6 @@ ACT LED blinking
 
 本文記錄嘗試將 console 改到 GPIO14/GPIO15 的過程。
 
-----------
-
 ## 2. 系統環境（硬體與接線）
 
 GPIO14/GPIO15 是 Raspberry Pi 傳統 UART pins：
@@ -62,8 +60,6 @@ minicom -D /dev/ttyUSB0 -b 115200
 picocom -b 115200 /dev/ttyUSB0
 
 ```
-
-----------
 
 ## 3. 除錯過程
 
@@ -119,8 +115,6 @@ USB-TTL OK
 Debian/Linux 可正常使用 GPIO14/GPIO15 當 console
 
 ```
-
-----------
 
 ### 3.2 Linux live devicetree 確認 GPIO14/GPIO15 對應 RP1 UART0
 
@@ -195,8 +189,6 @@ Linux ttyAMA0
 
 ```
 
-----------
-
 ### 3.3 Zephyr rpi_5 預設 console 是 uart10
 
 在 Zephyr source 中查詢 Raspberry Pi 5 UART node：
@@ -239,8 +231,6 @@ console=serial0,115200
 ```
 
 不會自動讓 Zephyr console 改到 GPIO14/GPIO15。
-
-----------
 
 ### 3.4 嘗試一：用 Zephyr overlay 新增 RP1 UART0 node
 
@@ -326,8 +316,6 @@ GPIO14/GPIO15 仍無 console output
 
 ```
 
-----------
-
 ### 3.5 DTS / overlay troubleshooting
 
 #### 3.5.1 overlay path 問題
@@ -348,8 +336,6 @@ west build -p always -b rpi_5 samples/hello_world \
   -DDTC_OVERLAY_FILE=$PWD/app-overlays/rpi5-rp1-uart0.overlay
 
 ```
-
-----------
 
 #### 3.5.2 top-level node 語法錯誤
 
@@ -379,8 +365,6 @@ rp1_uart0: serial@1f00030000 {
 };
 
 ```
-
-----------
 
 #### 3.5.3 reg cells 數量錯誤
 
@@ -413,8 +397,6 @@ reg = <0x1f 0x00030000 0x100>;
 
 ```
 
-----------
-
 #### 3.5.4 interrupts cells 數量錯誤
 
 錯誤：
@@ -438,8 +420,6 @@ interrupts = <0 123 4>;
 interrupts = <0 123 4 0>;
 
 ```
-
-----------
 
 #### 3.5.5 Linux-only DTS properties 不被 Zephyr binding 接受
 
@@ -466,8 +446,6 @@ uart-has-rtscts;
 ```
 
 結論：Linux DTS properties 不能直接照搬到 Zephyr overlay，必須符合 Zephyr binding。
-
-----------
 
 ### 3.6 嘗試二：blinky + RP1 UART0 overlay
 
@@ -497,8 +475,6 @@ Zephyr 沒有因為 RP1 UART0 node crash
 問題不是 Zephyr boot flow
 
 ```
-
-----------
 
 ### 3.7 嘗試三：在 Zephyr app 中手動設定 GPIO14/15 pinmux
 
@@ -573,8 +549,6 @@ static void rp1_gpio_set_uart0(void)
 
 ```
 
-----------
-
 ### 3.8 嘗試四：不使用 Zephyr UART driver，直接 raw write PL011
 
 為了排除 Zephyr PL011 driver / console path 問題，改成直接寫 RP1 UART0 PL011 registers。
@@ -617,8 +591,6 @@ FBRD = 3
 
 ```
 
-----------
-
 ### 3.9 Debian 中讀出 Linux 成功時的 UART / GPIO register
 
 回 Debian，在 GPIO14/GPIO15 console 正常時讀 register：
@@ -657,8 +629,6 @@ UART divisor 是 IBRD=27, FBRD=8
 這比較像 UART clock 是 50 MHz，而不是 48 MHz
 
 ```
-
-----------
 
 ### 3.10 嘗試五：Zephyr raw write 模仿 Linux register 值
 
@@ -751,8 +721,6 @@ sync
 仍無 console output
 
 ```
-
-----------
 
 ## 4. 結論與建議（最終結論）
 

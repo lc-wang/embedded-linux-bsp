@@ -4,8 +4,6 @@
 
 本文記錄 RZT2H (Ubuntu 24.04) 上透過 **ROS2 ** 控制 CR52 remoteproc 的完整流程，並整理實作與 debug 過程，方便未來維護與其他人參考。
 
-----------
-
 ## 2. 環境與前置條件（系統環境）
 
 RZT2H SBC 上運行：
@@ -17,8 +15,6 @@ Ubuntu 24.04 LTS (Noble)
 cat /etc/os-release 
 ```
 Host PC 也運行 ROS2，用 rqt 操作。
-
-----------
 
 ## 3. 安裝 ROS2
 參考官方文件即可
@@ -45,13 +41,10 @@ colcon version 0.16.x
 ```
 如果這行出現，表示 ROS2 workspace 就可以開始編譯。
 
-----------
-
 ## 4. 建立 ROS2 Workspace
 ```yaml
 mkdir -p ~/ros2_ws/src cd ~/ros2_ws 
 ```
-----------
 
 ## 5. `rzt2h_remoteproc` 套件建立流程
 
@@ -70,7 +63,6 @@ rzt2h_remoteproc/
       cr52_remoteproc_service.py   ← CR52 控制程式
   scripts/
 ```
-----------
 
 ### 5.1 修正後的 setup.py（包含 `glob` 與正確 entry point）
 ```python
@@ -103,14 +95,12 @@ setup(
     },
 )
 ```
-----------
 
 ## 6. CR52 RemoteProc Service Node 程式
 
 使用 ROS2 Service（std_srvs/Trigger）控制：
 -   `/cr52/start`
 -   `/cr52/stop`
-----------
 
 ## 7. Build 與執行
 
@@ -129,7 +119,6 @@ ros2 run rzt2h_remoteproc cr52_remoteproc_service
 ```bash
 [INFO]  [cr52_remoteproc]: CR52 RemoteProc ROS2 Service Node started.
 ```
-----------
 
 ## 8. Host PC 使用 rqt 操作 CR52
 
@@ -146,8 +135,6 @@ Plugins → Services → Service Caller
 -   `/cr52/stop`
    
 按下 Call 即可控制 CR52。
-
-----------
 
 ## 9. 多機 ROS2 通訊設定（Network Discovery）
 
@@ -174,8 +161,6 @@ ros2 multicast send
 ```
 能收到才算完全打通 discovery。
 
-----------
-
 ## 10. 常見問題與排查
 
 ### 10.1 CR52 沒有啟動的原因分析（權限問題）
@@ -194,8 +179,6 @@ ros2 multicast send
 RemoteProc sysfs 需要 root 權限才能寫入。
 
 ROS2 Node 以一般使用者執行 → echo 寫入失敗 → service 看起來「沒作用」。
-
-----------
 
 ### 10.2 最終採用的解法（setuid root）
 
@@ -222,7 +205,6 @@ cat /sys/class/remoteproc/remoteproc0/state
 gcc_rzt2h_cr52_0_rpmsg_linux_baremetal_demo.elf
 running
 ```
-----------
 
 ## 附錄
 

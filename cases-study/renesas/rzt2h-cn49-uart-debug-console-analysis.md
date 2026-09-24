@@ -11,14 +11,11 @@
 -   作為 **額外的 debug / log console**
 -   不進行焊接修改
 
-----------
-
 ## 2. 系統環境
 
 ### 2.1 可用硬體介面盤點結論
 
 經比對 schematic 與板級配置後，確認：
-
 
 | Connector        | 類型            | 是否 CPU 直出 | 備註                         |
 |------------------|-----------------|---------------|------------------------------|
@@ -27,10 +24,7 @@
 | CN49 (PMOD2)     | UART            | 是            | SCI1（P11_0 / P11_1）        |
 | CN13             | UART            | 是            | 未焊接                       |
 
-
 **唯一符合條件的介面為 CN49（PMOD2 UART）**
-
-----------
 
 ### 2.2 CN49 UART 硬體對應關係
 
@@ -43,10 +37,7 @@ CN49（PMOD2）對應 SoC 的 SCI1：
 | P11_1   | SCI1_TXD  | TXD1 |
 | P11_0   | SCI1_RXD  | RXD1 |
 
-
 這兩個腳位為 **CPU 直出 UART（3.3V TTL）**，未經任何轉接 IC。
-
-----------
 
 ### 2.3 UART 實體接線方式
 
@@ -66,8 +57,6 @@ GND
 -   **USB-UART 的 VCC 不要接**
 -   電平必須是 **3.3V TTL**
 -   先不要接 RTS / CTS 
-
-----------
 
 ## 3. 除錯過程
 
@@ -94,8 +83,6 @@ sci1_pins: sci1 {
 
 經測試，CN49 對應 **`/dev/ttySC1`**。
 
-----------
-
 ### 3.2 Runtime Pinmux 驗證
 
 使用 debugfs 確認 pinmux 實際生效狀態：
@@ -111,8 +98,6 @@ pin 89 (P11_1): device 80005400.serial  function sci1 group sci1
 ```
 確認 **P11_0 / P11_1 已正確切換為 SCI1**。
 
-----------
-
 ### 3.3 實體線路問題：DIP Switch 關鍵影響
 
 #### 3.3.1 問題現象
@@ -121,8 +106,6 @@ pin 89 (P11_1): device 80005400.serial  function sci1 group sci1
 -   PC → 板子（RX）完全無反應
 -   TX/RX loopback 測試失敗
 -   出現亂碼、單向通訊等異常
-
-----------
 
 ## 4. Root Cause 分析
 
@@ -134,8 +117,6 @@ P11_0_BSC_A5_LCDC_DATG0_PMOD2_RXD1
 ```
 **CN49 的 UART 腳位實際上是經過 10-pin DIP switch 才會接通**
 
-----------
-
 ## 5. 解決方案
 
 ### 5.1 必要設定
@@ -143,12 +124,9 @@ P11_0_BSC_A5_LCDC_DATG0_PMOD2_RXD1
 -   **SW6-4 = ON**  
     → 連接 `P11_0 → PMOD2_RXD1`
     
-
 同時需確保：
 
 -   其他與 P11_0 共用的功能（ESC_RESETOUT 等）**未同時打開**
-
-----------
 
 ### 5.2 通訊測試指令
 

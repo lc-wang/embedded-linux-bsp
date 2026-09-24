@@ -741,7 +741,6 @@ security patch level
 
 ## 18. TPM vs OP-TEE 的差異
 
-  
 TPM 和 OP-TEE 都跟平台安全有關，但角色不同。  
   
 | 項目 | TPM | OP-TEE |  

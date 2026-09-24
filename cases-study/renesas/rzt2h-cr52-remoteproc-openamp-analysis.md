@@ -7,7 +7,6 @@
 -   Cortex-R52 執行 RTOS / firmware
 -   希望從 Linux 啟動 CR52，並透過 OpenAMP / RPMsg 做 IPC
     
-
 Linux 使用標準 remoteproc 控制 flow：
 ```bash
 echo <firmware> > /sys/class/remoteproc/remoteproc0/firmware
@@ -16,8 +15,6 @@ echo start        > /sys/class/remoteproc/remoteproc0/state
 
 但發現：  
 **remoteproc 在啟動 CR52 時直接造成 Linux Kernel panic（SError Interrupt）。**
-
-----------
 
 ## 2. 除錯過程（觀察到的行為）
 
@@ -36,8 +33,6 @@ rz_rproc_start+0x1d0
 ### 2.1 Linux remoteproc 正在 `ioremap()` CR52 firmware / vring / resource_table 區域
 
 但該記憶體區域對 Linux **不可存取（Secure only / 未 map）**。
-
-----------
 
 ## 3. Root Cause 分析
 
@@ -69,8 +64,6 @@ ioremap(0xE0000000)
 → Kernel panic
 ``` 
 
-----------
-
 ## 4. 解決方案
 
 ### 4.1 修正方法：擴充 TF-A 記憶體 mapping 讓 Linux 能存取 CR52 firmware 區域
@@ -93,8 +86,6 @@ MAP_REGION_FLAT(0xE0000000, 0x9000000, MT_MEMORY | MT_RW | MT_SECURE),
 -   將 OpenAMP 共享記憶體區域納入 mapping
 -   供 Linux ioremap ()
 
-----------
-
 ### 4.2 修正方法：增加 translation table 數量
 
 新增這些 mapping 後 TF-A 原本的：
@@ -111,8 +102,6 @@ MAX_MMAP_REGIONS 7
 -   Page table 不足
 -   TF-A 在 early boot 失敗
 -   Linux 無法存取 CR52 區域
-
-----------
 
 ### 4.3 修正方法：放寬 R52 TCM / SYSRAM 權限
 
@@ -135,8 +124,6 @@ OpenAMP 要求：
    
 可被 Linux 端 remoteproc 安全存取。
 
-----------
-
 ### 4.4 修正後結果：remoteproc 成功啟動 CR52
 
 修正後：
@@ -150,8 +137,6 @@ echo start > /sys/class/remoteproc/remoteproc0/state
 -   resource_table 交換成功 
 -   vring 建立
 -   rpmsg 通道可以生成
-
-----------
 
 ## 5. 結論與建議（最終系統架構）
 

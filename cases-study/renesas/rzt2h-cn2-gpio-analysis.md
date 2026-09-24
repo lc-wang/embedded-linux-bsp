@@ -17,8 +17,6 @@
 -   GPIO、PFC、pinmux 三者的關係為何？
 - pull-up 與 open-drain 的差異是什麼？
 
-----------
-
 ## 2. 分析過程
 
 ### 2.1 RZ/T2H 腳位控制架構
@@ -40,8 +38,6 @@ Physical Pin (P03_3 → CN2 pin 11)
 
 Peripheral block 負責功能邏輯（例如 encoder、timer、I2C），而 **PFC（Pin Function Controller）** 則負責決定外部實體腳位要連接到哪個內部功能。
 
-----------
-
 #### 2.1.2 關鍵暫存器角色
 
 | Register | 功能說明                                              |
@@ -51,8 +47,6 @@ Peripheral block 負責功能邏輯（例如 encoder、timer、I2C），而 **PF
 | PM       | GPIO Input / Output 模式設定                           |
 | P        | GPIO Output Value                                     |
 | DRCTL    | Drive Control（輸出驅動型態 / 強度）                  |
-
-----------
 
 ### 2.2 為什麼 TRM / firmware enum 沒有 GPIO？
 
@@ -71,8 +65,6 @@ IOPORT_PIN_P033_PFC_22_ENCIFCK02
 
 > **當 PMC = 1（Peripheral 模式）時，PFC 可選擇的 peripheral multiplexer 值**。
 
-----------
-
 #### 2.2.2 GPIO 為什麼不在 enum 裡？
 
 在 Renesas 架構中：
@@ -88,10 +80,7 @@ IOPORT_PIN_P033_PFC_22_ENCIFCK02
 | GPIO        | 0   | 不使用                 |
 | Peripheral  | 1   | 決定 ENCIF / I2C / GPT |
 
-
 因此，TRM 或 firmware enum 中 **不會、也不需要列出 GPIO**。
-
-----------
 
 ### 2.3 Linux DTS 為什麼可以寫 `function = "gpio"`？
 
@@ -104,8 +93,6 @@ function = "gpio";
 ```
 
 此屬於標準 pinctrl client node 的合法設定。
-
-----------
 
 #### 2.3.2 `function = "gpio"` 的實際語意
 
@@ -120,8 +107,6 @@ function = "gpio"
 
 這與 firmware 中「GPIO 分支」的行為在硬體層級上完全一致。
 
-----------
-
 ### 2.4 pull-up 與 open-drain 的正確理解
 
 #### 2.4.1 `bias-pull-up` 的意義
@@ -131,8 +116,6 @@ bias-pull-up;
 ```
 
 代表啟用 SoC 內部 weak pull-up（通常為數十 kΩ 等級），僅影響腳位在未被驅動時的預設電位。
-
-----------
 
 #### 2.4.2 open-drain 的實際行為
 
@@ -152,8 +135,6 @@ open-drain 的本質為：
     -   外接電阻（建議）
     -   SoC 內部 pull-up（僅適合低速或非嚴格需求）
 
-----------
-
 ## 3. 解決方案
 
 ### 3.1 CN2 腳位是否可以改成 GPIO？
@@ -167,8 +148,6 @@ open-drain 的本質為：
 -   不需要 enum、不需要 PFC
 
 **硬體上完全可行**。
-
-----------
 
 #### 3.1.2 Linux DTS 建議寫法
 
@@ -188,8 +167,6 @@ open-drain 的本質為：
 -   清除任何 peripheral mux
 -   腳位強制回到 GPIO 模式
 
-----------
-
 ## 4. 結論與建議
 
 ### 4.1 目前 DTS 狀態的結論
@@ -202,8 +179,6 @@ open-drain 的本質為：
     -   是否有其他 subsystem 啟用該 pinmux
         
 **若要穩定使用 GPIO，必須在 pinctrl 中明確宣告。**
-
-----------
 
 ### 4.2 總結
 

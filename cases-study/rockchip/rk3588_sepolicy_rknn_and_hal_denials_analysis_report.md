@@ -1,6 +1,5 @@
 # RK3588 Android SEPolicy 問題分析與修正報告
 
-
 _(Rockchip RK3588 rknn_server + HAL binder denied)_
 
 ## 1. 問題概述（背景說明）
@@ -12,7 +11,6 @@ _(Rockchip RK3588 rknn_server + HAL binder denied)_
     
 2.  **HDMI HAL 嘗試透過 binder 呼叫 Camera HAL 時被拒絕**
     
-
 這兩類問題皆導致：
 
 -   kernel log/dmesg 出現 AVC denied
@@ -21,10 +19,7 @@ _(Rockchip RK3588 rknn_server + HAL binder denied)_
     
 -   無法繼續 bring-up / 測試功能
     
-
 本文件記錄分析流程、原因與最終採用的修正方法。
-
-----------
 
 ## 2. 除錯過程
 
@@ -36,18 +31,13 @@ _(Rockchip RK3588 rknn_server + HAL binder denied)_
 type=1400 audit: avc: denied { read } for comm="listener"  scontext=u:r:rknn_server:s0 tcontext=u:object_r:default_prop:s0 tclass=file
 ```
 
-
 __這表示 rknn_server 嘗試讀取系統屬性（ro._ / persist._），但無權限。**
-
-----------
 
 #### 2.1.2 編譯期錯誤 (secilc neverallow violation)
 
 ```bash
 neverallow check failed: neverallow base_typeattr_223 default_prop  (file (read open ...)) violated by allow rknn_server default_prop  (file (read open));
 ``` 
-
-----------
 
 ### 2.2 問題 2：HDMI HAL → Camera HAL Binder call denied
 
@@ -57,8 +47,6 @@ avc: denied  { call } for scontext=u:r:hal_hdmi_default:s0
 tcontext=u:r:hal_camera_default:s0
 tclass=binder
 ``` 
-
-----------
 
 ## 3. Root Cause 分析
 
@@ -76,7 +64,6 @@ tclass=binder
     
 -   `system/sepolicy/public/property.te:273`
     
-
 內容概念如下：
 ```bash
 neverallow { vendor domains } default_prop:file { read write open ... }
@@ -88,8 +75,6 @@ neverallow { vendor domains } default_prop:file { read write open ... }
 
 → 你無法修改它讓它讀 `ro.vendor.rknn.*` 這類合法的 vendor namespace 屬性。
 
-----------
-
 #### 3.1.4 為何「正規 allow rule」無法解決？
 
 因為 **AOSP neverallow 是硬限制（强制不可繞過）**：
@@ -100,7 +85,6 @@ neverallow { vendor domains } default_prop:file { read write open ... }
     
 -   不會因 sepolicy layering 而放寬
     
-
 除非 **改 AOSP 的 private sepolicy（不可能）**，否則永遠無法通過。
 
 因此，對閉源 rknn_server：
@@ -109,21 +93,16 @@ neverallow { vendor domains } default_prop:file { read write open ... }
 ✗ **你無法修改 default_prop 給它讀**  
 ✗ **你無法 override neverallow**
 
-----------
-
 ### 3.2 問題 2：HDMI HAL → Camera HAL Binder call
 
 HAL 之間的 binder 呼叫**預設不允許 cross-HAL 呼叫**，  
 必須顯示定義 allow。
-
-----------
 
 ## 4. 解決方案
 
 ### 4.1 問題 1：rknn_server 讀取 default_prop
 
 #### 4.1.1 可行的解法選項（分析）
-
 
 | 解法 | 可行？ | 優點 | 缺點 |
 |------|--------|--------|--------|
@@ -133,12 +112,7 @@ HAL 之間的 binder 呼叫**預設不允許 cross-HAL 呼叫**，
 | 使用 LD_PRELOAD propshim（在 libc 層改寫 property key） | ✓ | 100% 合法、不觸發 neverallow、可過編譯 | 需維護額外 .so（libpropshim） |
 | 將 rknn_server 設為 permissive domain | ✓ | 立即可用、最簡單、最快解法 | 不安全、非正式、不適合量產 |
 
-
-
-----------
-
 #### 4.1.2 最終採用解法：permissive rknn_server（因無需通過 VTS）
-
 
 > **此 build 目標為 bring-up validation，不作為 GMS/VTS/GTS release build。**
 
@@ -160,9 +134,6 @@ HAL 之間的 binder 呼叫**預設不允許 cross-HAL 呼叫**，
     
 -   不需修改 binary、不需 propshim
     
-
-----------
-
 ### 4.2 問題 2：HDMI HAL → Camera HAL Binder call 正規修正（最小必要權限）
 
 **修改：`hal_hdmi_default.te`**
@@ -176,12 +147,9 @@ HAL 之間的 binder 呼叫**預設不允許 cross-HAL 呼叫**，
 這是完全合法的 SELinux allow，  
 不會觸發 neverallow。
 
-----------
-
 ## 5. 結論與建議
 
 ### 5.1 最終整合結果
-
 
 | 項目 | 採用修正 | 狀態 |
 |------|----------|--------|
@@ -192,13 +160,9 @@ HAL 之間的 binder 呼叫**預設不允許 cross-HAL 呼叫**，
 
 ### 5.2 風險與建議
 
-
 | 項目 | 說明 |
 |------|------|
 | 安全性 | rknn_server domain 內所有 denied 都會被允許（permissive），SELinux 對該 domain 等同失效 |
 | 適用場景 | internal BSP / bring-up / demo / non-GMS build |
 | 不適用場景 | 量產、商用產品、GMS 認證、需通過 VTS/GTS 的版本 |
 | 建議 | 若未來要進入生產或正式商用 → 改用 propshim（LD_PRELOAD key rewrite）以符合正規 sepolicy 要求 |
-
-
-

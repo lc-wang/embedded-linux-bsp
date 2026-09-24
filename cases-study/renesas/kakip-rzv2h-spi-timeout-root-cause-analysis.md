@@ -16,13 +16,9 @@ spidev spi0.0: SPI transfer failed: -110
     
 -   SPI device 測試（Pixpaper 電子紙）
     
-
 這表示 SPI driver 在某些情況下沒有正確偵測到 **SPI 傳輸完成事件**，最終觸發 timeout。
 
-----------
-
 ## 2. 系統環境（測試平台）
-
 
 | 項目 | 說明 |  
 |------|------|  
@@ -32,8 +28,6 @@ spidev spi0.0: SPI transfer failed: -110
 | 作業系統 | Ubuntu |  
 | SPI Device | Pixpaper 電子紙 |  
 | 測試工具 | spidev_test / epd_test |
-
-----------
 
 ## 3. 除錯過程
 
@@ -52,8 +46,6 @@ SPI transfer failed: -110
 ```
 這代表 SPI controller 的傳輸沒有在預期時間內完成。
 
-----------
-
 #### 3.1.2 SPI Device 測試（Pixpaper）
 
 在 Pixpaper 電子紙測試程式中，也可以觀察到相同問題。
@@ -68,8 +60,6 @@ spi_master spi0: receive timeout 0
 spidev spi0.0: SPI transfer failed: -110
 ```
 雖然部分情況下顯示更新仍然成功，但頻繁的 timeout 表示 SPI 通訊存在不穩定情況。
-
-----------
 
 ### 3.2 SPI Driver 架構
 
@@ -97,10 +87,7 @@ Driver 主要透過以下資訊判斷傳輸是否完成：
     
 -   status flag
     
-
 若 driver 對這些事件的處理不完整，就可能誤判傳輸狀態。
-
-----------
 
 ## 4. Root Cause 分析
 
@@ -112,7 +99,6 @@ Driver 主要透過以下資訊判斷傳輸是否完成：
     
 -   RX FIFO full
     
-
 來判斷 SPI 傳輸是否完成。
 
 但實際上：
@@ -127,10 +113,7 @@ Driver 主要透過以下資訊判斷傳輸是否完成：
     
 -   completion event 遺漏
     
-
 最終 driver 等不到完成事件而進入 timeout。
-
-----------
 
 ## 5. 解決方案
 
@@ -144,7 +127,6 @@ Driver 主要透過以下資訊判斷傳輸是否完成：
     
 -   [https://github.com/YDS-Kakip-Team/kakip_linux/commit/77a30cf53385d3d55303511d2de731b89adaf8bb](https://github.com/YDS-Kakip-Team/kakip_linux/commit/77a30cf53385d3d55303511d2de731b89adaf8bb)
     
-
 這些 commit 對 RSPI driver 進行了較大的修改。
 
 主要改動包括：
@@ -154,8 +136,6 @@ Driver 主要透過以下資訊判斷傳輸是否完成：
 Driver 新增對 **SPI communication-end event** 的處理。
 
 這讓 driver 可以正確偵測 SPI transaction 何時真正結束，而不是只依賴 FIFO 狀態。
-
-----------
 
 #### 5.1.2 Interrupt handling 修正
 
@@ -167,9 +147,6 @@ Patch 修正了 SPI interrupt 的設定與處理流程。
     
 -   driver 不會等待不存在的 interrupt
     
-
-----------
-
 #### 5.1.3 FIFO handling 改善
 
 SPI 傳輸流程改為更符合 controller FIFO 行為的設計。
@@ -182,9 +159,6 @@ SPI 傳輸流程改為更符合 controller FIFO 行為的設計。
     
 -   stale status flag
     
-
-----------
-
 ### 5.2 修正後驗證
 
 套用 patch 後再次測試 SPI。
@@ -198,20 +172,15 @@ RX | ...
 ```
 SPI 傳輸正常完成，不再出現 timeout。
 
-----------
-
 #### 5.2.2 SPI Device 測試
 
 Pixpaper 電子紙更新正常。
 
 未再觀察到 SPI timeout。
 
-----------
-
 ### 5.3 長時間壓力測試
 
 為了驗證 SPI driver 穩定性，進行 **16 小時連續測試**。
-
 
 | 參數 | 設定 |  
 |------------|------------------|  

@@ -9,7 +9,6 @@ RK3588 平台使用 MIPI 訊號驅動第二顆外接顯示器（DisplayId=2）�
 -   **內容完全填滿、不裁切、不壓扁**
 -   **行為與 AOSP `wm user-rotation` 一致**
     
-
 問題：
 
 -   **Android 15 的 rotation 流程已與 A14 差異極大**    
@@ -17,7 +16,6 @@ RK3588 平台使用 MIPI 訊號驅動第二顆外接顯示器（DisplayId=2）�
 -   init.rc → `wm user-rotation` 無效 + SELinux 阻擋 
 -   SurfaceFlinger 調整 projection → 畫面會裁切 / 錯位
 -   LogicalDisplay 修改各種 hack → 還是少一整列 icon 
-----------
 
 ## 2. 除錯過程
 
@@ -35,8 +33,6 @@ Android 15 對 multi-display 的變動相當大，以下為與 Android 14 的差
 
 此架構變動 → **Rockchip A14 Patch 在 A15 會錯位 & 被裁切**。
 
-----------
-
 ### 2.2 研究方法與實驗流程
 
 1.  **比對 A14 / A15 Rockchip BSP patch**
@@ -49,8 +45,6 @@ Android 15 對 multi-display 的變動相當大，以下為與 Android 14 的差
 4.  用 `adb logcat -s SurfaceFlinger` 追動畫面
 5.  dumpsys SurfaceFlinger → 分析 MIPI display 投影矩陣
 6.  A/B 測試不同修改
-
-----------
 
 ### 2.3 為何 `wm user-rotation -d 2 lock 1` 是唯一有效的？
 
@@ -72,8 +66,6 @@ wm → cmd window → WindowManagerService.setUserRotation
 ✓ 正確更新 Input system（touch rotation）
 
 任何跳過 WMS 的方法（如直接改 SF）都會錯亂 → 導致裁切。
-
-----------
 
 ### 2.4 init.rc 嘗試與為何失敗
 
@@ -98,8 +90,6 @@ system_server_service denied
 **init.rc 無法做 per-display rotation。**  
 唯一方法：**進 framework。**
 
-----------
-
 ### 2.5 Rockchip 原廠 Patch（A14 vs A15）比較
 
 | 功能 | Android 14 | Android 15 |
@@ -115,8 +105,6 @@ system_server_service denied
 #### Rockchip A14 patch 無法直接移植到 A15
 
 因為抽象層全部重新設計。
-
-----------
 
 ### 2.6 Android 15 真正的 rotation 流程
 
@@ -135,7 +123,6 @@ WindowManagerService
 -   同步 scale    
 -   同步 touch alignment   
 -   同步 system bar inset
-----------
 
 ### 2.7 dumpsys SurfaceFlinger 深度分析（DisplayId=2）
 dumpsys 證實：
@@ -152,8 +139,6 @@ LogicalDisplay 設定的 geometry 被 InputFlinger / InsetsPolicy 覆蓋。
 這證實：  
 ✓ 必須走 WMS 正規種子流程  
 ✗ 不能只 patch SF / LogicalDisplay
-
-----------
 
 ## 3. Root Cause 分析
 
@@ -174,8 +159,6 @@ displayId=2 出現：
 - SurfaceControl Transaction 中 Matrix 計算異常  
 - **最終畫面一定裁切、方向錯誤**  
 
-----------
-
 ## 4. 解決方案（正式解法：加入 framework-level「開機後旋轉」）
 
 後來成功的方案：
@@ -195,8 +178,6 @@ displayId=2 出現：
 這也是 `wm user-rotation` 正常的原因  
 把 wm 的邏輯搬到 framework 內自動執行！
 
-----------
-
 ## 5. 結論與建議
 
 ### 5.1 不推薦的錯誤方向
@@ -208,8 +189,6 @@ displayId=2 出現：
 | 修改 LogicalDisplay `layerStackRect` | InsetsPolicy 會覆蓋掉所有變更 |
 | 在 init.rc 執行 `wm` 指令 | SELinux 限制 + system_server 尚未準備好 |
 | 使用 ContentRecorder hack | 這是錄影鏡像功能，不會改變真實顯示 |
-
-----------
 
 ### 5.2 結論
 
@@ -227,16 +206,12 @@ displayId=2 出現：
 -   Touch rotation 正確
 的方法。
 
-----------
-
 ### 5.3 未來可維護性建議
 
 -   建一個 **RotationService**，集中處理外接顯示設定 
 -   改用 **system_ext overlay property** 控制 per-display rotation
 -   預留後續 Android 16 的可能 API 變動
 -   將 MIPI panel rotation 配置加入 device overlay（config.xml）
-
-----------
 
 ## 附錄
 

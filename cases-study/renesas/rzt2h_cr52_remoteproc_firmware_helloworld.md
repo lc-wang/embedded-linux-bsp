@@ -9,8 +9,6 @@
 > - 如何在 Linux 上透過 remoteproc 啟動 CR52
 > - 如何用 `devmem2` 驗證 CR52 firmware 確實在執行
 
----
-
 ## 2. 環境與前置條件
 
 ### 2.1 軟體環境
@@ -28,8 +26,6 @@
 
 - RZ/T2H Evaluation Board（例如：R9A09G077M44）
 - A55 端 Linux 可正常啟動並登入 root shell
-
----
 
 ## 3. e² studio 專案建立
 
@@ -70,7 +66,6 @@
     
 -   remoteproc start_address：`0x10061000`
     
-
 ### 4.1 新增檔案
 
 1.  在 e² studio 專案上按右鍵：
@@ -81,7 +76,6 @@
     
     -   `New` → `File` → 檔名輸入：`rzt2h_cr52_remoteproc.ld`
         
-
 ### 4.2 貼上 linker script 內容
 
 在 `script/rzt2h_cr52_remoteproc.ld` 中貼入：
@@ -187,7 +181,6 @@ Linux remoteproc 會將 PC 設為 `0x10061000`，因此需要在該位址放入�
     
     -   `New` → `File` → 檔名：`startup_cr52.S`
         
-
 ### 5.2 貼上 startup 程式碼（簡化版）
 ```sh
     .syntax unified
@@ -241,9 +234,6 @@ _start:
         
 3.  如果專案中不存在這些檔案，則可略過此步驟。
     
-
-----------
-
 ## 7. 實作 HelloWorld firmware：`hal_entry.c`
 
 目標行為：CR52 firmware 週期性向一個固定位址寫入數值，A55 端可以用 `devmem2` 看到數值不斷增長。
@@ -283,7 +273,6 @@ void hal_entry(void)
 ```
 若 main.c 存在，通常 FSP 預設內容會在 main() 呼叫 hal_entry()，無需修改。
 
-
 ## 8. 設定專案使用自訂 linker script
 
 1.  專案按右鍵 → `Properties`
@@ -304,7 +293,6 @@ void hal_entry(void)
 -Tscript/rzt2h_cr52_remoteproc.ld
 ```
 套用後關閉設定視窗。
-
 
 ## 9. 編譯專案並產生 ELF
 
@@ -330,7 +318,6 @@ HelloWorld.elf
     
 -   `_start` 是否有定義（`startup_cr52.S` 有 `global _start`）
 
-
 ## 10. Linux 端：透過 remoteproc 啟動 CR52
 
 以下假設：
@@ -339,7 +326,6 @@ HelloWorld.elf
     
 -   firmware 路徑為 `/lib/firmware/HelloWorld.elf`
     
-
 ### 10.1 確認 remoteproc device 存在
 ```sh
 ls /sys/class/remoteproc
@@ -371,7 +357,6 @@ remoteproc remoteproc0: no resource table found for this firmware
 remoteproc remoteproc0: remote processor cr52_0 is now up
 ```
 `no resource table found for this firmware` 在本教學中屬正常現象，因為 HelloWorld 未使用 resource table。
-
 
 ## 11. 驗證（CR52 firmware 是否在執行）
 
@@ -406,7 +391,6 @@ Value at address 0x10070000 (0xffff9abcd000): 0x12341C8B
     
 -   remoteproc 已成功啟動 firmware 並讓 CR52 持續跑
 
-
 ## 12. 常見問題與排查
 
 ### 12.1 `Boot failed: -22` 或 `bad phdr da ...`
@@ -419,7 +403,6 @@ Value at address 0x10070000 (0xffff9abcd000): 0x12341C8B
     
 -   startup 檔未使用 ARM mode
     
-
 建議：
 
 -   確認 `ENTRY(_start)` 是否存在
@@ -428,9 +411,6 @@ Value at address 0x10070000 (0xffff9abcd000): 0x12341C8B
     
 -   確認 `startup_cr52.S` 第一個指令是 `.arm` 狀態
     
-
-----------
-
 ### 12.2 `Boot failed: -12` 或 `Registered carveout doesn't fit len request`
 
 此教學的 HelloWorld 未使用 resource table。  
@@ -446,7 +426,6 @@ remoteproc remoteproc0: Boot failed: -12
 -   HelloWorld 階段建議 **完全不要放 resource table**，維持本教學提供的狀態。
     
 -   若需要 OpenAMP / RPMsg，應以官方 OpenAMP 範例專案為基準，另行整合。
-
 
 ### 12.3 CR52 似乎無動作，但 remoteproc 顯示已啟動
 

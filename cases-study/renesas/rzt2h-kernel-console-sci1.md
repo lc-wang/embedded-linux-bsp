@@ -15,8 +15,6 @@
 
 此修改用於適配特定硬體設計，debug UART 實際連接至 **SCI1** 的情境。
 
-----------
-
 ### 1.2 原始系統行為
 
 預設 Kernel Console 設定如下：
@@ -28,12 +26,9 @@
 | Device node  | serial@80005000            |
 | Linux device | /dev/ttySC0                |
 
-
 Kernel log：
 
 `earlycon: sci0 at MMIO  0x80005000  console [ttySC0] enabled` 
-
-----------
 
 ### 1.3 修改目標
 
@@ -43,8 +38,6 @@ Kernel log：
 | Base         | 0x80005400        |
 | Linux device | /dev/ttySC1       |
 | Kernel log   | 由 SCI1 輸出      |
-
-----------
 
 ## 2. 系統環境
 
@@ -57,8 +50,6 @@ Kernel log：
 | 架構         | ARM64                                  |
 | UART IP      | Renesas RSCIF                          |
 | Toolchain    | aarch64-poky-linux-gcc                 |
-
-----------
 
 ## 3. 解決方案（Kernel 修改內容）
 
@@ -83,8 +74,6 @@ Kernel log：
 }; 
 ```
 
-----------
-
 ### 3.2 停用 SCI0（避免 fallback）
 
 ```
@@ -94,13 +83,9 @@ Kernel log：
 ```
 若未 disable，kernel 可能仍會自動選擇 SCI0。
 
-----------
-
 ### 3.3 Kernel console 指定方式（重點）
 
 注意：**本次實作並未修改 kernel DTS 的 `/chosen` node。**
-
-----------
 
 #### 3.3.1 kernel console 完全由 U-Boot bootargs 傳入
 
@@ -118,16 +103,12 @@ U-Boot 設定：
 
 ```
 
-----------
-
 #### 3.3.2 傳入 kernel 的 bootargs
 
 ```
 console=ttySC1,115200n8
 earlycon=rscif,80005400
 ```
-
-----------
 
 ### 3.4 Kernel log 驗證
 
@@ -145,8 +126,6 @@ earlycon=rscif,80005400
     
 -   SCI0 已完全未被使用
 
-----------
-
 ### 3.5 Runtime 驗證
 
 ```
@@ -159,8 +138,6 @@ okay
 dmesg | grep ttySC
 ```
 
-----------
-
 ## 4. 結論與建議
 
 ### 4.1 最終成果
@@ -172,8 +149,6 @@ printk: bootconsole [rscif] enabled
 console [ttySC1] enabled
 ```
 SCI0 可完全 disabled，不再參與 kernel console。
-
-----------
 
 ### 4.2 常見錯誤整理
 
@@ -189,8 +164,6 @@ SCI0 可完全 disabled，不再參與 kernel console。
     
 -   status = "okay"
 
-----------
-
 #### 4.2.2 kernel DTS 與 U-Boot DTS 不共用
 
 | Stage   | DTS 路徑                         |
@@ -198,10 +171,7 @@ SCI0 可完全 disabled，不再參與 kernel console。
 | U-Boot  | arch/arm/dts/                    |
 | Kernel  | arch/arm64/boot/dts/             |
 
-
 修改 kernel DTS **不會影響 U-Boot console**。
-
-----------
 
 #### 4.2.3 `/chosen` 非必要
 
