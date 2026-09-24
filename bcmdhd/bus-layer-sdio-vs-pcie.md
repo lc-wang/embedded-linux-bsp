@@ -53,35 +53,16 @@ SDIO 是 **transaction-based** 介面：
     
 -   高度依賴 **aggregation** 與 **timing**
     
-特性總結：
+#### 特性總結（SDIO）
 
-項目
-
-SDIO
-
-傳輸模型
-
-Transaction
-
-效能
-
-中
-
-延遲
-
-高
-
-CPU 負擔
-
-高
-
-Debug 難度
-
-中
-
-穩定性風險
-
-高（PM / timing）
+| 項目         | SDIO        |
+|--------------|-------------|
+| 傳輸模型 | Transaction |
+| 效能 | 中 |
+| 延遲 | 高 |
+| CPU 負擔 | 高 |
+| Debug 難度 | 中 |
+| 穩定性風險 | 高（PM / timing） |
 
 ### 2.2 SDIO 資料流概觀
 ```

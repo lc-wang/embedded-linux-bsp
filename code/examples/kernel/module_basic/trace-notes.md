@@ -65,7 +65,8 @@ do_one_initcall()
 ```
 統一執行。
 
-重要觀念
+## 5. 重要觀念
+
 ```
 module_init()
 = driver 被載入
@@ -75,15 +76,19 @@ probe()
 ```
 兩者意義完全不同。
 
-常用除錯指令
+## 6. 常用除錯指令
+
 ```
 lsmod
 cat /proc/modules
 modinfo hello_module.ko
 dmesg | tail
 ```
-Trace 建議方式
-function tracer
+
+## 7. Trace 建議方式
+
+### 7.1 function tracer
+
 ```
 echo function > /sys/kernel/debug/tracing/current_tracer
 echo do_init_module > /sys/kernel/debug/tracing/set_ftrace_filter
@@ -93,7 +98,9 @@ echo do_init_module > /sys/kernel/debug/tracing/set_ftrace_filter
 ```
 trace-cmd record -p function do_init_module
 ```
-建議心智模型
+
+## 8. 建議心智模型
+
 ```
 insmod
   ↓

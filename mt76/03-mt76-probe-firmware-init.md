@@ -48,8 +48,6 @@ struct mt76_dev {
     void __iomem *mmio;
     ...
 };
-    ...
-};` 
 ```
 **關鍵概念**：  
 mt76 從一開始就將「匯流排差異」封裝在 `mt76_bus_ops`。
