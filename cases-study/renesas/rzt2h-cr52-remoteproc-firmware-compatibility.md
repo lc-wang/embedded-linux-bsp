@@ -76,7 +76,7 @@ CR52 firmware 啟動後必須主動建立：
 ```c
 `OPENAMP_init();
 rpmsg_lite_master_init(...);
-rpmsg_lite_create_ept(...);` 
+rpmsg_lite_create_ept(...);
 ```
 remoteproc 只能啟動 firmware，但不會幫 firmware 建立 IPC。  
 若 firmware 缺少這些初始化動作：

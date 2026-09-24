@@ -67,7 +67,7 @@ workspace/
 
 #### 症狀
 ```sh
-Unable to resolve 'master' in upstream git repository` 
+Unable to resolve 'master' in upstream git repository
 ```
 
 #### 根本原因

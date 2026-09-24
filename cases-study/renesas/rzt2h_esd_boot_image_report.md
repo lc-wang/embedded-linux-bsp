@@ -128,7 +128,7 @@ dd  if=bl2_bp_esd.bin of=$loop_dev conv=notrunc
 
 探勘 offset：
 ```nginx
-xxd -s $((768*512)) -l 16 core-image*.wic`
+xxd -s $((768*512)) -l 16 core-image*.wic
 ```
 → 發現 FIP 在 LBA 768 → script 修正後正常。
 

@@ -89,7 +89,7 @@ route_hdmi1: route-hdmi1 {
 ```bash
 cp drivers/video/logo/logo_linux_clut224.ppm .
 sudo apt install imagemagick
-convert logo_linux_clut224.ppm logo_kernel.bmp` 
+convert logo_linux_clut224.ppm logo_kernel.bmp
 ```
 
 可選參數：

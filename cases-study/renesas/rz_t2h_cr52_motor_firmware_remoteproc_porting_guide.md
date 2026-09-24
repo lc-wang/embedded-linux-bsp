@@ -112,7 +112,7 @@ SECTIONS
     {
         KEEP(*(.resource_table*))
     } > FW
-}` 
+}
 ```
 > 註：remoteproc 可以接受「沒有 resource table」的 firmware。
 

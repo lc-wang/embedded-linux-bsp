@@ -38,7 +38,7 @@ rz_rproc_start+0x1d0
 
 分析 CR52 firmware 的 ELF：
 ```bash
-readelf -l firmware.elf` 
+readelf -l firmware.elf
 ```
 
 你發現它的記憶體段包括：

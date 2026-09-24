@@ -80,7 +80,7 @@
 Left Line Mux = NC
 Right Line Mux = NC
 Headset Mic Switch = off
-Left/Right PGA Mux = Differential` 
+Left/Right PGA Mux = Differential
  ```
 2.  耳麥 **仍然可以錄到聲音**
     

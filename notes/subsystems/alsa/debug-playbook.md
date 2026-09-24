@@ -46,7 +46,7 @@
 ```
 CPU DAI driver probe ?
 Codec driver probe ?
-Machine driver probe ?` 
+Machine driver probe ?
 ```
 
 #### Step 3
