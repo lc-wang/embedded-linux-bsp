@@ -2,7 +2,7 @@
 
 本章要把以下幾個概念串起來：
 
-```
+```text
 ARM TrustZone
 Secure World
 Normal World
@@ -15,7 +15,7 @@ Linux / Android
 
 重點不是深入 OP-TEE implementation，而是先理解：
 
-```
+```text
 Linux / Android 為什麼不是系統中最高權限？
 為什麼有些 key / memory / device 不能被 Linux 直接存取？
 Normal World 要怎麼呼叫 Secure World？
@@ -23,7 +23,7 @@ Normal World 要怎麼呼叫 Secure World？
 
 ## 1. 一張圖先看懂
 
-```
+```text
 +------------------------------------------------+
 |                 Normal World                   |
 |                                                |
@@ -54,7 +54,7 @@ Normal World 要怎麼呼叫 Secure World？
 
 一句話：
 
-```
+```text
 Linux 在 Normal World。
 OP-TEE 在 Secure World。
 兩邊透過 SMC 經過 EL3 切換。
@@ -73,7 +73,7 @@ ARM TrustZone 是 ARM SoC 提供的硬體隔離機制。
 
 重點：
 
-```
+```text
 Secure World 可以保護 key、secure storage、crypto service。
 Normal World 不能直接讀取 Secure World 的 memory 或 secure peripheral。
 ```
@@ -82,7 +82,7 @@ Normal World 不能直接讀取 Secure World 的 memory 或 secure peripheral。
 
 因為在 ARM BSP / Android BSP 中，你會常看到：
 
-```
+```text
 TF-A
 BL31
 OP-TEE
@@ -97,7 +97,7 @@ secure storage
 
 很多問題都跟 TrustZone 有關：
 
-```
+```text
 為什麼 Linux 讀不到某段 memory？
 為什麼某些 register access 會 abort？
 為什麼 Android KeyMint 需要 TEE？
@@ -120,7 +120,7 @@ ARMv8-A 常見 Exception Level：
 
 簡化理解：
 
-```
+```text
 Linux kernel 通常跑在 EL1。
 OP-TEE OS 通常跑在 Secure EL1。
 TF-A BL31 跑在 EL3。
@@ -130,7 +130,7 @@ TF-A BL31 跑在 EL3。
 
 典型 ARM secure boot flow：
 
-```
+```text
 BootROM
   ↓
 TF-A BL2 / SPL
@@ -146,7 +146,7 @@ Linux / Android
 
 可以理解成：
 
-```
+```text
 BootROM:
   SoC 最早執行的 ROM code
 
@@ -170,7 +170,7 @@ Linux / Android:
 
 SMC 是：
 
-```
+```text
 Secure Monitor Call
 ```
 
@@ -178,7 +178,7 @@ Normal World 不能直接跳進 Secure World。
 
 它必須透過 SMC：
 
-```
+```text
 Linux driver
   ↓
 SMC instruction
@@ -192,7 +192,7 @@ Trusted Application
 
 所以 SMC 可以理解成：
 
-```
+```text
 Normal World 呼叫 Secure World 的入口。
 ```
 
@@ -200,7 +200,7 @@ Normal World 呼叫 Secure World 的入口。
 
 以 Linux 使用 OP-TEE service 為例：
 
-```
+```text
 userspace
   ↓
 /dev/tee0
@@ -218,7 +218,7 @@ Trusted Application
 
 更完整一點：
 
-```
+```text
 +-----------------------------+
 | normal userspace            |
 | tee-supplicant / app        |
@@ -249,7 +249,7 @@ TrustZone 不只隔離 CPU 執行狀態，也常搭配 memory protection。
 
 常見情況：
 
-```
+```text
 DRAM 中保留一段 secure memory
 只有 Secure World 可以存取
 Normal World Linux 不可使用
@@ -257,7 +257,7 @@ Normal World Linux 不可使用
 
 Device Tree 可能會看到：
 
-```
+```dts
 reserved-memory {
     optee@9e000000 {
         reg = <0x0 0x9e000000 0x0 0x02000000>;
@@ -268,7 +268,7 @@ reserved-memory {
 
 重點：
 
-```
+```text
 no-map 代表 Linux 不應該把這段 memory map 起來使用。
 ```
 
@@ -276,7 +276,7 @@ no-map 代表 Linux 不應該把這段 memory map 起來使用。
 
 有些 SoC peripheral 可以設定成：
 
-```
+```text
 secure only
 non-secure only
 shared
@@ -284,7 +284,7 @@ shared
 
 例如：
 
-```
+```text
 crypto engine
 efuse controller
 key storage
@@ -295,7 +295,7 @@ some GPIO / I2C / SPI controller
 
 如果 peripheral 被設定成 secure only，Normal World driver 直接 access 可能會：
 
-```
+```text
 bus error
 external abort
 permission fault
@@ -308,7 +308,7 @@ OP-TEE 是 Secure World 裡的 TEE OS。
 
 它通常提供：
 
-```
+```text
 Trusted Application runtime
 secure storage
 crypto service
@@ -319,7 +319,7 @@ Android KeyMint / Gatekeeper backend
 
 但要注意：
 
-```
+```text
 TrustZone 是硬體隔離機制。
 OP-TEE 是跑在 Secure World 的軟體。
 ```
@@ -330,7 +330,7 @@ OP-TEE 是跑在 Secure World 的軟體。
 
 在 Android BSP 中，TrustZone 常出現在：
 
-```
+```text
 KeyMint
 Gatekeeper
 Widevine
@@ -341,7 +341,7 @@ hardware-backed keystore
 
 簡化 flow：
 
-```
+```text
 Android framework
   ↓
 KeyMint HAL
@@ -359,7 +359,7 @@ secure key operation
 
 重點：
 
-```
+```text
 key 不一定會離開 Secure World。
 Normal World 只是要求 Secure World 幫忙做 crypto operation。
 ```
@@ -368,14 +368,14 @@ Normal World 只是要求 Secure World 幫忙做 crypto operation。
 
 ### 12.1 看 kernel log
 
-```
+```bash
 dmesg | grep -i optee
 dmesg | grep -i tee
 ```
 
 常見 log：
 
-```
+```text
 optee: probing for conduit method
 optee: revision 3.x
 optee: initialized driver
@@ -383,13 +383,13 @@ optee: initialized driver
 
 ### 12.2 看 device node
 
-```
+```bash
 ls -l /dev/tee*
 ```
 
 可能看到：
 
-```
+```text
 /dev/tee0
 /dev/teepriv0
 ```
@@ -398,7 +398,7 @@ ls -l /dev/tee*
 
 ### 12.3 看 reserved memory
 
-```
+```bash
 dmesg | grep -i reserved
 cat /proc/iomem
 ```
@@ -407,13 +407,13 @@ cat /proc/iomem
 
 ### 12.4 看 kernel config
 
-```
+```text
 zcat /proc/config.gz | grep OPTEE
 ```
 
 常見 config：
 
-```
+```text
 CONFIG_TEE=y
 CONFIG_OPTEE=y
 ```
@@ -424,13 +424,13 @@ CONFIG_OPTEE=y
 
 Boot flow 少載入 tee.bin / tee.elf：
 
-```
+```text
 BootROM → TF-A → U-Boot → Linux
 ```
 
 結果：
 
-```
+```text
 Linux 找不到 OP-TEE。
 Android KeyMint / Gatekeeper 可能失敗。
 ```
@@ -441,7 +441,7 @@ secure memory 沒有保留，Linux 把 OP-TEE memory 拿去用。
 
 可能結果：
 
-```
+```text
 OP-TEE crash
 random memory corruption
 SMC call failed
@@ -454,7 +454,7 @@ Linux 與 firmware 對 SMC / HVC conduit 認知不同。
 
 可能 log：
 
-```
+```text
 optee: api uid mismatch
 optee: probing for conduit method failed
 ```
@@ -465,7 +465,7 @@ optee: probing for conduit method failed
 
 Normal World driver 直接讀寫可能造成：
 
-```
+```text
 Synchronous External Abort
 permission fault
 hang
@@ -477,7 +477,7 @@ Android userspace HAL 啟動，但底層 TEE service 不存在。
 
 常見影響：
 
-```
+```text
 KeyMint fail
 Gatekeeper fail
 keystore fail

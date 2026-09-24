@@ -85,7 +85,7 @@ int request_irq(unsigned int irq,
         unsigned long flags,
         const char *name,
         void *dev);
- ```
+```
 
 ### 4.1 常見 flags
 
@@ -145,7 +145,7 @@ SoftIRQ 類型：
 
 SoftIRQ 常以 ksoftirqd CPU thread 執行：
 
-```sh
+```bash
 ksoftirqd/0
 ksoftirqd/1
 ...
@@ -165,7 +165,7 @@ Tasklet = SoftIRQ 的 API 包裝。
 
 例如：
 
-```sh
+```bash
 cat /proc/irq/42/smp_affinity
 echo 2 > /proc/irq/42/smp_affinity  # 綁核心 1
 ```
@@ -179,19 +179,19 @@ echo 2 > /proc/irq/42/smp_affinity  # 綁核心 1
 ## 9. 調試命令
 
 查看所有 IRQ：
-```sh
+```bash
 cat /proc/interrupts
 ```
 查看中斷控制器：
-```sh
+```bash
 cat /sys/kernel/irqchip/*
 ```
 啟用 ftrace 中斷事件：
-```sh
+```bash
 echo 1 > /sys/kernel/debug/tracing/events/irq/enable
 ```
 查看 IRQ affinity：
-```sh
+```bash
 cat /proc/irq/*/smp_affinity
 ```
 

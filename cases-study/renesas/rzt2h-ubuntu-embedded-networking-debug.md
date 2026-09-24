@@ -5,17 +5,17 @@
 在 RZ/T2H 平台啟動 Ubuntu rootfs 後，出現以下問題：
 
 -   `ifconfig` 顯示已有 IPv4 位址
-    
+
 -   `ip route` 看似存在 default route
-    
+
 -   有時可 ping gateway
-    
+
 -   **無法穩定 ping 外部 IP（8.8.8.8）**
-    
+
 -   **永遠無法解析網域名稱**
-    
+
 -   重開機後網路行為不一致
-    
+
 常見現象如下：
 
 ```bash
@@ -53,7 +53,7 @@ default via 192.0.2.1 dev eth0  ✓
 
 systemd log 中可觀察到：
 
-```
+```text
 connmand: eth1 {add} route 0.0.0.0 gw 0.0.0.0
 ```
 
@@ -70,7 +70,7 @@ default dev eth1
 結果：
 
 -   不經 gateway
-    
+
 -   外部網路永遠無法連線
 
 #### 2.1.2 avahi 啟用 IPv4 Link-Local
@@ -84,7 +84,7 @@ avahi-daemon 會自動啟用：
 導致：
 
 -   kernel routing table 被污染
-    
+
 -   link up / down 時反覆新增與刪除 route
 
 #### 2.1.3 DNS 被 connman 接管
@@ -100,9 +100,9 @@ nameserver ::1
 但系統中：
 
 -   並無本地 DNS proxy
-    
+
 -   systemd-resolved 已停用
-    
+
 因此所有 DNS 查詢全部失敗：
 
 ```bash
@@ -121,9 +121,9 @@ echo "nameserver 8.8.8.8" > /etc/resolv.conf
 僅在當次有效，重開機後會再次失效，原因為：
 
 -   connman 開機後重新插入 routing
-    
+
 -   avahi 重新啟用 IPv4LL
-    
+
 -   resolv.conf 被再次覆寫
 
 ### 2.3 關鍵發現：rootfs build 與 runtime 的差異
@@ -150,7 +150,7 @@ Loaded: loaded (/usr/lib/systemd/system/connman.service)
 
 此問題並非單一 bug，而是 **多個 network manager 同時啟動所造成的競爭問題**。
 
-### 3.1 系統中同時存在：
+### 3.1 系統中同時存在
 
 | 元件                 | 狀態         |
 |----------------------|--------------|
@@ -163,11 +163,11 @@ Loaded: loaded (/usr/lib/systemd/system/connman.service)
 以上元件同時操作：
 
 -   routing table
-    
+
 -   default gateway
-    
+
 -   DNS
-    
+
 導致網路狀態無法穩定。
 
 ## 4. 解決方案
@@ -180,7 +180,7 @@ Loaded: loaded (/usr/lib/systemd/system/connman.service)
 
 最終採用架構：
 
-```
+```text
 Kernel Ethernet Driver
         ↓
 NetworkManager
@@ -193,9 +193,9 @@ Static DNS (/etc/resolv.conf)
 完全移除：
 
 -   connman
-    
+
 -   avahi
-    
+
 -   systemd-resolved
 
 ### 4.2 最終實作方式（rootfs 階段）
@@ -288,11 +288,11 @@ ping www.google.com ✓
 以下不可共存：
 
 -   connman
-    
+
 -   NetworkManager
-    
+
 -   systemd-networkd
-    
+
 -   udhcpc
 
 #### 5.1.2 `default dev ethX` 是致命 routing
@@ -302,7 +302,7 @@ ping www.google.com ✓
 #### 5.1.3 rootfs 階段 systemctl 並不可靠
 
 -   `systemctl disable` 在 chroot 常失效
-    
+
 -   `/etc/systemd/system/*.service -> /dev/null` 才是真正的 mask
 
 #### 5.1.4 DNS 問題 ≠ 網路問題
@@ -318,7 +318,7 @@ ping domain FAIL
 
 ### 5.2 最終架構圖
 
-```
+```text
 +---------------------+
 | Ethernet Driver     |
 +---------------------+

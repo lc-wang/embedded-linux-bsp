@@ -16,7 +16,7 @@ Linux kernel 中最基本的睡眠型鎖（sleeping lock）範例。
 
 ## 1. 一句話先記住
 
-```
+```text
 mutex
 = 可以睡眠的鎖
 = 適合 process context
@@ -36,7 +36,7 @@ mutex
 -   driver 內部需要保護共享狀態
 
 ## 3. Kernel 原始碼對照
-```
+```text
 kernel/locking/mutex.c  
 include/linux/mutex.h  
 fs/read_write.c

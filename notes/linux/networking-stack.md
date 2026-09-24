@@ -266,12 +266,12 @@ ip neigh
 ## 11. 常見 Debug 工具
 
 查看封包
-```sh
+```bash
 tcpdump -i eth0
 tcpdump -i wlan0 -vvv
 ```
 驅動層 debug
-```sh
+```bash
 ethtool -S eth0
 ```
 
@@ -282,13 +282,13 @@ ethtool -S eth0
 -   ring buffer overflow
 
 查看 CPU 使用
-```sh
+```bash
 perf top
 ```
 若 RX path 過重 → NAPI 配置可能不佳。
 
 查看 socket 狀態
-```sh
+```bash
 ss -ant
 ```
 

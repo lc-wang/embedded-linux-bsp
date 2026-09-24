@@ -16,7 +16,7 @@ Linux kernel 中最通用的「阻塞等待機制」。
 
 ## 1. 一句話先記住
 
-```
+```text
 waitqueue
 = 等「某個條件成立」
 ```
@@ -34,7 +34,7 @@ waitqueue
 -   driver data ready
 
 ## 3. Kernel 原始碼對照
-```
+```text
 kernel/sched/wait.c  
 include/linux/wait.h  
 fs/read_write.c

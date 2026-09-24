@@ -1,7 +1,7 @@
 # Kernel trace notes — dma_alloc_coherent
 
 ## 1. dma_alloc_coherent() 走哪裡？
-```
+```text
 dma_alloc_coherent()
 	└─ dma_alloc_attrs()
 		└─ ops->alloc()

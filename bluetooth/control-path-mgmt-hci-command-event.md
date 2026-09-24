@@ -3,18 +3,18 @@
 在 Bluetooth bring-up / debug 時，最常見、也最難解的問題幾乎都集中在 **control path**：
 
 -   `hciconfig hci0 up` 卡住
-    
+
 -   `btmgmt power on` 沒反應
-    
+
 -   btmon 看到 command，但 event 沒回來
-    
+
 -   BlueZ 顯示 power on，但 controller 實際沒動作
-    
+
 這一章只做一件事：  
 **把「mgmt → HCI command → HCI event → completion」這條路完整拆解**
 
 ## 1. Control Path 全景
-```
+```text
 User space
 ──────────
 bluetoothd / btmgmt
@@ -55,21 +55,21 @@ mgmt.c / bluetoothd
 歷史背景簡化版：
 
 -   早期：user space 直接送 raw HCI command
-    
+
 -   問題：
-    
+
     -   policy 混亂
-        
+
     -   race condition
-        
+
     -   多 process 控制同一顆 controller
-        
+
 -   解法：
-    
+
     -   kernel 統一管理 HCI device state
-        
+
     -   user space 只送「意圖」
-        
+
 **mgmt 就是「意圖層（intent layer）」**
 
 ### 2.2 mgmt 的入口點（Kernel）
@@ -85,11 +85,11 @@ mgmt.c / bluetoothd
 這裡做的事：
 
 1.  解析 mgmt command header
-    
+
 2.  依 opcode 分派 handler
-    
+
 3.  對應到 HCI 動作（通常是送 HCI command）
-    
+
 ### 2.3 常見 mgmt command 與用途
 
 | mgmt opcode               | 意義             |
@@ -112,7 +112,7 @@ User space：
 `btmgmt power on` 
 
 Kernel flow（簡化）：
-```
+```text
 mgmt_set_powered()
   └─ hci_dev_do_open()
        └─ hci_open_dev()
@@ -128,17 +128,17 @@ mgmt_set_powered()
 關鍵行為：
 
 -   檢查 hci_dev state
-    
+
 -   送出一系列必要的 HCI command：
-    
+
     -   HCI Reset
-        
+
     -   Read Local Version
-        
+
     -   Set event mask
-        
+
     -   LE setup（如果支援）
-        
+
 **如果這裡任何一個 command 沒完成 → power on 卡住**
 
 ## 4. HCI Command Queue 機制（為什麼會 timeout）
@@ -148,15 +148,15 @@ mgmt_set_powered()
 HCI core 有自己的 command queue：
 
 -   同時間只允許有限數量 pending command
-    
+
 -   每個 command 需要等：
-    
+
     -   `Command Complete`
-        
+
     -   或 `Command Status`
-        
+
 關鍵資料結構：
-```
+```c
 struct hci_dev {
     struct sk_buff_head cmd_q;
     struct sk_buff *sent_cmd;
@@ -173,13 +173,13 @@ struct hci_dev {
 實際流程：
 
 1.  封裝 HCI Command skb
-    
+
 2.  丟進 command queue
-    
+
 3.  睡眠等待 completion
-    
+
 4.  在 event handler 中被喚醒
-    
+
 **timeout 的本質**
 
 > command 有送，但對應的 event 沒回來
@@ -199,13 +199,13 @@ struct hci_dev {
 這裡會：
 
 -   parse event code
-    
+
 -   分派到對應 handler
-    
+
 -   更新 hci_dev state
-    
+
 -   完成 pending command
-    
+
 ### 5.2 關鍵事件：Command Complete / Status
 
 | Event              | 意義說明                                   |
@@ -216,23 +216,23 @@ struct hci_dev {
 如果這兩個 event **任一沒回來**：
 
 -   `hci_cmd_sync()` 永遠等不到
-    
+
 -   表現出來就是：
-    
+
     -   `hciconfig hci0 up` 卡住
-        
+
     -   btmgmt power on timeout
-        
+
 ## 6. btmon：把控制流程「實體化」的工具
 
 ### 6.1 btmon 能看到什麼？
 
 -   HCI Command（Host → Controller）
-    
+
 -   HCI Event（Controller → Host）
-    
+
 -   ACL data（資料面）
-    
+
 ### 6.2 用 btmon 對照 control path
 
 典型健康流程：
@@ -260,13 +260,13 @@ struct hci_dev {
 高機率原因：
 
 -   UART baud rate mismatch
-    
+
 -   UART RTS/CTS flow control 問題
-    
+
 -   firmware 尚未載入 / controller 還在 ROM
-    
+
 -   transport driver 沒真的送出去
-    
+
 優先檢查：
 
 ```text
@@ -279,37 +279,37 @@ drivers/bluetooth/btusb.c
 代表：
 
 -   controller 拒絕該 command
-    
+
 -   firmware 不支援該 opcode
-    
+
 -   controller 狀態不對（尚未 ready）
-    
+
 #### mgmt command 沒進到 HCI
 
 可能原因：
 
 -   hci_dev state 不允許
-    
+
 -   adapter 尚未註冊完成
-    
+
 -   先前 command queue 卡死
-    
+
 ### 7.2 Debug Control Path 的「標準流程」
 
 建議你之後都照這個順序：
 
 1.  停 bluetoothd
-    
+
 2.  用 `btmgmt power on`
-    
+
 3.  同時開 `btmon`
-    
+
 4.  看：
-    
+
     -   command 有沒有送
-        
+
     -   event 有沒有回
-        
+
 5.  再決定要不要看 BlueZ
-    
+
 **不要一開始就怪 BlueZ**

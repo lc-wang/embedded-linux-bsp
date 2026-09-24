@@ -27,14 +27,14 @@ miscdevice 是 character device 的簡化封裝，
 → 用 miscdevice。
 
 ## 2. Kernel 原始碼對照
-```
+```text
 drivers/char/misc.c
 fs/char_dev.c
 drivers/base/core.c
 ```
 
 ## 3. 使用流程總覽
-```
+```text
 module_init()
 └─ misc_register()
 ├─ alloc minor

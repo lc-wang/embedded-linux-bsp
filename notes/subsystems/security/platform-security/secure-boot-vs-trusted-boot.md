@@ -2,7 +2,7 @@
 
 本章要釐清幾個容易混在一起的名詞：
 
-```
+```text
 Secure Boot
 Verified Boot
 Trusted Boot
@@ -14,7 +14,7 @@ Attestation
 
 本章核心問題是：
 
-```
+```text
 誰負責阻止不可信 image？
 誰負責記錄實際載入內容？
 誰負責向外證明目前系統狀態？
@@ -22,7 +22,7 @@ Attestation
 
 ## 1. 一張圖先看懂
 
-```
+```text
                  [Root of Trust]
                         ↓
         +---------------+---------------+
@@ -41,7 +41,7 @@ Attestation
 
 一句話：
 
-```
+```text
 Secure Boot 負責擋下不可信 image。
 Measured Boot 負責記錄實際載入內容。
 Attestation 負責證明目前系統狀態。
@@ -74,7 +74,7 @@ Attestation 負責證明目前系統狀態。
 
 簡化理解：
 
-```
+```text
 Secure Boot:
   不可信 → 不執行
 
@@ -86,13 +86,13 @@ Measured Boot:
 
 Secure Boot 的核心概念是：
 
-```
+```text
 在執行下一階段 image 之前，先驗證它是不是被授權。
 ```
 
 典型 flow：
 
-```
+```text
 [BootROM]
     ↓ verify
 [SPL / TF-A]
@@ -106,7 +106,7 @@ Secure Boot 的核心概念是：
 
 如果驗證失敗：
 
-```
+```text
 不跳轉執行
 停止開機
 進入 recovery
@@ -119,7 +119,7 @@ Secure Boot 的核心概念是：
 
 Secure Boot / Verified Boot 可以保護：
 
-```
+```text
 bootloader
 kernel image
 DTB
@@ -131,7 +131,7 @@ firmware update package
 
 但前提是：
 
-```
+```text
 這些內容都有被納入驗證範圍。
 ```
 
@@ -143,7 +143,7 @@ Secure Boot 不代表系統沒有漏洞。
 
 它不能直接解決：
 
-```
+```text
 合法簽章 image 裡面的 CVE
 runtime exploit
 userspace service vulnerability
@@ -154,7 +154,7 @@ production device 上仍開著的 debug interface
 
 所以 Secure Boot 通常還要搭配：
 
-```
+```text
 rollback protection
 dm-verity
 SELinux enforcing
@@ -167,13 +167,13 @@ debug lock
 
 Verified Boot 通常可以理解成：
 
-```
+```text
 Secure Boot 在 OS / partition 層級的延伸。
 ```
 
 例如 Android AVB：
 
-```
+```text
 [Bootloader]
     ↓ verify
 [vbmeta]
@@ -187,7 +187,7 @@ Secure Boot 在 OS / partition 層級的延伸。
 
 Embedded Linux 也可以有類似概念：
 
-```
+```text
 [U-Boot]
     ↓ verify FIT image
 [Kernel + DTB + initramfs]
@@ -197,7 +197,7 @@ Embedded Linux 也可以有類似概念：
 
 重點：
 
-```
+```text
 不是只有 bootloader 要可信。
 OS image / rootfs / partition 也要可信。
 ```
@@ -208,13 +208,13 @@ Trusted Boot 常常透過 Measured Boot 實作。
 
 Measured Boot 的核心概念是：
 
-```
+```text
 不要只問 image 是否允許執行。還要記錄實際載入了什麼。
 ```
 
 典型 flow：
 
-```
+```text
 [Bootloader]
     ↓ measure
 [Kernel hash]
@@ -236,7 +236,7 @@ Measured Boot 的核心概念是：
 
 重點：
 
-```
+```text
 Measured Boot 不一定阻止開機。它主要產生可被檢查的紀錄。
 ```
 
@@ -244,7 +244,7 @@ Measured Boot 不一定阻止開機。它主要產生可被檢查的紀錄。
 
 PCR 是：
 
-```
+```text
 Platform Configuration Register
 ```
 
@@ -252,19 +252,19 @@ Platform Configuration Register
 
 PCR 不是單純覆蓋寫入，而是 extend：
 
-```
+```text
 PCR_new = Hash(PCR_old || new_measurement)
 ```
 
 這代表：
 
-```
+```text
 載入內容會影響 PCR載入順序也會影響 PCR
 ```
 
 所以 PCR 可以用來代表：
 
-```
+```text
 目前系統開機狀態的摘要
 ```
 
@@ -276,7 +276,7 @@ PCR 只是一組最後結果。
 
 所以 Measured Boot 會搭配 Event Log。
 
-```
+```text
 PCR:
   最終累積 hash
 
@@ -286,7 +286,7 @@ Event Log:
 
 Event Log 通常會記錄：
 
-```
+```text
 量測了什麼
 hash 是多少
 extend 到哪個 PCR
@@ -295,7 +295,7 @@ extend 到哪個 PCR
 
 Debug 時：
 
-```
+```text
 PCR 不符合預期
   ↓
 看 event log
@@ -307,13 +307,13 @@ PCR 不符合預期
 
 Attestation 是：
 
-```
+```text
 把目前系統狀態證明給本機 policy 或遠端 server。
 ```
 
 典型場景：
 
-```
+```text
 Device boot
   ↓
 Measured Boot 產生 PCR / event log
@@ -327,7 +327,7 @@ Allow / Deny / Limited mode
 
 簡化圖：
 
-```
+```text
 [Device TPM / TEE]
         ↓ quote / attestation
 [Remote Server]
@@ -337,7 +337,7 @@ Allow / Deny / Limited mode
 
 用途：
 
-```
+```text
 確認 device 是否跑合法 firmware決定是否釋放 disk key決定是否允許連接 backend service決定是否進入 limited mode
 ```
 
@@ -345,7 +345,7 @@ Allow / Deny / Limited mode
 
 可以，而且實務上常常一起使用。
 
-```
+```text
 Secure Boot:
   擋下不可信 image
 
@@ -358,7 +358,7 @@ Attestation:
 
 組合 flow：
 
-```
+```text
 [BootROM]
     ↓ verify
 [SPL / TF-A]
@@ -374,7 +374,7 @@ Attestation:
 
 一句話：
 
-```
+```text
 Verify 是 gatekeeper。
 Measure 是 audit trail。
 Attestation 是 proof。
@@ -384,7 +384,7 @@ Attestation 是 proof。
 
 Embedded Linux 常見組合：
 
-```
+```text
 BootROM secure boot
 U-Boot FIT signature
 signed Kernel / DTB / initramfs
@@ -396,7 +396,7 @@ rollback protection
 
 常見 flow：
 
-```
+```text
 [BootROM]
     ↓
 [Signed SPL / TF-A]
@@ -410,7 +410,7 @@ rollback protection
 
 BSP 工程師要特別確認：
 
-```
+```text
 DTB 是否包含在 FIT signature
 initramfs 是否包含在 FIT signature
 rootfs 是否有 dm-verity
@@ -422,7 +422,7 @@ update package 是否有簽章
 
 Android 常見組合：
 
-```
+```text
 Bootloader secure boot
 AVB
 vbmeta
@@ -435,7 +435,7 @@ RPMB
 
 簡化 flow：
 
-```
+```text
 [Bootloader]
     ↓ verify vbmeta
 [vbmeta]
@@ -449,7 +449,7 @@ RPMB
 
 BSP 工程師要特別確認：
 
-```
+```text
 bootloader 是否 locked
 AVB 是否 enabled
 vbmeta chain 是否完整
@@ -462,7 +462,7 @@ fastboot 是否允許 unsigned image
 
 ### 15.1 把 Secure Boot 和 Measured Boot 當成同一件事
 
-```
+```text
 Secure Boot 是 verify。
 Measured Boot 是 measure。
 ```
@@ -471,20 +471,20 @@ Measured Boot 是 measure。
 
 ### 15.2 有 Secure Boot，但 rootfs 沒驗證
 
-```
+```text
 Bootloader / kernel 都可信
 但 rootfs 可以被任意修改
 ```
 
 結果：
 
-```
+```text
 系統仍可能被植入 service / library / app。
 ```
 
 ### 15.3 有 measurement，但沒有人檢查
 
-```
+```text
 PCR 有值
 event log 有資料
 但沒有 attestation / policy / baseline
@@ -492,7 +492,7 @@ event log 有資料
 
 結果：
 
-```
+```text
 只是記錄，沒有形成安全決策。
 ```
 
@@ -502,7 +502,7 @@ PCR 改變不一定代表被攻擊。
 
 也可能是：
 
-```
+```text
 kernel cmdline 改變
 DTB 改變
 firmware version 改變
@@ -519,7 +519,7 @@ event log 順序改變
 
 所以需要：
 
-```
+```text
 rollback protection
 security version
 rollback index
@@ -530,7 +530,7 @@ anti-rollback counter
 
 ### 16.1 Step 1：確認驗證鏈
 
-```
+```text
 BootROM 是否驗證 SPL / TF-A？
 SPL / TF-A 是否驗證 U-Boot？
 U-Boot 是否驗證 Kernel / DTB / initramfs？
@@ -540,7 +540,7 @@ Update path 是否驗證 package？
 
 ### 16.2 Step 2：確認驗證範圍
 
-```
+```text
 kernel 是否被簽章
 DTB 是否被簽章
 initramfs 是否被簽章
@@ -550,7 +550,7 @@ Android vbmeta chain 是否包含所有必要 partition
 
 ### 16.3 Step 3：確認失敗時行為
 
-```
+```text
 signature mismatch 時會停在哪裡？
 會不會 fallback 到 insecure boot？
 會不會進入 unsigned recovery？
@@ -561,20 +561,20 @@ signature mismatch 時會停在哪裡？
 
 ### 17.1 Step 1：確認 TPM / measurement backend
 
-```
+```bash
 ls /sys/class/tpm/
 dmesg | grep -i tpm
 ```
 
 ### 17.2 Step 2：讀 PCR
 
-```
+```bash
 tpm2_pcrread
 ```
 
 用途：
 
-```
+```text
 確認 PCR 是否有被 extend
 不同 boot image 是否造成 PCR 改變
 ```
@@ -583,13 +583,13 @@ tpm2_pcrread
 
 常見路徑：
 
-```
+```text
 /sys/kernel/security/tpm0/binary_bios_measurements
 ```
 
 用途：
 
-```
+```text
 確認量測了哪些內容
 找出 PCR 變化原因
 確認 kernel / cmdline / initramfs 是否被量測
@@ -599,7 +599,7 @@ tpm2_pcrread
 
 問自己：
 
-```
+```text
 誰會檢查 PCR？
 誰保存 known-good baseline？
 誰決定 allow / deny？

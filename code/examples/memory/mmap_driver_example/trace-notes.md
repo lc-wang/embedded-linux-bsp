@@ -1,12 +1,12 @@
 # Kernel trace notes — mmap_driver_example
 
 ## 1. userspace 呼叫點
-```
+```text
 mmap(NULL, size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0)
 ```
 
 ## 2. kernel 入口點
-```
+```text
 sys_mmap / do_mmap
 ↓
 建立 VMA (vm_area_struct)
@@ -22,7 +22,7 @@ driver 的 .mmap()
 
 - 在 kernel init 時配置一個 page（alloc_page）
 - `.mmap()` 內用 `remap_pfn_range()` 把該 page 的 PFN 映射到 userspace
-```
+```text
 alloc_page()
 ↓
 page_to_pfn()

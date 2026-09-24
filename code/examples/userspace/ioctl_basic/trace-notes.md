@@ -1,24 +1,24 @@
 # Kernel trace notes — ioctl_basic
 
 ## 1. userspace 呼叫點
-```
+```text
 ioctl(fd, cmd, arg)
 glibc：
 syscall(SYS_ioctl, fd, cmd, arg)
 ```
 
 ## 2. kernel syscall 入口
-```
+```text
 SYSCALL_DEFINE3(ioctl)
 ```
 
 位置：
-```
+```text
 fs/ioctl.c
 ```
 
 ## 3. 呼叫流程
-```
+```text
 ioctl()
 └─ sys_ioctl()
 └─ do_vfs_ioctl()
@@ -27,7 +27,7 @@ ioctl()
 ```
 
 ## 4. ioctl cmd 結構
-```
+```text
 | dir | size | magic | nr |
 ```
 
@@ -36,13 +36,13 @@ ioctl()
 ## 5. user / kernel 資料流
 
 ### 5.1 _IOW
-```
+```text
 user data
 └─ copy_from_user()
 ```
 
 ### 5.2 _IOR
-```
+```text
 kernel data
 └─ copy_to_user()
 ```

@@ -64,7 +64,7 @@ struct my_resource_table {
 };
 ```
 
-### 4.1 用途：
+### 4.1 用途
 
 | 資源 | 說明 |
 |------|------|
@@ -96,19 +96,19 @@ remote firmware 常在 `.text` + `.bss` + `.resource_table`。
 
 ## 6. RPMsg Nameservice
 
-当 remote firmware 啟動後，它會發送：
+當 remote firmware 啟動後，它會發送：
 
 ```c
 rpmsg_ns_announce("my_rpmsg_service")
 ```
 Linux 則在：
 
-```sh
+```bash
 /sys/bus/rpmsg/devices/
 ```
 生成：
 
-```sh
+```bash
 my_rpmsg_service.0
 ```
 用戶層可透過 /dev/rpmsg0 通訊。
@@ -152,35 +152,35 @@ memory-region = <&cr52_reserved>;
 
 remoteproc：
 
-```sh
+```bash
 /sys/class/remoteproc/remoteprocX/state
 /sys/class/remoteproc/remoteprocX/firmware
 /sys/class/remoteproc/remoteprocX/trace0
 ```
 可用：
 
-```sh
+```bash
 echo start > remoteprocX/state
 echo stop > remoteprocX/state
 ```
 RPMsg：
 
-```sh
+```bash
 /sys/bus/rpmsg/devices/
 ```
 
 ## 10. 常見 Debug 指令
 
 查看 remoteproc 啟動 log
-```sh
+```bash
 dmesg | grep remoteproc
 ```
 查看 RPMsg channel
-```sh
+```bash
 ls /sys/bus/rpmsg/devices
 ```
 查看 vring 狀態
-```sh
+```bash
 dmesg | grep vring
 ```
 

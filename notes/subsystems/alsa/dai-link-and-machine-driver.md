@@ -5,7 +5,7 @@
 ## 1. 先建立整體視角
 
 在 SoC 音訊世界中：
-```
+```text
 CPU I2S controller  (platform driver)
 Codec chip          (I2C driver)
 Board wiring        (machine driver)
@@ -36,7 +36,7 @@ DAI = Digital Audio Interface
 
 ### 2.1 DAI 在 Kernel 中
 
-```
+```c
 struct snd_soc_dai {
     const char *name;
     struct snd_soc_dai_ops *ops;
@@ -46,7 +46,7 @@ struct snd_soc_dai {
 每個 driver 可以註冊一個或多個 DAI。
 
 例如：
-```
+```text
 rockchip_i2s.c   → 註冊 CPU DAI
 wm8960.c         → 註冊 Codec DAI
 ```
@@ -54,7 +54,7 @@ wm8960.c         → 註冊 Codec DAI
 ## 3. snd_soc_dai_link
 
 這是 ASoC 的「連線定義」。
-```
+```c
 struct snd_soc_dai_link {
     const char *name;
     const char *stream_name;
@@ -92,13 +92,13 @@ Machine driver 是：
 > 板級 glue layer
 
 常見位置：
-```
+```text
 sound/soc/rockchip/
 sound/soc/fsl/
 sound/soc/renesas/
 ```
 
-### 4.1 Machine driver 負責：
+### 4.1 Machine driver 負責
 
 -   定義 dai_link
 
@@ -113,7 +113,7 @@ sound/soc/renesas/
 ## 5. 實際註冊流程
 
 當系統 boot 時：
-```
+```text
 CPU DAI driver probe
 Codec driver probe
 Machine driver probe
@@ -122,7 +122,7 @@ Machine driver probe
 
 ### 5.1 Machine driver 範例
 
-```
+```c
 static  struct  snd_soc_dai_link  my_dai_link = {
     .name = "I2S-Codec",
     .stream_name = "Playback",
@@ -138,7 +138,7 @@ static  struct  snd_soc_dai_link  my_dai_link = {
 
 ### 5.2 註冊 card
 
-```
+```c
 static  struct  snd_soc_card  my_card = {
     .name = "MySoundCard",
     .owner = THIS_MODULE,
@@ -157,7 +157,7 @@ static  struct  snd_soc_card  my_card = {
 `snd_soc_register_card()` 
 
 內部會：
-```
+```text
 snd_soc_bind_card()
    ↓ soc_bind_dai_link()
    ↓
@@ -168,7 +168,7 @@ snd_soc_bind_card()
 
 ## 7. snd_soc_pcm_runtime 是什麼？
 
-```
+```c
 struct snd_soc_pcm_runtime {
     struct snd_soc_dai *cpu_dai;
     struct snd_soc_dai *codec_dai;
@@ -178,7 +178,7 @@ struct snd_soc_pcm_runtime {
 這是 runtime 連線物件。
 
 播放時：
-```
+```text
 aplay
   ↓
 ALSA Core
@@ -201,7 +201,7 @@ codec_dai->ops
 > 透過 device tree 描述
 
 例如：
-```
+```dts
 sound {
     compatible = "simple-audio-card";
 
@@ -225,7 +225,7 @@ simple-audio-card driver 會：
 ## 9. ASoC 真正運作流程
 
 播放時完整流程：
-```
+```text
 aplay
   ↓ snd_pcm_open()
   ↓ snd_soc_pcm_open()
@@ -249,7 +249,7 @@ DAC 輸出聲音
 如果沒有聲音：
 
 你要檢查：
-```
+```text
 1. CPU DAI driver 有 probe 嗎？
 2. Codec driver 有 probe 嗎？
 3. Machine driver 有 bind 成功嗎？

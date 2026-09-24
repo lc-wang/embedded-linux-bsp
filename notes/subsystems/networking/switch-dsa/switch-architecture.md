@@ -9,7 +9,7 @@
 
 ## 1. 單一 Ethernet
 
-```
+```text
 CPU
  ↓
 MAC
@@ -21,13 +21,13 @@ RJ45
 
 一個 interface：
 
-```
+```text
 eth0
 ```
 
 ## 2. Switch 架構
 
-```
+```text
 CPU
  ↓
 MAC
@@ -48,7 +48,7 @@ CPU port
 
 ### 3.1 CPU port
 
-```
+```text
 Switch ↔ CPU 的連接
 ```
 
@@ -59,7 +59,7 @@ Switch ↔ CPU 的連接
 
 ### 3.2 User port
 
-```
+```text
 接 RJ45 / LAN port
 ```
 
@@ -72,7 +72,7 @@ Switch ↔ CPU 的連接
 
 ### 4.1 TX（CPU → LAN）
 
-```
+```text
 CPU (eth0)
  ↓
 MAC
@@ -90,7 +90,7 @@ Wire
 
 ### 4.2 RX（LAN → CPU）
 
-```
+```text
 Wire
  ↓
 PHY
@@ -106,7 +106,7 @@ CPU
 
 ### 4.3 重點
 
-```
+```text
 CPU 只看到一個 MAC（eth0）但實際有多個 port
 ```
 
@@ -114,7 +114,7 @@ CPU 只看到一個 MAC（eth0）但實際有多個 port
 
 ### 5.1 傳統做法（vendor driver）
 
-```
+```text
 eth0 → 整個 switch
 ```
 
@@ -125,7 +125,7 @@ eth0 → 整個 switch
 
 常見：
 
-```
+```text
 ethsw / ethss driver
 ```
 
@@ -135,13 +135,13 @@ Distributed Switch Architecture
 
 ### 6.1 每個 port 都變 interface
 
-```
+```text
 ip link
 ```
 
 看到：
 
-```
+```text
 eth0        (CPU port)
 lan1
 lan2
@@ -151,7 +151,7 @@ lan4
 
 ### 6.2 可以用標準 Linux 工具
 
-```
+```text
 bridge
 vlan
 tc
@@ -161,19 +161,19 @@ tc
 
 ### 7.1 tagging
 
-```
+```text
 CPU ↔ Switch 的封包需要 tag
 ```
 
 用來：
 
-```
+```text
 告訴 switch 要去哪個 port
 ```
 
 ### 7.2 switch forwarding
 
-```
+```text
 switch 內部會自己轉封包
 ```
 
@@ -181,7 +181,7 @@ CPU 不一定會看到所有流量
 
 ### 7.3 offloading
 
-```
+```text
 switch 幫你做 forwarding
 ```
 
@@ -193,25 +193,25 @@ CPU 不需要處理
 
 這就是：
 
-```
+```text
 eth0 要先正常
 ```
 
 ### 8.2 switch driver 有沒有起來？
 
-```
+```bash
 dmesg | grep dsa
 ```
 
 ### 8.3 port 有沒有出現？
 
-```
+```text
 ip link
 ```
 
 ### 8.4 link 狀態
 
-```
+```bash
 ethtool lan1
 ```
 
@@ -221,7 +221,7 @@ ethtool lan1
 
 原因：
 
-```
+```text
 DSA 沒啟動或 DTS 沒設
 ```
 
@@ -229,7 +229,7 @@ DSA 沒啟動或 DTS 沒設
 
 可能：
 
-```
+```text
 CPU port timing（RGMII）
 ```
 
@@ -237,7 +237,7 @@ CPU port timing（RGMII）
 
 檢查：
 
-```
+```text
 SPI / MDIO / reset
 ```
 
@@ -245,6 +245,6 @@ SPI / MDIO / reset
 
 要想成：
 
-```
+```text
 DSA = Ethernet + 多 PHY + switch forwarding
 ```

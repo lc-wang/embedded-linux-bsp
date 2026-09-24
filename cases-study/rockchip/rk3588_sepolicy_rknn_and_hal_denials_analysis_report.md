@@ -8,17 +8,17 @@ _(Rockchip RK3588 rknn_server + HAL binder denied)_
 遇到兩類 SELinux 權限拒絕 (AVC denied) 問題：
 
 1.  **rknn_server（NPU Daemon）讀取 default_prop 被 AOSP neverallow 擋住**
-    
+
 2.  **HDMI HAL 嘗試透過 binder 呼叫 Camera HAL 時被拒絕**
-    
+
 這兩類問題皆導致：
 
 -   kernel log/dmesg 出現 AVC denied
-    
+
 -   sepolicy 編譯階段（secilc）直接失敗
-    
+
 -   無法繼續 bring-up / 測試功能
-    
+
 本文件記錄分析流程、原因與最終採用的修正方法。
 
 ## 2. 除錯過程
@@ -31,13 +31,13 @@ _(Rockchip RK3588 rknn_server + HAL binder denied)_
 type=1400 audit: avc: denied { read } for comm="listener"  scontext=u:r:rknn_server:s0 tcontext=u:object_r:default_prop:s0 tclass=file
 ```
 
-__這表示 rknn_server 嘗試讀取系統屬性（ro._ / persist._），但無權限。**
+**這表示 rknn_server 嘗試讀取系統屬性（ro._ / persist._），但無權限。**
 
 #### 2.1.2 編譯期錯誤 (secilc neverallow violation)
 
 ```bash
 neverallow check failed: neverallow base_typeattr_223 default_prop  (file (read open ...)) violated by allow rknn_server default_prop  (file (read open));
-``` 
+```
 
 ### 2.2 問題 2：HDMI HAL → Camera HAL Binder call denied
 
@@ -46,7 +46,7 @@ neverallow check failed: neverallow base_typeattr_223 default_prop  (file (read 
 avc: denied  { call } for scontext=u:r:hal_hdmi_default:s0
 tcontext=u:r:hal_camera_default:s0
 tclass=binder
-``` 
+```
 
 ## 3. Root Cause 分析
 
@@ -61,9 +61,9 @@ tclass=binder
 位置於：
 
 -   `system/sepolicy/private/property.te:141`
-    
+
 -   `system/sepolicy/public/property.te:273`
-    
+
 內容概念如下：
 ```bash
 neverallow { vendor domains } default_prop:file { read write open ... }
@@ -77,14 +77,14 @@ neverallow { vendor domains } default_prop:file { read write open ... }
 
 #### 3.1.4 為何「正規 allow rule」無法解決？
 
-因為 **AOSP neverallow 是硬限制（强制不可繞過）**：
+因為 **AOSP neverallow 是硬限制（強制不可繞過）**：
 
 -   不會被 allow rule 覆蓋
-    
+
 -   不會被 typeattribute 覆蓋
-    
+
 -   不會因 sepolicy layering 而放寬
-    
+
 除非 **改 AOSP 的 private sepolicy（不可能）**，否則永遠無法通過。
 
 因此，對閉源 rknn_server：
@@ -127,13 +127,13 @@ HAL 之間的 binder 呼叫**預設不允許 cross-HAL 呼叫**，
 效果：
 
 -   所有 rknn_server 的 denied 變成 permissive（允許）
-    
+
 -   kernel 不再阻斷 NPU 功能
-    
+
 -   sepolicy 編譯成功
-    
+
 -   不需修改 binary、不需 propshim
-    
+
 ### 4.2 問題 2：HDMI HAL → Camera HAL Binder call 正規修正（最小必要權限）
 
 **修改：`hal_hdmi_default.te`**

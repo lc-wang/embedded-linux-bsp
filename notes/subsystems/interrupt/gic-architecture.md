@@ -21,7 +21,7 @@ Generic Interrupt Controller
 
 ### 1.1 整體架構位置
 
-```
+```text
 Peripheral (GPIO / UART / etc)  
  ↓  
 Interrupt Source  
@@ -64,7 +64,7 @@ GIC 負責：
 
 ### 3.1 GICv2（較舊）
 
-```
+```text
  ┌────────────┐  
  │  CPU IF    │  
  └────┬───────┘  
@@ -78,7 +78,7 @@ GIC 負責：
 
 ### 3.2 GICv3（現代 SoC）
 
-```
+```text
  ┌────────────┐  
  │  CPU IF    │  
  └────┬───────┘  
@@ -146,15 +146,15 @@ SGI = software trigger interrupt
 ## 5. GIC 中的 IRQ 編號
 
 GIC 內部有：
-```
+```text
 hwirq (hardware IRQ)
 ```
 例如：
-```
+```text
 SPI 45
 ```
 但 Linux 看到的是：
-```
+```text
 IRQ 123
 ```
 透過 irq_domain mapping 轉換
@@ -162,7 +162,7 @@ IRQ 123
 ## 6. GIC Device Tree 描述
 
 典型 GICv3：
-```
+```dts
 gic: interrupt-controller@f9000000 {  
  compatible = "arm,gic-v3";  
  interrupt-controller;  
@@ -174,11 +174,11 @@ gic: interrupt-controller@f9000000 {
 ### 6.1 #interrupt-cells = <3> 是什麼？
 
 格式：
-```
+```text
 <type number flags>
 ```
 例如：
-```
+```dts
 interrupts = <GIC_SPI 45 IRQ_TYPE_LEVEL_HIGH>;
 ```
 代表：
@@ -191,7 +191,7 @@ interrupts = <GIC_SPI 45 IRQ_TYPE_LEVEL_HIGH>;
 ## 7. interrupt-parent 關係
 
 裝置：
-```
+```dts
 uart0: serial@xxxx {  
  interrupt-parent = <&gic>;  
  interrupts = <GIC_SPI 45 IRQ_TYPE_LEVEL_HIGH>;  
@@ -204,7 +204,7 @@ uart0: serial@xxxx {
 ## 8. Linux Kernel 中的 GIC driver
 
 核心檔案：
-```
+```text
 drivers/irqchip/irq-gic-v3.c
 ```
 負責：
@@ -216,7 +216,7 @@ drivers/irqchip/irq-gic-v3.c
 
 ## 9. Interrupt 處理流程（Kernel）
 
-```
+```text
 Hardware IRQ  
  ↓  
 GIC 接收  

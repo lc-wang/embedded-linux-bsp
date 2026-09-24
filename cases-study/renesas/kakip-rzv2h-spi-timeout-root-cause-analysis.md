@@ -5,7 +5,7 @@
 在 Kakip 平台（Renesas RZ/V2H）上進行 SPI 通訊時，系統偶爾會出現 SPI timeout 的錯誤。
 
 常見的 kernel log：
-```
+```text
 spi_master spi0: transmit timeout  
 spi_master spi0: receive timeout  
 spidev spi0.0: SPI transfer failed: -110
@@ -13,9 +13,9 @@ spidev spi0.0: SPI transfer failed: -110
 此問題在進行連續 SPI 傳輸時容易發生，例如：
 
 -   `spidev_test`
-    
+
 -   SPI device 測試（Pixpaper 電子紙）
-    
+
 這表示 SPI driver 在某些情況下沒有正確偵測到 **SPI 傳輸完成事件**，最終觸發 timeout。
 
 ## 2. 系統環境（測試平台）
@@ -36,11 +36,11 @@ spidev spi0.0: SPI transfer failed: -110
 #### 3.1.1 spidev_test
 
 使用 Linux SPI 測試工具即可重現此問題。
-```
+```bash
 sudo ./spidev_test -D /dev/spidev0.0 -v -S 32 -I 100
 ```
 在連續傳輸一段時間後，系統會出現 timeout：
-```
+```text
 spi_master spi0: transmit timeout  
 SPI transfer failed: -110
 ```
@@ -51,11 +51,11 @@ SPI transfer failed: -110
 在 Pixpaper 電子紙測試程式中，也可以觀察到相同問題。
 
 SPI 設定：
-```
+```text
 SPI_SPEED = 10 MHz
 ```
 執行時 log：
-```
+```text
 spi_master spi0: receive timeout 0  
 spidev spi0.0: SPI transfer failed: -110
 ```
@@ -66,7 +66,7 @@ spidev spi0.0: SPI transfer failed: -110
 RZ/V2H 使用 Linux kernel 中的 **RSPI driver**。
 
 SPI 資料流如下：
-```
+```text
 Userspace  
  ↓  
 spidev  
@@ -82,11 +82,11 @@ SPI device
 Driver 主要透過以下資訊判斷傳輸是否完成：
 
 -   FIFO 狀態
-    
+
 -   interrupt
-    
+
 -   status flag
-    
+
 若 driver 對這些事件的處理不完整，就可能誤判傳輸狀態。
 
 ## 4. Root Cause 分析
@@ -96,9 +96,9 @@ Driver 主要透過以下資訊判斷傳輸是否完成：
 原始 driver 主要依賴 FIFO 狀態，例如：
 
 -   TX FIFO empty
-    
+
 -   RX FIFO full
-    
+
 來判斷 SPI 傳輸是否完成。
 
 但實際上：
@@ -108,11 +108,11 @@ Driver 主要透過以下資訊判斷傳輸是否完成：
 在連續 SPI 傳輸時可能發生：
 
 -   driver 等待錯誤的 FIFO 狀態
-    
+
 -   interrupt 未正確觸發
-    
+
 -   completion event 遺漏
-    
+
 最終 driver 等不到完成事件而進入 timeout。
 
 ## 5. 解決方案
@@ -124,9 +124,9 @@ Driver 主要透過以下資訊判斷傳輸是否完成：
 相關 commit：
 
 -   [https://github.com/YDS-Kakip-Team/kakip_linux/commit/814ecf1fd70735d108653f32c79561e0fc41b6c6](https://github.com/YDS-Kakip-Team/kakip_linux/commit/814ecf1fd70735d108653f32c79561e0fc41b6c6)
-    
+
 -   [https://github.com/YDS-Kakip-Team/kakip_linux/commit/77a30cf53385d3d55303511d2de731b89adaf8bb](https://github.com/YDS-Kakip-Team/kakip_linux/commit/77a30cf53385d3d55303511d2de731b89adaf8bb)
-    
+
 這些 commit 對 RSPI driver 進行了較大的修改。
 
 主要改動包括：
@@ -144,9 +144,9 @@ Patch 修正了 SPI interrupt 的設定與處理流程。
 這確保：
 
 -   SPI completion event 能正確通知 driver
-    
+
 -   driver 不會等待不存在的 interrupt
-    
+
 #### 5.1.3 FIFO handling 改善
 
 SPI 傳輸流程改為更符合 controller FIFO 行為的設計。
@@ -154,11 +154,11 @@ SPI 傳輸流程改為更符合 controller FIFO 行為的設計。
 這降低了以下問題的機率：
 
 -   FIFO 狀態錯誤
-    
+
 -   race condition
-    
+
 -   stale status flag
-    
+
 ### 5.2 修正後驗證
 
 套用 patch 後再次測試 SPI。
@@ -166,7 +166,7 @@ SPI 傳輸流程改為更符合 controller FIFO 行為的設計。
 #### 5.2.1 spidev_test
 
 傳輸結果：
-```
+```text
 TX | ...  
 RX | ...
 ```
@@ -191,7 +191,7 @@ Pixpaper 電子紙更新正常。
 測試結果：
 
 -   未出現 SPI timeout
-    
+
 -   未出現 `SPI transfer failed (-110)`
-    
+
 -   SPI communication 穩定

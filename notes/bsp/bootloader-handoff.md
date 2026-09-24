@@ -28,13 +28,13 @@ Linux kernel 在設計上假設：
 -   CPU 已進入正確 execution level 
 -   基本記憶體可用
 -   device tree 正確描述硬體
-    
+
 但 kernel **不保證**：
 
 -   clock 一定處於預期狀態
 -   pinmux 一定是乾淨初始值
 -   power domain 一定被 reset
-    
+
 ## 3. Bootloader 常做、但 Kernel 未必會重設的事情
 
 ### 3.1 Clock / PLL 初始化
@@ -44,14 +44,14 @@ bootloader 常為了：
 -   console 
 -   DRAM
 -   storage
-    
+
 而設定 clock / PLL。
 
 若 kernel：
 
 -   假設 clock 為 reset state
 -   卻實際繼承 bootloader 狀態
-    
+
 可能造成 clock tree 行為不一致。
 
 ### 3.2 Pinmux / GPIO 狀態
@@ -60,7 +60,7 @@ bootloader 常設定：
 
 -   UART  
 -   storage
-    
+
 但 kernel pinctrl driver：
 
 -   可能不會完整覆寫所有 pin
@@ -69,7 +69,7 @@ bootloader 常設定：
 
 -   pin 狀態殘留
 -   功能偶發失效
-    
+
 ### 3.3 記憶體與保留區域
 
 bootloader 可能：
@@ -79,14 +79,14 @@ bootloader 可能：
 
 若 DTS 未同步：
 -   kernel 可能覆寫這些區域
-    
+
 ## 4. Device Tree 作為交界契約
 
 ### 4.1 DTS 的角色
 
 Device Tree 是：
 -   bootloader 與 kernel 的**共享描述檔**
-    
+
 它應該描述：
 
 -   硬體結構
@@ -99,7 +99,7 @@ Device Tree 是：
 
 -   bootloader DTS 與 kernel DTS 不一致
 -   clock / pinctrl node 定義不同
-    
+
 **這是 BSP 專案中非常常見的隱性 bug 來源。**
 
 ## 5. 為什麼問題常在 Kernel 才爆出來

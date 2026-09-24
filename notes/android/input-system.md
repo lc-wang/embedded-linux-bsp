@@ -247,7 +247,7 @@ InputDispatcher → reportANR()
 -   `getevent` 看起來 event 很即時   
 -   InputReader / Dispatcher log 沒異常
 -   但使用者仍感覺「點了沒反應」
-    
+
 實際原因可能是：
 | 問題描述                                   | 真正影響                         |
 |--------------------------------------------|----------------------------------|
@@ -260,7 +260,7 @@ InputDispatcher → reportANR()
 
 #### 1. 確認 input threads 所屬 cgroup
 
-```sh
+```bash
 ps -e -o pid,tid,comm,cgroup | grep Input
 ```
 觀察：
@@ -270,14 +270,14 @@ ps -e -o pid,tid,comm,cgroup | grep Input
 
 #### 2. 檢查 system / foreground cgroup 的 uclamp
 
-```sh
+```bash
 cat /sys/fs/cgroup/system/uclamp.min
 cat /sys/fs/cgroup/foreground/uclamp.min
 ```
 
 #### 3. 對照 input 與 scheduler trace
 
-```sh
+```bash
 atrace input sched gfx
 ```
 比對：
@@ -285,13 +285,13 @@ atrace input sched gfx
 -   input event 到達時間  
 -   InputDispatcher 實際被排程時間
 -   App UI thread 是否及時被喚醒
-    
+
 ### 10.5 BSP / vendor 常見踩雷點（input 專屬）
 
 1.  **system_server 被錯誤降級到 background cgroup**
 2.  **vendor scheduler patch 忽略 uclamp 設定**
 3.  **thermal policy 過早限制 big core，影響 input latency**
-    
+
 這類問題：
 -   driver 正確
 -   input pipeline 正確

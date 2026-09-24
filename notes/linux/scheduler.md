@@ -137,7 +137,7 @@ Load balance 會在：
 ### 7.1 CPU affinity
 
 強制任務只能在特定 CPU 跑：
-```sh
+```bash
 taskset -c 1,2 ./myapp
 ```
 
@@ -185,20 +185,20 @@ Android 特別依賴 scheduler + cpufreq + thermal 的互動。
 
 ### 10.1 查看任務排程狀態
 
-```sh
+```bash
 ps -eo pid,cls,pri,rtprio,ni,stat,comm
 ```
 
 ### 10.2 追蹤 scheduler events（強力）
 
-```sh
+```bash
 trace-cmd record -e sched_switch -e sched_wakeup
 trace-cmd report
 ```
 
 ### 10.3 檢查 CPU 利用率
 
-```sh
+```bash
 top
 htop
 perf top
@@ -206,7 +206,7 @@ perf top
 
 ### 10.4 檢查 runqueue 狀況
 
-```sh
+```bash
 cat /proc/sched_debug
 ```
 

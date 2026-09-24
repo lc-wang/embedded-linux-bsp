@@ -4,19 +4,19 @@
 
 hash 可以想成：  
 
-```text  
+```text
 資料的指紋
 ```
 
 如果資料變了：
 
-```
+```text
 hash 也會變
 ```
 
 例如：
 
-```
+```text
 kernel image
  ↓
 SHA256
@@ -28,7 +28,7 @@ kernel hash
 
 hash chain 是把每一步的 hash 串起來：
 
-```
+```text
 上一個 chain
 +
 目前 image hash
@@ -38,7 +38,7 @@ hash chain 是把每一步的 hash 串起來：
 
 所以任何一個 component 被改掉：
 
-```
+```text
 final chain digest 也會改變
 ```
 
@@ -46,13 +46,13 @@ final chain digest 也會改變
 
 本範例輸入多個 component：
 
-```
+```text
 ./hash_chain_minimal tfa.bin uboot.bin Image board.dtb
 ```
 
 程式會做：
 
-```
+```text
 chain_0 = 0
 
 measurement_1 = SHA256(tfa.bin)
@@ -70,7 +70,7 @@ chain_4 = SHA256(chain_3 || measurement_4)
 
 最後得到：
 
-```
+```text
 final chain digest
 ```
 
@@ -80,7 +80,7 @@ Boot flow 不是單一檔案。
 
 它通常是：
 
-```
+```text
 BootROM
  ↓
 TF-A
@@ -106,7 +106,7 @@ hash chain 可以把整個 boot sequence 壓成一個 digest。
 
 Measured Boot 的概念是：
 
-```
+```text
 不一定阻止開機
 但會記錄開了什麼
 ```
@@ -117,13 +117,13 @@ Measured Boot 的概念是：
 
 TPM PCR 的概念類似：
 
-```
+```text
 PCR_new = SHA256(PCR_old || measurement)
 ```
 
 這和本範例的：
 
-```
+```text
 chain_new = SHA256(chain_old || image_hash)
 ```
 
@@ -133,7 +133,7 @@ chain_new = SHA256(chain_old || image_hash)
 
 Secure Boot 則更進一步：
 
-```
+```text
 hash
 +
 signature
@@ -143,7 +143,7 @@ trusted public key
 
 它不只是記錄，而是決定：
 
-```
+```text
 能不能執行
 ```
 
@@ -155,13 +155,13 @@ trusted public key
 
 hash 一樣只能表示：
 
-```
+```text
 內容沒變
 ```
 
 但不能表示：
 
-```
+```text
 內容可信
 ```
 
@@ -175,7 +175,7 @@ hash chain 是 measurement model。
 
 Secure Boot 還需要：
 
-```
+```text
 signature verification
 trusted key
 enforcement policy
@@ -183,7 +183,7 @@ enforcement policy
 
 ## 7. 最重要一句話
 
-```
+```text
 hash chain 可以描述「開機流程變了沒有」
 
 但 Root of Trust 必須保護：

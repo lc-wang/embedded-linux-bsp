@@ -7,19 +7,19 @@
 在 Renesas **RZ/T2H** 平台中：
 
 -   Boot ROM
-    
+
 -   Trusted Firmware-A
-    
+
 -   U-Boot
-    
+
 皆預設使用 **SCI0** 作為開機序列主控台（boot console）。
 
 然而在實際硬體設計上：
 
 -   SCI0 腳位未接出
-    
+
 -   Debug UART 實際連接於 **SCI1**
-    
+
 因此需將 **U-Boot console 由 SCI0 改為 SCI1**，以便在 TF-A 後仍可持續看到 UART 訊息。
 
 ### 1.2 修改目標
@@ -38,7 +38,7 @@
 
 #### 2.1.1 新增 SCI1 device node
 
-```
+```dts
 sci1: serial@80005400 {
         compatible = "renesas,r9a09g077-rz-rscif",
                      "renesas,rz-rscif";
@@ -75,14 +75,14 @@ aliases {
 即使完成以上設定：
 
 -   TF-A 可正常由 SCI1 輸出
-    
+
 -   進入 U-Boot 後 **完全沒有任何 UART 訊息**
 
 ## 3. Root Cause 分析
 
 ### 3.1 問題根因分析
 
-#### 3.1.1 關鍵原因：
+#### 3.1.1 關鍵原因
 
 **U-Boot serial driver 並不支援該 compatible 字串。**
 
@@ -93,7 +93,7 @@ aliases {
 `drivers/serial/serial_sh.c` 
 
 其 `of_match_table` 僅支援：
-```
+```text
 "renesas,sci"
 "renesas,scif"
 "renesas,scifa"
@@ -102,7 +102,7 @@ aliases {
 
 #### 3.1.3 SCI1 DTS 使用的 compatible
 
-```
+```text
 "renesas,r9a09g077-rz-rscif"
 "renesas,rz-rscif"
 ```
@@ -112,17 +112,17 @@ aliases {
 #### 3.1.4 結果
 
 -   SCI1 節點存在
-    
+
 -   alias 正確
-    
+
 -   clock / reg 正確
-    
+
 但：
 
 > **U-Boot 找不到可 bind 的 serial driver**
 
 因此：
-```
+```text
 serial device probe = skipped
 console = none
 ```
@@ -132,7 +132,7 @@ console = none
 ### 3.2 為什麼 SCI0 一開始可以正常工作？
 
 因為原始 DTS 中：
-```
+```dts
 sci0: serial@80005000 {
         compatible = "renesas,r9a09g077-rsci",
                      "renesas,rsci";
@@ -148,7 +148,7 @@ SCI1 若未使用相同 compatible，U-Boot 將完全無法識別。
 
 ### 4.1 修正後 SCI1 DTS 節點
 
-```
+```dts
 sci1: serial@80005400 {
         compatible = "renesas,r9a09g077-rsci",
                      "renesas,rsci";
@@ -167,7 +167,7 @@ sci1: serial@80005400 {
 ### 4.2 修改後結果
 
 U-Boot 成功於 SCI1 顯示訊息：
-```
+```text
 U-Boot 2024.xx
 CPU: Renesas RZ/T2H
 DRAM: 4096 MiB

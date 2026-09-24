@@ -7,7 +7,7 @@
 -   firmware（FW）載入流程
 -   MCU（Micro Controller Unit）初始化
 -   WFDMA / RX / TX path 啟動前置條件
-    
+
 **這一章是理解後續 DMA / TX / RX / MCU command 的關鍵地基**。
 
 ## 1. Linux driver probe 的角色定位（總覽）
@@ -18,7 +18,7 @@
 2.  **配置最小可運作硬體狀態**
 3.  **建立 driver 的軟體物件**
 4.  **將裝置註冊到上層 subsystem（mac80211）**
-    
+
 對 mt76 而言，probe 並不只是「掛上 netdev」，而是：
 > **完成 Wi-Fi SoC 的 SoC-level bring-up**
 
@@ -40,7 +40,7 @@
 -   建立 `struct mt76_dev`
 -   初始化 **bus ops**
 -   設定 IRQ / DMA capability
-    
+
 ```c
 struct mt76_dev {
     struct device *dev;
@@ -138,7 +138,7 @@ MCU 與 host 之間為 **非同步通訊**：
 -   Host 發送 command
 -   MCU 回傳 event
 -   Driver 使用 completion / wait_event
-    
+
 ```c
 wait_for_completion_timeout(&dev->mcu.cmpl, timeout);
 ```
@@ -158,7 +158,7 @@ wait_for_completion_timeout(&dev->mcu.cmpl, timeout);
 -   mac80211 **知道這張卡存在** 
 -   但 **RX/TX 尚未啟用**
 -   DMA ring 仍可能是 disabled 狀態
-    
+
 真正開始資料流，是在 **interface up + channel set** 之後。
 
 ## 6. 常見問題與排查（Probe 階段常見失敗類型）
@@ -181,7 +181,7 @@ wait_for_completion_timeout(&dev->mcu.cmpl, timeout);
 -   firmware 與 driver 版本不相容
 -   ROM patch 未正確載入
 -   bus（PCIe/USB）reset 問題
-    
+
 ### 6.3 Probe 成功但無法掃描
 
 多半是：

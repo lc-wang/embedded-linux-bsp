@@ -39,7 +39,7 @@ cfg80211 假設：
 
 ### 2.1 Scan 的完整 call flow
 
-```
+```text
 cfg80211_ops->scan
  └─ wl_cfg80211_scan()
      └─ wl_do_escan()
@@ -51,15 +51,15 @@ cfg80211_ops->scan
 ### 2.2 Scan result 如何回到 Linux
 
 -   firmware 掃描到 BSS
-    
+
 -   逐筆透過 **event packet** 回傳
-    
+
 -   driver 呼叫：
-    
+
 `cfg80211_inform_bss()` 
 
 -   scan complete event → 結束 scan
-    
+
 **關鍵觀念**
 
 > cfg80211 的 BSS table ≠ firmware 的真實狀態  
@@ -68,13 +68,13 @@ cfg80211_ops->scan
 ### 2.3 常見 scan 問題誤區
 
 -   scan callback 有回來 ≠ firmware 掃到 AP
-    
+
 -   scan result 為空 ≠ scan 失敗（可能被 regulatory 擋）
-    
+
 ## 3. Connect（STA Join）流程
 
 ### 3.1 Connect 的控制流程
-```
+```text
 cfg80211_ops->connect
  └─ wl_cfg80211_connect()
      ├─ 設定 auth / akm / wsec
@@ -86,39 +86,39 @@ cfg80211_ops->connect
 ### 3.2 Connect 結果的來源
 
 -   firmware 嘗試 association
-    
+
 -   成功 / 失敗 → event 回報
-    
+
 -   driver 轉譯為：
-    
+
 `cfg80211_connect_result()` 
 
 ### 3.3 常見 connect 問題
 
 -   join iovar 成功，但永遠等不到 event
-    
+
 -   firmware 因 state 不允許而忽略 join
-    
+
 -   NVRAM / regulatory 導致 join 被拒
-    
+
 ## 4. Disconnect 與 Link State
 
 ### 4.1 Disconnect 行為
 
 -   cfg80211 `disconnect()`
-    
+
 -   driver 發送 disconnect iovar
-    
+
 -   firmware 回報 link down event
-    
+
 ### 4.2 非預期斷線
 
 -   AP deauth
-    
+
 -   roaming fail
-    
+
 -   power save timeout
-    
+
 **所有斷線都以 event 為準**
 
 ## 5. Roaming
@@ -126,11 +126,11 @@ cfg80211_ops->connect
 ### 5.1 bcmdhd 的 roam 模型
 
 -   roaming 完全由 firmware 決定
-    
+
 -   host 只接收 roam event
-    
+
 ### 5.2 Roam event 流程
-```
+```text
 firmware roam
  └─ WLC_E_ROAM
      └─ wl_cfg80211_event()
@@ -141,15 +141,15 @@ firmware roam
 ### 5.3 Roam 相關誤解
 
 -   cfg80211 無法設定 roam threshold
-    
+
 -   roam policy 大多是 firmware 私有邏輯
-    
+
 -   Linux 端只能開 / 關 roam
-    
+
 ## 6. AP Mode
 
 ### 6.1 啟動 AP 的流程
-```
+```text
 cfg80211_ops->start_ap
  └─ wl_cfg80211_start_ap()
      ├─ 設定 beacon
@@ -172,27 +172,27 @@ cfg80211_ops->start_ap
 ### 6.3 AP mode 常見問題
 
 -   AP 起來但 client 掃不到
-    
+
 -   client 連上但 throughput 極低
-    
+
 -   AP 在 DFS channel 行為異常
-    
+
 ## 7. cfg80211 與 firmware state 不同步的問題
 
 ### 7.1 為什麼會不同步？
 
 -   event 丟失
-    
+
 -   RX path 被 flow control 卡住
-    
+
 -   firmware reset 未同步通知
-    
+
 ### 7.2 常見症狀
 
 -   cfg80211 顯示 connected，但實際沒流量
-    
+
 -   cfg80211 顯示 disconnected，但 firmware 還在送封包
-    
+
 **cfg80211 是「觀察者」，不是「事實來源」**
 
 ## 8. 常見問題與排查（Debug cfg80211 × bcmdhd）
@@ -202,17 +202,17 @@ cfg80211_ops->start_ap
 請同時檢查：
 
 -   firmware event log
-    
+
 -   data path 是否正常
-    
+
 -   bus layer 是否卡住
-    
+
 ### 8.2 Debug 問題時的正確順序
 
 1.  firmware 是否收到指令？
-    
+
 2.  firmware 是否回 event？
-    
+
 3.  driver 是否正確轉譯 event？
-    
+
 4.  cfg80211 是否正確更新 state？

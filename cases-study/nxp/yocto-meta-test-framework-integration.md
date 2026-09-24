@@ -19,7 +19,7 @@
 5.  **建立自訂 image 配方 core-image-testfw**
 6.  **bitbake core-image-testfw**
 7.  **target 運行 testfw 驗證**
-    
+
 整體架構：
 ```text
 meta-test-framework/
@@ -36,25 +36,25 @@ meta-test-framework/
 ## 2. bitbake-layers 建立 meta layer
 
 建立獨立 layer：
-```sh
+```bash
 cd build-imx95-smarc-wayland
 bitbake-layers create-layer ../meta-test-framework 
 ```
 加入 Yocto build：
-```sh
+```bash
 bitbake-layers add-layer ../meta-test-framework
 ```
 檢查是否成功加入：
-```sh
+```bash
 bitbake-layers  show-layers
 ```
 
 ## 3. devtool 使用流程與注意事項
 
 ### 3.1 devtool add 步驟
-```sh
+```bash
 devtool add test-framework https://github.com/lc-wang/test-framework.git --version main
-``` 
+```
 
 產生的內容會被放在 workspace：
 ```text
@@ -66,12 +66,12 @@ workspace/
 ### 3.2 devtool 常見問題：branch=main 仍找 master
 
 #### 症狀
-```sh
+```bash
 Unable to resolve 'master' in upstream git repository
 ```
 
 #### 根本原因
-```sh
+```bash
 Yocto 的 git fetcher 在部分版本會強制 fallback 至 master。
 ```
 
@@ -84,33 +84,33 @@ Yocto 的 git fetcher 在部分版本會強制 fallback 至 master。
 若執行 devtool add 後想重建 recipe：
 
 #### 錯誤症狀
-```sh
+```bash
 recipe test-framework is already in your workspace
 ```
 
 #### 解法 1（推薦）：清空 workspace
-```sh
+```bash
 rm -rf workspace 
 ```
 
 #### 解法 2：reset 單一 recipe
-```sh
+```bash
 devtool reset test-framework
 ```
 
 ### 3.4 devtool add 後 recipe 缺少 do_install
 
 devtool 不會自動產生 do_install：
-```sh
+```bash
 Package  'test-framework' has no installation candidate
 ```
 需手動補上（見後續完整 recipe）。
 
 ## 4. test-framework_git.bb — 最終可用版
-```sh
+```bash
 meta-test-framework/recipes-test-framework/test-framework/test-framework_git.bb
 ```
-```sh
+```bash
 DESCRIPTION = "Automated Test Framework for Linux BSP / PCBA / System Test"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/MIT;md5=0835b7f5f8e2d301a25de4f6c51e4f7a"
@@ -145,10 +145,10 @@ FILES:${PN} += "${bindir}/testfw"
 ```
 
 ## 5. 自訂 image recipe：core-image-testfw
-```sh
+```bash
 meta-test-framework/recipes-core/images/core-image-testfw.bb
 ```
-```sh
+```bash
 DESCRIPTION = "Image with test-framework"
 LICENSE = "MIT"
 
@@ -161,17 +161,17 @@ IMAGE_INSTALL:append = " test-framework"
 ## 6. testfw 可執行啟動器
 
 路徑：
-```sh
+```bash
 /usr/bin/testfw
 ```
 內容：
-```sh
+```bash
 #!/bin/sh
 cd /opt/test-framework/scripts/core
 exec ./menu.sh "$@"
 ```
 這修正了 test-framework 找不到 libs 的問題：
-```sh
+```bash
 core/libs/logging_utils.sh:  No  such  file  or  directory
 ```
 

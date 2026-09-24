@@ -25,7 +25,7 @@ dma_alloc_coherent
 - cache 一致性（coherent）
 
 ## 2. Kernel 原始碼對照
-```
+```text
 kernel/dma/mapping.c
 drivers/base/dma-mapping.c
 include/linux/dma-mapping.h

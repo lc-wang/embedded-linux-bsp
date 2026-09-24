@@ -25,7 +25,7 @@ framebuffer 不擁有 memory
 
 ## 2. DRM memory stack
 
-```
+```text
 userspace mmap
  ↓
 drm framebuffer
@@ -41,13 +41,13 @@ physical pages
 
 GEM：
 
-```
+```text
 Graphics Execution Manager
 ```
 
 本質上：
 
-```
+```text
 DRM 的 memory object 管理系統
 ```
 
@@ -55,13 +55,13 @@ DRM 的 memory object 管理系統
 
 shmem GEM：
 
-```
+```text
 使用 shared memory backend 的 GEM object
 ```
 
 也就是：
 
-```
+```text
 memory 由 kernel shmem subsystem 提供
 ```
 
@@ -69,7 +69,7 @@ memory 由 kernel shmem subsystem 提供
 
 因為：
 
-```
+```text
 CPU 能直接存取
 mmap 容易
 helper 完整
@@ -78,7 +78,7 @@ helper 完整
 
 ## 6. Kernel 原始碼對照
 
-```
+```text
 drivers/gpu/drm/drm_gem.c
 drivers/gpu/drm/drm_gem_shmem_helper.c
 drivers/gpu/drm/drm_framebuffer.c

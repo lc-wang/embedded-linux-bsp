@@ -8,7 +8,7 @@
 
 ## 1. 整體時間軸
 
-```
+```text
 Boot
  ↓
 MAC driver probe
@@ -36,7 +36,7 @@ Ping OK
 
 ### 2.1 Step 1：Driver probe
 
-```
+```text
 kernel boot
  ↓
 platform_driver → probe()
@@ -50,7 +50,7 @@ platform_driver → probe()
 
 #### 檢查
 
-```
+```bash
 dmesg | grep -i eth
 ```
 
@@ -61,7 +61,7 @@ dmesg | grep -i eth
 
 ### 2.2 Step 2：MDIO bus 初始化
 
-```
+```text
 MAC driver
  ↓
 mdiobus_register()
@@ -74,13 +74,13 @@ mdiobus_register()
 
 #### 檢查
 
-```
+```bash
 dmesg | grep -i mdio
 ```
 
 #### 問題
 
-```
+```text
 MDIO timeout
 No PHY found
 ```
@@ -92,7 +92,7 @@ No PHY found
 
 ### 2.3 Step 3：PHY attach
 
-```
+```text
 phy_connect()
 或
 of_phy_connect()
@@ -105,7 +105,7 @@ of_phy_connect()
 
 #### 檢查
 
-```
+```bash
 dmesg | grep -i phy
 ```
 
@@ -116,19 +116,19 @@ dmesg | grep -i phy
 
 ### 2.4 Step 4：register_netdev
 
-```
+```c
 register_netdev(dev);
 ```
 
 #### 應該發生
 
-```
+```text
 ip link
 ```
 
 看到：
 
-```
+```text
 eth0
 ```
 
@@ -138,13 +138,13 @@ eth0
 
 ### 2.5 Step 5：ip link up
 
-```
+```text
 ip link set eth0 up
 ```
 
 #### Kernel flow
 
-```
+```text
 dev_open()
  ↓
 ndo_open()
@@ -158,13 +158,13 @@ ndo_open()
 
 #### 檢查
 
-```
+```bash
 dmesg
 ```
 
 ### 2.6 Step 6：PHY auto-negotiation
 
-```
+```text
 PHY
  ↓
 交換能力（speed / duplex）
@@ -174,13 +174,13 @@ PHY
 
 #### 檢查
 
-```
+```bash
 ethtool eth0
 ```
 
 #### 正常
 
-```
+```text
 Link detected: yes
 Speed: 1000Mb/s
 ```
@@ -194,7 +194,7 @@ Speed: 1000Mb/s
 
 ### 2.7 Step 7：Link Up → MAC enable
 
-```
+```text
 PHY → callback
  ↓
 MAC driver
@@ -204,7 +204,7 @@ enable TX/RX
 
 #### Kernel log
 
-```
+```text
 eth0: Link is Up - 1000Mbps/Full
 ```
 
@@ -212,19 +212,19 @@ eth0: Link is Up - 1000Mbps/Full
 
 #### 基本測試
 
-```
+```bash
 ping 8.8.8.8
 ```
 
 #### deeper debug
 
-```
+```bash
 tcpdump -i eth0
 ```
 
 #### statistics
 
-```
+```bash
 ethtool -S eth0
 ```
 
@@ -234,7 +234,7 @@ ethtool -S eth0
 
 檢查：
 
-```
+```bash
 dmesg | grep eth
 ```
 
@@ -250,7 +250,7 @@ dmesg | grep eth
 
 檢查：
 
-```
+```bash
 ethtool eth0
 ```
 
@@ -258,7 +258,7 @@ ethtool eth0
 
 90%：
 
-```
+```text
 RGMII delay 問題
 ```
 
@@ -274,7 +274,7 @@ RGMII delay 問題
 
 檢查：
 
-```
+```text
 ndo_start_xmit 是否被呼叫
 queue 是否 stop
 ```
@@ -283,7 +283,7 @@ queue 是否 stop
 
 這個 flow：
 
-```
+```text
 Driver → MDIO → PHY → Link → Packet
 ```
 
@@ -301,7 +301,7 @@ Driver → MDIO → PHY → Link → Packet
 
 ### 5.1 強制 speed
 
-```
+```bash
 ethtool -s eth0 speed 100 duplex full autoneg off
 ```
 
@@ -309,13 +309,13 @@ ethtool -s eth0 speed 100 duplex full autoneg off
 
 ### 5.2 查看 carrier
 
-```
+```bash
 cat /sys/class/net/eth0/carrier
 ```
 
 ### 5.3 查看 state
 
-```
+```bash
 cat /sys/class/net/eth0/operstate
 ```
 
@@ -325,32 +325,32 @@ cat /sys/class/net/eth0/operstate
 
 #### 基本
 
-```
+```bash
 ip link
 ethtool eth0
 ```
 
 #### driver
 
-```
+```bash
 ethtool -i eth0
 ```
 
 #### statistics
 
-```
+```bash
 cat /proc/net/dev
 ethtool -S eth0
 ```
 
 #### PHY
 
-```
+```text
 mdio-tool dump eth0 1
 ```
 
 #### 封包
 
-```
+```bash
 tcpdump -i eth0
 ```

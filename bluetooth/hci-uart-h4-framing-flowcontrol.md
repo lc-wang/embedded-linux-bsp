@@ -8,13 +8,13 @@
 常見症狀：
 
 -   `hciconfig hci0 up` timeout
-    
+
 -   btmon 看到第一個 command，之後全消失
-    
+
 -   brcm_patchram_plus 偶爾成功、偶爾失敗
-    
+
 -   換 firmware 沒差，換 kernel 版本沒差
-    
+
 這一章專門拆解 **UART 層真正會壞的地方**
 
 ## 1. HCI over UART 的本質：沒有封包邊界的世界
@@ -24,13 +24,13 @@
 UART 的特性：
 
 -   沒有封包邊界
-    
+
 -   沒有 CRC
-    
+
 -   沒有 retry
-    
+
 -   所有 framing 都靠 **軟體協議**
-    
+
 對 Bluetooth 而言，這個協議就是 **HCI H4**。
 
 ## 2. HCI H4 協議：一切從第一個 byte 開始
@@ -66,7 +66,7 @@ ACL packet：
 ## 3. hci_uart 架構總覽
 
 ### 3.1 關鍵檔案
-```
+```text
 drivers/bluetooth/
 ├─ hci_uart.c        # HCI UART core
 ├─ hci_ldisc.c       # TTY line discipline (N_HCI)
@@ -74,13 +74,13 @@ drivers/bluetooth/
 hci_uart 負責：
 
 -   HCI device lifecycle
-    
+
 -   將 HCI packet 交給 HCI core
-    
+
 -   protocol abstraction（H4 / BCSP / etc）
-    
+
 ### 3.2 line discipline（N_HCI）的角色
-```
+```text
 /dev/ttyS9
    │
    └─ N_HCI (hci_ldisc)
@@ -92,9 +92,9 @@ hci_uart 負責：
 N_HCI 做的事：
 
 -   接管 tty 的 read/write
-    
+
 -   把 byte stream 丟給 hci_uart parser
-    
+
 **任何其他 process 開 tty 都會破壞這個模型**
 
 ## 4. brcm_patchram_plus vs kernel：為什麼會打架？
@@ -102,26 +102,26 @@ N_HCI 做的事：
 ### 4.1 兩個「master」搶同一條 tty
 
 典型災難配置：
-```
+```text
 Process A: brcm_patchram_plus
 Process B: hci_uart (kernel)
 ```
 兩邊都：
 
 -   設 baud rate
-    
+
 -   設 flow control
-    
+
 -   送 HCI command
-    
+
 結果：
 
 -   framing 混亂
-    
+
 -   command/event 對不上
-    
+
 -   表現為「玄學不穩」
-    
+
 **硬規則**
 
 > 同一時間，只能有一個 entity 控制該 UART
@@ -131,15 +131,15 @@ Process B: hci_uart (kernel)
 **方案 A：User space 初始化**
 
 -   brcm_patchram_plus 完成 firmware + baud
-    
+
 -   再 attach hci_uart
-    
+
 **方案 B：Kernel 全權處理**
 
 -   serdev + btbcm
-    
+
 -   user space 不碰 tty
-    
+
 混用 = 必爆
 
 ## 5. baud rate mismatch：最常見、最難一眼看出的錯
@@ -149,17 +149,17 @@ Process B: hci_uart (kernel)
 常見錯誤：
 
 -   Host 切到 3M
-    
+
 -   Controller 還在 115200（或反過來）
-    
+
 後果：
 
 -   byte stream 立刻變亂碼
-    
+
 -   parser 讀到錯誤 packet type
-    
+
 -   HCI core 再也等不到正確 event
-    
+
 ### 5.2 btmon 的經典症狀
 
 `< HCI Command: Reset (no event forever)` 
@@ -175,15 +175,15 @@ Process B: hci_uart (kernel)
 實務建議：
 
 -   firmware download：115200（穩定）
-    
+
 -   運行時再切高 baud（如 3M）
-    
+
 因為：
 
 -   firmware download 階段 packet 多、密
-    
+
 -   framing error 成本極高
-    
+
 ## 6. RTS / CTS Flow Control：第二大隱形殺手
 
 ### 6.1 軟體有開，硬體沒接
@@ -191,25 +191,25 @@ Process B: hci_uart (kernel)
 最典型錯誤：
 
 -   `crtscts` = on
-    
+
 -   板子根本沒接 RTS/CTS
-    
+
 後果：
 
 -   Host 永遠等 CTS
-    
+
 -   或 controller TX overflow
-    
+
 -   結果 = packet 丟失
-    
+
 ### 6.2 Flow control 壞掉的表現
 
 -   有些 command 回得來，有些不行
-    
+
 -   小 command OK，大 packet（ACL）開始炸
-    
+
 -   表現「極不穩定」
-    
+
 ### 6.3 必做檢查清單
 
 `stty -F /dev/ttyS9 -a` 
@@ -217,43 +217,43 @@ Process B: hci_uart (kernel)
 確認：
 
 -   baud rate
-    
+
 -   `-crtscts` 或 `crtscts` 是否符合硬體
-    
+
 ## 7. serdev vs line discipline：為什麼 serdev 比較安全
 
 ### 7.1 serdev 的優點
 
 -   kernel 單一 owner
-    
+
 -   power / clock / reset 整合
-    
+
 -   不需 user space 開 tty
-    
+
 **更適合 BSP / 量產系統**
 
 ### 7.2 line discipline 的風險
 
 -   user space 容易誤觸 tty
-    
+
 -   service 啟動順序容易 race
-    
+
 -   debug 成本高
-    
+
 ## 8. 常見問題與排查（UART 層 debug 的「黃金流程」）
 
 當你懷疑 UART 層時：
 
 1.  停 bluetoothd
-    
+
 2.  確保只有一個 entity 使用 tty
-    
+
     `lsof /dev/ttyS9` 
-    
+
 3.  確認 baud / flow
-    
+
 4.  開 `btmon`
-    
+
 5.  只測 `btmgmt power on`
-    
+
 **只要 HCI Reset 沒回 event，就 100% 是 UART 層**

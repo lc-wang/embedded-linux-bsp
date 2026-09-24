@@ -193,7 +193,7 @@ drmModePageFlip()
 ```
 Kernel → 呼叫 CRTC 的：
 
-```
+```text
 ->atomic_flush()
 ```
 然後在下一次 VBLANK：
@@ -223,15 +223,15 @@ DRM KMS
 
 ### 11.1 列出 DRM 裝置
 
-```sh
+```bash
 ls /sys/class/drm/
 ```
 列出 modes
-```sh
+```bash
 modetest -M <driver>
 ```
 顯示 buffer 測試
-```
+```bash
 kmscube
 ```
 檢查 Atomic log

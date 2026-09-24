@@ -2,7 +2,7 @@
 
 本章要把以下幾個概念串起來：
 
-```
+```text
 rollback attack
 rollback index
 security version
@@ -18,7 +18,7 @@ boot-time check
 
 重點不是只知道「版本不能降版」，而是理解：
 
-```
+```text
 為什麼已簽章的舊 image 仍然可能危險？
 rollback index 存在哪裡才安全？
 為什麼 update time 和 boot time 都要檢查？
@@ -29,7 +29,7 @@ Rollback Protection 是 Secure Boot / Firmware Update Security 的重要補強�
 
 ## 1. 一張圖先看懂
 
-```
+```text
 [Current device security version = 5]
         ↓
 [Install package security version = 3]
@@ -43,7 +43,7 @@ Rollback Protection 是 Secure Boot / Firmware Update Security 的重要補強�
 
 一句話：
 
-```
+```text
 Rollback Protection 是防止 signed old vulnerable image 被重新安裝或開機。
 ```
 
@@ -51,19 +51,19 @@ Rollback Protection 是防止 signed old vulnerable image 被重新安裝或開�
 
 Secure Boot 可以確認：
 
-```
+```text
 image 是不是由可信 key 簽章？
 ```
 
 但它不一定能判斷：
 
-```
+```text
 這個 image 是不是太舊？這個版本是不是有已知漏洞？
 ```
 
 例如：
 
-```
+```text
 v1.0:
   signed image
   contains security bug
@@ -75,7 +75,7 @@ v1.1:
 
 如果 device 已經更新到 v1.1，但仍允許開機 v1.0：
 
-```
+```text
 攻擊者可以刷回 v1.0  
 利用舊漏洞攻擊系統
 ```
@@ -94,7 +94,7 @@ v1.1:
 
 簡化理解：
 
-```
+```text
 Secure Boot:
   這是不是我們簽的？
 
@@ -106,7 +106,7 @@ Rollback Protection:
 
 攻擊者的目標不是偽造簽章，而是利用舊版合法 image。
 
-```
+```text
 [Device currently runs v2]
         ↓
 [v2 has security fix]
@@ -126,7 +126,7 @@ Rollback Protection:
 
 需要額外檢查：
 
-```
+```text
 image security_version >= device stored rollback_index
 ```
 
@@ -134,31 +134,31 @@ image security_version >= device stored rollback_index
 
 Rollback index 可以理解成：
 
-```
+```text
 device 允許開機的最低安全版本。
 ```
 
 例如：
 
-```
+```text
 device rollback_index = 5
 ```
 
 代表：
 
-```
+```text
 security_version >= 5 的 image 才允許安裝或開機
 ```
 
 如果 image 是：
 
-```
+```text
 image security_version = 3
 ```
 
 結果：
 
-```
+```text
 reject
 ```
 
@@ -168,7 +168,7 @@ reject
 
 例如：
 
-```
+```text
 version = "1.2.3"
 ```
 
@@ -176,7 +176,7 @@ version = "1.2.3"
 
 rollback protection 通常需要一個可比較、不可任意降低的 security version：
 
-```
+```text
 security_version = 5
 rollback_index = 5
 anti_rollback_counter = 5
@@ -192,7 +192,7 @@ anti_rollback_counter = 5
 
 重點：
 
-```
+```text
 不是每次功能更新都一定要提高 security version。
 但修補安全漏洞後，通常需要提高 security version。
 ```
@@ -203,7 +203,7 @@ Rollback check 不應該只出現在 update client。
 
 通常要有兩層：
 
-```
+```text
 Update-time check
 Boot-time check
 ```
@@ -212,7 +212,7 @@ Boot-time check
 
 發生在安裝 firmware 時。
 
-```
+```text
 [Update package]
     ↓
 [Check package security_version]
@@ -224,7 +224,7 @@ Boot-time check
 
 目的：
 
-```
+```text
 不要把明顯過舊的 image 寫進 storage。
 ```
 
@@ -232,7 +232,7 @@ Boot-time check
 
 發生在 bootloader 開機時。
 
-```
+```text
 [Bootloader]
     ↓
 [Read image rollback index]
@@ -244,14 +244,14 @@ Boot-time check
 
 目的：
 
-```
+```text
 防止攻擊者繞過 update client，
 直接寫入 storage 或切換 slot。
 ```
 
 一句話：
 
-```
+```text
 Update-time check 是第一道門。
 Boot-time check 是最後防線。
 ```
@@ -262,7 +262,7 @@ Rollback counter 必須存在 Normal World 不能任意修改的位置。
 
 常見選項：
 
-```
+```text
 eFuse / OTP
 RPMB
 TEE secure storage
@@ -275,7 +275,7 @@ bootloader protected metadata
 
 優點：
 
-```
+```text
 硬體保護強
 不可被普通軟體降低
 適合保存不可逆安全狀態
@@ -283,7 +283,7 @@ bootloader protected metadata
 
 限制：
 
-```
+```text
 寫入次數有限
 通常不可逆
 不適合頻繁更新
@@ -292,7 +292,7 @@ bootloader protected metadata
 
 適合：
 
-```
+```text
 重要 security version
 key hash
 secure boot enable
@@ -303,7 +303,7 @@ production lock state
 
 優點：
 
-```
+```text
 支援 replay protection
 比 eFuse 更適合保存可更新 counter
 常與 OP-TEE secure storage 搭配
@@ -311,7 +311,7 @@ production lock state
 
 限制：
 
-```
+```text
 需要 RPMB key provisioning
 storage device 要支援
 bring-up 較複雜
@@ -319,7 +319,7 @@ bring-up 較複雜
 
 適合：
 
-```
+```text
 rollback counter
 secure storage metadata
 Android rollback index
@@ -330,7 +330,7 @@ TEE-backed counter
 
 優點：
 
-```
+```text
 適合 TPM-based platform
 可搭配 policy
 可保存安全狀態
@@ -338,14 +338,14 @@ TEE-backed counter
 
 限制：
 
-```
+```text
 embedded ARM 平台不一定有 TPM
 需要 TPM provisioning / policy 設計
 ```
 
 適合：
 
-```
+```text
 measured boot policy
 device state
 sealed key version
@@ -357,7 +357,7 @@ Rollback counter 不是越早更新越好。
 
 錯誤流程：
 
-```
+```text
 [Verify package]
     ↓
 [Update rollback counter to 6]
@@ -369,7 +369,7 @@ Rollback counter 不是越早更新越好。
 
 可能結果：
 
-```
+```text
 counter 已經變成 6
 但新 image 沒寫完整
 舊 image security_version = 5
@@ -381,7 +381,7 @@ device brick
 
 A/B update 通常會搭配：
 
-```
+```text
 write inactive slot
 verify written image
 boot new slot
@@ -392,7 +392,7 @@ then commit security state
 
 概念 flow：
 
-```
+```text
 [Running slot A, rollback_index = 5]
         ↓
 [Install slot B, security_version = 6]
@@ -408,7 +408,7 @@ then commit security state
 
 重點：
 
-```
+```text
 不要在新 image 還沒確認可用前，
 讓舊 image 永遠不能回去。
 ```
@@ -421,7 +421,7 @@ A/B update 中，slot metadata 和 rollback index 要一起設計。
 
 常見狀態：
 
-```
+```text
 slot A:
   successful = yes
   security_version = 5
@@ -433,7 +433,7 @@ slot B:
 
 更新後：
 
-```
+```text
 slot B bootable
 slot B retry_count = 3
 slot B successful = no
@@ -441,14 +441,14 @@ slot B successful = no
 
 開機成功後：
 
-```
+```text
 slot B successful = yes
 rollback_index = 6
 ```
 
 如果 slot B 開機失敗：
 
-```
+```text
 fallback to slot A
 rollback_index 不應該太早提高到 6
 ```
@@ -461,7 +461,7 @@ Android Verified Boot 有 rollback index 概念。
 
 簡化 flow：
 
-```
+```text
 [Bootloader]
     ↓
 [Verify vbmeta signature]
@@ -477,7 +477,7 @@ Android Verified Boot 有 rollback index 概念。
 
 概念：
 
-```
+```text
 vbmeta rollback_index >= stored rollback_index
 ```
 
@@ -485,7 +485,7 @@ vbmeta rollback_index >= stored rollback_index
 
 Android 常見保存位置：
 
-```
+```text
 RPMB
 tamper-resistant storage
 SoC secure storage
@@ -493,7 +493,7 @@ SoC secure storage
 
 BSP 要確認：
 
-```
+```text
 rollback index location 是否正確
 bootloader 是否真的檢查
 OTA 是否更新 rollback index
@@ -506,7 +506,7 @@ Embedded Linux 沒有固定唯一標準。
 
 常見組合：
 
-```
+```text
 U-Boot verified boot
 FIT image signature
 custom security_version in FIT config
@@ -517,7 +517,7 @@ RPMB / eFuse / TPM NV counter
 
 簡化 flow：
 
-```
+```text
 [Update package]
     ↓ verify signature
 [Read package security_version]
@@ -533,7 +533,7 @@ RPMB / eFuse / TPM NV counter
 
 重點：
 
-```
+```text
 Linux BSP 需要自己定義清楚 security_version 放哪裡、誰檢查、counter 存哪裡。
 ```
 
@@ -543,7 +543,7 @@ Rollback protection 不能只做在 OTA。
 
 所有能寫入 image 的路徑都要檢查：
 
-```
+```text
 OTA
 recovery update
 USB update
@@ -556,14 +556,14 @@ UART download mode
 
 常見錯誤：
 
-```
+```text
 OTA 拒絕舊版本
 但 recovery 允許刷舊版本
 ```
 
 結果：
 
-```
+```text
 rollback protection 被繞過。
 ```
 
@@ -571,7 +571,7 @@ rollback protection 被繞過。
 
 開發階段常需要：
 
-```
+```text
 允許降版測試
 允許刷 test image
 允許 fastboot flash
@@ -580,7 +580,7 @@ rollback protection 被繞過。
 
 但 production 要確認：
 
-```
+```text
 是否仍允許 rollback？
 是否仍接受 test key？
 是否仍允許 unsigned image？
@@ -589,7 +589,7 @@ rollback protection 被繞過。
 
 如果 production device 允許任意降版：
 
-```
+```text
 rollback protection 實際上不存在。
 ```
 
@@ -599,7 +599,7 @@ rollback protection 實際上不存在。
 
 檢查：
 
-```
+```text
 bootloader image version
 kernel / FIT security_version
 vbmeta rollback_index
@@ -609,7 +609,7 @@ update package security_version
 
 要知道：
 
-```
+```text
 哪個欄位是真正參與安全判斷？
 哪個只是顯示用？
 ```
@@ -618,7 +618,7 @@ update package security_version
 
 問自己：
 
-```
+```text
 stored rollback index 存在哪裡？
 eFuse？
 RPMB？
@@ -629,7 +629,7 @@ bootloader metadata？
 
 並確認：
 
-```
+```text
 Normal World 能不能任意改低？
 是否防 replay？
 是否可被 factory reset 清掉？
@@ -637,7 +637,7 @@ Normal World 能不能任意改低？
 
 ### 16.3 Step 3：確認 update-time check
 
-```
+```text
 安裝舊版 package 是否會被拒絕？
 簽章正確但 security_version 較低是否會被拒絕？
 錯誤時是否不寫入 partition？
@@ -645,7 +645,7 @@ Normal World 能不能任意改低？
 
 ### 16.4 Step 4：確認 boot-time check
 
-```
+```text
 直接把舊版 image 寫進 storage 是否會被 bootloader 擋下？
 切換到舊 slot 是否會被拒絕？
 vbmeta rollback_index 過低是否會 boot fail？
@@ -653,7 +653,7 @@ vbmeta rollback_index 過低是否會 boot fail？
 
 ### 16.5 Step 5：確認 counter 更新時機
 
-```
+```text
 counter 是安裝時更新？
 第一次成功開機後更新？
 health check 通過後更新？
@@ -661,7 +661,7 @@ health check 通過後更新？
 
 尤其要檢查：
 
-```
+```text
 更新 counter 後斷電是否會 brick？
 fallback slot 是否仍可用？
 ```
@@ -670,7 +670,7 @@ fallback slot 是否仍可用？
 
 ### 17.1 只靠 version string
 
-```
+```text
 version = "1.2.3"
 ```
 
@@ -678,7 +678,7 @@ version = "1.2.3"
 
 結果：
 
-```
+```text
 攻擊者可能透過舊版 signed image rollback。
 ```
 
@@ -686,7 +686,7 @@ version = "1.2.3"
 
 如果 rollback counter 放在：
 
-```
+```text
 /etc/version
 /var/lib/update/version
 普通 ext4 partition
@@ -698,7 +698,7 @@ version = "1.2.3"
 
 攻擊者可能繞過 OTA：
 
-```
+```text
 直接寫 storage
 用 recovery
 用 factory tool
@@ -711,7 +711,7 @@ version = "1.2.3"
 
 可能造成：
 
-```
+```text
 新 image 還沒確認成功
 舊 image 已經不能開
 device brick
@@ -721,7 +721,7 @@ device brick
 
 production 還允許：
 
-```
+```text
 test key image
 unsigned image
 fastboot flash
@@ -732,7 +732,7 @@ rollback protection 可能被繞過。
 
 ## 18. Rollback Protection Checklist
 
-```
+```text
 [ ] Image security_version / rollback_index is defined
 [ ] Security version is separate from display version if needed
 [ ] Stored rollback index location is protected

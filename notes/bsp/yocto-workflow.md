@@ -12,7 +12,7 @@ Yocto 對 BSP 工程師來說，不是包裝工具，而是：
 -   系統整合器（kernel / u-boot / rootfs） 
 -   變更仲裁者（多個 layer 同時存在）
 -   Debug 放大鏡（讓錯誤被隱藏或放大）
-    
+
 **工程現實**：
 
 -   功能異常 ≠ code 有問題
@@ -30,7 +30,7 @@ bitbake-layers show-layers
 
 -   BSP layer 是否真的覆蓋 vendor layer
 -   bbappend 有沒有被吃到
-    
+
 > **工程原則**：
 > 
 > -   不知道哪個 layer 生效，就不要 debug code
@@ -43,7 +43,7 @@ bitbake-layers show-layers
 -   bbappend 檔名不匹配
 -   layer priority 太低
 -   FILESEXTRAPATHS 沒加
-    
+
 快速驗證：
 
 ```bash
@@ -68,32 +68,32 @@ devtool modify virtual/kernel
 
 -   立即可用 
 -   **不適合長期存在**
-    
+
 ### 3.2 路徑 B：bbappend + patch（正式修改）
 
 適用：
 
 -   要進版控  
 -   要交付到正式部署環境
-    
+
 關鍵點：
 
 -   patch 必須可重現
 -   recipe 不應 hardcode path
-    
+
 ### 3.3 路徑 C：external src（大型專案）
 
 適用：
 
 -   kernel / u-boot 大改
 -   長期分支維護
-    
+
 風險：
 -   image 可重現性下降
-   
+
 ## 4. Debug 決策流程
 
-```
+```text
 行為不符預期
   ├─ 確認 image 是否 rebuild
   ├─ 確認 recipe 是否被選中
@@ -120,11 +120,11 @@ bitbake -e virtual/kernel | grep ^SRC_URI
 
 -   patch 是否真的被套用
 -   是否被其他 layer 覆蓋
-    
+
 ### 5.2 U-Boot
 
 -   常見錯誤：改了 board 但 image 沒變
-    
+
 -   驗證方式：
 
 ```bash

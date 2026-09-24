@@ -161,7 +161,7 @@ dmesg | grep -i i2c
 -   timeout 
 -   NACK
 -   arbitration lost
-    
+
 這類訊息多半指向：
 -   clock 不穩
 -   bus speed 過高

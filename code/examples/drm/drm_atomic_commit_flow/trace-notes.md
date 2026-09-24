@@ -9,7 +9,7 @@
 
 例如：
 
-```
+```text
 先改 plane
 再改 CRTC
 再開 connector
@@ -17,7 +17,7 @@
 
 中途：
 
-```
+```text
 畫面可能進入不一致狀態
 ```
 
@@ -25,7 +25,7 @@
 
 modern DRM：
 
-```
+```text
 先建立完整新 state
  ↓
 全部檢查
@@ -39,7 +39,7 @@ atomic state 包含：
 
 ### 3.1 plane state
 
-```
+```text
 plane 顯示哪張 framebuffer
 ```
 
@@ -51,7 +51,7 @@ plane 顯示哪張 framebuffer
 
 ### 3.2 CRTC state
 
-```
+```text
 scanout 狀態
 ```
 
@@ -63,7 +63,7 @@ scanout 狀態
 
 ### 3.3 connector state
 
-```
+```text
 輸出 routing
 ```
 
@@ -74,13 +74,13 @@ scanout 狀態
 
 ## 4. atomic commit 真正做的事情
 
-```
+```text
 建立「下一個 display 世界」
 ```
 
 而不是：
 
-```
+```text
 立刻亂改硬體
 ```
 
@@ -88,7 +88,7 @@ scanout 狀態
 
 ### 5.1 userspace
 
-```
+```text
 DRM_IOCTL_MODE_ATOMIC
 ```
 
@@ -96,25 +96,25 @@ DRM_IOCTL_MODE_ATOMIC
 
 kernel：
 
-```
+```text
 drm_mode_atomic_ioctl()
 ```
 
 ### 5.2 state allocation
 
-```
+```text
 drm_atomic_state_alloc()
 ```
 
 建立：
 
-```
+```text
 struct drm_atomic_state
 ```
 
 ### 5.3 state check
 
-```
+```text
 drm_atomic_check_only()
 ```
 
@@ -122,7 +122,7 @@ drm_atomic_check_only()
 
 driver：
 
-```
+```text
 plane->atomic_check()
 crtc->atomic_check()
 ```
@@ -131,33 +131,33 @@ crtc->atomic_check()
 
 例如：
 
-```
+```text
 這張 framebuffer 能不能 scanout？
 ```
 
-```
+```text
 這個 plane 支不支援這個 format？
 ```
 
-```
+```text
 CRTC bandwidth 夠不夠？
 ```
 
 ### 6.1 commit
 
-```
+```text
 drm_atomic_commit()
 ```
 
 ↓
 
-```
+```text
 drm_atomic_helper_commit()
 ```
 
 ### 6.2 helper commit flow
 
-```
+```text
 disable old state
  ↓
 update planes
@@ -167,13 +167,13 @@ enable new state
 
 ### 6.3 最後到 driver callback
 
-```
+```text
 pipe->update()
 ```
 
 driver 在這裡：
 
-```
+```text
 設定真正 hardware register
 ```
 
@@ -181,13 +181,13 @@ driver 在這裡：
 
 page flip：
 
-```
+```text
 scanout framebuffer 改成另一張
 ```
 
 也就是：
 
-```
+```text
 plane state 的 FB_ID 改變
 ```
 
@@ -204,19 +204,19 @@ plane state 的 FB_ID 改變
 
 不能再：
 
-```
+```text
 一步一步亂改
 ```
 
 ## 9. 最重要一句話
 
-```
+```text
 atomic commit
 本質上是在切換「整個 display state」
 ```
 
 ## 10. 最後總結（modern DRM mental model）
-```
+```text
 framebuffer  
 ↓  
 plane state  
@@ -234,14 +234,14 @@ hardware update
 
 本章新增：  
 
-```text  
+```text
 userspace/atomic_modeset_minimal.c
 ```
 這是 legacy `drmModeSetCrtc()` 的 atomic 版本。
 
 它示範：
 
-```
+```text
 open /dev/dri/card0
  ↓
 drmSetClientCap(UNIVERSAL_PLANES)
@@ -264,33 +264,33 @@ drmModeAtomicCommit()
 
 #### connector
 
-```
+```text
 CRTC_ID = crtc_id
 ```
 
 意思是：
 
-```
+```text
 這個 connector 要接到哪個 CRTC
 ```
 
 #### CRTC
 
-```
+```text
 MODE_ID = mode blob
 ACTIVE = 1
 ```
 
 意思是：
 
-```
+```text
 設定顯示 timing
 並啟用 scanout
 ```
 
 #### plane
 
-```
+```text
 FB_ID = framebuffer
 CRTC_ID = crtc_id
 SRC_* = framebuffer 內的來源範圍
@@ -299,14 +299,14 @@ CRTC_* = 螢幕上的顯示範圍
 
 意思是：
 
-```
+```text
 這個 plane 要把哪張 framebuffer
 顯示到哪個 CRTC 上
 ```
 
 ### 11.2 對應 kernel flow
 
-```
+```text
 drmModeAtomicCommit()
  ↓
 DRM_IOCTL_MODE_ATOMIC
@@ -326,7 +326,7 @@ driver atomic callbacks
 
 ### 11.3 最重要一句話
 
-```
+```text
 atomic commit 不是單純換 framebuffer
 
 而是一次提交：

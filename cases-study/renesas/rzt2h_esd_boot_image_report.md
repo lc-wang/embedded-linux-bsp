@@ -11,7 +11,7 @@
     -   `Image`
     -   `*.dtb`
     -   `modules/`
-        
+
 -   使用 Ubuntu Host 生成完整可開機 SD 卡 image。
 
 在過程中發現：
@@ -79,7 +79,7 @@ fdisk -l core-image*.wic
 
 ```bash
 xxd -s 0 -l 16 core-image*.wic
-0x00000000:  fab8  0010 8ed0  bc00  ...
+00000000: fab8 0010 8ed0 bc00  ...
 ```
 
 → 前面不是 0，也不是 bl2_bp，表示 Yocto WIC **並沒有把 BL2_BP 放在 LBA0**。
@@ -88,7 +88,7 @@ xxd -s 0 -l 16 core-image*.wic
 ```bash
 xxd -s 0 -l 16 ubuntu.img
 00000000: 0100 0000 0000 0000 ......
-``` 
+```
 
 代表：
 
@@ -102,7 +102,7 @@ xxd -s $((1*512)) -l 16 wic.img
 ```
 → 這裡會看到：
 
-```
+```text
 0100 0000 0000 0000
 ```
 證實：
@@ -120,10 +120,10 @@ dd  if=bl2_bp_esd.bin of=$loop_dev conv=notrunc
 ```
 → 寫到 LBA0，而不是 Yocto 的 LBA1。
 
-#### Root cause：
+#### Root cause
 -   Yocto `.wic` 有 WIC metadata header → 前面不是 empty
 -   ROM 不從 LBA0 boot，從 **LBA1** boot
-    
+
 #### 問題 2：FIP offset 錯誤
 
 探勘 offset：
@@ -155,19 +155,19 @@ start=524288
 
 ## 3. Root Cause 分析（最終 Root Cause 與結論）
 
-### 3.1 不能開機的真正原因：
+### 3.1 不能開機的真正原因
 
 > **你把 BL2_BP 寫到 LBA 0。但 Yocto 寫在 LBA 1。**  
 > ROM 只從 LBA1 讀 BootParam → LBA0 完全無作用。
 
-### 3.2 Partition layout 需完全符合 Yocto：
+### 3.2 Partition layout 需完全符合 Yocto
 
 | Partition | Start | Type |
 |-----------|--------|------|
 | P1 | 4096 | FAT32 (0x0c) |
 | P2 | 44536 | EXT4 (0x83) |
 
-### 3.3 Bootloader offset 必須固定：
+### 3.3 Bootloader offset 必須固定
 
 | Component | LBA |
 |-----------|------|

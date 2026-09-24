@@ -19,11 +19,11 @@
     -   `remoteproc` 驅動
     -   `cr52_0` 對應的 `/sys/class/remoteproc/remoteproc0` 介面
 -   本手冊所有修改，**請在複製後的新專案上做**，不要破壞原始版本。
-    
+
 ## 3. 用 e² studio 建立「Remoteproc 版」專案
 
 1.  在 e² studio 專案視窗中：
-    
+
     -   右鍵原專案 `RZT2H_INVBLV_SPM_ENCD_FOC_E2S_V100`
     -   選 **Copy** → 再點空白處 → **Paste**
 2.  輸入新名稱（建議）：
@@ -38,7 +38,7 @@
 -   路徑建議：`script/rzt2h_cr52_remoteproc.ld`
 
 內容範例
-```sh
+```bash
 ENTRY(_start)
 
 /* Firmware in CR52 SRAM
@@ -121,13 +121,13 @@ SECTIONS
 1.  專案右鍵 → **Properties** 
 2.  左側選單：  
     `C/C++ Build` → `Settings` → `Tool Settings`
-    
+
 3.  在 **GNU Arm Cross C Linker** → `General`（或 Script 選項）中：
-    
+
     -   找到「Script file」或 `-T` 相關設定      
     -   指定為：`script/rzt2h_cr52_remoteproc.ld`      
 4.  套用（Apply），關閉視窗。
-    
+
 ## 5. 移除「自帶 reset / clock 設定」的啟動碼
 
 ### 5.1 停用 startup / crt 檔案
@@ -143,13 +143,13 @@ remoteproc 會：
 
 -   `startup.c` 或 `startup_core.c`
 -   任何 `*_start.c` / `vector_table.c` 若是自行重設 stack / reset handler 的，也需確認。
-    
+
 對這些檔案：
 
 1.  右鍵檔案 → **Properties**
 2.  `C/C++ Build` → **Settings** → 勾選 **Exclude from build**
 3.  對 Debug / Release configuration 都做一次確認。
-    
+
 > 如果有 `.s` / `.asm` 的啟動碼檔案，也同樣排除。
 
 ## 6. 修改 hal_entry.c：接管 main 流程給 remoteproc
@@ -210,7 +210,7 @@ void hal_entry(void)
 -   `R_SYSC_NS->MSTPCR*` → 開關模組 clock
 -   `R_XSPI_OSPI_Open()` / `ospi_set_DTR_OPI_Mode_enable()`
 -   `EI()` / `DI()` 等
-    
+
 這些對於「Linux 早就初始化好的 SoC」來說，**都是高風險操作**。
 
 ### 7.2 Remoteproc-safe 版
@@ -307,7 +307,7 @@ void R_Systeminit(void)
     -   避開會讓 Linux 掛掉的東西
     -   只做「motor 控制必要的資料結構初始化」
     -   呼叫 `setup_motor()`、`setup_encoder()`
-        
+
 ### 8.2 建議實作骨架
 
 在 `m_rzt.c` 裡增加：
@@ -380,25 +380,25 @@ void m_startup_remoteproc_safe(void)
 3.  成功後，到 `Debug` 或 `Release` 資料夾找到：
     -   `RZT2H_INVBLV_SPM_ENCD_FOC_E2S_V100_remoteproc.elf`
 4.  將該檔拷貝到 Linux 板子（例如 `/lib/firmware`或）。
-    
+
 ## 10. 驗證（Linux 端操作 remoteproc）
 
 ### 10.1 啟動 CR52 韌體
-```sh
+```bash
 echo RZT2H_INVBLV_SPM_ENCD_FOC_E2S_V100_remoteproc.elf \
   > /sys/class/remoteproc/remoteproc0/firmware
 
 echo start > /sys/class/remoteproc/remoteproc0/state
 ```
 確認狀態：
-```sh
+```bash
 cat /sys/class/remoteproc/remoteproc0/state
 # 應該看到 "running"
 ```
 ### 10.2 確認 CR52 主迴圈有在跑
 
 在 `m_heartbeat()` 中有：
-```sh
+```bash
 _cntr++;
 if (_cntr >= 10000)
 {
@@ -411,7 +411,7 @@ if (_cntr >= 10000)
 (*(volatile  uint32_t*)0x10070020)++;
 ```
 Linux 上讀值：
-```sh
+```bash
 sudo devmem2 0x10070020
 # 連續讀，看到數字一直增加 => CR52 正常跑
 ```
@@ -423,16 +423,15 @@ sudo devmem2 0x10070020
 檢查以下幾點：
 
 1.  `hal_entry.c` 是否仍有：
-    
+
     -   `R_RWP_NS->PRCRN` / `R_RWP_S->PRCRS`
     -   `R_SYSC_NS->MSTPCRA*` / `MSTPCRC*`
-        
+
 2.  `R_Systeminit()` 是否還呼叫：
-    
+
     -   `R_IOPORT_Open(&g_ioport_ctrl, &g_bsp_pin_cfg);`
     -   `R_BSP_RegisterProtectDisable()` + `MRCTLA` / `MSTPCR*`
     -   OSPI / xSPI 相關設定
-        
+
 3.  是否有 LED 控制腳位正好跟 MMC pins 共用：
     -   若懷疑，先把所有 `LEDx =` 相關程式碼整段註解。
-        

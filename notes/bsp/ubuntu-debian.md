@@ -97,7 +97,7 @@ systemd-analyze blame
 ```
 範例：
 
-``` ini
+```ini
 [Unit]
 Description=My Daemon
 After=network.target
@@ -130,7 +130,7 @@ dpkg -i linux-image-*.deb
 dpkg -i linux-headers-*.deb
 ```
 
-### 5.1 注意：
+### 5.1 注意
 
 -   Kernel modules 在 `/lib/modules/<version>/`
 -   Bootloader 需能讀取 `/boot/vmlinuz-*`（GRUB / U-Boot）
@@ -190,7 +190,7 @@ Ubuntu/Debian 使用：
 -   netplan
 -   `/etc/network/interfaces`（legacy）
 
-### 7.1 以 eth0 為例：
+### 7.1 以 eth0 為例
 
 `/etc/netplan/01-netcfg.yaml`：
 
@@ -200,7 +200,7 @@ network:
   ethernets:
     eth0:
       dhcp4: true
- ```
+```
 Wi-Fi（wpa_supplicant）：
 
 ```bash

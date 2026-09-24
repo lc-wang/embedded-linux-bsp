@@ -4,7 +4,7 @@
 
 DRM driver 做的事情其實很單純：  
 
-```text  
+```text
 有人給我一張圖  
 ↓  
 我決定怎麼顯示  
@@ -14,7 +14,7 @@ DRM driver 做的事情其實很單純：
 
 在 simple KMS 模型裡，這條路徑被簡化成：
 
-```
+```text
 framebuffer
 ↓
 simple display pipe
@@ -28,7 +28,7 @@ display
 
 ### 2.1 driver probe
 
-```
+```text
 platform_driver probe
  ↓
 建立 drm_device
@@ -46,7 +46,7 @@ drm_dev_register()
 
 userspace 可能透過：
 
-```
+```text
 fbdev emulation
 或
 DRM ioctl（dumb buffer / AddFB2 / atomic commit）
@@ -58,7 +58,7 @@ DRM ioctl（dumb buffer / AddFB2 / atomic commit）
 
 當顯示內容要更新時：
 
-```
+```text
 userspace request
  ↓
 drm atomic framework
@@ -78,14 +78,14 @@ driver callback
 
 這一章最重要的觀念：
 
-```
+```text
 driver 真正碰硬體的地方
 通常就在 pipe->update()
 ```
 
 也就是：
 
-```
+```text
 framebuffer 已經準備好了
 現在要把它送進實際顯示硬體
 ```
@@ -94,7 +94,7 @@ framebuffer 已經準備好了
 
 ### 3.1 probe 路徑
 
-```
+```text
 platform probe
  └─ my_drm_probe()
      ├─ devm_drm_dev_alloc()
@@ -108,7 +108,7 @@ platform probe
 
 ### 3.2 顯示更新路徑
 
-```
+```text
 drm_mode_atomic_ioctl
  └─ drm_atomic_commit
      └─ drm_atomic_helper_commit
@@ -118,14 +118,14 @@ drm_mode_atomic_ioctl
 
 ### 3.3 如果第一次開啟顯示
 
-```
+```text
 atomic commit
  └─ pipe->enable()
 ```
 
 ### 3.4 如果關閉輸出
 
-```
+```text
 atomic commit
  └─ pipe->disable()
 ```
@@ -154,6 +154,6 @@ atomic commit
 
 這時候用 `drm_simple_display_pipe`：
 
-```
+```text
 簡單好維護足夠對應單一路徑顯示裝置
 ```

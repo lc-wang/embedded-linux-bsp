@@ -4,7 +4,7 @@
 
 在 i.MX8MP 平台（客製載板）的 Yocto 環境上啟用 WiFi tethering（SoftAP）時，connmand 直接崩潰：
 
-```
+```text
 $ sudo connmanctl tether wifi on <SSID> <PSK>
 Wifi SSID set
 Wifi passphrase set
@@ -36,7 +36,7 @@ Error enabling wifi tethering: Message recipient disconnected from message bus w
 
 `Message recipient disconnected from message bus without replying` 代表 D-Bus 呼叫進行到一半、對象程序從 bus 上消失 —— 第一個懷疑就是 daemon 崩潰。從 dmesg 的 audit 訊息找到證據：**connmand 的 PID 在啟用 tethering 的瞬間改變**：
 
-```
+```text
 [  101.773286] audit: ... table=nat entries=0 op=xt_register pid=552 comm="connmand"
 [  102.380134] audit: ... table=filter entries=0 op=xt_register pid=1328 comm="connmand"
 ```
@@ -61,7 +61,7 @@ sudo connmanctl tether wifi on <SSID> <PSK>
 
 Log 最後一段直接點出死因：
 
-```
+```text
 connmand[1223]: src/iptables.c:__connman_iptables_append() 2 -t nat -A connman-POSTROUTING -s 192.168.0.2/24 -o eth1 -j MASQUERADE
 connmand[1223]: src/iptables.c:prepare_target() target MASQUERADE
 free(): invalid pointer
@@ -165,7 +165,7 @@ static void reset_xtables(void)
 
 meta layer 加上 bbappend：
 
-```
+```text
 meta-<layer>/recipes-connectivity/connman/
 ├── connman_%.bbappend
 └── connman/0001-iptables-Fix-crash-with-iptables-1.8.11.patch
@@ -207,7 +207,7 @@ SRC_URI += "file://0001-iptables-Fix-crash-with-iptables-1.8.11.patch"
 
 #### A.1 程式的記憶體分區
 
-```
+```text
 高位址
    ┌─────────────┐
    │   stack     │ ← 區域變數
@@ -227,7 +227,7 @@ connman 的 `static struct option iptables_opts[]` 住在 **.data 區**，從程
 
 `malloc(100)` 實際配置的不只 100 bytes，它在**回傳指標的前面**塞了一塊 metadata（chunk header），記錄大小與狀態：
 
-```
+```text
         ┌──────────────┬─────────────────────┐
 heap:   │ chunk header │   你的 100 bytes    │
         └──────────────┴─────────────────────┘
@@ -240,7 +240,7 @@ heap:   │ chunk header │   你的 100 bytes    │
 
 `free(iptables_opts)` 時 glibc 一樣往前讀「header」——但那裡是 .data 區的其他全域變數，讀出的大小、旗標全是垃圾值。現代 glibc 對 heap 完整性做了大量檢查（heap corruption 是資安漏洞溫床），發現位址不在 heap 管轄範圍、header 不合法，便主動呼叫 `abort()`：
 
-```
+```text
 free(): invalid pointer
 Aborting (signal 6)
 ```
@@ -253,7 +253,7 @@ Aborting (signal 6)
 
 iptables 的命令列選項**不是固定的**：
 
-```
+```text
 iptables -A INPUT -p tcp -m tcp --dport 80 -j REJECT --reject-with tcp-reset
          ↑基本選項        ↑ --dport 是 libxt_tcp.so 的  ↑ --reject-with 是 libxt_REJECT.so 的
 ```
@@ -310,7 +310,7 @@ return merge;
 
 以上面那條指令為例，兩次 merge 後的工作表（注意**後載入的 extension 反而排前面**，但 getopt 按名字查表、歸屬按 val 區段判斷，順序不影響功能）：
 
-```
+```text
 [base: append/jump/source...] [REJECT: reject-with=513] [tcp: dport=257, sport=258]
  母版複本（每次重抄）           第二次 merge 進場（+512）   第一次 merge 進場（+256）
 ```
@@ -319,7 +319,7 @@ return merge;
 
 每個 extension 的選項 `val` 都從 1、2、3 自編，合併會撞號，所以進場時平移到專屬區段（第一個 +256、第二個 +512…），offset 存進該 extension 的 `xt_t->option_offset`。解析時反向使用：
 
-```
+```text
 REJECT 定義          merge 平移         getopt 回傳      範圍比對                還原
 reject-with val=1 → 1+512 = 513  →  c = 513  →  513 ∈ [512,768) → REJECT → 513-512=1 → 查 REJECT 選項表
 ```
@@ -379,7 +379,7 @@ struct xtables_globals iptables_globals = {
 
 connman 的 `src/iptables.c` 與 iptables 專案的 `iptables/iptables.c` 只是撞名，前者編進 connmand 本體，後者屬於 `/usr/sbin/iptables` 指令、與 connmand 程序無關。執行期的位址空間：
 
-```
+```text
 connmand 程序
 ┌────────────────────────────────┐
 │ connmand 本體                  │ ← prepare_target() / reset_xtables()
@@ -398,7 +398,7 @@ connmand 程序
 
 `#include <xtables.h>` 只提供編譯期型別資訊，與依賴無關。依賴鏈是：
 
-```
+```text
 #include <xtables.h>   → 編譯器知道怎麼呼叫（簽名檢查）
 -lxtables（連結期）    → ELF 寫入 NEEDED: libxtables.so.12
 ld-linux（每次啟動）   → 按 NEEDED 載入 .so、解析符號，全部在 main() 之前
@@ -442,7 +442,7 @@ void _init(void)   /* dlopen 時由動態連結器自動執行 */
 
 機制原理：編譯器把 constructor 函式位址放進 ELF 的 `.init_array` section（可用 `readelf -d libxt_MASQUERADE.so | grep INIT` 驗證），而執行 init 函式是 dlopen 規格的一部分：
 
-```
+```text
 dlopen(...)
   ├─ 1. mmap 映射 .so
   ├─ 2. 載入它自己的 NEEDED 依賴
@@ -473,7 +473,7 @@ static void reset_xtables(void)
 
 **路徑 A：這輪有載入 extension（有 merge 發生）**
 
-```
+```text
 reset:  dup₁ 誕生，opts = dup₁
 merge₁: libxtables 內部 free(opts) → dup₁ 回收 ✓    opts = 合併表A
 merge₂: libxtables 內部 free(opts) → 表A 回收 ✓     opts = 合併表B
@@ -484,7 +484,7 @@ dup₁ 由 **libxtables 1.8.11 的 merge 順手回收**（回收點 2）——�
 
 **路徑 B：這輪只用基本選項（沒有 merge）**
 
-```
+```text
 reset:  dup₁ 誕生，opts = dup₁
 reset:  opts(dup₁) != orig → g_free → dup₁ 回收 ✓   opts = dup₂ 誕生
 ```

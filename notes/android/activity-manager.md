@@ -16,7 +16,7 @@
 -   input-system：事件從哪來   
 -   graphics-display：畫面怎麼顯示  
 -   system-services：system_server 有哪些服務
-    
+
 **AMS 則負責決定：哪些 App / Process 值得被系統「活著對待」**。
 
 核心觀念：
@@ -27,7 +27,7 @@ AMS 的存在，就是為了確保：
 
 -   使用者正在互動的 App 不會被干擾
 -   系統在資源不足時能做出一致、可預期的選擇
-    
+
 AMS 位於：
 
 ```text
@@ -57,12 +57,12 @@ onCreate → onStart → onResume → onPause → onStop
 -   App 無法要求：
     -   一定常駐
     -   一定不被 kill
-        
+
 AMS 依據的是：
 -   使用者互動狀態
 -   Window 可見性（來自 WMS）
 -   系統整體資源壓力
-    
+
 ### 2.2 Process lifecycle 比 Activity 更重要
 
 在 AMS 的視角中：
@@ -73,7 +73,7 @@ AMS 依據的是：
 這也是為什麼：
 -   Activity 可能被重建
 -   Process 可能直接被 kill
-    
+
 ## 3. Process Importance 與 OOM Adj
 
 ### 3.1 為什麼 Android 需要 process 分級
@@ -95,12 +95,12 @@ AMS 會將 process 分類，例如：
 
 -   **直接影響是否會被 kill**  
 -   **直接影響 OOM adj 值**
-    
+
 ### 3.2 OOM Adj 是怎麼來的
 
 -   OOM adj 由 AMS 計算
 -   傳遞給 kernel / LMKD 作為參考
-    
+
 重點是責任分界：
 
 | 元件   | 負責職責說明                         |
@@ -136,12 +136,12 @@ AMS 監控多種類型的 ANR：
 -   CPU 被背景任務佔滿
 -   system_server thread 被 block
 -   記憶體回收導致延遲
-    
+
 結果是：
 
 -   App 看起來「沒回應」
 -   但真正慢的是系統路徑
-    
+
 **ANR 是系統健康指標，不只是 App 錯誤。**
 
 ## 5. AMS 與 WMS 的核心連結：Task 作為共同抽象
@@ -171,7 +171,7 @@ Android 面對的問題不是「管理 Activity」，而是：
 -   Task 是一組 Activity 的集合
 -   代表一個使用者操作流程（back stack）
 -   是前景 / 背景、lifecycle 與 process 重要性的判斷基礎
-    
+
 AMS 關心的是：
 -   哪個 Task 在前景？
 -   哪個 Task 對應的 process 應該被視為重要？
@@ -183,7 +183,7 @@ AMS 關心的是：
 -   Task 是一組 window / surface 的容器
 -   決定畫面上的 z-order、可見性與 focus
 -   支援 split-screen、PIP、多 display
-    
+
 WMS 關心的是：
 -   哪個 Task 在最上層？ 
 -   哪個 Task 對使用者可見？
@@ -199,9 +199,9 @@ WMS 關心的是：
 可以用一句話概括：
 
 -   WMS 提供 **Task 的可見性事實（visibility / focus）**
-    
+
 -   AMS 根據這些事實，做出 **系統層決策（importance / lifecycle）**
-    
+
 ### 5.5 實際決策資料流（Visibility → Importance）
 
 以下是使用者切換 App 時，實際發生的流程：
@@ -228,7 +228,7 @@ AMS：更新 OOM adj、前景 / 背景狀態
 
 -   **WMS 是「眼睛」**：告訴系統現在看到什麼
 -   **AMS 是「大腦」**：根據看到的結果做決定
-    
+
 ### 5.6 Task 為何是 Input 與 Graphics 的錨點
 
 -   **Input**：   
@@ -254,12 +254,12 @@ Task 是 Input / Graphics / AMS 之間的共同交集。
 
 -   **Task 是使用者行為單位**（Activity / back stack）
 -   **Process 是系統資源單位**（memory / CPU）
-    
+
 一個 Task：
 
 -   可能只對應一個 process
 -   也可能橫跨多個 process（service / content provider）
-    
+
 AMS 的責任不是維持 Task 與 Process 的一對一關係， 而是 **根據 Task 狀態，動態調整相關 process 的重要性**。
 
 ### 6.2 可見 Task 如何影響 Process Importance
@@ -317,19 +317,19 @@ AMS 降低 Task importance
 -   Task 已不在使用者視野
 -   系統記憶體壓力升高
 -   Process 成為合理的回收對象
-    
+
 #### 誤解 2：OOM 問題一定是 Kernel
 
 如果 AMS 的 Task / Process 分級錯誤：
 
 -   即使 Kernel 正常
 -   使用者仍會感覺「系統亂殺 App」
-    
+
 ### 6.5 Task 為何是記憶體與 UX 的橋樑
 
 -   使用者只感知 **Task 是否還在**
 -   系統只管理 **Process 是否還活著**
-    
+
 AMS 透過 Task， 把「使用者體驗」轉換成「系統資源決策」。
 
 ## 7. AMS 與其他 subsystem 的互動
@@ -338,16 +338,16 @@ AMS 透過 Task， 把「使用者體驗」轉換成「系統資源決策」。
 
 -   WMS 提供 window 可見性
 -   AMS 依此判斷 process 是否重要
-    
+
 沒有 WMS：
 -   AMS 無法知道 App 是否真的在螢幕上
-    
+
 ### 7.2 與 Input 系統
 
 -   InputDispatcher 偵測 input timeout
 -   回報 AMS
 -   AMS 決定是否觸發 ANR
-    
+
 ### 7.3 與 scheduler / cgroup（概念層）
 
 -   AMS 不直接控制 scheduler
@@ -370,7 +370,7 @@ dumpsys activity services
 -   process state
 -   OOM adj
 -   最近的 lifecycle 事件
-    
+
 ### 8.2 常見誤判案例
 
 | 現象       | 真正原因                           |

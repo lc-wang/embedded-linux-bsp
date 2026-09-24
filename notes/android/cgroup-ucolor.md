@@ -17,7 +17,7 @@
 -   預設假設：
     -   workload 長時間存在
     -   使用者不在乎「瞬間互動延遲」
-        
+
 但 Android 的特性完全不同：
 
 | Android 特性                         | 對 Scheduler 的衝擊                           |
@@ -33,7 +33,7 @@
 
 -   cgroup（分類與資源隔離）
 -   uclamp（限制 scheduler 的效能選擇範圍）
-    
+
 存在的核心理由。
 
 ## 2. Android 使用的 cgroup 架構
@@ -48,7 +48,7 @@ Android 11 之後：
 
 -   設計思想仍延續自早期 Android cgroup v1
 -   system_server / init / lmkd 邏輯仍帶有「角色導向」
-    
+
 ### 2.2 Android 的核心 cgroup 分類邏輯
 
 Android **不是用 PID 直接管理**，而是：
@@ -80,7 +80,7 @@ Linux scheduler 在 EAS（Energy Aware Scheduling）下：
 -   UI thread 剛醒來時 util 很低
 -   scheduler 可能選到小 core
 -   → jank
-    
+
 ### 3.2 uclamp 的本質
 
 uclamp = **utilization clamp**
@@ -106,7 +106,7 @@ Android 幾乎 **不對單一 task 手動設 uclamp**，而是：
 
 -   以 cgroup 為單位 
 -   framework 控制「角色 → uclamp policy」
-  
+
 原因：
 
 -   process / thread 太多
@@ -168,7 +168,7 @@ ActivityManager / WindowManager
 -   **kernel 完全不知道什麼是 top-app**
 -   kernel 只看到：
     -   某個 cgroup 設了 uclamp
-        
+
 ### 5.2 debug 重點
 
 當效能異常時，你要問的是：
@@ -176,7 +176,7 @@ ActivityManager / WindowManager
 1.  這個 thread 現在在哪個 cgroup？
 2.  該 cgroup 的 uclamp 設定是什麼？
 3.  scheduler 是否真的照這個值在跑？
-    
+
 ## 6. 實戰 Debug：UI 卡頓怎麼查
 
 ### 6.1 先從 userspace 確認角色
@@ -203,7 +203,7 @@ echo 1 > /sys/kernel/debug/tracing/events/sched/sched_wakeup/enable
 
 -   wakeup → runqueue
 -   CPU 類型是否符合預期
-    
+
 ## 7. 從 BSP / kernel 角度常見踩雷點
 
 ### 7.1 kernel config 沒開 uclamp
@@ -217,12 +217,12 @@ CONFIG_FAIR_GROUP_SCHED=y
 
 -   framework 設了
 -   kernel 直接忽略
-    
+
 ### 7.2 cpufreq / EAS 與 uclamp 不一致
 
 -   uclamp 只影響 util
 -   cpufreq governor 邏輯錯 → 還是慢
-    
+
 **uclamp 不是萬能**
 
 ### 7.3 vendor kernel 魔改 scheduler
@@ -231,24 +231,24 @@ CONFIG_FAIR_GROUP_SCHED=y
 
 -   vendor patch 覆蓋 uclamp
 -   debug 時看到值正確但行為不對
-    
+
 ## 8. 與其他 subsystem 的關聯
 
 ### 8.1 與 Binder
 
 -   binder thread pool 可能被放錯 cgroup
 -   造成 system_server latency
-    
+
 ### 8.2 與 LMKD
 
 -   記憶體壓力 → 調整 cgroup priority
 -   間接影響 CPU
-    
+
 ### 8.3 與 thermal
 
 -   thermal throttle 會壓低 freq
 -   即使 uclamp 高也無法突破
-    
+
 ## 9. 本章應該真正記住的事情
 
 1.  **Android 的效能不是 scheduler 自己決定的**

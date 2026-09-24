@@ -92,7 +92,7 @@ mmap() → share underlying page cache
 ## 5. Mount 與 Rootfs 選擇流程
 
 Boot 時 kernel 根據 `root=` 參數選擇 rootfs：
-```sh
+```bash
 root=/dev/mmcblk0p2
 rootwait
 rw
@@ -146,7 +146,7 @@ readpage()
 → page ready
 ```
 
-### 7.1 bio 是 block I/O 的核心結構：
+### 7.1 bio 是 block I/O 的核心結構
 
 ```c
 struct bio {
@@ -179,27 +179,27 @@ VFS 仍透過 file_operations 管理它們。
 
 ### 9.1 查看 mount
 
-```sh
+```bash
 mount
 cat /proc/mounts
 ```
 查看 filesystem 資訊
-```sh
+```bash
 dumpe2fs /dev/mmcblk0p2
 tune2fs -l /dev/mmcblk0p2
 ```
 查看 IO 狀況
-```sh
+```bash
 iotop
 iostat
 ```
 追蹤 VFS 呼叫
-```sh
+```bash
 trace-cmd record -e vfs
 trace-cmd report
 ```
 追蹤 page cache
-```sh
+```bash
 cat /proc/meminfo
 cat /proc/slabinfo
 ```

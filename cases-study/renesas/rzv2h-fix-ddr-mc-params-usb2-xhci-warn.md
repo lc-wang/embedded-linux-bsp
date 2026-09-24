@@ -6,7 +6,7 @@
 
 在 Kakip（RZ/V2H）開發板上接上 USB2 相機後，xHCI host controller 出現以下 kernel 警告：
 
-```
+```text
 xhci-hcd 15860000.usb: WARN: HC couldn't access mem fast enough for slot 1 ep 2
 ```
 
@@ -20,7 +20,7 @@ xhci-hcd 15860000.usb: WARN: HC couldn't access mem fast enough for slot 1 ep 2
 
 #### 1.2.1 Kernel 警告訊息
 
-```
+```text
 xhci-hcd 15860000.usb: WARN: HC couldn't access mem fast enough for slot 1 ep 2
 ```
 
@@ -55,7 +55,7 @@ xhci-hcd 15860000.usb: WARN: HC couldn't access mem fast enough for slot 1 ep 2
 
 檢查 DDR 記憶體控制器參數設定檔：
 
-```
+```text
 plat/renesas/rz/soc/v2h/drivers/ddr/ddr_param_def_lpddr4.c
 ```
 
@@ -89,7 +89,7 @@ plat/renesas/rz/soc/v2h/drivers/ddr/ddr_param_def_lpddr4.c
 
 ### 5.1 修改檔案
 
-```
+```text
 plat/renesas/rz/soc/v2h/drivers/ddr/ddr_param_def_lpddr4.c
 ```
 
@@ -124,7 +124,7 @@ plat/renesas/rz/soc/v2h/drivers/ddr/ddr_param_def_lpddr4.c
 
 ### 6.2 問題總結
 
-#### 不是以下問題：
+#### 不是以下問題
 
 - ✗ 非 USB2 cable 問題
 - ✗ 非 USB2 相機硬體故障
@@ -132,6 +132,6 @@ plat/renesas/rz/soc/v2h/drivers/ddr/ddr_param_def_lpddr4.c
 - ✗ 非 USB hub / switch 問題
 - ✗ 非 PHY / 實體層問題
 
-#### 真正原因：
+#### 真正原因
 
 > **`param_setup_mc[]` 中的 LPDDR4 記憶體控制器參數設定不當，導致 USB2 DMA 傳輸時記憶體頻寬不足，引發 xHCI controller stall。**

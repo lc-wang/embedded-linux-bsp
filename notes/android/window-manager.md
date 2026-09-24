@@ -15,7 +15,7 @@
 
 -   **AMS 決定誰重要**（process / task importance）
 -   **WMS 決定誰可見**（window / task visibility）
-    
+
 這兩者不是重疊，而是**分工**。
 
 關鍵前提是：
@@ -38,12 +38,12 @@ system_server
 -   管理 window 的建立、銷毀與層級
 -   維護「畫面上發生了什麼」的事實
 -   對其他 subsystem（AMS / Input）提供可見性資訊
-    
+
 真正的繪製與合成：
 
 -   由 App / RenderThread
 -   由 SurfaceFlinger 負責
-    
+
 **WMS 是「顯示事實管理者」，不是渲染者。**
 
 ## 3. Task：WMS 與 AMS 的共同抽象
@@ -70,7 +70,7 @@ system_server
     -   visibility
     -   z-order
     -   focus 狀態
-        
+
 簡化結構如下：
 
 ```text
@@ -103,12 +103,12 @@ AMS 根據這些事實做出系統決策。
 
 -   Window 是否可見 
 -   比 Activity lifecycle 更直接反映 UX
-    
+
 例如：
 
 -   Activity technically resumed 
 -   但 window 被遮住
-    
+
 對使用者來說，這仍然是「不可見」。
 
 ### 4.2 實際決策鏈
@@ -128,7 +128,7 @@ AMS 重新計算 Task / Process importance
 -   split-screen
 -   overlay window
 -   PIP
-    
+
 都會影響 App 是否被視為前景。
 
 ## 5. WMS 與 Input 系統的關係
@@ -161,7 +161,7 @@ InputDispatcher
 
 -   input 可能送錯 App
 -   或被判定為 timeout（Input ANR）
-    
+
 ## 6. WMS 與 Graphics / SurfaceFlinger
 
 ### 6.1 WMS 不負責繪製
@@ -170,7 +170,7 @@ WMS 的責任是：
 
 -   建立 window 與 surface 的關係
 -   決定 layer 的層級
-    
+
 實際合成由 SurfaceFlinger 完成。
 
 ### 6.2 Task 與 Layer 的關係
@@ -182,7 +182,7 @@ WMS 提供：
 -   layer hierarchy
 -   visibility
 -   z-order
-    
+
 **Graphics pipeline 依賴 WMS 提供正確的畫面結構。**
 
 ## 7. 常見問題與排查（常見 WMS 問題與 Debug 方向）

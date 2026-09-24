@@ -5,7 +5,7 @@
 在 RZ/T2H 平台中：
 -   Cortex-A55 執行 Linux
 -   Cortex-R52 通常執行即時控制（motor/FOC/encoder 等）firmware
-    
+
 某些系統架構需求希望：
 
 **由 Linux 透過 remoteproc 啟動 CR52 並使用 OpenAMP（RPMsg）進行互動。**
@@ -29,7 +29,7 @@ remoteproc 需要從 firmware 中取得：
 -   通訊通道數
 -   trace 資訊（若有）
 -   vdev 配置
-    
+
 這些資訊都存放於 `.resource_table` 區段，例如：
 ```c
 .readelf -l <firmware>.elf
@@ -61,7 +61,7 @@ OpenAMP 範例中，CR52 firmware 的記憶體布局位於 SYSRAM：
 .text     → 0x10060000
 .data     → 0x10062000
 .entry    → 0x10061000
-``` 
+```
 
 Device Tree 中 remoteproc 節點也會指定：
 ```dts
@@ -96,7 +96,7 @@ remoteproc 只能啟動 firmware，但不會幫 firmware 建立 IPC。
 -   為 TCM/SRAM 中固定地址設計
 -   不採用 0x1006xxxx SYSRAM layout
 -   不包含 remoteproc 所需的可解析 LOAD segments
-    
+
 因此 remoteproc 無法載入正確程式碼段或 entry point。
 
 ### 3.2 缺少 `.resource_table`、`.vring`、共享記憶體配置
@@ -180,7 +180,7 @@ Linux 與 CR52 使用：
 -   SCIF  
 -   SPI 
 -   shared registers
-    
+
 等方式進行通訊。
 
 優點：
@@ -188,7 +188,7 @@ Linux 與 CR52 使用：
 -   不需要 resource_table 
 -   不中斷現有 motor/FOC 程式設計 
 -   適用於大量工控產品
-    
+
 此模式也是 motor-control 系統中最普遍的設計方式。
 
 ## 5. 結論與建議

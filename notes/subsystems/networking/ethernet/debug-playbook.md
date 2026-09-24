@@ -8,7 +8,7 @@
 
 ## 1. Debug 思維
 
-```
+```text
 Ethernet 問題永遠分層看：Driver → MDIO → PHY → Link → Packet
 ```
 
@@ -16,7 +16,7 @@ Ethernet 問題永遠分層看：Driver → MDIO → PHY → Link → Packet
 
 ### 2.1 Step 1：有沒有 interface？
 
-```
+```text
 ip link
 ```
 
@@ -24,13 +24,13 @@ ip link
 
 問題在：
 
-```
+```text
 Driver / probe / DTS
 ```
 
 ### 2.2 Step 2：driver 是誰？
 
-```
+```bash
 ethtool -i eth0
 ```
 
@@ -40,7 +40,7 @@ ethtool -i eth0
 
 ### 2.3 Step 3：link 狀態
 
-```
+```bash
 ethtool eth0
 ```
 
@@ -54,7 +54,7 @@ ethtool eth0
 
 ### 2.4 Step 4：有沒有封包？
 
-```
+```bash
 ping 8.8.8.8
 tcpdump -i eth0
 ```
@@ -63,7 +63,7 @@ tcpdump -i eth0
 
 問題在：
 
-```
+```text
 MAC / RGMII / DMA
 ```
 
@@ -71,45 +71,45 @@ MAC / RGMII / DMA
 
 ### 3.1 基本狀態
 
-```
+```text
 ip link
 ip addr
 ```
 
 ### 3.2 driver
 
-```
+```bash
 ethtool -i eth0
 ```
 
 ### 3.3 link
 
-```
+```bash
 ethtool eth0
 ```
 
 ### 3.4 statistics
 
-```
+```bash
 cat /proc/net/dev
 ethtool -S eth0
 ```
 
 ### 3.5 PHY（MDIO）
 
-```
+```text
 mdio-tool dump eth0 1
 ```
 
 ### 3.6 封包
 
-```
+```bash
 tcpdump -i eth0
 ```
 
 ### 3.7 carrier
 
-```
+```bash
 cat /sys/class/net/eth0/carrier
 ```
 
@@ -119,7 +119,7 @@ cat /sys/class/net/eth0/carrier
 
 #### 現象
 
-```
+```text
 ip link 看不到 eth0
 ```
 
@@ -130,7 +130,7 @@ ip link 看不到 eth0
 
 #### Debug
 
-```
+```bash
 dmesg | grep eth
 ```
 
@@ -138,7 +138,7 @@ dmesg | grep eth
 
 #### 現象
 
-```
+```text
 dmesg:No PHY found
 ```
 
@@ -149,7 +149,7 @@ dmesg:No PHY found
 
 #### Debug
 
-```
+```bash
 dmesg | grep mdio
 ```
 
@@ -157,7 +157,7 @@ dmesg | grep mdio
 
 #### 現象
 
-```
+```text
 Link detected: no
 ```
 
@@ -171,26 +171,26 @@ Link detected: no
 
 #### 現象
 
-```
+```text
 Link detected: yes
 但 ping timeout
 ```
 
 #### 90% 原因
 
-```
+```text
 RGMII delay 錯（phy-mode）
 ```
 
 #### Debug
 
-```
+```bash
 ethtool -S eth0
 ```
 
 看：
 
-```
+```text
 rx_crc_errors
 rx_errors
 ```
@@ -204,7 +204,7 @@ rx_errors
 
 #### 原因
 
-```
+```text
 IRQ / NAPI / DMA 問題
 ```
 
@@ -212,7 +212,7 @@ IRQ / NAPI / DMA 問題
 
 #### 原因
 
-```
+```text
 queue stop
 ndo_start_xmit 沒跑
 ```
@@ -226,7 +226,7 @@ ndo_start_xmit 沒跑
 
 #### 原因
 
-```
+```text
 clock / reset / RGMII skew
 ```
 
@@ -234,31 +234,31 @@ clock / reset / RGMII skew
 
 ### 5.1 強制 speed（排除 negotiation）
 
-```
+```bash
 ethtool -s eth0 speed 100 duplex full autoneg off
 ```
 
 ### 5.2 檢查 queue
 
-```
+```text
 tc qdisc show dev eth0
 ```
 
 ### 5.3 ftrace
 
-```
+```bash
 echo net_dev_xmit > /sys/kernel/debug/tracing/set_event
 ```
 
 ### 5.4 interrupt
 
-```
+```bash
 cat /proc/interrupts
 ```
 
 ## 6. Debug Decision Tree
 
-```
+```text
 沒 eth0?
   → driver
 

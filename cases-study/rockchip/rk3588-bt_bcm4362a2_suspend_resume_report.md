@@ -10,7 +10,7 @@
 
 修正方式改為使用：
 
-```sh
+```bash
 btattach -B /dev/ttyS9 -P bcm -S 3000000
 ```
 
@@ -42,7 +42,7 @@ CONFIG_BT_HCIUART_BCM=y
 
 原本的 Bluetooth 初始化流程如下：
 
-```sh
+```bash
 connmanctl enable bluetooth
 
 sleep 2
@@ -208,7 +208,7 @@ hciconfig hci0 up
 
 修正後的初始化流程為：
 
-```sh
+```bash
 connmanctl enable bluetooth
 
 sleep 1
@@ -515,7 +515,7 @@ StartLimitIntervalSec / StartLimitBurst：
 
 `bt-init.sh` 使用：
 
-```sh
+```bash
 exec btattach -B /dev/ttyS9 -P bcm -S 3000000
 ```
 
@@ -555,14 +555,14 @@ CONFIG_BT_HCIUART_BCM=y
 
 將：
 
-```sh
+```bash
 brcm_patchram_plus1 ... /dev/ttyS9 &
 hciconfig hci0 up
 ```
 
 改成：
 
-```sh
+```bash
 exec btattach -B /dev/ttyS9 -P bcm -S 3000000
 ```
 
@@ -600,7 +600,7 @@ SRC_URI += "file://bt-hciuart-bcm.cfg"
 
 #### 4.5.1 確認 kernel config
 
-```sh
+```bash
 zcat /proc/config.gz | grep -E 'CONFIG_SERIAL_DEV_BUS|CONFIG_BT_HCIUART_SERDEV|CONFIG_BT_HCIUART_BCM'
 ```
 
@@ -616,7 +616,7 @@ CONFIG_BT_HCIUART_BCM=y
 
 #### 4.5.2 確認 service 狀態
 
-```sh
+```bash
 systemctl status bt-init.service
 ```
 
@@ -637,13 +637,13 @@ main process 應該是 btattach
 
 #### 4.5.3 確認 HCI device
 
-```sh
+```bash
 hciconfig -a
 ```
 
 或：
 
-```sh
+```bash
 bluetoothctl list
 ```
 
@@ -656,7 +656,7 @@ controller 可以被 BlueZ 看見
 
 #### 4.5.4 確認沒有舊 helper 同時執行
 
-```sh
+```bash
 ps aux | grep -E 'btattach|brcm_patchram|hciattach'
 ```
 
@@ -670,7 +670,7 @@ brcm_patchram_plus1 不應該同時管理同一個 UART
 
 #### 4.5.5 檢查 kernel log
 
-```sh
+```bash
 dmesg | grep -iE 'bluetooth|hci|bcm|ttyS9|uart'
 ```
 
@@ -686,7 +686,7 @@ HCI UART attach 是否成功
 
 #### 4.5.6 suspend/resume 壓力測試
 
-```sh
+```bash
 for i in $(seq 1 20); do
     echo "Suspend/resume test: $i"
     rtcwake -m mem -s 20
@@ -707,7 +707,7 @@ hci0 不會消失
 
 #### 4.5.7 optional：檢查 rfkill
 
-```sh
+```bash
 rfkill list
 ```
 
@@ -728,7 +728,7 @@ resume 後 Bluetooth 不應該卡在 blocked
 
 改用：
 
-```sh
+```bash
 btattach -B /dev/ttyS9 -P bcm -S 3000000
 ```
 
@@ -758,13 +758,13 @@ HCIUARTSETPROTO -> HCI_UART_BCM
 
 確認 `/dev/ttyS9` 是否存在：
 
-```sh
+```bash
 ls -l /dev/ttyS9
 ```
 
 確認是否有其他 process 佔用 UART：
 
-```sh
+```bash
 ps aux | grep -E 'btattach|brcm_patchram|hciattach'
 ```
 
@@ -774,13 +774,13 @@ ps aux | grep -E 'btattach|brcm_patchram|hciattach'
 
 先檢查 kernel config：
 
-```sh
+```bash
 zcat /proc/config.gz | grep CONFIG_BT_HCIUART_BCM
 ```
 
 再檢查 log：
 
-```sh
+```bash
 journalctl -u bt-init.service -b
 dmesg | grep -iE 'bluetooth|hci|bcm|uart'
 ```
@@ -800,7 +800,7 @@ firmware 或 controller reset 問題
 
 檢查 service log：
 
-```sh
+```bash
 journalctl -u bt-init.service -b --no-pager
 ```
 

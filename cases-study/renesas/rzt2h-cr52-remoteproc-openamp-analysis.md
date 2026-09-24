@@ -6,12 +6,12 @@
 -   Cortex-A55 執行 Linux
 -   Cortex-R52 執行 RTOS / firmware
 -   希望從 Linux 啟動 CR52，並透過 OpenAMP / RPMsg 做 IPC
-    
+
 Linux 使用標準 remoteproc 控制 flow：
 ```bash
 echo <firmware> > /sys/class/remoteproc/remoteproc0/firmware
 echo start        > /sys/class/remoteproc/remoteproc0/state
-``` 
+```
 
 但發現：  
 **remoteproc 在啟動 CR52 時直接造成 Linux Kernel panic（SError Interrupt）。**
@@ -54,7 +54,7 @@ readelf -l firmware.elf
 然而，RZ/T2H 的預設 TF-A（BL31）將：
 -   `0x10000000`（SYSRAM）
 -   `0xE0000000`（OpenAMP/vring）
-    
+
 視為 Secure-only 或未納入 translation table。
 
 因此 Linux 在 remoteproc 啟動 CR52 時：
@@ -62,7 +62,7 @@ readelf -l firmware.elf
 ioremap(0xE0000000)
 → SError (permission denied / unmapped)
 → Kernel panic
-``` 
+```
 
 ## 4. 解決方案
 
@@ -72,15 +72,15 @@ ioremap(0xE0000000)
 -   CR52 firmware 程式碼  
 -   resource_table
 -   vring buffer
-    
+
 就必須在 TF-A（BL31）加入 memory mapping。
 
 #### 4.1.1 你的修正：在 BL31 中新增 mapping
 
-``` c
+```c
 MAP_REGION_FLAT(0x10000000, 0x200000, MT_MEMORY | MT_RW | MT_SECURE),
 MAP_REGION_FLAT(0xE0000000, 0x9000000, MT_MEMORY | MT_RW | MT_SECURE),
-``` 
+```
 這讓 TF-A：
 -   為 SYSRAM 建立 translation table
 -   將 OpenAMP 共享記憶體區域納入 mapping
@@ -121,13 +121,13 @@ OpenAMP 要求：
 這使：
 -   CR52 loader 區域
 -   OpenAMP IPC 區域
-   
+
 可被 Linux 端 remoteproc 安全存取。
 
 ### 4.4 修正後結果：remoteproc 成功啟動 CR52
 
 修正後：
-``` bash
+```bash
 echo start > /sys/class/remoteproc/remoteproc0/state
 ```
 不再 panic
@@ -140,7 +140,7 @@ echo start > /sys/class/remoteproc/remoteproc0/state
 
 ## 5. 結論與建議（最終系統架構）
 
-```pgsql
+```text
 +---------------------------+
 |       Linux (A55)         |
 |                           |

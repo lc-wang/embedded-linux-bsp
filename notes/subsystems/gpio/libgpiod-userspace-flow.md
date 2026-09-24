@@ -3,7 +3,7 @@
 ## 1. 為什麼需要 libgpiod？
 
 GPIO char device 提供的是：
-```
+```text
 open()  
 ioctl()  
 read()
@@ -32,7 +32,7 @@ read()
 
 ## 2. libgpiod 整體架構
 
-```
+```text
 Application  
  │  
  ▼  
@@ -48,7 +48,7 @@ gpiolib (kernel)
 ## 3. 常用 CLI 工具
 
 安裝：
-```
+```bash
 sudo apt install gpiod
 ```
 工具列表：
@@ -65,22 +65,22 @@ sudo apt install gpiod
 
 ### 4.1 Step 1 確認 controller
 
-```
+```bash
 gpiodetect
 ```
 輸出：
-```
+```text
 gpiochip0 [rockchip-gpio] (32 lines)  
 gpiochip1 [rockchip-gpio] (32 lines)
 ```
 
 ### 4.2 Step 2 查看 line 使用狀態
 
-```
+```bash
 gpioinfo gpiochip0
 ```
 會顯示：
-```
+```text
 line 5: "reset" output active-low [used]
 ```
 關鍵資訊：
@@ -95,7 +95,7 @@ line 5: "reset" output active-low [used]
 
 ### 4.3 Step 3 手動控制 GPIO
 
-```
+```bash
 gpioset gpiochip0 5=1
 ```
 注意：
@@ -106,11 +106,11 @@ gpioset gpiochip0 5=1
 
 ### 4.4 Step 4 監聽中斷
 
-```
+```bash
 gpiomon gpiochip0 12
 ```
 當 edge 發生時：
-```
+```text
 event: RISING EDGE
 ```
 
@@ -118,33 +118,33 @@ event: RISING EDGE
 
 ### 5.1 取得 chip
 
-```
+```c
 struct  gpiod_chip  *chip;  
 chip  =  gpiod_chip_open("/dev/gpiochip0");
 ```
 
 ### 5.2 取得 line
 
-```
+```c
 struct  gpiod_line  *line;  
 line  =  gpiod_chip_get_line(chip, 5);
 ```
 
 ### 5.3 request output
 
-```
+```c
 gpiod_line_request_output(line, "myapp", 1);
 ```
 
 ### 5.4 set value
 
-```
+```c
 gpiod_line_set_value(line, 0);
 ```
 
 ### 5.5 event 監聽
 
-```
+```c
 gpiod_line_request_rising_edge_events(line, "myapp");  
 gpiod_line_event_wait(line, NULL);  
 gpiod_line_event_read(line, &event);
@@ -152,7 +152,7 @@ gpiod_line_event_read(line, &event);
 
 ## 6. Edge Event 完整流程
 
-```
+```text
 Hardware interrupt  
  ↓  
 gpio controller irq handler  
@@ -195,15 +195,15 @@ gpiod_line_event_read()
 ## 8. Active-Low 問題
 
 DT：
-```
+```dts
 reset-gpios = <&gpio3 5 GPIO_ACTIVE_LOW>;
 ```
 libgpiod 會顯示：
-```
+```text
 active-low
 ```
 代表：
-```
+```text
 1 = low  
 0 = high
 ```
@@ -212,7 +212,7 @@ active-low
 ## 9. Multi-line Atomic Control
 
 v2 支援：
-```
+```bash
 gpioset gpiochip0 5=1 6=0
 ```
 可以同時操作。

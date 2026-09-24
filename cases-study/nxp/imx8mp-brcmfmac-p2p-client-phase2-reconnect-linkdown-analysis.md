@@ -12,7 +12,7 @@ WSC（phase 1）已經成功、拿到 WPA2 憑證，但在 **phase 2（用該憑
 
 典型失敗症狀（板子當 client、手機當 GO、5GHz）：
 
-```
+```text
 P2P-GO-NEG-SUCCESS role=client freq=5180
 Trying to associate with <go-mac>
 WPS-SUCCESS                               ← phase 1（WSC）成功
@@ -81,7 +81,7 @@ bringup 期間大量 live-insmod 測試可能留下髒狀態，因此先取一�
 
 在 phase 2 重連的當下，`P2P2DBG` 印出決定性的一段：
 
-```
+```text
 connect ENTER iftype=8 key_mgmt=1                 ← phase-2（WPA2）連線進入
 connstat event=16 status=0 flags=0x0 sme=0x3 up=0 down=1   ← 一個「link-down」
 connstat event=16 status=0 flags=0x1 sme=0x3 up=0 down=0
@@ -99,7 +99,7 @@ connstat event=0  status=0 flags=0x0 sme=0x3 up=1 down=0   ← 真正的 link-up
 `brcmf_notify_connect_status()` 的 linkdown 分支不分青紅皂白：只要 `is_linkdown`，
 就往 `brcmf_bss_connect_done(cfg, ndev, e, false)` 走（回報連線失敗）。於是流程變成：
 
-```
+```text
 phase-2 假 link-down → brcmf_bss_connect_done(false)
    → cfg80211 回報連線失敗 → wpa 收到 ASSOC-REJECT status_code=16
    → wpa 觸發「復原重掃」→ 對 P2P client bsscfg 發 escan
@@ -163,7 +163,7 @@ phase-2 假 link-down → brcmf_bss_connect_done(false)
 
 **client 方向（`cmd wifip2p connect <mac> -i 0`，連兩次）：**
 
-```
+```text
 connstat event=16 flags=0x0 down=1        ← 假 link-down（fix 觸發、忽略）
 connstat event=0  up=1                     ← 真正 link-up → phase-2 繼續
 WPS-SUCCESS → WPA: Key negotiation completed [PTK=CCMP GTK=CCMP]

@@ -42,11 +42,11 @@ sys_reboot()
 **關鍵重點：**
 
 -   `pm_power_off` 若為 `NULL` 或「無效實作」
-    
+
 -   kernel **不會 busy wait**
-    
+
 -   最終行為會 **退回 restart path**
-    
+
 ### 2.2 RK806 在 Driver 架構中的定位
 
 #### 2.2.1 RK806 Driver 類型
@@ -70,11 +70,11 @@ static  const  struct  of_device_id  rk806_of_match[] = {
 **重要事實：**
 
 -   RK806 driver **沒有設定 `pm_power_off`**
-    
+
 -   RK806 **不是 system power controller**
-    
+
 -   RK806 不會主動決定 poweroff 行為
-    
+
 ### 2.3 RK806 的真實 Power-Off Call Flow
 
 #### 2.3.1 DTS 定義（關鍵）
@@ -106,19 +106,19 @@ kernel_power_off()
 #### Kernel 保證的事情
 
 -   呼叫 `pinctrl_select_state()`
-    
+
 -   將 PMIC 控制腳位切換到 power-off 狀態
-    
+
 #### Kernel 不知道的事情
 
 -   PWRDN 是 active-high 還是 active-low
-    
+
 -   後面是否接 load switch / MCU
-    
+
 -   是否仍有 always-on rail
-    
+
 -   是否 SoC 本身仍有 reset source
-    
+
 **是否真的斷電 = 硬體設計責任**
 
 ### 2.5 ftrace：用來確認「有沒有走到那裡」
@@ -130,11 +130,11 @@ echo  function > /sys/kernel/tracing/current_tracer echo rk806 > /sys/kernel/tra
 #### 2.5.2 為什麼 poweroff 後是空的？
 
 -   poweroff 是 **terminal event**
-    
+
 -   CPU 直接 reset / power loss
-    
+
 -   trace buffer 尚未 flush
-    
+
 **這不是 ftrace 無效，而是 poweroff 特性**
 
 ### 2.6 printk vs pr_emerg vs pstore
@@ -142,27 +142,27 @@ echo  function > /sys/kernel/tracing/current_tracer echo rk806 > /sys/kernel/tra
 #### 2.6.1 printk / pr_info 的限制
 
 -   依賴 console / log buffer
-    
+
 -   poweroff 時 **極可能來不及輸出**
-    
+
 #### 2.6.2 pr_emerg 的意義
 
 `pr_emerg("rk806: entering power-off\n");` 
 
 -   最高 log level
-    
+
 -   優先嘗試同步輸出
-    
+
 -   但 **仍不保證保存**
-    
+
 #### 2.6.3 pstore
 
 ##### 啟用條件
 
 -   `CONFIG_PSTORE`
-    
+
 -   `CONFIG_PSTORE_RAM` 或 EFI backend
-    
+
 ##### 使用方式
 
 `ls /sys/fs/pstore` 
@@ -170,27 +170,27 @@ echo  function > /sys/kernel/tracing/current_tracer echo rk806 > /sys/kernel/tra
 ##### 適用場景
 
 -   panic
-    
+
 -   reboot
-    
+
 -   poweroff 前最後訊息
-    
+
 **pstore 是唯一能跨 reboot 保存證據的工具**
 
 ### 2.7 dynamic_debug 為什麼幫助有限
 
 -   dynamic_debug 依賴 **正常執行期間**
-    
+
 -   poweroff path 時間極短
-    
+
 -   更適合用在：
-    
+
     -   probe
-        
+
     -   suspend/resume
-        
+
     -   regulator enable/disable
-        
+
 ### 2.8 kallsyms / vmlinux / faddr2line
 
 #### 2.8.1 kallsyms
@@ -206,23 +206,23 @@ aarch64-linux-gnu-addr2line -e vmlinux ffffffc0xxxxxxxx
 用途：
 
 -   address → function → source file
-    
+
 -   驗證實際執行位置
-    
+
 ## 3. Root Cause 分析（為什麼會「Poweroff → Reboot」）
 
 ### 3.1 合法推論鏈
 
 1.  RK806 被動接受 PWRDN
-    
+
 2.  硬體未完全切斷 SoC 電源
-    
+
 3.  SoC 偵測到 reset condition
-    
+
 4.  BootROM 重新啟動
-    
+
 5.  表現為「reboot」
-    
+
 **Kernel 已完成它該做的事**
 
 ## 4. 結論與建議
@@ -230,13 +230,13 @@ aarch64-linux-gnu-addr2line -e vmlinux ffffffc0xxxxxxxx
 ### 4.1 結論
 
 -   RK806 **不是 system power controller**
-    
+
 -   Kernel poweroff 流程 **已正確執行**
-    
+
 -   `pinctrl_select_state("pmic-power-off")` 為最後責任點
-    
+
 -   實際是否斷電，取決於 **硬體電源樹設計**
-    
+
 -   poweroff → reboot **不是 kernel bug**
 
 ### 4.2 RK808 vs RK806：世代差異總結

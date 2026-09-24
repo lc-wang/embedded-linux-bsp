@@ -8,7 +8,7 @@
 
 ## 1. 基本 DSA DTS 架構
 
-```
+```dts
 switch@0 {
     compatible = "...";
 
@@ -39,7 +39,7 @@ switch@0 {
 
 ### 2.1 CPU port
 
-```
+```dts
 port@0 {
     reg = <0>;
     label = "cpu";
@@ -51,19 +51,19 @@ port@0 {
 
 #### 重點
 
-```
+```text
 ethernet = <&eth0>
 ```
 
 代表：
 
-```
+```text
 這個 port 連到 MAC（CPU）
 ```
 
 ### 2.2 User port
 
-```
+```dts
 port@1 {
     reg = <1>;
     label = "lan1";
@@ -74,7 +74,7 @@ port@1 {
 
 代表：
 
-```
+```text
 這個 port 對應外部 PHY
 ```
 
@@ -82,7 +82,7 @@ port@1 {
 
 ### 3.1 外部 PHY
 
-```
+```dts
 mdio {
     phy1: ethernet-phy@1 {
         reg = <1>;
@@ -92,7 +92,7 @@ mdio {
 
 user port：
 
-```
+```dts
 phy-handle = <&phy1>;
 ```
 
@@ -104,7 +104,7 @@ phy-handle = <&phy1>;
 
 ### 4.1 CPU port 常見寫法
 
-```
+```dts
 port@0 {
     reg = <0>;
     label = "cpu";
@@ -120,37 +120,37 @@ port@0 {
 
 #### 為什麼用 fixed-link？
 
-```
+```text
 CPU ↔ Switch 不做 auto-negotiation
 ```
 
 否則：
 
-```
+```text
 link 不穩 / negotiation 卡住
 ```
 
 ## 5. phy-mode
 
-```
+```dts
 phy-mode = "rgmii-id";
 ```
 
 這會直接影響：
 
-```
+```text
 CPU port timing（所有 lanX 都靠這條）
 ```
 
 ### 5.1 超重要
 
-```
+```text
 CPU port timing 錯 = 所有 lan port 壞
 ```
 
 ## 6. 完整範例
 
-```
+```dts
 &eth0 {
     phy-mode = "rgmii-id";
 };
@@ -192,7 +192,7 @@ switch@0 {
 
 原因：
 
-```
+```text
 ports node 錯
 reg 錯
 DSA 沒 parse 到
@@ -202,7 +202,7 @@ DSA 沒 parse 到
 
 90%：
 
-```
+```text
 CPU port phy-mode / RGMII delay 錯
 ```
 
@@ -210,7 +210,7 @@ CPU port phy-mode / RGMII delay 錯
 
 檢查：
 
-```
+```text
 CPU port DTS（fixed-link / phy-mode）
 ```
 
@@ -218,7 +218,7 @@ CPU port DTS（fixed-link / phy-mode）
 
 檢查：
 
-```
+```text
 phy-handle
 MDIO
 reset
@@ -228,7 +228,7 @@ reset
 
 通常：
 
-```
+```text
 clock / delay / reset timing
 ```
 
@@ -236,31 +236,31 @@ clock / delay / reset timing
 
 ### 8.1 port 有沒有出現
 
-```
+```text
 ip link
 ```
 
 ### 8.2 link 狀態
 
-```
+```bash
 ethtool lan1
 ```
 
 ### 8.3 CPU port
 
-```
+```bash
 ethtool eth0
 ```
 
 ### 8.4 dmesg
 
-```
+```bash
 dmesg | grep dsa
 ```
 
 ## 9. Debug Flow
 
-```
+```text
 eth0 OK？
  → yes
 
@@ -274,18 +274,18 @@ lan1 不通？
 
 ### 10.1 Rule 1
 
-```
+```text
 CPU port = 所有 port 的出口
 ```
 
 ### 10.2 Rule 2
 
-```
+```text
 CPU port timing 錯 = 全滅
 ```
 
 ### 10.3 Rule 3
 
-```
+```text
 fixed-link 很常是必要的
 ```

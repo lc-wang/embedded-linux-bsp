@@ -3,17 +3,17 @@
 真正的資料傳輸依賴以下核心機制：
 
 -   **DMA rings**
-    
+
 -   **WFDMA (Wireless Front-end DMA)**
-    
+
 -   **WED (Wireless Ethernet Dispatcher)**
-    
+
 -   **TX/RX descriptor**
-    
+
 -   **queue scheduling**
-    
+
 本章會完整解析：
-```
+```text
 skb → mt76 → DMA → WFDMA → WiFi MAC → air  
 air → WiFi MAC → WFDMA → DMA → mt76 → mac80211
 ```
@@ -21,7 +21,7 @@ air → WiFi MAC → WFDMA → DMA → mt76 → mac80211
 ## 1. mt76 Data Plane 架構
 
 mt76 的資料平面設計如下：
-```
+```text
 mac80211  
  │  
  │ skb  
@@ -39,7 +39,7 @@ WiFi MAC / PHY
 Air
 ```
 反向 RX path：
-```
+```text
 Air  
  │  
  ▼  
@@ -65,7 +65,7 @@ Wi-Fi driver 幾乎都採用 **ring buffer + descriptor** 架構。
 mt76 也不例外。
 
 基本概念：
-```
+```text
 +----------------------------------+  
 | descriptor | descriptor | ...    |  
 +----------------------------------+  
@@ -85,7 +85,7 @@ mt76 也不例外。
 ## 3. mt76 queue abstraction
 
 mt76 使用以下資料結構抽象 queue：
-```
+```c
 struct  mt76_queue {  
   void  *desc;  
   dma_addr_t  desc_dma;  
@@ -109,15 +109,15 @@ struct  mt76_queue {
 ## 4. TX 資料流
 
 TX path 起點是：
-```
+```text
 mac80211 → ieee80211_ops.tx()
 ```
 對應 mt76：
-```
+```text
 mt76_mac80211_tx()
 ```
 流程如下：
-```
+```text
 mac80211  
  │  
  ▼  
@@ -143,7 +143,7 @@ MediaTek TX descriptor 叫做：
 TXWI (Transmit Wireless Info)
 
 典型格式：
-```
+```c
 struct  mt76_txwi {  
   __le32  txd1;  
   __le32  txd2;  
@@ -169,7 +169,7 @@ RX descriptor 叫：
 RXWI
 
 典型內容：
-```
+```c
 struct  mt76_rxwi {  
   __le32  rxd1;  
   __le32  rxd2;  
@@ -194,15 +194,15 @@ WFDMA 是 MediaTek Wi-Fi SoC 的 DMA engine。
 功能：
 
 -   TX descriptor fetch
-    
+
 -   RX descriptor write
-    
+
 -   interrupt trigger
-    
+
 -   queue scheduling
-    
+
 簡化架構：
-```
+```text
 Host memory  
  │  
  ▼  
@@ -215,14 +215,14 @@ WFDMA engine
 WiFi MAC
 ```
 WFDMA register 通常定義於：
-```
+```text
 drivers/net/wireless/mediatek/mt76/<chip>/regs.h
 ```
 
 ## 8. RX path（資料接收）
 
 RX path：
-```
+```text
 Air  
  │  
  ▼  
@@ -243,13 +243,13 @@ mac80211
 driver 主要做：
 
 1.  檢查 RX descriptor
-    
+
 2.  建立 skb
-    
+
 3.  填寫 rx_status
-    
+
 4.  呼叫 mac80211
-    
+
 ## 9. WED（Wireless Ethernet Dispatcher）
 
 WED 是 **MediaTek SoC networking accelerator hardware**。
@@ -259,15 +259,15 @@ WED 是 **MediaTek SoC networking accelerator hardware**。
 WED 主要用於：
 
 -   降低 CPU packet processing 負擔
-    
+
 -   提升 Wi-Fi throughput
-    
+
 -   offload RX reorder
 
 ### 9.1 WED 在 SoC 中的位置
 
 MediaTek SoC networking pipeline：
-```
+```text
  +-------------+  
  |    CPU      |  
  | Linux kernel|  
@@ -288,7 +288,7 @@ MediaTek SoC networking pipeline：
 ### 9.2 為什麼需要 WED
 
 沒有 WED 時：
-```
+```text
 WiFi MAC  
  │  
  ▼  
@@ -309,11 +309,11 @@ mac80211
 問題：
 
 -   interrupt rate 高
-    
+
 -   RX reorder 在 CPU
-    
+
 -  CPU 成為 throughput bottleneck
-    
+
 ### 9.3 WED Offload 功能
 
 WED 可 offload：
@@ -330,16 +330,16 @@ WED 可 offload：
 ### 9.4 RRO（Reorder Offload）
 
 802.11 AMPDU packet 常常 out-of-order：
-```
+```text
 expected: 1 2 3 4 5  
 arrived : 1 3 2 5 4
 ```
 沒有 RRO：
-```
+```text
 RX → CPU reorder → mac80211
 ```
 有 RRO：
-```
+```text
 RX → WED reorder → mac80211
 ```
 CPU 負擔大幅降低。
@@ -349,11 +349,11 @@ CPU 負擔大幅降低。
 WED 也會減少 interrupt。
 
 沒有 WED：
-```
+```text
 packet → interrupt
 ```
 有 WED：
-```
+```text
 packet1  
 packet2  
 packet3  
@@ -366,11 +366,11 @@ single interrupt
 ### 9.6 WED 與 mt76 driver 的關係
 
 WED driver 位於：
-```
+```text
 drivers/net/ethernet/mediatek/mtk_wed.c
 ```
 mt76 driver 會：
-```
+```text
 register wed device  
 setup wed rx rings  
 enable wed offload
@@ -388,7 +388,7 @@ enable wed offload
 | MLO support | Multi-Link Operation |  
 | Higher throughput | 支援 Wi-Fi 7 traffic |  
 | Improved RRO | 更大的 reorder window |
-    
+
 ## 11. 不同晶片 DMA 架構
 
 | Chipset | TX ring | RX ring | WED |  
@@ -407,19 +407,19 @@ mt76 core 對這些差異做了抽象化。
 CPU 仍需處理：
 
 -   interrupt
-    
+
 -   descriptor parsing
-    
+
 -   skb allocation
-    
+
 -   protocol processing
-    
+
 因此 throughput 常受：
-```
+```text
 packets/sec
 ```
 而非
-```
+```text
 bandwidth
 ```
 限制。
@@ -429,21 +429,21 @@ bandwidth
 原因：
 
 1. **queue abstraction**
-```
+```text
 struct mt76_queue
 ```
 2. **bus abstraction**
-```
+```text
 mt76_bus_ops
 ```
 3. **chipset ops**
-```
+```text
 mt76_driver_ops
 ```
 這讓：
 
 -   新 Wi-Fi generation（Wi-Fi 7）
-    
+
 -   新 SoC（Filogic）
-    
+
 都可以重用 mt76 core。

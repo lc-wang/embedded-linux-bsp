@@ -58,7 +58,7 @@ Kernel log：
 #### 3.1.1 檔案位置
 
 `arch/arm64/boot/dts/renesas/r9a09g077m44-dev.dts` 
-```
+```dts
 &pinctrl {
         sci1_pins: sci1 {
                 pinmux = <RZT2H_PORT_PINMUX(11, 1, 4)>, /* SCI1_TXD */
@@ -76,7 +76,7 @@ Kernel log：
 
 ### 3.2 停用 SCI0（避免 fallback）
 
-```
+```dts
 &sci0 {
         status = "disabled";
 };
@@ -90,7 +90,7 @@ Kernel log：
 #### 3.3.1 kernel console 完全由 U-Boot bootargs 傳入
 
 U-Boot 設定：
-```
+```text
 --- a/include/configs/rzt2h-dev.h
 +++ b/include/configs/rzt2h-dev.h
 @@ -61,7 +61,7 @@
@@ -105,7 +105,7 @@ U-Boot 設定：
 
 #### 3.3.2 傳入 kernel 的 bootargs
 
-```
+```text
 console=ttySC1,115200n8
 earlycon=rscif,80005400
 ```
@@ -113,7 +113,7 @@ earlycon=rscif,80005400
 ### 3.4 Kernel log 驗證
 
 開機訊息顯示：
-```
+```text
 [    0.000000] earlycon: rscif at MMIO 0x0000000080005400
 [    0.000000] printk: bootconsole [rscif] enabled
 [    0.016869] printk: console [ttySC1] enabled
@@ -121,19 +121,19 @@ earlycon=rscif,80005400
 代表：
 
 -   early console 使用 SCI1
-    
+
 -   kernel console 綁定 ttySC1
-    
+
 -   SCI0 已完全未被使用
 
 ### 3.5 Runtime 驗證
 
-```
+```text
 # 確認 SCI1 device tree 狀態
 cat /sys/firmware/devicetree/base/soc/serial@80005400/status
 okay
 ```
-```
+```bash
 # Kernel console device
 dmesg | grep ttySC
 ```
@@ -143,7 +143,7 @@ dmesg | grep ttySC
 ### 4.1 最終成果
 
 Linux kernel 開機 log 已可完整從 **SCI1 UART** 輸出：
-```
+```text
 earlycon: rscif at MMIO 0x80005400
 printk: bootconsole [rscif] enabled
 console [ttySC1] enabled
@@ -157,11 +157,11 @@ SCI0 可完全 disabled，不再參與 kernel console。
 必須同時具備：
 
 -   UART node 存在
-    
+
 -   pinctrl 設定正確
-    
+
 -   clock / power domain 啟用
-    
+
 -   status = "okay"
 
 #### 4.2.2 kernel DTS 與 U-Boot DTS 不共用
@@ -178,7 +178,7 @@ SCI0 可完全 disabled，不再參與 kernel console。
 本案例中：
 
 -   kernel **完全依賴 bootargs**
-    
+
 -   `/chosen { stdout-path }` 未修改
-    
+
 -   行為仍完全正確

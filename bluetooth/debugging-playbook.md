@@ -31,7 +31,7 @@
 | lsof        | 檢查 tty 裝置是否被多個程序佔用               |
 
 ## 3. 除錯總流程
-```
+```text
 [Step 1] hci0 是否存在？
 [Step 2] hci0 能否 power on？
 [Step 3] HCI command / event 是否成對？
@@ -43,7 +43,7 @@
 ## 4. Step 1：hci0 不存在
 
 ### 4.1 檢查方式
-```
+```bash
 hciconfig -a
 btmgmt info
 ```
@@ -53,23 +53,23 @@ btmgmt info
 高機率問題層級：
 
 -   ✗ transport driver 沒 attach
-    
+
 -   ✗ UART / USB 硬體未 ready
-    
+
 -   ✗ DT / ACPI / power / clock 問題
-    
+
 優先查看：
 
 -   `drivers/bluetooth/hci_uart.c`
-    
+
 -   `drivers/bluetooth/btusb.c`
-    
+
 -   UART driver probe log
-    
+
 ## 5. Step 2：hci0 存在，但 power on 失敗
 
 ### 5.1 驗證方式
-```
+```bash
 systemctl stop bluetooth
 btmon &
 btmgmt power on
@@ -80,15 +80,15 @@ btmgmt power on
 #### 情況 A：完全沒有 HCI command
 
 -   kernel mgmt 沒送 command
-    
+
 -   hci_dev state 不正確
-    
+
 檢查：
 
 -   `net/bluetooth/mgmt.c`
-    
+
 -   `hci_dev_do_open()`
-    
+
 #### 情況 B：有 command，沒有 event
 
 btmon：
@@ -98,9 +98,9 @@ btmon：
 **100% 是 transport / firmware / UART 問題**
 
 -   UART：baud / RTS/CTS / framing
-    
+
 -   USB：firmware missing / controller crash
-    
+
 ## 6. Step 3：HCI command / event 對照判斷表
 
 | btmon 行為                 | 判斷方向                         |
@@ -129,11 +129,11 @@ btmon：
 檢查：
 
 -   patch download 是否完整
-    
+
 -   是否在 reset 前後切 baud
-    
+
 -   是否與 kernel driver 搶 tty
-    
+
 ## 8. Step 5：UART 專屬除錯流程（H4）
 
 ### 8.1 確認只有一個 UART 使用者
@@ -143,12 +143,12 @@ btmon：
 如果看到：
 
 -   brcm_patchram_plus
-    
+
 -   bluetoothd
-    
+
 -   hciattach  
     同時存在 → **必爆**
-    
+
 ### 8.2 確認 UART 參數
 
 `stty -F /dev/ttyS9 -a` 
@@ -156,11 +156,11 @@ btmon：
 重點檢查：
 
 -   baud rate
-    
+
 -   `crtscts` 是否與硬體一致
-    
+
 ### 8.3 最小測試法（UART）
-```
+```bash
 systemctl stop bluetooth
 btmon &
 btmgmt power on
@@ -183,11 +183,11 @@ lsusb -t
 USB 問題通常非常明確：
 
 -   enumeration 失敗
-    
+
 -   firmware missing
-    
+
 -   device reset loop
-    
+
 ## 10. Step 7：確認 Data Plane（scan / connect）
 
 ### 10.1 Control OK ≠ Data OK
@@ -197,9 +197,9 @@ USB 問題通常非常明確：
 `btmgmt find` 
 
 -   find 失敗 → controller / firmware
-    
+
 -   find 成功，但 profile 不行 → BlueZ / profile
-    
+
 ### 10.2 ACL data 是否正常
 
 btmon 中是否看到：
@@ -209,9 +209,9 @@ btmon 中是否看到：
 沒有 ACL：
 
 -   link layer 沒建立
-    
+
 -   pairing / encryption 問題
-    
+
 ## 11. 常見「假象」與真相對照表
 
 | 假象                     | 真相說明                     |
@@ -226,7 +226,7 @@ btmon 中是否看到：
 如果同一顆 BT chip：
 
 -   USB 正常
-    
+
 -   UART 異常
-    
+
 **請立刻停止懷疑 firmware**

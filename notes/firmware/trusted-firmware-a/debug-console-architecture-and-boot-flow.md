@@ -32,7 +32,7 @@
 TF-A 內建一套極簡化的字元輸出框架，用於支援早期除錯輸出。
 
 其整體呼叫路徑如下：
-```
+```text
 tf_log()
 │
 ▼
@@ -89,7 +89,7 @@ TF-A console driver 的功能非常單純：
 ## 3. Console Scope（輸出範圍）
 
 每個 console 會註冊一組 scope flags：
-```
+```text
 CONSOLE_FLAG_BOOT
 CONSOLE_FLAG_RUNTIME
 CONSOLE_FLAG_CRASH
@@ -112,7 +112,7 @@ CONSOLE_FLAG_CRASH
 ## 4. Console 初始化時序
 
 TF-A 的 console 初始化流程如下：
-```
+```text
 Boot ROM
   │
   ▼
@@ -194,7 +194,7 @@ BL31 無輸出
 -   platform early fault 排查
 
 常見初始化位置：
-```
+```text
 plat_early_platform_setup()
 bl31_early_platform_setup()
 ```
@@ -210,7 +210,7 @@ bl31_early_platform_setup()
 -   適用於正常開機輸出
 
 常見初始化位置：
-```
+```text
 bl2_platform_setup()
 bl31_platform_setup()
 ```
@@ -271,7 +271,7 @@ U-Boot：
 -   直接存取既有 UART 設定
 
 因此常見現象為：
-```
+```text
 TF-A log 正常
 ↓
 U-Boot log 立即接續

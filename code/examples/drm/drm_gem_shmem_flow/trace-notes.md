@@ -10,13 +10,13 @@ framebuffer 看起來像：
 
 但：
 
-```
+```text
 framebuffer 本身其實沒有真正的像素資料
 ```
 
 真正的像素資料：
 
-```
+```text
 在 GEM memory object 裡
 ```
 
@@ -24,7 +24,7 @@ framebuffer 本身其實沒有真正的像素資料
 
 你可以把 GEM object 想成：
 
-```
+```text
 DRM 專用的 memory container
 ```
 
@@ -39,7 +39,7 @@ DRM 專用的 memory container
 
 ### 3.1 dumb buffer flow
 
-```
+```text
 CREATE_DUMB
  ↓
 建立 GEM object
@@ -51,13 +51,13 @@ CREATE_DUMB
 
 ### 3.2 AddFB2
 
-```
+```text
 drmModeAddFB2()
 ```
 
 會做：
 
-```
+```text
 framebuffer
 ↓
 reference GEM object
@@ -65,7 +65,7 @@ reference GEM object
 
 ## 4. 最重要觀念
 
-```
+```text
 framebuffer
 只是「如何顯示」
 
@@ -75,7 +75,7 @@ GEM object
 
 ## 5. mmap flow
 
-```
+```text
 userspace mmap
  ↓
 GEM mmap handler
@@ -90,7 +90,7 @@ shmem page
 ## 6. Level 3：kernel trace
 
 ### 6.1 userspace 建立 dumb buffer
-``` 
+```text
 userspace：  
 DRM_IOCTL_MODE_CREATE_DUMB
 ↓
@@ -103,7 +103,7 @@ driver->dumb_create()
 
 通常 simple DRM driver 會：
 
-```
+```text
 drm_gem_shmem_create()
 ```
 
@@ -111,7 +111,7 @@ drm_gem_shmem_create()
 
 它會：
 
-```
+```text
 1. 建立 GEM object
 2. 配置 backing memory
 3. 建立 shmem mapping
@@ -120,12 +120,12 @@ drm_gem_shmem_create()
 
 也就是：
 
-```
+```text
 GEM object真正開始擁有 memory
 ```
 
 ### 6.3 userspace mmap framebuffer memory
-```
+```text
 userspace：
 mmap()
 ↓
@@ -138,7 +138,7 @@ drm_gem_shmem_mmap()
 
 這一步：
 
-```
+```text
 建立 VMA（虛擬記憶體區間）
 但 page 還不一定存在
 ```
@@ -147,7 +147,7 @@ drm_gem_shmem_mmap()
 
 例如：
 
-```
+```text
 p[0] = 0xff;
 ↓
 CPU 發現 page table 沒有 mapping
@@ -162,7 +162,7 @@ drm_gem_shmem_fault()
 
 它會：
 
-```
+```text
 1. 找到對應 shmem page
 2. 如果 page 不存在 → 配置 page
 3. 建立 userspace mapping
@@ -171,7 +171,7 @@ drm_gem_shmem_fault()
 
 ### 6.6 所以真正流程其實是
 
-```
+```text
 userspace mmap
  ↓
 VMA 建立
@@ -189,7 +189,7 @@ userspace 真正拿到 memory
 
 ### 6.7 最重要理解
 
-```
+```text
 mmap()
 不代表 page 已存在
 
@@ -210,7 +210,7 @@ page fault
 
 想成：
 
-```
+```text
 一塊共享畫布
 ```
 
@@ -222,7 +222,7 @@ page fault
 
 都可以：
 
-```
+```text
 看同一塊畫布
 ```
 
@@ -236,7 +236,7 @@ page fault
 
 真正 modern graphics stack：
 
-```
+```text
 同一塊 memory
 一路傳下去
 ```
@@ -247,13 +247,13 @@ page fault
 
 GPU：
 
-```
+```text
 把畫面畫進 GEM memory
 ```
 
 例如：
 
-```
+```text
 OpenGL render target
 ```
 
@@ -261,7 +261,7 @@ OpenGL render target
 
 Wayland：
 
-```
+```text
 拿到同一塊 memory
 ```
 
@@ -275,19 +275,19 @@ Wayland：
 
 最後：
 
-```
+```text
 DRM plane 指向同一塊 memory
 ```
 
 CRTC：
 
-```
+```text
 直接 scanout
 ```
 
 ## 11. 所以真正發生的是
 
-```
+```text
 同一塊 memory：
 
 GPU 寫
@@ -301,7 +301,7 @@ DRM 顯示
 
 因為：
 
-```
+```text
 copy framebuffer 超貴
 ```
 
@@ -313,7 +313,7 @@ copy framebuffer 超貴
 
 所以 modern graphics stack：
 
-```
+```text
 核心目標 = zero-copy
 ```
 
@@ -321,7 +321,7 @@ copy framebuffer 超貴
 
 這通常透過：
 
-```
+```text
 dma-buf
 ```
 
@@ -331,7 +331,7 @@ dma-buf
 
 輸出：
 
-```
+```text
 dma-buf fd
 ```
 
@@ -339,7 +339,7 @@ dma-buf fd
 
 拿到：
 
-```
+```text
 dma-buf fd
 ```
 
@@ -349,19 +349,19 @@ import 成自己的 GEM object。
 
 再：
 
-```
+```text
 drm_gem_prime_import()
 ```
 
 得到：
 
-```
+```text
 scanout-able GEM memory
 ```
 
 ## 14. 所以真正的是
 
-```
+```text
 同一塊 physical memory
 ```
 
@@ -383,7 +383,7 @@ gem_shmem_skeleton.c
 
 它不是完整 display driver，而是用來觀察：
 
-```
+```text
 DRM driver
  ↓
 GEM shmem helper
@@ -393,7 +393,7 @@ mmap / PRIME / GEM object
 
 ### 15.1 這個 skeleton 的重點
 
-```
+```text
 DRM_GEM_SHMEM_DRIVER_OPS
 ```
 
@@ -408,7 +408,7 @@ DRM_GEM_SHMEM_DRIVER_OPS
 
 ### 15.2 對應 kernel flow
 
-```
+```text
 userspace open /dev/dri/cardX
  ↓
 DRM fops

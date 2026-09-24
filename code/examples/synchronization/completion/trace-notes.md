@@ -4,7 +4,7 @@
 
 想像兩個 thread：
 
-```
+```text
 Thread A：等事情完成
 Thread B：事情完成後通知
 completion 就是：
@@ -13,7 +13,7 @@ A: 等
 B: 完成後叫醒 A
 
 ## 2. Level 2
-```
+```text
 Thread A:  
  wait_for_completion()  
   
@@ -28,12 +28,12 @@ Thread B:
 ```
 
 ## 3. Level 3
-```
+```text
 wait_for_completion()  
  └─ wait_for_common()  
  └─ schedule()  
 ```
-```
+```text
 complete()  
  └─ wake_up_process()
 ```
@@ -49,7 +49,7 @@ complete()
 ## 5. 為什麼 driver 很常用？
 
 因為 driver 很多是：
-```
+```text
 start hardware  
  ↓  
 等 interrupt  
@@ -57,7 +57,7 @@ start hardware
 完成
 ```
 這時候：
-```
+```text
 wait_for_completion()  
 + complete()
 ```

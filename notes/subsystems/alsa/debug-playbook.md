@@ -19,7 +19,7 @@
 ## 1. 音訊問題分類模型
 
 音訊問題通常分成四大類：
-```
+```text
 [1] Card 沒建立
 [2] PCM 無法播放
 [3] PCM 正常但沒聲音
@@ -43,7 +43,7 @@
 #### Step 2
 
 確認 driver probe：
-```
+```text
 CPU DAI driver probe ?
 Codec driver probe ?
 Machine driver probe ?
@@ -73,7 +73,7 @@ Machine driver probe ?
 
 ### 3.2 檢查
 
-```
+```bash
 cat /proc/asound/cards
 cat /proc/asound/pcm
 ```
@@ -121,7 +121,7 @@ cat /proc/asound/pcm
 `cat /sys/kernel/debug/asoc/dapm` 
 
 確認：
-```
+```text
 DAC ON ?
 Output ON ?
 Supply ON ?
@@ -132,7 +132,7 @@ Supply ON ?
 
 ### 4.4 Step 4：看 mixer
 
-```
+```bash
 amixer scontrols
 amixer scontents
 ```
@@ -232,7 +232,7 @@ DTS format mismatch
 
 ## 8. 快速決策樹
 
-```
+```text
 沒聲音？
   ↓
 Card 有嗎？

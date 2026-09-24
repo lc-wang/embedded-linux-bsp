@@ -81,9 +81,9 @@ Left Line Mux = NC
 Right Line Mux = NC
 Headset Mic Switch = off
 Left/Right PGA Mux = Differential
- ```
+```
 2.  耳麥 **仍然可以錄到聲音**
-    
+
 #### 3.3.2 這代表什麼？
 
 > **耳麥麥克風並不是走 Line / MicL / MicR**
@@ -92,7 +92,7 @@ Left/Right PGA Mux = Differential
 
 -   **耳麥的訊號在硬體上已經掛到 MIC_P / MIC_N**
 -   或至少在類比前端與 Main Mic 匯流
-    
+
 也就是：
 ```text
 MIC_P / MIC_N
@@ -122,12 +122,12 @@ amixer -c 1 cset name='Main Mic Switch' on
 因為它們：
 -   ✓ 只控制 mic 是否「活著」    
 -   ✗ 不控制 mic 聲音是否「進 ADC」
-    
+
 真正決定錄音來源的是：
 -   `Line Mux`
 -   `PGA Mux`
 -   `Differential Mux`
-    
+
 -   **以及硬體接線**
 
 ## 5. 解決方案
@@ -149,16 +149,16 @@ amixer -c 1 cset name='Main Mic Switch' on
 
 -   耳麥不要接到 MIC_P / MIC_N
 -   或加入 analog switch（TS5A / FSA 系列）
-    
+
 #### 方法二：重新定義產品需求
 
 -   接受「插耳麥就用耳麥 mic」
-    
+
 ## 6. 結論與建議
 
 ### 6.1 最終工程結論
 
-#### 在目前硬體設計下：
+#### 在目前硬體設計下
 
 > **「插著耳麥，還想只錄 Main Mic」  
 > 在純軟體層是做不到的**

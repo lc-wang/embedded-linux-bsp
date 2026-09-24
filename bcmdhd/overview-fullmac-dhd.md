@@ -44,7 +44,7 @@ Linux 掌握 **完整無線狀態**
 **Linux 並不知道 Wi-Fi 真正怎麼運作，只是在「下指令 + 收事件」**
 
 ## 2. DHD（Dongle Host Driver）的整體分層
-```
+```text
 +-----------------------------+
 | cfg80211 |
 | (Linux wireless framework) |
@@ -129,13 +129,13 @@ typedef struct dhd_pub {
 ```
 
 -   與 bus 無關
-    
+
 -   control path / data path 共用
-    
+
 -   幾乎所有 dhd_* API 都會傳遞它
 
 ### 4.2 `dhd_info_t` — Linux glue 層
-```
+```c
 typedef struct dhd_info {
     dhd_pub_t pub;
     struct net_device *net;
@@ -145,41 +145,41 @@ typedef struct dhd_info {
 } dhd_info_t;
 ```
 -   netdev
-    
+
 -   wiphy
-    
+
 -   workqueue
-    
+
 -   notifier
-    
+
 **`dhd_info_t` = Linux 世界的入口**
 
 ### 4.3 `wl_cfg80211_info` — cfg80211 狀態機
 
 -   scan state
-    
+
 -   connect state
-    
+
 -   event handling context
-    
+
 -   mutex / completion
-    
+
 ## 5. Control Plane 與 Data Plane 的根本分離
 
 ### 5.1 Control Plane（命令 / 事件）
 
 -   ioctl
-    
+
 -   iovar
-    
+
 -   firmware event
-    
+
 **bcmdhd ≠ 邏輯執行者，只是 command transporter**
 
 ### 5.2 Data Plane（封包流）
 
 -   TX：Host Dongle
-    
+
 -   RX：Dongle Host
-    
+
 -   Flow control 完全受 firmware 回報影響

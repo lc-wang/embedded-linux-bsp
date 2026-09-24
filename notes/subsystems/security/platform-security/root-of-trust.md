@@ -2,7 +2,7 @@
 
 本章要先建立 Platform Security 最核心的概念：
 
-```
+```text
 Root of Trust
 Chain of Trust
 Secure Boot
@@ -12,7 +12,7 @@ Secure Storage
 
 重點不是一次講完所有安全技術，而是先理解：
 
-```
+```text
 系統從哪裡開始被信任？
 誰驗證誰？
 key / counter / secure storage 為什麼不能只放在 rootfs？
@@ -20,7 +20,7 @@ key / counter / secure storage 為什麼不能只放在 rootfs？
 
 ## 1. 一張圖先看懂
 
-```
+```text
 [Power On]
     ↓
 [BootROM]
@@ -44,7 +44,7 @@ key / counter / secure storage 為什麼不能只放在 rootfs？
 
 一句話：
 
-```
+```text
 Root of Trust 是信任鏈的起點。
 Chain of Trust 是一層驗證下一層。
 ```
@@ -53,13 +53,13 @@ Chain of Trust 是一層驗證下一層。
 
 Root of Trust 可以理解成：
 
-```
+```text
 系統中最早被信任，而且一般軟體無法修改的安全起點。
 ```
 
 在 ARM SoC / Embedded Linux / Android 平台中，Root of Trust 常見來源是：
 
-```
+```text
 BootROM
 eFuse / OTP
 Hardware Unique Key
@@ -70,13 +70,13 @@ TEE / TrustZone secure world
 
 但對 BSP 工程師來說，最常遇到的是：
 
-```
+```text
 BootROM + eFuse / OTP
 ```
 
 也就是：
 
-```
+```text
 BootROM 內建驗證邏輯
 eFuse / OTP 保存 public key hash 或 secure boot 狀態
 ```
@@ -102,7 +102,7 @@ eFuse / OTP 保存 public key hash 或 secure boot 狀態
 
 一般 BSP boot flow 可能長這樣：
 
-```
+```text
 BootROM
   ↓
 SPL / TF-A
@@ -116,7 +116,7 @@ RootFS
 
 Security 視角會變成：
 
-```
+```text
 BootROM
   ↓ verify
 SPL / TF-A
@@ -130,7 +130,7 @@ RootFS / Android partitions
 
 差異在於：
 
-```
+```text
 一般 boot flow:
   重點是能不能開機
 
@@ -142,7 +142,7 @@ security boot flow:
 
 Root of Trust 通常可以分成三類。
 
-```
+```text
 Root of Trust for Verification
 Root of Trust for Measurement
 Root of Trust for Storage
@@ -152,20 +152,20 @@ Root of Trust for Storage
 
 用途：
 
-```
+```text
 確認下一階段 image 是不是被授權的 image。
 ```
 
 典型例子：
 
-```
+```text
 BootROM 使用 eFuse 裡的 key hash
 驗證 first bootloader 的 signature
 ```
 
 流程：
 
-```
+```text
 [BootROM]
     ↓
 [Read key hash from eFuse]
@@ -177,7 +177,7 @@ BootROM 使用 eFuse 裡的 key hash
 
 如果驗證失敗：
 
-```
+```text
 停止開機
 進入 recovery mode
 進入 USB download mode
@@ -190,19 +190,19 @@ BootROM 使用 eFuse 裡的 key hash
 
 用途：
 
-```
+```text
 記錄系統實際載入了什麼。
 ```
 
 典型例子：
 
-```
+```text
 Firmware / bootloader 把 kernel hash extend 到 TPM PCR。
 ```
 
 流程：
 
-```
+```text
 [Bootloader]
     ↓
 [Measure kernel / cmdline / initramfs]
@@ -214,7 +214,7 @@ Firmware / bootloader 把 kernel hash extend 到 TPM PCR。
 
 重點：
 
-```
+```text
 Measured Boot 不一定會擋開機。
 它主要是留下紀錄，讓後續可以做 attestation。
 ```
@@ -223,13 +223,13 @@ Measured Boot 不一定會擋開機。
 
 用途：
 
-```
+```text
 保存不能被 Normal World 隨便讀寫的資料。
 ```
 
 常見資料：
 
-```
+```text
 device key
 disk encryption key
 rollback counter
@@ -240,7 +240,7 @@ secure storage metadata
 
 常見儲存位置：
 
-```
+```text
 eFuse / OTP
 TPM NVRAM
 RPMB
@@ -250,7 +250,7 @@ Secure Element
 
 重點：
 
-```
+```text
 key / counter / secret 不應該只放在普通 rootfs。
 ```
 
@@ -260,7 +260,7 @@ Root of Trust 只是起點。
 
 真正的系統安全需要建立完整的 Chain of Trust。
 
-```
+```text
 Root of Trust
   ↓
 BootROM
@@ -276,13 +276,13 @@ RootFS / Android partitions
 
 核心規則：
 
-```
+```text
 前一層驗證下一層。
 ```
 
 也就是：
 
-```
+```text
 BootROM 驗證 SPL / TF-A
 SPL / TF-A 驗證 U-Boot
 U-Boot 驗證 Kernel / DTB / initramfs
@@ -294,7 +294,7 @@ Update system 驗證 firmware package
 
 這是 BSP 最常遇到的模型。
 
-```
+```text
 [Power On]
     ↓
 [BootROM starts]
@@ -316,19 +316,19 @@ Update system 驗證 firmware package
 
 如果 image 被修改：
 
-```
+```text
 signature mismatch
 ```
 
 如果使用錯誤 key 簽章：
 
-```
+```text
 public key hash mismatch
 ```
 
 如果 secure boot fuse 已經 enable：
 
-```
+```text
 unsigned image 不應該再被允許執行
 ```
 
@@ -336,7 +336,7 @@ unsigned image 不應該再被允許執行
 
 很多人只注意 kernel image，但在 BSP 裡：
 
-```
+```text
 DTB
 initramfs
 kernel cmdline
@@ -348,7 +348,7 @@ kernel cmdline
 
 DTB 可以影響：
 
-```
+```text
 reserved-memory
 device status
 interrupt routing
@@ -359,7 +359,7 @@ kernel bootargs
 
 如果 kernel 有簽，但 DTB 沒簽：
 
-```
+```text
 攻擊者可能不改 kernel code，只改 DTB 就改變系統行為。
 ```
 
@@ -367,7 +367,7 @@ kernel bootargs
 
 initramfs 可能包含：
 
-```
+```text
 early userspace
 mount script
 rootfs unlock logic
@@ -377,7 +377,7 @@ firmware loading logic
 
 如果 initramfs 沒有被驗證：
 
-```
+```text
 攻擊者可能在真正 rootfs mount 前就介入開機流程。
 ```
 
@@ -385,7 +385,7 @@ firmware loading logic
 
 ### 9.1 只驗證 bootloader，沒驗證 kernel
 
-```
+```text
 BootROM → SPL verified
 SPL → U-Boot loaded
 U-Boot → Kernel not verified
@@ -393,33 +393,33 @@ U-Boot → Kernel not verified
 
 結果：
 
-```
+```text
 攻擊者仍可替換 kernel。
 ```
 
 ### 9.2 kernel 有簽，但 DTB 沒簽
 
-```
+```text
 U-Boot verifies Image
 U-Boot loads unsigned board.dtb
 ```
 
 結果：
 
-```
+```text
 攻擊者可以透過 DTB 改 bootargs / reserved-memory / device status。
 ```
 
 ### 9.3 rootfs 沒有驗證
 
-```
+```text
 Kernel is trusted
 RootFS is writable ext4
 ```
 
 結果：
 
-```
+```text
 /sbin/init
 systemd service
 shared library
@@ -430,20 +430,20 @@ application
 
 ### 9.4 update package 沒有驗證
 
-```
+```text
 Normal boot path is secure
 Firmware update path accepts unsigned package
 ```
 
 結果：
 
-```
+```text
 攻擊者可以透過 update path 寫入惡意 image。
 ```
 
 ### 9.5 沒有 rollback protection
 
-```
+```text
 v2 修掉安全漏洞
 v1 仍然是合法簽章 image
 device 允許刷回 v1
@@ -451,7 +451,7 @@ device 允許刷回 v1
 
 結果：
 
-```
+```text
 攻擊者可以刷回舊版漏洞 image。
 ```
 
@@ -461,7 +461,7 @@ device 允許刷回 v1
 
 先問：
 
-```
+```text
 這顆 SoC 的第一個信任點是什麼？
 BootROM 是否支援 secure boot？
 secure boot enable 狀態存在哪裡？
@@ -470,7 +470,7 @@ public key hash 存在哪裡？
 
 常見答案：
 
-```
+```text
 BootROM
 eFuse / OTP
 SoC vendor secure boot mechanism
@@ -480,7 +480,7 @@ SoC vendor secure boot mechanism
 
 畫出自己的平台 flow：
 
-```
+```text
 BootROM
   ↓
 SPL / TF-A
@@ -494,7 +494,7 @@ RootFS
 
 然後逐層標記：
 
-```
+```text
 這一層是否有 signature verification？
 驗證用的 key 來自哪裡？
 下一層 image 是否完整包含在驗證範圍？
@@ -504,7 +504,7 @@ RootFS
 
 檢查：
 
-```
+```text
 使用 test key 還是 production key？
 public key hash 是否已經 provision？
 secure boot fuse 是否已經 enable？
@@ -514,7 +514,7 @@ rollback counter 是否已經初始化？
 
 注意：
 
-```
+```text
 eFuse / OTP 通常不可逆。
 ```
 
@@ -524,7 +524,7 @@ eFuse / OTP 通常不可逆。
 
 Embedded Linux 常見：
 
-```
+```text
 dm-verity
 read-only rootfs
 signed update package
@@ -534,7 +534,7 @@ IMA / EVM
 
 Android 常見：
 
-```
+```text
 AVB
 vbmeta
 dm-verity
@@ -556,7 +556,7 @@ locked bootloader
 
 至少還要確認：
 
-```
+```text
 DTB 是否驗證
 initramfs 是否驗證
 rootfs 是否驗證
@@ -571,7 +571,7 @@ rootfs 是 Normal World 可見的儲存空間。
 
 敏感資料應該使用：
 
-```
+```text
 TEE secure storage
 TPM
 RPMB
@@ -585,7 +585,7 @@ eFuse / OTP
 
 常見不可逆錯誤：
 
-```
+```text
 燒錯 public key hash
 提前 enable secure boot
 提前 lock debug port
@@ -595,7 +595,7 @@ test key 被燒成 production key
 
 ## 12. BSP Checklist
 
-```
+```text
 [ ] SoC BootROM secure boot capability is known
 [ ] Root of Trust location is identified
 [ ] Secure boot enable bit location is known

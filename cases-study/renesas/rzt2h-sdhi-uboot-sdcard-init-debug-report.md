@@ -17,14 +17,14 @@ Card did not respond to voltage select! : -110
 -   無法載入環境變數
 -   無法載入 kernel image
 -   無法啟動系統
-    
+
 本問題表面上看似：
 
 -   DTS pinctrl / 電壓
 -   SDHI clock
 -   OCR / HCS 問題
 -   SD 卡容量差異（16GB vs 32GB）
-    
+
 但實際根因 **與上述全部無關**。
 
 ### 1.2 現象與可重現流程
@@ -64,7 +64,7 @@ Card did not respond to voltage select! : -110
 
 ### 2.1 DTS 層面驗證
 
-#### 2.1.1 檢查內容：
+#### 2.1.1 檢查內容
 
 -   `sdhi0` / `sdhi1` node    
 -   clock 設定是否正確
@@ -72,7 +72,7 @@ Card did not respond to voltage select! : -110
 -   alias (`mmc0`, `mmc1`)
 -   pinctrl 是否存在
 
-#### 2.1.2 結果：
+#### 2.1.2 結果
 
 -   DTS 實際內容是 **正確、有定義、有 clocks、有 interrupt**
 -   Board DTS 也有開啟 `sdhi0` / `sdhi1` (`status = "okay"`)
@@ -90,7 +90,7 @@ mmc->ocr &= ~(OCR_HCS | OCR_S18R);
 
 -   SDSC 舊卡 fail
 -   SDHC 卡正常
-    
+
 但在刪除這行後，**問題依然存在** → 排除 OCR 根因。
 
 ### 2.3 硬體端（pinmux/power）測試
@@ -170,7 +170,7 @@ git revert ed302f38a8e28604fc13e9af5e8fd9eecc3101a6
 ```
 並且也 revert 掉 SDHI_SD_STATUS register 操作。
 
-#### 4.1.1 revert 後：
+#### 4.1.1 revert 後
 
 -   16GB SDHC 正常讀取
 -   32GB 正常

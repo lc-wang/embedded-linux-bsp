@@ -6,13 +6,13 @@ MIPI DSI panel driver 不是完整 DRM driver。
 
 它比較像：  
 
-```text  
+```text
 「螢幕本體的驅動」
 ```
 
 它負責：
 
-```
+```text
 這片 panel 要怎麼上電
 怎麼 reset
 怎麼送初始化命令
@@ -24,7 +24,7 @@ MIPI DSI panel driver 不是完整 DRM driver。
 
 整體 display pipeline 大概是：
 
-```
+```text
 DRM CRTC
  ↓
 encoder / bridge
@@ -40,7 +40,7 @@ panel
 
 一個 MIPI DSI panel driver 通常同時有兩個身份：
 
-```
+```text
 mipi_dsi_driver
 +
 drm_panel
@@ -50,7 +50,7 @@ drm_panel
 
 負責掛在 MIPI DSI bus 上：
 
-```
+```text
 compatible match
  ↓
 probe()
@@ -62,7 +62,7 @@ mipi_dsi_attach()
 
 提供 DRM panel callback：
 
-```
+```text
 prepare()
 enable()
 disable()
@@ -76,7 +76,7 @@ get_modes()
 
 通常做：
 
-```
+```text
 power on
 reset GPIO
 init sequence
@@ -85,7 +85,7 @@ exit sleep mode
 
 意思是：
 
-```
+```text
 panel 硬體準備好了
 ```
 
@@ -93,14 +93,14 @@ panel 硬體準備好了
 
 通常做：
 
-```
+```text
 display on
 backlight on
 ```
 
 意思是：
 
-```
+```text
 畫面可以亮了
 ```
 
@@ -108,7 +108,7 @@ backlight on
 
 通常做：
 
-```
+```text
 backlight off
 display off
 ```
@@ -117,7 +117,7 @@ display off
 
 通常做：
 
-```
+```text
 enter sleep mode
 power off
 reset low
@@ -127,7 +127,7 @@ reset low
 
 ### 5.1 Device Tree match
 
-```
+```text
 compatible = "example,panel-dsi-minimal"
 ↓
 mipi_dsi_driver.probe()
@@ -137,7 +137,7 @@ minimal_panel_probe()
 
 ### 5.2 probe 內部流程
 
-```
+```text
 minimal_panel_probe()
  ├─ devm_kzalloc()
  ├─ 設定 dsi->lanes / format / mode_flags
@@ -150,7 +150,7 @@ minimal_panel_probe()
 
 當 DRM pipeline 要啟用輸出時：
 
-```
+```text
 atomic commit
  ↓
 bridge / encoder enable
@@ -168,7 +168,7 @@ panel->enable()
 
 關閉輸出時：
 
-```
+```text
 atomic disable
  ↓
 drm_panel_disable()
@@ -182,37 +182,37 @@ panel->unprepare()
 
 ## 6. get_modes() 在做什麼？
 
-```
+```text
 get_modes()
 ```
 
 負責告訴 DRM：
 
-```
+```text
 這片 panel 支援哪些解析度 / timing
 ```
 
 本範例提供固定 mode：
 
-```
+```text
 800x480
 ```
 
 ## 7. DSI attach 是什麼？
 
-```
+```text
 mipi_dsi_attach()
 ```
 
 意思是：
 
-```
+```text
 把這個 panel peripheral 接到 DSI host
 ```
 
 如果沒有 attach：
 
-```
+```text
 DSI host 不知道這個 panel 存在
 ```
 
@@ -224,13 +224,13 @@ DSI host 不知道這個 panel 存在
 
 ✓ panel driver 主要負責：
 
-```
+```text
 panel power / init / mode / enable lifecycle
 ```
 
 ## 9. 最重要一句話
 
-```
+```text
 DRM core 管「怎麼顯示」
 
 panel driver 管「這片螢幕怎麼被打開」

@@ -151,7 +151,7 @@ booti ${kernel_addr_r} - ${fdt_addr_r}
 3.  研究 `include/configs/<board>.h` 與 `defconfig` 的差異。
 4.  編譯自定義 U-Boot，加入你自己的命令 (`cmd_*.c`)。
 5.  深入了解 SPL → U-Boot Proper → Kernel 的銜接。
-    
+
 ## 附錄
 
 ### A. 延伸閱讀

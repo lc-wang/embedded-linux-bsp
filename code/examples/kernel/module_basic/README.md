@@ -24,7 +24,7 @@ Linux kernel module 最小生命週期範例。
 ## 1. Kernel 原始碼對照位置
 
 相關核心程式碼位於：
-```
+```text
 include/linux/module.h
 kernel/module/main.c
 kernel/module/kmod.c
@@ -32,7 +32,7 @@ init/main.c
 ```
 
 模組載入時的關鍵函式：
-```
+```text
 finit_module()
 └─ idempotent_init_module()
    └─ init_module_from_file()
@@ -53,7 +53,7 @@ finit_module()
 以 v6.6 / v6.12 的 `kernel/module/main.c` 為準。`init_module()` syscall（傳入 buffer 而非 fd）則走 `copy_module_from_user()` → `load_module()`。
 
 ## 2. Module 載入流程（insmod）
-```
+```text
 userspace
 └─ insmod hello_module.ko
    └─ finit_module()
@@ -66,7 +66,7 @@ kernel
 ```
 
 ## 3. Module 卸載流程（rmmod）
-```
+```text
 rmmod hello_module
 └─ delete_module()
    ├─ try_stop_module()
@@ -78,7 +78,7 @@ rmmod hello_module
 ## 4. 為什麼這很重要？
 
 在 trace kernel driver 時，你一定會看到：
-```
+```text
 do_one_initcall()
 ```
 

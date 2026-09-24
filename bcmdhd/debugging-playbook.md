@@ -19,7 +19,7 @@
 ## 1. Debug 的第一原則：先選對層級
 
 ### 1.1 bcmdhd 的五個 Debug 層級
-```
+```text
 [ L1 ] cfg80211 / userspace
 [ L2 ] Control Path (ioctl / iovar / event)
 [ L3 ] Data Path (TX / RX / flow control)

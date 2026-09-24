@@ -7,13 +7,13 @@
 然而，在實際系統整合時，會遇到以下疑問：
 
 -   TRM / firmware enum 中 **沒有看到 GPIO mode**
-    
+
 -   但 Linux DTS 卻可以寫：
-    
+
     ```dts
     function = "gpio";
     ```
-    
+
 -   GPIO、PFC、pinmux 三者的關係為何？
 - pull-up 與 open-drain 的差異是什麼？
 
@@ -25,7 +25,7 @@
 
 RZ/T2H（以及多數 Renesas Linux SoC）的腳位控制可分為兩層：
 
-```
+```text
 Peripheral Block (ENCIF / I2C / GPT / MTU …)
         ▲
         │（內部訊號）
@@ -98,7 +98,7 @@ function = "gpio";
 
 在 Linux pinctrl driver 中：
 
-```
+```text
 function = "gpio"
 → Disable peripheral function
 → Set PMC = 0
@@ -124,7 +124,7 @@ open-drain 的本質為：
 -   輸出端不主動拉高
 -   僅能拉低或呈現 Hi-Z
 -   必須搭配 pull-up 才能形成高電位
-    
+
 在 RZ/T2H 上：
 
 -   GPIO controller 沒有獨立的硬體 open-drain mode
@@ -172,12 +172,12 @@ open-drain 的本質為：
 ### 4.1 目前 DTS 狀態的結論
 
 -   現有 DTS **未明確定義 CN2 11–14 為 GPIO**
-    
+
 -   未宣告 ≠ GPIO
 -   未宣告時，腳位行為取決於：
     -   bootloader 預設
     -   是否有其他 subsystem 啟用該 pinmux
-        
+
 **若要穩定使用 GPIO，必須在 pinctrl 中明確宣告。**
 
 ### 4.2 總結

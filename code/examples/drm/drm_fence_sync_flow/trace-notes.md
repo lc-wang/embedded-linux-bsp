@@ -4,19 +4,19 @@
 
 假設：  
 
-```text  
+```text
 GPU 正在畫 framebuffer B
 ```
 
 但：
 
-```
+```text
 display controller 已經準備 scanout
 ```
 
 問題：
 
-```
+```text
 GPU 到底畫完了沒？
 ```
 
@@ -24,13 +24,13 @@ GPU 到底畫完了沒？
 
 fence：
 
-```
+```text
 「工作完成通知」
 ```
 
 ### 2.1 GPU render flow
 
-```
+```text
 GPU render start
  ↓
 GPU working...
@@ -46,13 +46,13 @@ signal fence
 
 display：
 
-```
+```text
 直接 scanout framebuffer
 ```
 
 可能：
 
-```
+```text
 GPU 還沒畫完
 ```
 
@@ -66,25 +66,25 @@ GPU 還沒畫完
 
 DRM：
 
-```
+```text
 wait GPU completion fence
 ```
 
 ↓
 
-```
+```text
 GPU signal done
 ```
 
 ↓
 
-```
+```text
 才允許 page flip
 ```
 
 ## 4. acquire fence 是什麼？
 
-```
+```text
 consumer 等 producer 完成
 ```
 
@@ -98,7 +98,7 @@ consumer 等 producer 完成
 
 ## 5. release fence 是什麼？
 
-```
+```text
 consumer 通知：
 buffer 已經用完
 ```
@@ -111,13 +111,13 @@ producer 才能安全 reuse buffer。
 
 kernel：
 
-```
+```text
 偷偷幫你同步
 ```
 
 userspace：
 
-```
+```text
 看不到 fence
 ```
 
@@ -125,13 +125,13 @@ userspace：
 
 userspace：
 
-```
+```text
 明確傳 fence fd
 ```
 
 例如：
 
-```
+```text
 IN_FENCE_FD
 OUT_FENCE_PTR
 ```
@@ -142,7 +142,7 @@ OUT_FENCE_PTR
 
 GPU render：
 
-```
+```text
 submit GPU job
 ```
 
@@ -150,7 +150,7 @@ submit GPU job
 
 建立：
 
-```
+```text
 struct dma_fence
 ```
 
@@ -158,13 +158,13 @@ struct dma_fence
 
 GPU IRQ：
 
-```
+```text
 render complete
 ```
 
 ↓
 
-```
+```text
 dma_fence_signal()
 ```
 
@@ -172,13 +172,13 @@ dma_fence_signal()
 
 GPU driver export：
 
-```
+```text
 sync_file fd
 ```
 
 userspace 拿到：
 
-```
+```text
 fence fd
 ```
 
@@ -186,7 +186,7 @@ fence fd
 
 userspace：
 
-```
+```text
 IN_FENCE_FD = gpu_fence_fd
 ```
 
@@ -194,19 +194,19 @@ IN_FENCE_FD = gpu_fence_fd
 
 kernel：
 
-```
+```text
 drm_atomic_set_fence_for_plane()
 ```
 
 ↓
 
-```
+```text
 dma_fence_wait()
 ```
 
 ## 8. 真正 page flip timing
 
-```
+```text
 GPU render done
  ↓
 fence signal
@@ -222,7 +222,7 @@ page flip
 
 SurfaceFlinger / HWC：
 
-```
+```text
 acquire fence
 ↓
 HWC wait
@@ -236,7 +236,7 @@ release fence
 
 Wayland compositor：
 
-```
+```text
 linux explicit sync protocol
 ```
 
@@ -246,7 +246,7 @@ linux explicit sync protocol
 
 Vulkan：
 
-```
+```text
 timeline semaphore
 sync fd
 ```
@@ -255,7 +255,7 @@ sync fd
 
 ## 12. 最重要觀念
 
-```
+```text
 atomic commit
 不只更新 framebuffer
 
@@ -265,6 +265,6 @@ atomic commit
 
 ## 13. 最重要一句話
 
-```
+```text
 fence 的本質：「這塊 memory 現在能安全被使用了嗎？」
 ```

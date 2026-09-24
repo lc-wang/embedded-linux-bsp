@@ -4,7 +4,7 @@
 
 在 i.MX8MP 平台從 vendor bcmdhd driver 遷移到 mainline brcmfmac 後，WiFi 一跑 iperf 壓測就在數秒內崩潰：
 
-```
+```text
 $ iperf -c 192.168.137.223 -t 60 -i 1 -P4
 [SUM]  0.0- 5.0 sec  1.75 MBytes   769 Kbits/sec
 write failed: Connection reset by peer
@@ -12,7 +12,7 @@ write failed: Connection reset by peer
 
 dmesg 錯誤簽名（每次都相同）：
 
-```
+```text
 brcmfmac: mmc_submit_one: CMD53 sg block write failed -84
 mmc0: Timeout waiting for hardware interrupt.
 brcmfmac: brcmf_sdio_txfail: sdio error, abort command and terminate frame
@@ -65,7 +65,7 @@ brcmfmac: brcmf_sdio_hdparse: seq NN: max tx seq number error   （之後連環�
 
 燒回舊 BSP 確認 bcmdhd 的實際 SDIO 狀態：
 
-```
+```text
 [dhd] sdioh_attach: sd clock rate = 208000000
 mmc0: new ultra high speed SDR104 SDIO card at address 0001
 /sys/kernel/debug/mmc0/ios → actual clock 200000000 Hz, timing spec: SDR104
@@ -73,7 +73,7 @@ mmc0: new ultra high speed SDR104 SDIO card at address 0001
 
 **bcmdhd 同樣跑在 SDR104 / 200MHz**，同一條 `iperf -P4 -t60`：
 
-```
+```text
 [SUM]  0.0-60.0 sec  1.98 GBytes   284 Mbits/sec     ← 跑滿 60 秒，dmesg 0 錯誤
 ```
 
@@ -120,7 +120,7 @@ mmc0: new ultra high speed SDR104 SDIO card at address 0001
 
 一筆 TX 封包從系統送到晶片的旅程，三個關鍵機制各在不同層：
 
-```
+```text
 [多個 skb 封包]（各自獨立、位置不相鄰的記憶體緩衝區）
    ↓ ① glom（聚合）—— 協定層
 [superframe：把 N 個封包串成一批，用一次 CMD53 送出]
@@ -149,7 +149,7 @@ memcpy）；brcmfmac 用 SG：列清單讓 ADMA 逐段抓（省 CPU，但清單�
 block 逐一傳，**每個 block 尾端各帶 CRC16 校驗**。此值在 probe 時由
 `sdio_set_block_size()` 對 F2 通道設定：
 
-```
+```text
 blocksize=512:  [512B資料+CRC] [512B資料+CRC] ...
 blocksize=256:  [256B+CRC] [256B+CRC] [256B+CRC] ...
 ```
@@ -239,7 +239,7 @@ F2 blocksize 決定「匯流排上每一口切多大」。病根在第三層（�
 
 ### 5.2 Yocto 整合
 
-```
+```text
 meta-<layer>/recipes-kernel/linux/
 ├── linux-imx_%.bbappend
 └── linux-imx/0001-brcmfmac-use-256B-F2-blocksize-for-BCM43752.patch

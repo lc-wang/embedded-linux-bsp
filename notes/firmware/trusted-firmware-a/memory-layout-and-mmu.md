@@ -25,7 +25,7 @@
 ## 1. TF-A 的記憶體觀念總覽
 
 TF-A 的記憶體使用可概念化為三個階段：
-```
+```text
 (1) MMU disabled
 (2) MMU enabled, minimal mapping
 (3) MMU enabled, full runtime mapping
@@ -43,7 +43,7 @@ TF-A 的記憶體使用可概念化為三個階段：
 - 沒有 cache policy 控制
 
 因此：
-```
+```text
 MMIO access = write physical address directly
 ```
 
@@ -122,9 +122,9 @@ UART 屬於：
 
 因此必須被明確加入 MMU mapping。
 
-### 6.1 範例：
+### 6.1 範例
 
-```
+```text
 MAP_REGION_FLAT(UART_BASE,
                 UART_SIZE,
                 MT_DEVICE | MT_RW | MT_SECURE)
@@ -162,7 +162,7 @@ MAP_REGION_FLAT(UART_BASE,
 ## 8. BL2 / BL31 中 MMU 初始化的位置
 
 典型流程如下：
-```
+```text
 BL2
  ├─ early console (MMU off)
  ├─ memory discovery
@@ -224,7 +224,7 @@ UART MMIO 必須使用 device memory attribute。
 
 -   錯誤 mapping 會導致：
 
-```
+```text
 write buffer 未 flush
 UART register 寫入失效
 ```

@@ -131,7 +131,7 @@ echo spi_* > set_ftrace_filter
 -   CS 是否在正確時間被拉低
 -   clock 是否穩定
 -   data 是否對齊 clock edge
-    
+
 **只看 log，不看訊號 = SPI debug 一定失敗**。
 
 ## 6. Case Study：SPI 電子紙面板
@@ -141,7 +141,7 @@ echo spi_* > set_ftrace_filter
 -   SPI 頻寬低、latency 高
 -   更新需要 **multi-pass + waveform (LUT)**
 -   busy pin 代表硬體狀態機
-    
+
 ### 6.2 常見錯誤模式
 
 | 現象                     | 真正原因                     |

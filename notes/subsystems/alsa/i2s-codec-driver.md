@@ -5,13 +5,13 @@
 ## 1. ASoC Driver 分層回顧
 
 之前我們講到：
-```
+```text
 Machine driver
 CPU DAI driver
 Codec driver
 ```
 這一章我們聚焦在：
-```
+```text
 CPU DAI driver
 Codec driver
 ```
@@ -23,7 +23,7 @@ CPU DAI driver 通常是：
 `SoC 內建 I2S controller driver` 
 
 例如：
-```
+```text
 sound/soc/rockchip/rockchip_i2s.c
 sound/soc/fsl/fsl_sai.c
 sound/soc/renesas/rcar/
@@ -43,7 +43,7 @@ sound/soc/renesas/rcar/
 ## 3. 核心結構：snd_soc_dai_driver
 
 在 CPU driver 中你會看到：
-```
+```c
 static  struct  snd_soc_dai_driver  rockchip_i2s_dai = {
     .name = "rockchip-i2s",
     .playback = {
@@ -59,7 +59,7 @@ static  struct  snd_soc_dai_driver  rockchip_i2s_dai = {
 
 ## 4. snd_soc_dai_ops
 
-```
+```c
 struct snd_soc_dai_ops {
     int (*startup)(...);
     void (*shutdown)(...);
@@ -73,7 +73,7 @@ struct snd_soc_dai_ops {
 ## 5. 播放完整 call flow
 
 播放時會發生：
-```
+```text
 aplay
   ↓ snd_pcm_hw_params()
   ↓ snd_soc_pcm_hw_params()
@@ -82,7 +82,7 @@ cpu_dai->ops->hw_params()
 codec_dai->ops->hw_params()
 ```
 然後：
-```
+```text
 snd_soc_dai_trigger()
   ↓
 cpu_dai->ops->trigger()
@@ -94,7 +94,7 @@ codec_dai->ops->trigger()
 這是最重要的函式。
 
 典型內容：
-```
+```c
 static int rockchip_i2s_hw_params(...)
 {
     int rate = params_rate(params);
@@ -118,7 +118,7 @@ static int rockchip_i2s_hw_params(...)
 ## 7. I2S Clock 計算
 
 I2S clock 組成：
-```
+```text
 MCLK
   ↓
 BCLK
@@ -126,7 +126,7 @@ BCLK
 LRCLK
 ```
 公式：
-```
+```text
 LRCLK = Sample Rate
 BCLK = Sample Rate × Channels × BitWidth
 ```
@@ -170,7 +170,7 @@ Codec driver 通常：
 `I2C driver` 
 
 例如：
-```
+```text
 wm8960.c
 rt5651.c
 ```
@@ -186,14 +186,14 @@ rt5651.c
 
 ## 10. Codec Driver 結構
 
-```
+```c
 static struct snd_soc_component_driver soc_codec_dev_wm8960 = {
     .dapm_widgets = wm8960_dapm_widgets,
     .dapm_routes = wm8960_routes,
 };
 ```
 並且：
-```
+```c
 static struct snd_soc_dai_driver wm8960_dai = {
     .name = "wm8960-hifi",
     .ops = &wm8960_dai_ops,
@@ -203,7 +203,7 @@ static struct snd_soc_dai_driver wm8960_dai = {
 ## 11. codec hw_params 在做什麼？
 
 典型：
-```
+```c
 static int wm8960_hw_params(...)
 {
     int rate = params_rate(params);
@@ -274,7 +274,7 @@ Codec 提供 BCLK
 ## 15. Driver 初始化流程
 
 Probe 時：
-```
+```text
 platform_driver_probe
   ↓
 devm_snd_soc_register_component()
@@ -282,7 +282,7 @@ devm_snd_soc_register_component()
 註冊 DAI
 ```
 Codec driver：
-```
+```text
 i2c_probe
   ↓
 snd_soc_register_component()
@@ -290,7 +290,7 @@ snd_soc_register_component()
 
 ## 16. 完整播放流程
 
-```
+```text
 Machine driver 建立 link
   ↓
 CPU DAI probe

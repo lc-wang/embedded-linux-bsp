@@ -8,7 +8,7 @@ RK3588 平台使用 MIPI 訊號驅動第二顆外接顯示器（DisplayId=2）�
 -   **將 MIPI 面板旋轉 90°（或 270°）**
 -   **內容完全填滿、不裁切、不壓扁**
 -   **行為與 AOSP `wm user-rotation` 一致**
-    
+
 問題：
 
 -   **Android 15 的 rotation 流程已與 A14 差異極大**    
@@ -56,7 +56,7 @@ wm → cmd window → WindowManagerService.setUserRotation
 → DisplayRotation # per-display 修改
 → SurfaceFlinger.setProjection
 → HAL
-``` 
+```
 
 這條路徑會：
 
@@ -168,7 +168,7 @@ displayId=2 出現：
 
 後來成功的方案：
 
-### 4.1 在 WindowManagerService.systemReady 呼叫：
+### 4.1 在 WindowManagerService.systemReady 呼叫
 
 `setUserRotation(displayId, USER_ROTATION_LOCKED, rotation);` 
 

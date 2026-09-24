@@ -30,7 +30,7 @@ Bus layer **不負責**：
 
 不論 SDIO 或 PCIe，DHD core 只透過抽象 API 呼叫：
 
-```
+```text
 dhd_bus_txdata()
 dhd_bus_txctl()
 dhd_bus_rxctl()
@@ -46,13 +46,13 @@ dhd_bus_stop()
 SDIO 是 **transaction-based** 介面：
 
 -   CMD52：register read/write
-    
+
 -   CMD53：data transfer（block / byte mode）
-    
+
 -   無真正 DMA ring
-    
+
 -   高度依賴 **aggregation** 與 **timing**
-    
+
 #### 特性總結（SDIO）
 
 | 項目         | SDIO        |
@@ -65,32 +65,32 @@ SDIO 是 **transaction-based** 介面：
 | 穩定性風險 | 高（PM / timing） |
 
 ### 2.2 SDIO 資料流概觀
-```
+```text
 Host
  └─ CMD53 write/read
      └─ SDIO function
          └─ Dongle firmware
 ```
 -   TX：Host 主動 push
-    
+
 -   RX：依 interrupt / polling 讀回
-    
+
 ### 2.3 Aggregation：效能與災難的分水嶺
 
 SDIO 為了效能，會：
 
 -   將多個 packet aggregation 成一筆 CMD53
-    
+
 -   RX/TX 都可能 aggregation
-    
+
 問題點：
 
 -   aggregation size 過大 → buffer overflow
-    
+
 -   aggregation timing 不佳 → latency 飆高
-    
+
 -   resume 後 aggregation state 錯亂 → RX 卡死
-    
+
 **SDIO 的問題 8 成來自 aggregation 與 power transition**
 
 ### 2.4 SDIO 常見故障模式
@@ -98,17 +98,17 @@ SDIO 為了效能，會：
 #### 1) Resume 後 Wi-Fi 完全沒反應
 
 -   SDIO function 未正確 wake
-    
+
 -   firmware 還在 sleep
-    
+
 -   RX interrupt 沒再進來
-    
+
 #### 2) 偶發 timeout / data corruption
 
 -   CMD53 retry
-    
+
 -   block size mismatch
-    
+
 -   host timing 與 firmware 不同步
 
 ## 3. PCIe Bus（`dhd_pcie.c` / `dhd_msgbuf.c`）
@@ -118,9 +118,9 @@ SDIO 為了效能，會：
 PCIe 是 **DMA-based ring architecture**：
 
 -   Host 與 firmware 共用 memory
-    
+
 -   以 ring buffer 溝通
-    
+
 -   interrupt + doorbell 機制
 
 #### 特性總結（PCIe）
@@ -136,35 +136,35 @@ PCIe 是 **DMA-based ring architecture**：
 
 ### 3.2 PCIe 資料流概觀
 
-```
+```text
 Host memory  (TX/RX rings) ⇄ DMA
 Dongle firmware
 ```
 
 -   TX：填 ring entry → doorbell
-    
+
 -   RX：firmware 填 completion → interrupt
-    
+
 ### 3.3 msgbuf Protocol（核心）
 
 PCIe bcmdhd 使用 **msgbuf protocol**：
 
 -   TX ring
-    
+
 -   RX ring
-    
+
 -   completion ring
-    
+
 -   event ring
-    
+
 每一種 ring 都有：
 
 -   write index
-    
+
 -   read index
-    
+
 -   credit / quota
-    
+
 **任一 ring 停止前進 = 整個 Wi-Fi 停擺**
 
 ### 3.4 PCIe 常見故障模式
@@ -172,17 +172,17 @@ PCIe bcmdhd 使用 **msgbuf protocol**：
 #### 1) TX ring 不前進
 
 -   firmware 不回 completion
-    
+
 -   interrupt lost
-    
+
 -   doorbell 未觸發
-    
+
 #### 2) RX event 卡住
 
 -   completion ring 塞滿
-    
+
 -   RX interrupt 被 mask
-    
+
 -   memory corruption
 
 ## 4. SDIO vs PCIe：實務比較
@@ -198,7 +198,7 @@ PCIe bcmdhd 使用 **msgbuf protocol**：
 **選擇原則**
 
 -   IoT / 低功耗：SDIO
-    
+
 -   高 throughput / AP / STA heavy load：PCIe
 
 ## 5. Firmware Download 與 Reset 差異
@@ -206,19 +206,19 @@ PCIe bcmdhd 使用 **msgbuf protocol**：
 ### 5.1 SDIO
 
 -   透過 CMD53 寫入 firmware
-    
+
 -   時間長、易受 timing 影響
-    
+
 -   reset 成本低
-    
+
 ### 5.2 PCIe
 
 -   透過 memory window / BAR
-    
+
 -   較快
-    
+
 -   reset 成本高（需重建 ring）
-    
+
 ## 6. 常見問題與排查
 
 ### 6.1 Debug Bus Layer 的實戰指引
@@ -226,35 +226,35 @@ PCIe bcmdhd 使用 **msgbuf protocol**：
 #### SDIO Debug Checklist
 
 -   SDIO interrupt 是否進來
-    
+
 -   CMD53 retry / error count
-    
+
 -   RX aggregation size
-    
+
 -   resume 後第一包是否成功
-    
+
 #### PCIe Debug Checklist
 
 -   ring index 是否前進
-    
+
 -   completion 是否回來
-    
+
 -   interrupt 是否觸發
-    
+
 -   DMA mapping 是否正確
-    
+
 ### 6.2 問題定位快速判斷法
 
 > **「看起來像 data path 問題，實際是 bus 卡住」**
 
 -   TX 送不出去？
-    
+
     -   看 bus TX 是否成功
-        
+
 -   RX 沒 event？
-    
+
     -   看 bus RX / interrupt
-        
+
 -   resume 後死？
-    
+
     -   先懷疑 bus power state

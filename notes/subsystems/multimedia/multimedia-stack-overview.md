@@ -8,24 +8,24 @@
 在 Embedded BSP 開發中，常見問題：
 
 -   camera 有出 data 但畫面不顯示
-    
+
 -   DRM plane 沒更新
-    
+
 -   VPU decode 很慢
-    
+
 -   CPU usage 爆高
-    
+
 -   dmabuf export 失敗
-    
+
 -   Wayland 有畫面但 kmssink 沒畫面
-    
+
 這些問題的本質：
 
 **沒有完整理解 userspace → kernel → hardware 的資料流**
 
 ## 2. 整體 Multimedia Stack 架構圖
 
-```
+```text
 ┌──────────────────────────────────┐  
 │            Application            │  
 │  (gst-launch / Qt / Chrome etc)  │  
@@ -77,33 +77,33 @@
 例如：
 
 -   `gst-launch-1.0`
-    
+
 -   Qt Multimedia
-    
+
 -   Browser
-    
+
 -   GStreamer-based player
-    
+
 負責：
 
 -   建立 pipeline
-    
+
 -   控制播放
-    
+
 -   決定資料流方向
-    
+
 ### 3.2 GStreamer Layer
 
 核心負責：
 
 -   buffer 管理
-    
+
 -   element 串接
-    
+
 -   caps negotiation
-    
+
 -   event 傳遞
-    
+
 例如：
 
 gst-launch-1.0 v4l2src ! videoconvert ! waylandsink
@@ -113,11 +113,11 @@ gst-launch-1.0 v4l2src ! videoconvert ! waylandsink
 #### v4l2src
 
 對應 kernel：
-```
+```text
 /dev/videoX
 ```
 會呼叫：
-```
+```text
 VIDIOC_REQBUFS  
 VIDIOC_QBUF  
 VIDIOC_STREAMON
@@ -126,11 +126,11 @@ VIDIOC_STREAMON
 #### kmssink / waylandsink
 
 kmssink 直接對應：
-```
+```text
 DRM_IOCTL_MODE_ATOMIC
 ```
 waylandsink 對應：
-```
+```text
 wayland compositor → DRM
 ```
 
@@ -143,13 +143,13 @@ wayland compositor → DRM
 用途：
 
 -   camera capture
-    
+
 -   codec encode/decode
-    
+
 -   memory-to-memory device
-    
+
 source code：
-```
+```text
 drivers/media/
 ```
 
@@ -158,15 +158,15 @@ drivers/media/
 用途：
 
 -   plane 管理
-    
+
 -   framebuffer
-    
+
 -   atomic commit
-    
+
 -   display pipeline
-    
+
 source code：
-```
+```text
 drivers/gpu/drm/
 ```
 
@@ -175,18 +175,18 @@ drivers/gpu/drm/
 用途：
 
 -   在 driver 間共享 buffer
-    
+
 -   zero-copy pipeline
-    
+
 source code：
-```
+```text
 drivers/dma-buf/
 ```
 
 ## 4. 真實資料流範例（Camera → Display）
 
 以下是一個真實 RK / i.MX pipeline：
-```
+```text
 Camera Sensor  
  │  
  ▼  
@@ -225,54 +225,54 @@ Panel
 而是：
 
 -   driver buffer 沒 dequeue
-    
+
 -   DRM plane 沒更新
-    
+
 -   dma-buf attachment fail
-    
+
 -   format 不匹配
-    
+
 -   memory type 設錯
-    
+
 ## 6. Multimedia Stack 的三種典型 Pipeline
 
 ### 6.1 Capture → Display
 
-```
+```text
 v4l2src ! kmssink
 ```
 用途：
 
 -   camera preview
-    
+
 -   factory test
-    
+
 ### 6.2 Decode → Display
 
-```
+```text
 filesrc ! h264parse ! v4l2h264dec ! kmssink
 ```
 用途：
 
 -   video playback
-    
+
 -   hardware decode
-    
+
 ### 6.3 Encode Pipeline
 
-```
+```text
 v4l2src ! v4l2h264enc ! filesink
 ```
 用途：
 
 -   recording
-    
+
 -   surveillance
-    
+
 ## 7. Mental Model
 
 腦中要有這張圖：
-```
+```text
 Userspace element  
  ↓  
 GStreamer buffer  

@@ -16,7 +16,7 @@ DRM vblank / page flip / display timing flow 心智模型。
 
 ## 1. 一句話先記住
 
-```text  
+```text
 page flip  
 = scanout framebuffer 的切換
 ```
@@ -25,7 +25,7 @@ page flip
 
 vblank：
 
-```
+```text
 顯示控制器掃描完一整個 frame
 到下一 frame 開始前的空檔
 ```
@@ -34,14 +34,14 @@ vblank：
 
 因為：
 
-```
+```text
 只有在 vblank 切 framebuffer
 才不容易 tearing
 ```
 
 ## 4. scanout flow
 
-```
+```text
 CRTC scanout framebuffer A
  ↓
 vblank
@@ -55,26 +55,26 @@ vblank
 
 如果：
 
-```
+```text
 scanout 到一半突然換 framebuffer
 ```
 
 畫面就可能：
 
-```
+```text
 上半部是舊 frame
 下半部是新 frame
 ```
 
 這就是：
 
-```
+```text
 tearing
 ```
 
 ## 6. Kernel 原始碼對照
 
-```
+```text
 drivers/gpu/drm/drm_vblank.c
 drivers/gpu/drm/drm_atomic_helper.c
 drivers/gpu/drm/drm_crtc.c

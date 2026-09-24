@@ -34,7 +34,7 @@ mt76 位於最底層：
 -   MCU 指令
 -   EEPROM/EFUSE
 -   PHY/RF 參數
-    
+
 mac80211 則負責：
 -   STA 建立/刪除
 -   AP beacon 設定

@@ -19,7 +19,7 @@
 ## 1. BL31 在 Boot Flow 中的位置
 
 回顧整體流程：
-```
+```text
 Boot ROM
 │
 ▼
@@ -87,7 +87,7 @@ SMC instruction
 請求 BL31 提供服務。
 
 流程概念如下：
-```
+```text
 Non-secure world (EL1/EL2)
 │
 ├─ SMC

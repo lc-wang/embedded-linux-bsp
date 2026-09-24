@@ -17,7 +17,7 @@
 
 ### 1.1 核心概念
 
-```
+```text
 hwirq (hardware IRQ)  
  ↓  
 irq_domain  
@@ -35,7 +35,7 @@ virq (Linux IRQ)
 
 ### 2.1 實際例子
 
-```
+```text
 GPIO3_5 → hwirq = 5
          ↓
 gpio irq_domain translate
@@ -65,7 +65,7 @@ irq_domain 負責：
 
 ### 4.1 linear domain
 
-```
+```text
 irq_domain_add_linear()
 ```
 用途：
@@ -75,7 +75,7 @@ irq_domain_add_linear()
 
 ### 4.2 tree domain
 
-```
+```text
 irq_domain_add_tree()
 ```
 用途：
@@ -85,11 +85,11 @@ irq_domain_add_tree()
 
 ### 4.3 hierarchical domain
 
-```
+```text
 irq_domain_create_hierarchy()
 ```
 用於：
-```
+```text
 GPIO → GIC  
 PCIe → GIC  
 MSI → GIC
@@ -97,7 +97,7 @@ MSI → GIC
 
 ## 5. Hierarchical IRQ Flow
 
-```
+```text
 Device IRQ  
  ↓  
 GPIO controller (child domain)  
@@ -114,36 +114,36 @@ CPU
 
 ### 6.1 Step 1 GPIO driver 建立 irq_domain
 
-```
+```text
 gpiochip_irqchip_add()
 ```
 或：
-```
+```text
 irq_domain_add_linear()
 ```
 
 ### 6.2 Step 2 建立 parent 關係
 
-```
+```text
 irq_set_parent()
 ```
 或透過：
-```
+```text
 interrupt-parent (DT)
 ```
 
 ### 6.3 Step 3 mapping 發生
 
 當 driver：
-```
+```text
 request_irq()
 ```
 kernel 會：
-```
+```text
 irq_create_mapping()
 ```
 完成：
-```
+```text
 hwirq → virq
 ```
 
@@ -151,7 +151,7 @@ hwirq → virq
 
 ### 7.1 GIC 定義
 
-```
+```dts
 gic: interrupt-controller@xxxx {  
 compatible = "arm,gic-v3";  
 interrupt-controller;  
@@ -161,7 +161,7 @@ interrupt-controller;
 
 ### 7.2 GPIO controller
 
-```
+```dts
 gpio3: gpio@xxxx {  
 gpio-controller;  
 interrupt-controller;  
@@ -174,7 +174,7 @@ interrupts = <GIC_SPI 89 IRQ_TYPE_LEVEL_HIGH>;
 
 ### 7.3 Device 使用
 
-```
+```dts
 interrupt-parent = <&gpio3>;  
 interrupts = <5 IRQ_TYPE_EDGE_FALLING>;
 ```
@@ -187,19 +187,19 @@ interrupts = <5 IRQ_TYPE_EDGE_FALLING>;
 
 ### 8.1 建立 mapping
 
-```
+```c
 irq_create_mapping(domain, hwirq);
 ```
 
 ### 8.2 handler 呼叫
 
-```
+```c
 generic_handle_irq(virq);
 ```
 
 ### 8.3 domain translate
 
-```
+```text
 domain->ops->map()  
 domain->ops->xlate()
 ```
@@ -208,25 +208,25 @@ domain->ops->xlate()
 
 ### 9.1 看 virq
 
-```
+```bash
 cat /proc/interrupts
 ```
 
 ### 9.2 看 mapping
 
-```
+```bash
 cat /sys/kernel/debug/irq/irqs/<irq>
 ```
 
 ### 9.3 看 domain
 
-```
+```bash
 cat /sys/kernel/debug/irq_domain/*
 ```
 
 ### 9.4 trace mapping
 
-```
+```bash
 echo  function > /sys/kernel/debug/tracing/current_tracer  
 echo irq_create_mapping > set_ftrace_filter
 ```
@@ -257,7 +257,7 @@ GPIO → GIC mapping 沒建立
 ### 10.4 IRQ number mismatch
 
 看到：
-```
+```text
 GIC 45  
 但 /proc/interrupts 是 123
 ```
@@ -265,7 +265,7 @@ GIC 45
 
 ## 11. IRQ Flow
 
-```
+```text
 Hardware IRQ  
  ↓  
 GIC hwirq  
@@ -282,11 +282,11 @@ driver ISR
 ## 12. Stacked IRQ Domain
 
 有些情況：
-```
+```text
 MSI → PCIe → GIC
 ```
 或：
-```
+```text
 GPIO expander → I2C → GPIO → GIC
 ```
 會有多層 domain

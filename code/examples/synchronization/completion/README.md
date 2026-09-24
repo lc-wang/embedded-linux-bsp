@@ -16,7 +16,7 @@ Linux kernel 中的「一次性事件同步機制」。
 
 ## 1. 一句話先記住
 
-```
+```text
 completion
 = 一個 thread 等另一個 thread 說「好了」
 ```

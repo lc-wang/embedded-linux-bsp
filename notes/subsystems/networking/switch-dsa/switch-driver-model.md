@@ -9,13 +9,13 @@
 
 ## 1. Driver 在整體架構的位置
 
-```
+```text
 Platform / SPI / MDIO driver        ↓Switch driver（DSA）        ↓DSA core        ↓net_device（lan1~lanX）
 ```
 
 ## 2. Driver Probe Flow
 
-```
+```text
 driver probe()
   ↓
 init hardware（reset / regmap）
@@ -33,19 +33,19 @@ DSA core 建立 port
 
 ### 2.1 關鍵 API
 
-```
+```c
 dsa_register_switch(ds);
 ```
 
 這一行是：
 
-```
+```text
 把 switch 註冊到 DSA core
 ```
 
 ## 3. `dsa_switch` 初始化
 
-```
+```c
 struct dsa_switch *ds;
 
 ds->ops = &my_switch_ops;
@@ -55,15 +55,15 @@ ds->priv = priv;
 
 ### 3.1 重點
 
-```
+```text
 num_ports = switch port 數量（含 CPU port）
 ```
 
 ## 4. `dsa_switch_ops`
 
-### 4.1 最基本：
+### 4.1 最基本
 
-```
+```c
 static const struct dsa_switch_ops ops = {
     .setup         = my_setup,
     .port_enable   = my_port_enable,
@@ -71,9 +71,9 @@ static const struct dsa_switch_ops ops = {
 };
 ```
 
-### 4.2 常見擴充：
+### 4.2 常見擴充
 
-```
+```text
     .phy_read
     .phy_write
     .get_tag_protocol
@@ -83,7 +83,7 @@ static const struct dsa_switch_ops ops = {
 
 ### 5.1 MDIO-based switch
 
-```
+```text
 MAC
  ↓
 MDIO
@@ -98,7 +98,7 @@ Switch chip
 
 ### 5.2 SPI-based switch
 
-```
+```text
 CPU
  ↓
 SPI
@@ -115,7 +115,7 @@ Switch chip
 
 driver probe 會是：
 
-```
+```text
 spi_driver
 mdio_driver
 i2c_driver
@@ -125,7 +125,7 @@ i2c_driver
 
 DSA core 會做：
 
-```
+```text
 for each port:
     create dsa_port
     assign type（CPU / USER）
@@ -136,26 +136,26 @@ for each port:
 
 driver 要標記：
 
-```
+```text
 哪一個 port 是 CPU port
 ```
 
 DTS 或 driver：
 
-```
+```text
 port@0 → CPU
 port@1~4 → user
 ```
 
 ## 8. Tagging protocol 設定
 
-```
+```c
 .get_tag_protocol = my_tag_proto;
 ```
 
 driver 告訴 kernel：
 
-```
+```text
 用哪種 tagging 格式
 ```
 
@@ -163,7 +163,7 @@ driver 告訴 kernel：
 
 ### 9.1 TX
 
-```
+```text
 lan1
  ↓
 DSA core
@@ -177,7 +177,7 @@ MAC
 
 ### 9.2 RX
 
-```
+```text
 eth0  
  ↓  
 driver 收到  
@@ -191,25 +191,25 @@ DSA core 拆 tag
 
 ### 10.1 driver probe
 
-```
+```bash
 dmesg | grep -i switch
 ```
 
 ### 10.2 DSA 註冊
 
-```
+```bash
 dmesg | grep dsa
 ```
 
 ### 10.3 netdev
 
-```
+```text
 ip link
 ```
 
 ### 10.4 driver info
 
-```
+```bash
 ethtool -i lan1
 ```
 
@@ -219,7 +219,7 @@ ethtool -i lan1
 
 原因：
 
-```
+```text
 dsa_register_switch 沒成功
 num_ports 錯
 ```
@@ -228,7 +228,7 @@ num_ports 錯
 
 檢查：
 
-```
+```text
 .port_enable 沒實作
 ```
 
@@ -236,7 +236,7 @@ num_ports 錯
 
 可能：
 
-```
+```text
 tagging 錯CPU port 設錯
 ```
 
@@ -244,14 +244,14 @@ tagging 錯CPU port 設錯
 
 檢查：
 
-```
+```text
 SPI / MDIO communication
 chip id
 ```
 
 ## 12. Debug Flow
 
-```
+```text
 driver probe OK?
 → DSA 註冊 OK?
 → port 有沒有？
@@ -263,19 +263,19 @@ driver probe OK?
 
 ### 13.1 driver log
 
-```
+```c
 pr_info("switch probe\n");
 pr_info("port enable %d\n", port);
 ```
 
 ### 13.2 ftrace
 
-```
+```bash
 echo net_dev_xmit > /sys/kernel/debug/tracing/set_event
 ```
 
 ## 14. 總結
 
-```
+```text
 switch driver = 初始化硬體 + 告訴 DSA core 怎麼用它
 ```

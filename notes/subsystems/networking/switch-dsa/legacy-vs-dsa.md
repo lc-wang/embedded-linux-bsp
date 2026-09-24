@@ -11,7 +11,7 @@
 
 ### 1.1 Legacy（ethss / ethsw）
 
-```
+```text
 Vendor BSP（私有實作）
 ```
 
@@ -26,7 +26,7 @@ Vendor BSP（私有實作）
 
 Distributed Switch Architecture
 
-```
+```text
 Linux upstream 標準架構
 ```
 
@@ -34,7 +34,7 @@ Linux upstream 標準架構
 
 ### 2.1 Legacy（ethss / ethsw）
 
-```
+```text
 CPU
  ↓
 eth0（整個 switch）
@@ -47,13 +47,13 @@ Switch chip
 
 特點：
 
-```
+```text
 只有一個 netdev（eth0）
 ```
 
 ### 2.2 DSA
 
-```
+```text
 CPU
  ↓
 eth0（CPU port）
@@ -66,7 +66,7 @@ Switch
 
 特點：
 
-```
+```text
 每個 port 都有 netdev
 ```
 
@@ -76,7 +76,7 @@ Switch
 
 #### TX
 
-```
+```text
 CPU
  ↓
 eth0
@@ -88,7 +88,7 @@ portX（由 driver 決定）
 
 #### RX
 
-```
+```text
 Switch
  ↓
 eth0
@@ -102,7 +102,7 @@ CPU **不知道來源 port**
 
 #### TX
 
-```
+```text
 lan1
  ↓
 DSA core
@@ -118,7 +118,7 @@ port1
 
 #### RX
 
-```
+```text
 Switch
  ↓
 tagged packet
@@ -166,7 +166,7 @@ lan1
 
 ### 5.1 Legacy（ethsw / ethss）
 
-```
+```text
 eth driver（整合）
  ├── MAC
  ├── switch control
@@ -176,13 +176,13 @@ eth driver（整合）
 
 特點：
 
-```
+```text
 所有邏輯在 driver 裡
 ```
 
 ### 5.2 DSA
 
-```
+```text
 MAC driver
 DSA core
 switch driver
@@ -190,7 +190,7 @@ switch driver
 
 分層：
 
-```
+```text
 MAC（eth0）
 Switch（DSA）
 Port（lanX）
@@ -200,7 +200,7 @@ Port（lanX）
 
 ### 6.1 Legacy
 
-```
+```dts
 ethernet@... {
     ...
     switch-config = ...;
@@ -209,13 +209,13 @@ ethernet@... {
 
 通常：
 
-```
+```text
 沒有標準格式（vendor-specific）
 ```
 
 ### 6.2 DSA
 
-```
+```dts
 switch@0 {
     ports {
         port@0 { label = "cpu"; };
@@ -226,7 +226,7 @@ switch@0 {
 
 特點：
 
-```
+```text
 標準化 binding
 ```
 
@@ -234,45 +234,45 @@ switch@0 {
 
 ### 7.1 Legacy
 
-#### 看到：
+#### 看到
 
-```
+```text
 ip link
 ```
 
-```
+```text
 eth0
 ```
 
-#### 問題：
+#### 問題
 
-```
+```text
 不知道哪個 port 壞
 ```
 
-#### Debug：
+#### Debug
 
-```
+```text
 vendor tool / ioctl
 ```
 
 ### 7.2 DSA
 
-#### 看到：
+#### 看到
 
-```
+```text
 ip link
 ```
 
-```
+```text
 eth0
 lan1
 lan2
 ```
 
-#### Debug：
+#### Debug
 
-```
+```bash
 ethtool lan1
 tcpdump -i lan1
 bridge vlan show
@@ -307,18 +307,18 @@ bridge vlan show
 
 #### netdev
 
-```
+```text
 eth0 → lanX
 ```
 
 #### config
 
-```
+```text
 vendor API → bridge / vlan
 ```
 
 #### debug
 
-```
+```text
 ioctl → ethtool / tcpdump
 ```

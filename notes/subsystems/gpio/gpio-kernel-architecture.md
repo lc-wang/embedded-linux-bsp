@@ -27,7 +27,7 @@ GPIO（General Purpose Input Output）是：
 
 ## 2. GPIO 在 Kernel 的整體架構
 
-```
+```text
 User space
     │
     │  (libgpiod / ioctl)
@@ -77,7 +77,7 @@ Hardware register
 `struct  gpio_chip` 
 
 核心成員：
-```
+```c
 struct gpio_chip {
     const char *label;
     int base;
@@ -94,13 +94,13 @@ struct gpio_chip {
 ## 5. GPIO Descriptor 機制
 
 舊 API：
-```
+```text
 gpio_request()
 gpio_direction_output()
 gpio_set_value()
 ```
 新 API：
-```
+```text
 gpiod_get()
 gpiod_direction_output()
 gpiod_set_value()
@@ -145,7 +145,7 @@ GPIO ≠ pinctrl
 -   pinctrl 是功能 mux / bias / drive strength
 
 流程：
-```
+```text
 pinctrl 先 mux 成 gpio
  ↓
 gpio driver 才能控制方向
@@ -155,7 +155,7 @@ gpio driver 才能控制方向
 ## 8. Kernel 初始化流程
 
 boot 時：
-```
+```text
 pinctrl init
    ↓
 gpio controller probe
@@ -165,14 +165,14 @@ register gpiochip
 建立 /dev/gpiochipX
 ```
 你可以透過：
-```
+```bash
 ls /sys/class/gpio
 ls /dev/gpiochip*
 ```
 
 ## 9. GPIO 在 Driver 中的典型用法
 
-```
+```c
 struct gpio_desc *reset_gpio;
 
 reset_gpio = devm_gpiod_get(dev, "reset", GPIOD_OUT_HIGH);

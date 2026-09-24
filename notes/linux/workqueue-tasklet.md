@@ -35,7 +35,7 @@ Tasklet 即是建立在 SoftIRQ（TASKLET_SOFTIRQ）之上。
 
 -   可能由 `ksoftirqd/*` 
 
-```
+```text
 IRQ → raise_softirq() → __do_softirq() → 呼叫對應 handler
 ```
 
@@ -46,7 +46,7 @@ Workqueue 完全不屬於 SoftIRQ，它使用：
 -   kernel thread（kworker）執行
 -   支援 sleep / scheduling / mutex    
 -   可依 CPU 或 unbound 執行
-```
+```text
 schedule_work() → 加入 WQ → kworker picks → 執行 handler
 ```
 
@@ -201,7 +201,7 @@ schedule_delayed_work(&dev->dwork, msecs_to_jiffies(10));
 
 ### 7.1 Tasklet 裡睡眠
 
-```
+```text
 BUG: sleeping function called from invalid context
 ```
 
@@ -234,7 +234,7 @@ flush_workqueue(wq);
 
 ### 8.1 SoftIRQ
 
-```
+```bash
 cat /proc/softirqs
 ```
 
@@ -242,7 +242,7 @@ cat /proc/softirqs
 
 ### 8.2 Workqueue DebugFS
 
-```
+```bash
 ls /sys/kernel/debug/workqueue
 
 ```
@@ -255,13 +255,13 @@ ls /sys/kernel/debug/workqueue
 
 ### 8.3 ftrace（觀察 BH 行為）
 
-```
+```bash
 echo function_graph > /sys/kernel/debug/tracing/current_tracer
 ```
 
 ### 8.4 Lockdep（偵測睡眠問題）
 
-```
+```text
 CONFIG_PROVE_LOCKING=y
 ```
 

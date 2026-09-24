@@ -144,7 +144,7 @@ psci_cpu_suspend();
 6.  驅動層測試：
     -   加入 `pr_info()` 於 `.suspend()` / `.resume()` 驗證執行順序。
     -   驗證 clock/regulator 是否如預期關閉與開啟。
-        
+
 ## 10. 常見問題與排查
 
 | 問題 | 可能原因 | 解決建議 |

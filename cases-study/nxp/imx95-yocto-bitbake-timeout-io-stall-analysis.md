@@ -16,7 +16,7 @@ Timeout while waiting for a reply from the bitbake server
 `BlockingIOError: [Errno 11] Resource temporarily unavailable` 
 ```
 3.  外接 SSD / HDD 出現 I/O 卡住狀況
-    
+
 4.  `/dev/sdb3`、`/tmp`、SSTATE/TMPDIR 空間不足，觸發 Yocto Disk Monitor：
 ```bash
 `ERROR: Immediately halt since the disk space monitor action is  "HALT"!` 
@@ -62,7 +62,7 @@ Yocto 建置時：
 -   多工 thread → 大量同時 read/write 
 -   外接碟無法跟上 → I/O queue 堆積
 -   BitBake server 的 IPC socket 卡住 → timeout
- 
+
 這是最典型的 BitBake timeout 成因之一。
 
 **BitBake server 不是壞掉，是硬碟反應太慢導致 client 無法連上。**
@@ -76,7 +76,7 @@ Yocto 需要：
 -   expand tarballs
 -   產生 sysroot staging
 -   將編譯結果同步進 tmp/work 與 sstate
-    
+
 **這些是最不適合放在外接 HDD/SSD（尤其是 USB 3.x 接口）的位置**  
 → 會造成非常明顯的 I/O stall。
 
@@ -91,7 +91,7 @@ ERROR: Immediately halt since the disk space monitor action is "HALT"!
 -   `/tmp` 在 /dev/sdb3（外接硬碟）
 -   只剩不到 100MB 
 -   Yocto _直接禁止_ 任何任務執行
-    
+
 這會導致 bitbake server 鎖住 socket 甚至崩潰。
 
 ### 4.4 核心結論（最關鍵一點）

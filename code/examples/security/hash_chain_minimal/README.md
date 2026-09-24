@@ -16,7 +16,7 @@ Root of Trust / Secure Boot 中最基本的 hash chain 範例。
 
 ## 1. 一句話先記住
 
-```text  
+```text
 hash  
 = 檢查資料有沒有變  
   
@@ -26,7 +26,7 @@ hash chain
 
 ## 2. 基本模型
 
-```
+```text
 BootROM
  ↓ measure
 TF-A
@@ -40,13 +40,13 @@ RootFS
 
 每一層都可以被 hash：
 
-```
+```text
 H(image)
 ```
 
 然後串成：
 
-```
+```text
 chain = H(previous_chain || current_image_hash)
 ```
 
@@ -54,7 +54,7 @@ chain = H(previous_chain || current_image_hash)
 
 如果只記錄單一 hash：
 
-```
+```text
 H(kernel)
 ```
 
@@ -62,7 +62,7 @@ H(kernel)
 
 但 boot flow 是一整串：
 
-```
+```text
 TF-A
 U-Boot
 Kernel
@@ -76,13 +76,13 @@ RootFS
 
 hash chain 本身只能回答：
 
-```
+```text
 內容有沒有變？
 ```
 
 但不能回答：
 
-```
+```text
 這個內容是不是可信？
 ```
 
@@ -107,13 +107,13 @@ hash chain 本身只能回答：
 
 需要 OpenSSL development package：
 
-```
+```bash
 sudo apt install libssl-dev
 ```
 
 Build：
 
-```
+```text
 make
 ```
 
@@ -121,7 +121,7 @@ make
 
 建立測試檔案：
 
-```
+```bash
 echo "TF-A image" > tfa.bin
 echo "U-Boot image" > uboot.bin
 echo "Linux kernel image" > Image
@@ -130,7 +130,7 @@ echo "Device Tree Blob" > board.dtb
 
 執行：
 
-```
+```text
 ./hash_chain_minimal tfa.bin uboot.bin Image board.dtb
 ```
 
@@ -144,7 +144,7 @@ echo "Device Tree Blob" > board.dtb
 
 因為 Secure Boot 還需要：
 
-```
+```text
 signature verification
 +
 trusted public key

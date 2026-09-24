@@ -27,7 +27,7 @@
 Clock 決定：
 -   裝置是否能運作
 -   裝置的效能與功耗
-    
+
 Linux 使用 Common Clock Framework（CCF）管理：
 -   clock tree
 -   clock enable / disable 
@@ -38,7 +38,7 @@ Linux 使用 Common Clock Framework（CCF）管理：
 -   clock 沒 enable
 -   parent clock 選錯
 -   rate 不符合硬體需求
-    
+
 結果常見表現：
 
 -   driver probe 成功，但功能異常 
@@ -51,11 +51,11 @@ Linux 使用 Common Clock Framework（CCF）管理：
 Reset 決定：
 -   裝置是否處於已知狀態
 -   是否能安全開始操作
-    
+
 SoC 通常提供：
 -   多個 reset line 
 -   不同 reset domain
-    
+
 ### 3.2 常見錯誤
 
 -   reset 沒 release
@@ -72,7 +72,7 @@ Regulator 決定：
 
 -   電壓是否存在   
 -   電壓是否穩定
-    
+
 driver 透過 regulator API：
 
 -   取得電源
@@ -83,12 +83,12 @@ driver 透過 regulator API：
 -   regulator 未宣告  
 -   enable 順序錯誤
 -   voltage 不符合 datasheet
-    
+
 結果可能是：
 
 -   裝置偶發性錯誤
 -   suspend / resume 後失效
-    
+
 ## 5. Device Tree 中的 Clock / Reset / Power
 
 ### 5.1 DTS 是描述，不是行為
@@ -99,7 +99,7 @@ DTS 負責：
 DTS **不負責**：
 -   確保初始化順序
 -   確保資源可用時機
-    
+
 這些都由 driver model 與 framework 處理。
 
 ### 5.2 DTS 常見陷阱
@@ -124,17 +124,17 @@ return -EPROBE_DEFER;
 
 這是 BSP 中：
 -   正常且必要的行為
-    
+
 ## 7. Suspend / Resume 為什麼容易壞
 
 Suspend / resume 需要：
 -   正確的 power sequence
 -   正確的 clock / reset handling
-    
+
 常見問題：
 -   resume 後裝置無回應
 -   clock 未重新 enable
-    
+
 **這通常是 BSP 整合問題，不是單一 driver bug。**
 
 ## 8. 常見問題與排查（Debug Checklist）
@@ -144,12 +144,12 @@ Suspend / resume 需要：
 -   是否 enable
 -   parent 是否正確
 -   rate 是否合理
-    
+
 ### 8.2 Reset
 
 -   是否已 release
 -   順序是否正確
-    
+
 ### 8.3 Power
 
 -   regulator 是否存在

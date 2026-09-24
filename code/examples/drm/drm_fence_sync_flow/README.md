@@ -25,7 +25,7 @@ fence
 
 因為：
 
-```
+```text
 GPU render
 與
 display scanout
@@ -37,7 +37,7 @@ display scanout
 
 可能：
 
-```
+```text
 display controller 已開始 scanout
 但 GPU 還沒畫完
 ```
@@ -51,7 +51,7 @@ display controller 已開始 scanout
 
 ## 4. 真正 graphics flow
 
-```
+```text
 GPU render
  ↓
 fence
@@ -67,27 +67,27 @@ page flip
 
 ## 5. dma_fence 是什麼？
 
-```
+```text
 dma_fence
 = kernel 內部 synchronization object
 ```
 
 它代表：
 
-```
+```text
 某個 producer 的工作完成狀態
 ```
 
 ## 6. sync_file 是什麼？
 
-```
+```text
 sync_file
 = userspace 可傳遞的 fence fd
 ```
 
 也就是：
 
-```
+```text
 dma_fence
 ↓
 包裝成 fd
@@ -95,7 +95,7 @@ dma_fence
 
 ## 7. Kernel 原始碼對照
 
-```
+```text
 drivers/dma-buf/dma-fence.c
 drivers/dma-buf/sync_file.c
 drivers/gpu/drm/drm_atomic.c

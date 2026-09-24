@@ -36,7 +36,7 @@ Linux 對 firmware 的基本假設是：
 -   `request_firmware()`
 -   userspace helper（udev / systemd）
 -   `/lib/firmware` 檔案系統
-    
+
 ## 3. Firmware 載入的實際流程
 
 ```text
@@ -55,7 +55,7 @@ firmware 傳回 kernel
 
 -   firmware 載入是 **同步或非同步**
 -   依賴 userspace 是否 ready
-    
+
 ## 4. 為什麼 Firmware 常造成 Probe 卡住
 
 ### 4.1 userspace 尚未 ready
@@ -63,7 +63,7 @@ firmware 傳回 kernel
 在早期 boot：
 -   rootfs 尚未 mount
 -   udev 尚未啟動
-    
+
 此時 request_firmware 可能：
 -   block    
 -   timeout
@@ -77,14 +77,14 @@ firmware 傳回 kernel
 結果：
 -   driver probe 失敗  
 -   裝置功能受限
-    
+
 ## 5. Device Tree 與 Firmware 名稱
 
 ### 5.1 DTS 的責任
 
 DTS 常用來：
 -   指定 firmware 名稱
-    
+
 但 DTS：
 -   不負責 firmware 是否存在
 -   不保證載入成功
@@ -102,7 +102,7 @@ DTS 常用來：
 
 若 driver 未正確處理：
 -   resume 後裝置無反應
-    
+
 **這是 BSP 常見但容易被忽略的問題。**
 
 ## 7. Firmware Debug Toolbox
@@ -135,7 +135,7 @@ cat /proc/cmdline
 
 -   使用 initramfs
 -   rootfs 掛載過晚
-    
+
 ### 7.4 手動觸發載入
 
 ```bash

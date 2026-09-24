@@ -16,7 +16,7 @@ DRM atomic commit flow 心智模型。
 
 ## 1. 一句話先記住
 
-```text  
+```text
 atomic commit  
 = 一次更新整個 display state
 ```
@@ -25,19 +25,19 @@ atomic commit
 
 舊世界：
 
-```
+```text
 先改 plane再改 CRTC再改 connector
 ```
 
 問題：
 
-```
+```text
 中途可能畫面錯亂
 ```
 
 ## 3. atomic 世界
 
-```
+```text
 所有 state
 一起驗證
 一起切換
@@ -45,7 +45,7 @@ atomic commit
 
 ## 4. atomic commit 更新哪些東西？
 
-```
+```text
 plane state
 CRTC state
 connector state
@@ -53,7 +53,7 @@ connector state
 
 ## 5. 最核心流程
 
-```
+```text
 userspace atomic request
  ↓
 drm_atomic_state
@@ -71,7 +71,7 @@ hardware update
 
 atomic commit 的本質：
 
-```
+```text
 不是「立刻改硬體」
 
 而是：
@@ -80,7 +80,7 @@ atomic commit 的本質：
 
 ## 7. Kernel 原始碼對照
 
-```
+```text
 drivers/gpu/drm/drm_atomic.c
 drivers/gpu/drm/drm_atomic_helper.c
 drivers/gpu/drm/drm_plane.c

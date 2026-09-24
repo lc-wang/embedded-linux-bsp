@@ -7,21 +7,21 @@
 在 **Renesas RZ/T2H** 平台中，官方提供的 **Trusted Firmware-A（TF-A）** 預設序列主控台（console）設定為：
 
 -   UART IP：**RSCIF / SCI0**
-    
+
 -   Base address：`0x80005000`
-    
+
 -   Pin：
-    
+
     -   TX：P27_5
-        
+
     -   RX：P27_4
-        
+
 然而在實際硬體設計上：
 
 -   SCI0 腳位並未接出至 debug UART
-    
+
 -   板端實際連接的是 **SCI1**
-    
+
 因此若不調整 TF-A，將會在最早期開機階段（BL2 / BL31）**完全沒有序列輸出**。
 
 ### 1.2 修改目標
@@ -41,14 +41,14 @@
 
 #### 2.1.1 修改 SCIF base address
 
-```
+```text
 - #define RZT2H_SCIF_BASE  0x80005000
 + #define RZT2H_SCIF_BASE  0x80005400
 ```
 
 #### 2.1.2 修改 pinmux 為 SCI1
 
-```
+```text
 {11, 1, 20, ...}, /* TXD1 */
 {11, 0, 20, ...}, /* RXD1 */
 ```
@@ -64,14 +64,14 @@
 雖然：
 
 -   base address 已改為 SCI1
-    
+
 -   pinmux 也已正確
-    
+
 但 **Renesas TF-A 的 console 初始化流程中，仍完全以 SCI0 為前提設計**。
 
-#### 3.1.1 TF-A console 初始化流程如下：
+#### 3.1.1 TF-A console 初始化流程如下
 
-```
+```text
 BL2 / BL31
  └─ rz_console_init()
      ├─ cpg_mstop_scif()      ← 解除 module stop
@@ -79,12 +79,12 @@ BL2 / BL31
      └─ console_rz_register() ← console driver
 ```
 
-#### 3.1.2 問題點在於：
+#### 3.1.2 問題點在於
 
 -   `cpg_mstop_scif()` **只解除 SCIF0 的 module stop**
-    
+
 -   SCI1 的 clock 仍處於停止狀態
-    
+
 導致：
 
 > 即使程式存取 SCI1 暫存器  
@@ -98,14 +98,14 @@ BL2 / BL31
 
 #### 3.2.1 `sys_regs.h`
 
-```
+```text
 /* only SCIF0 defined */
 #define MSTPCRA_MSTPCRA08   (8)
 ```
 
 #### 3.2.2 `cpg.c`
 
-```
+```c
 /* 固定解除 SCIF0 */ mmio_write_32(MSTPCRA,
     mmio_read_32(MSTPCRA) & ~BIT_32(MSTPCRA_MSTPCRA08));
 ```
@@ -129,7 +129,7 @@ BL2 / BL31
 **檔案：**
 
 `plat/renesas/rz/soc/t2h/drivers/pfc.c` 
-```
+```c
 static const PORT_SETTINGS sci_pins[] = {
     {11, 1, 20, DRCTL_SRm0_MSK | DRCTL_Em0_DRIVE_HI_MSK}, /* TXD1 */
     {11, 0, 20, DRCTL_SRm0_MSK | DRCTL_Em0_DRIVE_HI_MSK}, /* RXD1 */
@@ -141,7 +141,7 @@ static const PORT_SETTINGS sci_pins[] = {
 **檔案：**
 
 `plat/renesas/rz/soc/t2h/include/sys_regs.h` 
-```
+```text
 /* SCIF0 */
 #define MSTPCRA_MSTPCRA08        (8)
 
@@ -155,7 +155,7 @@ static const PORT_SETTINGS sci_pins[] = {
 **檔案：**
 
 `plat/renesas/rz/soc/t2h/drivers/cpg.c` 
-```
+```c
 static void cpg_mstop_scif(void)
 {
     uint32_t bit = MSTPCRA_MSTPCRA08; /* 預設 SCI0 */
@@ -175,7 +175,7 @@ static void cpg_mstop_scif(void)
 ### 4.5 修改結果
 
 成功於 SCI1 看到 TF-A console：
-```
+```text
 NOTICE:  BL2: v2.7(release)
 NOTICE:  BL2: Built : 10:39:57, Jan 23 2026
 NOTICE:  BL2: Booting BL31
@@ -190,15 +190,15 @@ NOTICE:  BL31: Built : 10:39:59, Jan 23 2026
 TF-A 尚需：
 
 -   module clock enable
-    
+
 -   MSTP bit 解除
-    
+
 -   BL2 / BL31 同步初始化
 
 ### 5.2 Renesas TF-A console 為「固定 instance 設計」
 
 -   原始程式僅支援 SCI0
-    
+
 -   非動態選擇 UART instance
-    
+
 -   若需切換 UART，必須同步修改 CPG 與 sys_regs

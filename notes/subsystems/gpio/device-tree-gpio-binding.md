@@ -21,7 +21,7 @@ driver 根本拿不到 GPIO descriptor
 ## 2. GPIO Controller 在 DT 中的樣子
 
 範例（Rockchip 類型）：
-```
+```dts
 gpio0: gpio@fec20000 {  
  compatible = "rockchip,gpio-bank";  
  reg = <0x0 0xfec20000 0x0 0x100>;  
@@ -42,11 +42,11 @@ gpio0: gpio@fec20000 {
 ## 3. GPIO Binding 基本格式
 
 標準格式：
-```
+```dts
 gpios = <&gpioX line flags>;
 ```
 例如：
-```
+```dts
 reset-gpios = <&gpio3 5 GPIO_ACTIVE_LOW>;
 ```
 含義：
@@ -69,7 +69,7 @@ include/dt-bindings/gpio/gpio.h
 
 ### 4.1 常見 Flags
 
-```
+```text
 #define GPIO_ACTIVE_HIGH      0  
 #define GPIO_ACTIVE_LOW       1  
 #define GPIO_OPEN_DRAIN       2  
@@ -84,12 +84,12 @@ include/dt-bindings/gpio/gpio.h
 這個 flag **只影響邏輯語意，不改變硬體模式**。
 
 意思是：
-```
+```text
 logical 1 → physical 0  
 logical 0 → physical 1
 ```
 Kernel 內部會在：
-```
+```text
 gpiod_set_value()
 ```
 做邏輯反轉。
@@ -97,7 +97,7 @@ gpiod_set_value()
 #### 常見錯誤
 
 很多人以為：
-```
+```text
 GPIO_ACTIVE_LOW = open drain
 ```
 錯。
@@ -118,7 +118,7 @@ open drain 表示：
 高電平由外部 pull-up 提供
 
 硬體模式：
-```
+```text
 output-low  → drive low  
 output-high → high-Z
 ```
@@ -150,7 +150,7 @@ gpio controller driver 是否支援
 ### 5.1 基本概念
 
 在 controller 中定義：
-```
+```dts
 #gpio-cells = <2>;
 ```
 表示：
@@ -158,7 +158,7 @@ gpio controller driver 是否支援
 > phandle 後面要接 2 個參數
 
 格式為：
-```
+```text
 <&controller param1 param2>
 ```
 
@@ -166,11 +166,11 @@ gpio controller driver 是否支援
 
 #### Case A：2 cells
 
-```
+```dts
 #gpio-cells = <2>;
 ```
 代表：
-```
+```text
 <&gpioX offset flags>
 ```
 這是最常見格式。
@@ -178,15 +178,15 @@ gpio controller driver 是否支援
 #### Case B：3 cells
 
 某些 SoC 會：
-```
+```dts
 #gpio-cells = <3>;
 ```
 格式變成：
-```
+```text
 <&controller bank offset flags>
 ```
 例如：
-```
+```text
 <&gpio 2 5 GPIO_ACTIVE_LOW>
 ```
 
@@ -201,11 +201,11 @@ gpio controller driver 是否支援
 -   有些 controller 需要特殊參數
 
 Kernel 解析時：
-```
+```text
 of_parse_phandle_with_args()
 ```
 會依照：
-```
+```text
 #gpio-cells
 ```
 解析數量。
@@ -223,7 +223,7 @@ of_parse_phandle_with_args()
 ## 6. GPIO Hog 機制
 
 DT 可直接 claim GPIO：
-```
+```dts
 enable-hog {  
  gpio-hog;  
  gpios = <5 GPIO_ACTIVE_HIGH>;  
@@ -250,15 +250,15 @@ enable-hog {
 ## 7. reset-gpios / enable-gpios 命名規則
 
 標準 naming：
-```
+```text
 xxx-gpios
 ```
 driver 會：
-```
+```c
 devm_gpiod_get(dev, "reset", GPIOD_OUT_LOW);
 ```
 自動對應：
-```
+```text
 reset-gpios
 ```
 這是 descriptor model 的關鍵。
@@ -280,7 +280,7 @@ DT 需要描述：
 
 ### 8.2 Controller 宣告
 
-```
+```dts
 gpio3: gpio@xxxx {  
  gpio-controller;  
  interrupt-controller;  
@@ -294,25 +294,25 @@ gpio3: gpio@xxxx {
 ### 8.3 裝置使用 interrupt-parent
 
 標準寫法：
-```
+```dts
 interrupt-parent = <&gpio3>;  
 interrupts = <5 IRQ_TYPE_LEVEL_LOW>;
 ```
 格式由：
-```
+```text
 #interrupt-cells
 ```
 決定。
 
 通常是：
-```
+```text
 <offset trigger-type>
 ```
 
 ### 8.4 interrupt-gpios 是什麼？
 
 某些 binding 允許簡寫：
-```
+```dts
 interrupt-gpios = <&gpio3 5 GPIO_ACTIVE_LOW>;
 ```
 這種寫法：
@@ -327,7 +327,7 @@ interrupt-gpios = <&gpio3 5 GPIO_ACTIVE_LOW>;
 
 ### 8.5 完整 IRQ flow
 
-```
+```text
 Hardware edge  
  ↓  
 GPIO controller irq handler  
@@ -369,7 +369,7 @@ pinctrl = 控制 pin 功能 + 電氣特性
 
 ### 9.2 pinctrl 設定範例
 
-```
+```c
 panel_pins: panel-pins {  
  pins = "GPIO3_B5";  
  function = "gpio";  
@@ -377,7 +377,7 @@ panel_pins: panel-pins {
 };
 ```
 裝置：
-```
+```dts
 pinctrl-names = "default";  
 pinctrl-0 = <&panel_pins>;
 ```
@@ -398,7 +398,7 @@ pinctrl 是「電氣層」
 
 ### 9.4 錯誤案例
 
-#### 情境：
+#### 情境
 
 reset 拉不起來
 
@@ -415,7 +415,7 @@ reset 拉不起來
 ### 9.5 Debug pinctrl
 
 查看：
-```
+```text
 /sys/kernel/debug/pinctrl/
 ```
 可看：
@@ -429,20 +429,20 @@ reset 拉不起來
 ## 10. Open Drain + Pull-up
 
 正確寫法：
-```
+```dts
 reset-gpios = <&gpio3 5 GPIO_ACTIVE_LOW>;
 ```
 pinctrl：
-```
+```dts
 bias-pull-up;  
 drive-open-drain;
 ```
 或：
-```
+```text
 GPIO_OPEN_DRAIN
 ```
 注意：很多人誤以為：
-```
+```text
 GPIO_ACTIVE_LOW = open drain
 ```
 完全錯誤。
@@ -450,27 +450,27 @@ GPIO_ACTIVE_LOW = open drain
 ## 11. 多 GPIO 定義
 
 支援 multi-line：
-```
+```c
 data-gpios = <&gpio1 3 GPIO_ACTIVE_HIGH>,  
  <&gpio1 4 GPIO_ACTIVE_HIGH>;
 ```
 driver 可：
-```
+```c
 devm_gpiod_get_array();
 ```
 
 ## 12. Debug 指令
 
 Dump DT：
-```
+```bash
 dtc -I fs /sys/firmware/devicetree/base
 ```
 或：
-```
+```bash
 cat /proc/device-tree/xxx
 ```
 查 GPIO：
-```
+```bash
 cat /sys/kernel/debug/gpio
 ```
 

@@ -16,7 +16,7 @@ WIFI_HIDL_FEATURE_DUAL_INTERFACE := true
 
 但實際測試結果：
 
-``` bash
+```bash
 dumpsys wifi | grep Concurrency
 STA + STA Concurrency Supported: false
 STA + AP  Concurrency Supported: false
@@ -33,7 +33,7 @@ WIFI_HIDL_FEATURE_DUAL_INTERFACE := true
 ```
 編譯後在 Soong 輸出目錄中仍無對應旗標：
 
-``` bash
+```bash
 grep -r "WIFI_HIDL_FEATURE_DUAL_INTERFACE" out/soong/.intermediates/hardware/interfaces/wifi/aidl/default/
 # (no results)
 ```
@@ -69,7 +69,7 @@ soong_config_variables: {
 ```
 
 即 Soong 的實際變數名為：
-``` makefile
+```makefile
 SOONG_CONFIG_wifi_hidl_feature_dual_interface := true
 ```
 
@@ -77,14 +77,14 @@ SOONG_CONFIG_wifi_hidl_feature_dual_interface := true
 
 原本的設定：
 
-``` makefile
+```makefile
 WIFI_HIDL_FEATURE_DUAL_INTERFACE := true
 ```
 並不會自動傳遞給 Soong。
 
 必須在 BoardConfig.mk 或 device.mk 中明確加入：
 
-``` makefile
+```makefile
 SOONG_CONFIG_NAMESPACES += wifi
 SOONG_CONFIG_wifi += \
     hidl_feature_dual_interface \
@@ -99,19 +99,19 @@ SOONG_CONFIG_wifi_hidl_feature_aware := true
 Android 15 不再使用 soong.variables，
 改為 per-product 格式：
 
-``` bash
+```bash
 out/soong/soong.rk3588.variables
 out/soong/soong.rk3588.extra.variables
 ```
 檢查是否已生成：
 
-``` bash
+```bash
 grep -A5 wifi out/soong/soong.rk3588.variables
 ```
 
 預期輸出：
 
-``` json
+```json
 "wifi": {
     "hidl_feature_dual_interface": true,
     "hidl_feature_aware": true
@@ -124,7 +124,7 @@ grep -A5 wifi out/soong/soong.rk3588.variables
 
 為了讓 Soong 重新解析 config：
 
-``` bash
+```bash
 rm -f out/soong/soong.rk3588.variables
 rm -f out/soong/soong.rk3588.extra.variables
 m android.hardware.wifi-service -j
@@ -132,7 +132,7 @@ m android.hardware.wifi-service -j
 
 重新 build Wi-Fi HAL 後，在 build log 中可看到：
 
-``` diff
+```text
 -DWIFI_HIDL_FEATURE_DUAL_INTERFACE
 ```
 
@@ -142,7 +142,7 @@ m android.hardware.wifi-service -j
 
 若直接在 `wifi_feature_flags.cpp` 中強制：
 
-``` cpp
+```cpp
 #define WIFI_HIDL_FEATURE_DUAL_INTERFACE true
 ```
 
@@ -162,7 +162,7 @@ Android 15 中仍維持以下條件控制：
 
 在 BoardConfig.mk 中加入：
 
-``` makefile
+```makefile
 SOONG_CONFIG_NAMESPACES += wifi
 SOONG_CONFIG_wifi += hidl_feature_dual_interface hidl_feature_aware
 SOONG_CONFIG_wifi_hidl_feature_dual_interface := true
@@ -171,19 +171,19 @@ SOONG_CONFIG_wifi_hidl_feature_aware := true
 
 清除 Soong Cache：
 
-``` bash
+```bash
 rm -f out/soong/soong.rk3588_board*.variables
 ```
 
 重建 Wi-Fi HAL：
 
-``` bash
+```bash
 m android.hardware.wifi-service -j
 ```
 
 驗證結果：
 
-``` bash
+```bash
 dumpsys wifi | grep Concurrency
 ```
 
@@ -191,7 +191,7 @@ dumpsys wifi | grep Concurrency
 
 重新刷機後：
 
-``` bash
+```bash
 dumpsys wifi | grep Concurrency
 STA + STA Concurrency Supported: false
 STA + AP  Concurrency Supported: true
@@ -203,7 +203,7 @@ Dual Interface 功能已成功啟用。
 
 #### 4.3.1 驗證 Soong 變數生成
 
-``` bash
+```bash
 grep -A5 wifi out/soong/soong.rk3588.variables
 ```
 
@@ -213,7 +213,7 @@ grep -A5 wifi out/soong/soong.rk3588.variables
 
 #### 4.3.2 檢查 HAL 編譯旗標
 
-``` bash
+```bash
 grep -r "WIFI_HIDL_FEATURE_DUAL_INTERFACE" out/soong/.intermediates/hardware/interfaces/wifi/aidl/default/
 ```
 
@@ -221,19 +221,19 @@ grep -r "WIFI_HIDL_FEATURE_DUAL_INTERFACE" out/soong/.intermediates/hardware/int
 
 #### 4.3.3 確認 build.prop 內容
 
-``` bash
+```bash
 grep wifi out/target/product/rk3588_board/system/build.prop
 grep wifi out/target/product/rk3588_board/vendor/build.prop
 ```
 若需追蹤中介檔：
 
-``` bash
+```bash
 grep wifi out/target/product/rk3588_board/obj/PACKAGING/*_build.prop_intermediates/build.prop
 ```
 
 #### 4.3.4 Runtime 層驗證
 
-``` bash
+```bash
 adb shell getprop | grep wifi
 adb shell getprop | grep vendor.wifi
 adb shell getprop | grep ro.vendor.wifi
@@ -242,12 +242,12 @@ adb shell getprop | grep ro.vendor.wifi
 
 #### 4.3.5 HAL 狀態驗證
 
-``` bash
+```bash
 adb shell dumpsys wifi | grep Concurrency
 ```
 預期顯示：
 
-``` yaml
+```text
 STA + STA Concurrency Supported: false
 STA + AP  Concurrency Supported: true
 ```
@@ -256,7 +256,7 @@ STA + AP  Concurrency Supported: true
 
 若仍未生效，可執行：
 
-``` bash
+```bash
 rm -f out/soong/soong.rk3588_board*.variables
 m android.hardware.wifi-service -j
 ```

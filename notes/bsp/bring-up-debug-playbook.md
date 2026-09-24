@@ -16,7 +16,7 @@ BSP 問題的困難點，不在於單一技術，而在於：
 -   問題橫跨 bootloader / kernel / firmware / userspace  
 -   現象往往延遲出現（runtime / suspend / resume）
 -   很多錯誤「看起來像 driver bug」
-    
+
 沒有 Playbook，debug 常會變成：
 -   直覺改 driver
 -   嘗試性 patch
@@ -32,7 +32,7 @@ BSP 問題的困難點，不在於單一技術，而在於：
 
 -   裝置 probe 失敗
 -   bus 上完全看不到裝置
-    
+
 通常優先懷疑：
 -   clock / reset    
 -   pinctrl

@@ -10,7 +10,7 @@
 
 ## 1. Ethernet 硬體分層
 
-```
+```text
 CPU
  ↓
 MAC (Ethernet controller)
@@ -28,7 +28,7 @@ RJ45 / cable
 
 負責：
 
-```
+```text
 TX/RX packet
 DMA
 descriptor ring
@@ -41,7 +41,7 @@ interrupt
 
 負責：
 
-```
+```text
 電訊號轉換
 link negotiation
 speed / duplex
@@ -50,11 +50,11 @@ cable detection
 
 ## 3. MAC 與 PHY 的連線（phy-mode）
 
-```
+```text
 phy-mode 決定 MAC 與 PHY 之間「如何傳輸資料」
 ```
 
-### 3.1 常見模式：
+### 3.1 常見模式
 
 | 模式 | 說明 | 速度 | 使用場景 |  
 |-------|-------------------------|----------|----------------------|  
@@ -67,13 +67,13 @@ phy-mode 決定 MAC 與 PHY 之間「如何傳輸資料」
 
 #### MII
 
-```
+```text
 很多線（data + clock）簡單但腳位多
 ```
 
 #### RMII
 
-```
+```text
 減少腳位（2-bit data）需要 reference clock（50MHz）
 ```
 
@@ -84,25 +84,25 @@ phy-mode 決定 MAC 與 PHY 之間「如何傳輸資料」
 
 #### RGMII
 
-```
+```text
 4-bit data（DDR）125MHz clock
 ```
 
 特點：
 
-```
+```text
 少腳位 + 支援 1Gbps
 ```
 
 注意：但有一個超重要問題：
 
-```
+```text
 clock 與 data 需要 delay（skew）
 ```
 
 #### SGMII
 
-```
+```text
 高速 serial（類似 PCIe）
 ```
 
@@ -114,19 +114,19 @@ clock 與 data 需要 delay（skew）
 
 DTS：
 
-```
+```dts
 phy-mode = "rgmii";
 ```
 
 如果設錯：
 
-```
+```text
 link up 但不能傳或 完全沒有 link
 ```
 
 ## 4. MDIO 是什麼？
 
-```
+```text
 MAC
  ↓
 MDIO bus
@@ -136,14 +136,14 @@ PHY register
 
 用來：
 
-```
+```text
 讀寫 PHY register
 控制 link / speed / status
 ```
 
-### 4.1 MDIO 類似：
+### 4.1 MDIO 類似
 
-```
+```text
 "Ethernet 專用的 I2C"
 ```
 
@@ -158,19 +158,19 @@ PHY register
 
 ### 5.1 範例：讀 PHY
 
-```
+```text
 mdio-tool read eth0 1 0
 ```
 
 或：
 
-```
+```bash
 ethtool eth0
 ```
 
 ## 6. phylib（Linux PHY framework）
 
-```
+```text
 MAC driver
    ↓
 phylib
@@ -178,21 +178,21 @@ phylib
 PHY driver
 ```
 
-### 6.1 driver 通常做：
+### 6.1 driver 通常做
 
-```
+```c
 phy_connect(dev, phy_name, handler, flags, interface);
 ```
 
 或：
 
-```
+```text
 of_phy_connect()
 ```
 
-### 6.2 phylib 負責：
+### 6.2 phylib 負責
 
-```
+```text
 auto negotiation
 link state machine
 speed/duplex update
@@ -201,7 +201,7 @@ callback driver
 
 ## 7. Link up flow
 
-```
+```text
 1. PHY reset
 2. PHY auto-negotiation
 3. link partner 回應
@@ -213,19 +213,19 @@ callback driver
 
 ### 7.1 Kernel log
 
-```
+```bash
 dmesg | grep eth
 ```
 
 常見：
 
-```
+```text
 eth0: Link is Up - 1000Mbps/Full
 ```
 
 ## 8. PHY state machine
 
-```
+```text
 DOWN
  ↓
 STARTING
@@ -235,15 +235,15 @@ AN（auto-negotiation）
 RUNNING
 ```
 
-### 8.1 kernel 內部：
+### 8.1 kernel 內部
 
-```
+```text
 phy_state_machine()
 ```
 
 ## 9. DTS 描述
 
-```
+```dts
 ethernet@... {
     phy-mode = "rgmii";
 
@@ -259,13 +259,13 @@ mdio {
 
 ### 9.1 重點
 
-```
+```text
 reg = <1>  → PHY address
 ```
 
 ## 10. Bring-up Flow
 
-```
+```text
 1. probe MAC driver
 2. init MDIO bus
 3. scan PHY
@@ -278,31 +278,31 @@ reg = <1>  → PHY address
 
 ### 11.1 PHY 有沒有抓到？
 
-```
+```bash
 dmesg | grep phy
 ```
 
 ### 11.2 MDIO 有沒有動？
 
-```
+```bash
 dmesg | grep mdio
 ```
 
 ### 11.3 link 狀態
 
-```
+```bash
 ethtool eth0
 ```
 
 ### 11.4 PHY register
 
-```
+```text
 mdio-tool dump eth0 1
 ```
 
 ### 11.5 driver
 
-```
+```bash
 ethtool -i eth0
 ```
 
@@ -310,7 +310,7 @@ ethtool -i eth0
 
 ### 12.1 沒有 PHY
 
-```
+```text
 No PHY found
 ```
 
@@ -324,7 +324,7 @@ No PHY found
 
 檢查：
 
-```
+```text
 線
 switch
 PHY power/reset
@@ -334,7 +334,7 @@ PHY power/reset
 
 90% 是：
 
-```
+```text
 phy-mode 錯
 RGMII delay 沒設
 ```
@@ -343,7 +343,7 @@ RGMII delay 沒設
 
 檢查：
 
-```
+```text
 clock
 reset timing
 power
@@ -353,13 +353,13 @@ power
 
 debug 時要分清：
 
-```
+```text
 問題在 MAC？
 還是 PHY？
 還是 MDIO？
 ```
 
-### 13.1 判斷方式：
+### 13.1 判斷方式
 
 | 現象 | 問題層 |  
 |------------------|---------------|  

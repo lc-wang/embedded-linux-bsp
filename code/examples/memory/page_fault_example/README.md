@@ -21,7 +21,7 @@ E3 (this chapter)
 = lazy mapping（缺頁才補）
 
 ## 2. 流程
-```
+```text
 userspace access memory  
 ↓  
 page not present  
@@ -38,7 +38,7 @@ mapping 建立
 ```
 
 ## 3. Kernel 原始碼對照
-```
+```text
 mm/memory.c  
 mm/mmap.c  
 include/linux/mm.h

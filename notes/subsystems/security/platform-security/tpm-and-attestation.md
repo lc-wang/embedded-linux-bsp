@@ -2,7 +2,7 @@
 
 本章要把以下幾個概念串起來：
 
-```
+```text
 TPM
 PCR
 Event Log
@@ -15,7 +15,7 @@ Known-good baseline
 
 重點不是介紹所有 TPM command，而是理解：
 
-```
+```text
 TPM 如何記錄開機狀態？
 PCR 為什麼不能直接被軟體任意改寫？
 Event Log 為什麼需要存在？
@@ -26,7 +26,7 @@ Remote Attestation 怎麼判斷 device 是否可信？
 
 ## 1. 一張圖先看懂
 
-```
+```text
 [Bootloader / Firmware]
         ↓ measure hash
 [TPM PCR extend]
@@ -46,7 +46,7 @@ Remote Attestation 怎麼判斷 device 是否可信？
 
 一句話：
 
-```
+```text
 TPM 負責保存 measurement。
 Event Log 負責解釋 measurement。
 Attestation 負責證明目前 device state。
@@ -56,13 +56,13 @@ Attestation 負責證明目前 device state。
 
 TPM 是：
 
-```
+```text
 Trusted Platform Module
 ```
 
 可以理解成一個受保護的安全元件，用來提供：
 
-```
+```text
 secure key storage
 PCR measurement
 random number generation
@@ -73,7 +73,7 @@ anti-tamper state reporting
 
 在平台上可能是：
 
-```
+```text
 Discrete TPM:
   外接 TPM chip，例如 SPI / I2C TPM
 
@@ -86,7 +86,7 @@ Integrated TPM:
 
 對 BSP 工程師來說，TPM 最常見的用途是：
 
-```
+```text
 Measured Boot
 Remote Attestation
 Disk key sealing
@@ -99,7 +99,7 @@ TPM 主要不是拿來「擋 image 執行」。
 
 它更常用來：
 
-```
+```text
 記錄系統實際載入了什麼
 保存可信狀態
 讓本機或遠端驗證目前系統狀態
@@ -117,7 +117,7 @@ TPM 主要不是拿來「擋 image 執行」。
 
 PCR 是：
 
-```
+```text
 Platform Configuration Register
 ```
 
@@ -125,7 +125,7 @@ Platform Configuration Register
 
 PCR 的特性：
 
-```
+```text
 不能被一般軟體任意寫成指定值
 通常只能透過 extend 更新
 reset 條件受 TPM / platform policy 控制
@@ -133,20 +133,20 @@ reset 條件受 TPM / platform policy 控制
 
 extend 概念：
 
-```
+```text
 PCR_new = Hash(PCR_old || measurement)
 ```
 
 意思是：
 
-```
+```text
 載入內容會影響 PCR
 載入順序也會影響 PCR
 ```
 
 所以 PCR 可以表示：
 
-```
+```text
 這台 device 目前開機路徑的摘要
 ```
 
@@ -154,7 +154,7 @@ PCR_new = Hash(PCR_old || measurement)
 
 Measured Boot 中常見流程：
 
-```
+```text
 [Bootloader]
     ↓ calculate hash
 [Kernel image hash]
@@ -182,7 +182,7 @@ Measured Boot 中常見流程：
 
 簡化後：
 
-```
+```text
 measure component
   ↓
 extend PCR
@@ -194,7 +194,7 @@ continue boot
 
 重點：
 
-```
+```text
 PCR 保存的是累積結果。
 Event Log 保存的是每一次 measurement 的明細。
 ```
@@ -205,7 +205,7 @@ PCR 只有最後的 hash 結果。
 
 但 debug 時你會想知道：
 
-```
+```text
 到底是哪個元件被量測？
 哪個 hash 改變？
 量測順序是什麼？
@@ -216,7 +216,7 @@ extend 到哪個 PCR？
 
 Event Log 常見內容：
 
-```
+```text
 PCR index
 event type
 measured component name
@@ -227,7 +227,7 @@ event data
 
 概念：
 
-```
+```text
 PCR:
   最終摘要
 
@@ -239,7 +239,7 @@ Event Log:
 
 假設 PCR 值變了：
 
-```
+```text
 PCR changed
 ```
 
@@ -247,7 +247,7 @@ PCR changed
 
 可能原因：
 
-```
+```text
 kernel image changed
 DTB changed
 kernel cmdline changed
@@ -259,7 +259,7 @@ event order changed
 
 所以實務 debug flow 是：
 
-```
+```text
 PCR mismatch
   ↓
 read event log
@@ -275,7 +275,7 @@ find changed component
 
 完整一點的 measured boot flow：
 
-```
+```text
 [Power On]
     ↓
 [Firmware / Bootloader starts]
@@ -295,7 +295,7 @@ find changed component
 
 注意：
 
-```
+```text
 Measured Boot 不一定阻止開機。
 它只是把實際載入內容記錄下來。
 ```
@@ -306,13 +306,13 @@ Measured Boot 不一定阻止開機。
 
 Attestation 是：
 
-```
+```text
 證明目前平台狀態的機制。
 ```
 
 常見問題：
 
-```
+```text
 這台 device 現在跑的是不是我們允許的 firmware？
 kernel 有沒有被替換？
 boot args 有沒有被改？
@@ -321,7 +321,7 @@ rootfs verification 有沒有啟用？
 
 Attestation 的目標不是單純讀 PCR，而是：
 
-```
+```text
 用 TPM 簽出一份可信證明。
 ```
 
@@ -333,7 +333,7 @@ TPM Quote 是 attestation 的核心動作之一。
 
 概念 flow：
 
-```
+```text
 [Verifier]
     ↓ send nonce
 [Device]
@@ -350,7 +350,7 @@ TPM Quote 是 attestation 的核心動作之一。
 
 重點：
 
-```
+```text
 Quote 可以證明 PCR 值來自 TPM。
 Nonce 可以防止 replay old quote。
 ```
@@ -359,7 +359,7 @@ Nonce 可以防止 replay old quote。
 
 典型 remote attestation：
 
-```
+```text
 Remote Server
     ↓ challenge nonce
 Device
@@ -378,7 +378,7 @@ Remote Server
 
 簡化圖：
 
-```
+```text
 [Device TPM]
     ↓ quote PCR
 [Device Agent]
@@ -390,7 +390,7 @@ Remote Server
 
 Policy decision 可能是：
 
-```
+```text
 allow normal service
 deny connection
 release disk key
@@ -403,13 +403,13 @@ trigger remediation
 
 Known-good baseline 是：
 
-```
+```text
 被允許的 firmware / bootloader / kernel / config measurement 集合。
 ```
 
 也就是 verifier 會拿 device 回報的狀態去比對：
 
-```
+```text
 目前 PCR / event log
   vs
 已知可信版本 baseline
@@ -419,7 +419,7 @@ baseline 通常會隨版本更新。
 
 例如：
 
-```
+```text
 Product A firmware v1.0
 Product A firmware v1.1
 Product A firmware v1.2 security fix
@@ -433,13 +433,13 @@ Key Sealing 是 TPM 另一個常見用途。
 
 概念：
 
-```
+```text
 把 key 綁定到特定 PCR 狀態。
 ```
 
 例如 disk encryption key 只有在以下狀態才釋放：
 
-```
+```text
 PCR0 = expected firmware state
 PCR4 = expected bootloader state
 PCR8 = expected kernel cmdline state
@@ -448,7 +448,7 @@ PCR9 = expected initramfs state
 
 flow：
 
-```
+```text
 [Boot]
     ↓
 [Measured Boot updates PCR]
@@ -464,7 +464,7 @@ flow：
 
 重點：
 
-```
+```text
 不是單純把 key 存進 TPM。
 而是讓 key 只在特定 boot state 下能被取出。
 ```
@@ -473,7 +473,7 @@ flow：
 
 Embedded Linux 常見架構：
 
-```
+```text
 BootROM
   ↓
 Bootloader
@@ -489,7 +489,7 @@ userspace attestation agent
 
 Linux 中常見元件：
 
-```
+```text
 /dev/tpm0
 /dev/tpmrm0
 /sys/class/tpm/
@@ -500,7 +500,7 @@ tpm2-tools
 
 常見用途：
 
-```
+```text
 read PCR
 parse event log
 perform quote
@@ -511,14 +511,14 @@ seal / unseal secret
 
 ### 15.1 Step 1：確認 TPM device
 
-```
+```bash
 ls -l /dev/tpm*
 ls /sys/class/tpm/
 ```
 
 常見結果：
 
-```
+```text
 /dev/tpm0
 /dev/tpmrm0
 /sys/class/tpm/tpm0
@@ -531,13 +531,13 @@ ls /sys/class/tpm/
 
 ### 15.2 Step 2：看 kernel log
 
-```
+```bash
 dmesg | grep -i tpm
 ```
 
 常見 driver 關鍵字：
 
-```
+```text
 tpm_tis
 tpm_crb
 tpm_tis_spi
@@ -545,7 +545,7 @@ tpm_tis_spi
 
 如果是 SPI TPM，要同時確認：
 
-```
+```text
 SPI controller probe
 TPM device tree / ACPI node
 IRQ / reset GPIO
@@ -554,13 +554,13 @@ clock / regulator
 
 ### 15.3 Step 3：讀 PCR
 
-```
+```bash
 tpm2_pcrread
 ```
 
 用途：
 
-```
+```text
 確認 PCR 是否存在
 確認 PCR 是否有被 extend
 比較不同 boot image 對 PCR 的影響
@@ -570,19 +570,19 @@ tpm2_pcrread
 
 常見路徑：
 
-```
+```text
 /sys/kernel/security/tpm0/binary_bios_measurements
 ```
 
 常用工具：
 
-```
+```text
 tpm2_eventlog /sys/kernel/security/tpm0/binary_bios_measurements
 ```
 
 用途：
 
-```
+```text
 確認量測了哪些 component
 確認 event log 是否和 PCR 對得起來
 找出 PCR mismatch 原因
@@ -592,13 +592,13 @@ tpm2_eventlog /sys/kernel/security/tpm0/binary_bios_measurements
 
 概念指令：
 
-```
+```text
 tpm2_quote
 ```
 
 用途：
 
-```
+```text
 讓 TPM 對指定 PCR 狀態簽章
 提供給 verifier 做 attestation
 ```
@@ -609,7 +609,7 @@ tpm2_quote
 
 如果是 discrete TPM，BSP 常見要確認：
 
-```
+```text
 TPM bus:
   SPI / I2C / LPC / memory mapped
 
@@ -630,7 +630,7 @@ Power:
 
 SPI TPM 可能會遇到：
 
-```
+```text
 TPM probe timeout
 wrong SPI mode
 IRQ not firing
@@ -640,7 +640,7 @@ TPM locality error
 
 Debug 時不要只看 TPM driver，也要看：
 
-```
+```text
 SPI controller
 pinctrl
 clock
@@ -654,14 +654,14 @@ interrupt routing
 
 結果：
 
-```
+```text
 可以看到 PCR 值
 但很難知道 PCR 為什麼變了
 ```
 
 改善：
 
-```
+```text
 確認 firmware / bootloader 有產生 event log
 確認 Linux securityfs 有掛載
 確認 event log 有被傳給 verifier
@@ -671,13 +671,13 @@ interrupt routing
 
 結果：
 
-```
+```text
 系統有記錄，但沒有任何安全決策
 ```
 
 需要補：
 
-```
+```text
 known-good baseline
 local policy
 remote verifier
@@ -688,7 +688,7 @@ key sealing policy
 
 可能原因：
 
-```
+```text
 kernel cmdline 每次變動
 boot counter 被量測
 timestamp 被量測
@@ -699,7 +699,7 @@ firmware variable 改變
 
 Debug 方式：
 
-```
+```text
 比較 event log
 找出哪個 event digest 每次不同
 確認該 event 是否應該被納入 policy
@@ -711,7 +711,7 @@ Debug 方式：
 
 正確做法：
 
-```
+```text
 verifier 產生 nonce
 device quote 時包含 nonce
 verifier 檢查 nonce 是否一致
@@ -723,13 +723,13 @@ Firmware update 後 PCR 合理變化。
 
 如果 baseline 沒更新：
 
-```
+```text
 新版本可能被誤判為不可信
 ```
 
 所以 baseline 要和：
 
-```
+```text
 firmware version
 bootloader version
 kernel version
@@ -742,7 +742,7 @@ security patch level
 ## 18. TPM vs OP-TEE 的差異
 
 TPM 和 OP-TEE 都跟平台安全有關，但角色不同。  
-  
+
 | 項目 | TPM | OP-TEE |  
 |------|-----|--------|  
 | 類型 | 安全模組 / TPM implementation | TEE OS |  
@@ -754,14 +754,14 @@ TPM 和 OP-TEE 都跟平台安全有關，但角色不同。
 
 一句話：
 
-```
+```text
 TPM 偏向記錄與證明平台狀態。
 OP-TEE 偏向提供 Secure World runtime 與安全服務。
 ```
 
 ## 19. BSP Checklist
 
-```
+```text
 [ ] TPM hardware / fTPM implementation is identified
 [ ] TPM driver is enabled
 [ ] /dev/tpm0 or /dev/tpmrm0 exists

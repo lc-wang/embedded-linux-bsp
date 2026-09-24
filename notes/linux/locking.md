@@ -191,7 +191,7 @@ reader:
    seq = read_seqbegin()
    read data
  } while (read_seqretry())
- ```
+```
 
 非常快，用於：
 -   jiffies
@@ -259,16 +259,16 @@ synchronize_rcu()
 ## 15. Debug 工具
 
 查看鎖等待
-```sh
+```bash
 echo w > /proc/sysrq-trigger
 ```
 ftrace 追蹤鎖行為
-```sh
+```bash
 echo function > /sys/kernel/debug/tracing/current_tracer
 echo "*lock*" > set_ftrace_filter
 ```
 lockstat 分析
-```sh
+```bash
 lockstat
 ```
 可分析：
@@ -287,6 +287,6 @@ lockstat
 | RCU reader 持續太久 | writer 永遠無法釋放 |
 
 利用 lockdep 偵測：
-```sh
+```bash
 echo 1 > /proc/sys/kernel/debug/lockdep
 ```

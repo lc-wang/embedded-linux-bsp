@@ -5,7 +5,7 @@
 
 ## 1. 整體架構
 
-```c
+```text
    +--------------------------+
    |       User Space         |
    |--------------------------|
@@ -43,7 +43,7 @@
 ```c
 struct wiphy *wiphy = wiphy_new(&cfg80211_ops, sizeof(...));
 wiphy_register(wiphy);
- ```
+```
   - 提供操作 callback（cfg80211_ops）：
 ```c
 static const struct cfg80211_ops mywifi_ops = {
@@ -52,7 +52,7 @@ static const struct cfg80211_ops mywifi_ops = {
     .disconnect = mywifi_disconnect,
     .set_channel = mywifi_set_channel,
 };
-  ```
+```
 
 ## 3. nl80211
 
@@ -128,7 +128,7 @@ iw / wpa_supplicant → nl80211 → cfg80211 → (mac80211) → driver
 
 ## 7. 事件流程範例：WiFi 連線
 
-``` pgsql
+```text
 User (wpa_supplicant)
    │
    │ NL80211_CMD_CONNECT

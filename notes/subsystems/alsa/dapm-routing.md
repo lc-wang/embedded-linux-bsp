@@ -60,7 +60,7 @@ DAPM 是一個：
 
 ## 4. DAPM 的核心資料結構
 
-```
+```text
 struct snd_soc_dapm_widget
 struct snd_soc_dapm_route
 ```
@@ -86,7 +86,7 @@ Widget 是「音訊 block」。
 -   Supply
 
 範例：
-```
+```text
 SND_SOC_DAPM_DAC("DAC", "Playback", REG, BIT, 0),
 SND_SOC_DAPM_OUTPUT("SPK"),
 ```
@@ -96,7 +96,7 @@ SND_SOC_DAPM_OUTPUT("SPK"),
 Route 定義：
 
 `Source → Destination` 
-```
+```c
 static  const  struct  snd_soc_dapm_route  routes[] = {
     {"SPK", NULL, "DAC"},
 };
@@ -112,7 +112,7 @@ static  const  struct  snd_soc_dapm_route  routes[] = {
 `aplay` 
 
 流程：
-```
+```text
 PCM start
   ↓
 ASoC 啟動 DAPM walk
@@ -132,7 +132,7 @@ DAPM 會：
 ## 6. 真實 codec 範例（以 WM8960 為例）
 
 在 wm8960 driver 中：
-```
+```c
 static const struct snd_soc_dapm_widget wm8960_dapm_widgets[] = {
     SND_SOC_DAPM_DAC("Left DAC", "Playback", WM8960_POWER1, 8, 0),
     SND_SOC_DAPM_DAC("Right DAC", "Playback", WM8960_POWER1, 7, 0),
@@ -215,7 +215,7 @@ DAC 可能不會開。
 ## 11. Machine driver 也會加 routing
 
 Machine driver 裡：
-```
+```c
 static  const  struct  snd_soc_dapm_route  audio_map[] = {
     {"Headphone Jack", NULL, "HPLOUT"},
 };
@@ -224,7 +224,7 @@ static  const  struct  snd_soc_dapm_route  audio_map[] = {
 
 ## 12. 完整播放時 DAPM 動作
 
-```
+```text
 snd_soc_dapm_stream_event()
   ↓ dapm_power_widgets()
   ↓ dapm_seq_run()

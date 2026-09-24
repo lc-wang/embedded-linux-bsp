@@ -9,7 +9,7 @@
 
 ## 1. net_device 是什麼？
 
-```
+```c
 struct net_device {
     const struct net_device_ops *netdev_ops;
     char name[IFNAMSIZ];
@@ -20,13 +20,13 @@ struct net_device {
 
 可以理解成：
 
-```
+```text
 "Linux kernel 對一張網卡的抽象"
 ```
 
 每個 interface：
 
-```
+```text
 eth0
 eth1
 ```
@@ -37,7 +37,7 @@ eth1
 
 ### 2.1 (1) 分配
 
-```
+```c
 struct net_device *dev;
 
 dev = alloc_etherdev(sizeof(struct priv_data));
@@ -50,7 +50,7 @@ dev = alloc_etherdev(sizeof(struct priv_data));
 
 ### 2.2 (2) 設定 ops
 
-```
+```c
 static const struct net_device_ops my_ops = {
     .ndo_open       = my_open,
     .ndo_stop       = my_stop,
@@ -62,13 +62,13 @@ dev->netdev_ops = &my_ops;
 
 ### 2.3 (3) 註冊
 
-```
+```c
 register_netdev(dev);
 ```
 
 完成後：
 
-```
+```text
 ip link
 ```
 
@@ -78,7 +78,7 @@ ip link
 
 ### 3.1 整體流程
 
-```
+```text
 probe()
   ↓
 alloc_etherdev()
@@ -100,13 +100,13 @@ network ready
 
 ## 4. `ip link up` 發生什麼？
 
-```
+```text
 ip link set eth0 up
 ```
 
 Kernel flow：
 
-```
+```text
 dev_open()
   ↓
 __dev_open()
@@ -116,7 +116,7 @@ netdev_ops->ndo_open()
 
 進入 driver：
 
-```
+```c
 static int my_open(struct net_device *dev)
 {
     enable_irq();
@@ -128,25 +128,25 @@ static int my_open(struct net_device *dev)
 
 ### 4.1 重點
 
-```
+```c
 netif_start_queue(dev);
 ```
 
 這行代表：
 
-```
+```text
 開始允許 TX
 ```
 
 ## 5. `ip link down`
 
-```
+```text
 ip link set eth0 down
 ```
 
 Flow：
 
-```
+```text
 dev_close()
   ↓
 ndo_stop()
@@ -154,7 +154,7 @@ ndo_stop()
 
 driver：
 
-```
+```c
 static int my_stop(struct net_device *dev)
 {
     netif_stop_queue(dev);
@@ -166,14 +166,14 @@ static int my_stop(struct net_device *dev)
 
 ## 6. TX entry point
 
-```
+```text
 static netdev_tx_t my_xmit(struct sk_buff *skb,
                           struct net_device *dev)
 ```
 
 Flow：
 
-```
+```text
 TCP/IP stack
   ↓
 dev_queue_xmit()
@@ -183,14 +183,14 @@ ndo_start_xmit()
 
 driver 要做：
 
-```
+```text
 copy skb → DMA buffer
 kick hardware
 ```
 
 ## 7. RX flow（driver 端）
 
-```
+```text
 IRQ / NAPI
   ↓
 napi_poll()
@@ -202,7 +202,7 @@ netif_receive_skb()
 
 ## 8. private data（driver 自己的 state）
 
-```
+```c
 struct my_priv {
     void __iomem *base;
     struct napi_struct napi;
@@ -212,13 +212,13 @@ struct my_priv {
 
 取得方式：
 
-```
+```c
 struct my_priv *priv = netdev_priv(dev);
 ```
 
 ## 9. net_device 與 PHY 關係
 
-```
+```text
 net_device
    ↓
 phydev
@@ -228,13 +228,13 @@ PHY driver
 
 通常 driver 會：
 
-```
+```text
 phy_connect()
 ```
 
 或：
 
-```
+```text
 of_phy_connect()
 ```
 
@@ -242,25 +242,25 @@ of_phy_connect()
 
 ### 10.1 查看 interface
 
-```
+```text
 ip link
 ```
 
 ### 10.2 查看 driver
 
-```
+```bash
 ethtool -i eth0
 ```
 
 ### 10.3 TX/RX
 
-```
+```bash
 cat /proc/net/dev
 ```
 
 ### 10.4 queue 狀態
 
-```
+```text
 tc qdisc show dev eth0
 ```
 
@@ -317,13 +317,13 @@ tc qdisc show dev eth0
 
 可以加 log：
 
-```
+```c
 pr_info("ndo_open called\n");
 pr_info("xmit called len=%u\n", skb->len);
 ```
 
 或用 ftrace：
 
-```
+```bash
 echo net_dev_xmit > /sys/kernel/debug/tracing/set_event
 ```

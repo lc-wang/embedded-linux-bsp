@@ -37,7 +37,7 @@ PSCI 是 ARM 定義的一套標準介面，用於：
 ## 2. PSCI 在整體架構中的位置
 
 整體關係如下：
-```
+```text
 Linux / U-Boot (non-secure)
 │
 │ SMC (PSCI call)
@@ -58,7 +58,7 @@ SoC power / clock / reset controller
 PSCI 是透過 **SMC（Secure Monitor Call）** 進入 BL31。
 
 流程概念：
-```
+```text
 EL1/EL2 (OS)
 └─ SMC #PSCI_CPU_ON
 │
@@ -100,7 +100,7 @@ BL31 會根據 SMC ID 判斷該呼叫是否屬於 PSCI，並進行分派。
 ## 6. PSCI 的責任分層模型
 
 PSCI 的實作可分為三層：
-```
+```text
 PSCI generic layer
 │
 ├─ state validation
@@ -120,7 +120,7 @@ TF-A 本身負責前兩層，
 ## 7. CPU_ON 的典型流程
 
 以 CPU_ON 為例，流程概念如下：
-```
+```text
 Linux kernel
 └─ psci_cpu_on()
 │
@@ -152,7 +152,7 @@ Secondary CPU 啟動時：
 - 需要 secure world 初始化
 
 因此其 entry path 為：
-```
+```text
 power on
 → secure reset vector
 → BL31
@@ -188,7 +188,7 @@ SYSTEM_OFF / RESET 代表：
 - 通常觸發 PMIC 或 SoC reset controller
 
 流程為：
-```
+```text
 OS
 └─ SMC SYSTEM_RESET
 │

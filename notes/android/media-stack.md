@@ -94,7 +94,7 @@ ISP / Sensor / MIPI-CSI / DMA
 Output Stream
 ```
 
-#### HAL v3 特點：
+#### HAL v3 特點
 
 | 層級 | 功能 |
 | --- | --- |

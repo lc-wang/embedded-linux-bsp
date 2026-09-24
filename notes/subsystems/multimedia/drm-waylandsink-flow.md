@@ -6,7 +6,7 @@
 ## 1. Sink 的兩種路徑
 
 GStreamer 顯示有兩種主要方式：
-  
+
 | Sink | 路徑 | 特性 |  
 |-------------|--------------------------|------------------------------|  
 | kmssink | 直接 → DRM | 無 compositor（最接近硬體） |  
@@ -16,13 +16,13 @@ GStreamer 顯示有兩種主要方式：
 
 ### 2.1 Pipeline
 
-```
+```bash
 gst-launch-1.0 v4l2src ! kmssink
 ```
 
 ### 2.2 資料流
 
-```
+```text
 Camera  
  │  
  ▼  
@@ -46,11 +46,11 @@ Panel
 
 ### 2.3 kmssink 本質
 
-```
+```text
 userspace → DRM ioctl caller
 ```
 主要操作：
-```
+```text
 DRM_IOCTL_MODE_ATOMIC  
 DRM_IOCTL_MODE_SETPLANE
 ```
@@ -58,7 +58,7 @@ DRM_IOCTL_MODE_SETPLANE
 ## 3. DRM 核心元件
 
 DRM display pipeline：
-```
+```text
 Framebuffer  
  │  
  ▼  
@@ -98,7 +98,7 @@ Panel
 ## 5. Atomic Commit Flow
 
 kmssink 使用 atomic modeset：
-```
+```text
 prepare property  
  │  
  ▼  
@@ -113,7 +113,7 @@ atomic commit
 
 ### 5.1 Atomic 流程
 
-```
+```text
 drmModeAtomicAlloc()  
 drmModeAtomicAddProperty()  
 drmModeAtomicCommit()
@@ -121,7 +121,7 @@ drmModeAtomicCommit()
 
 ### 5.2 Kernel flow
 
-```
+```text
 userspace (kmssink)  
  │  
  ▼  
@@ -140,11 +140,11 @@ hardware update
 ## 6. DMABUF → DRM
 
 kmssink 通常接收：
-```
+```text
 GstBuffer (dmabuf)
 ```
 流程：
-```
+```text
 dmabuf fd  
  │  
  ▼  
@@ -159,7 +159,7 @@ framebuffer
 
 ## 7. Zero-Copy Display
 
-```
+```text
 camera → dmabuf → DRM → panel
 ```
 沒有：
@@ -172,13 +172,13 @@ camera → dmabuf → DRM → panel
 
 ### 8.1 Pipeline
 
-```
+```bash
 gst-launch-1.0 v4l2src ! waylandsink
 ```
 
 ### 8.2 資料流
 
-```
+```text
 v4l2src  
  │  
  ▼  
@@ -199,14 +199,14 @@ Panel
 
 ### 8.3 waylandsink 本質
 
-```
+```text
 client → Wayland protocol
 ```
 不直接操作 DRM。
 
 ## 9. Wayland 架構
 
-```
+```text
 Application (waylandsink)  
  │  
  ▼  
@@ -236,7 +236,7 @@ Display
 ### 11.1 kmssink 無畫面
 
 原因：
-```
+```text
 plane 沒設  
 connector 沒 enable  
 mode 不正確
@@ -245,7 +245,7 @@ mode 不正確
 ### 11.2 atomic commit fail
 
 原因：
-```
+```text
 property 不完整  
 format mismatch
 ```
@@ -253,7 +253,7 @@ format mismatch
 ### 11.3 有 connector 但沒畫面
 
 原因：
-```
+```text
 CRTC 沒綁定  
 plane 沒 attach
 ```
@@ -261,7 +261,7 @@ plane 沒 attach
 ### 11.4 waylandsink 有畫面但 kmssink 沒有
 
 原因：
-```
+```text
 compositor 幫你處理  
 但 DRM driver 有問題
 ```
@@ -270,11 +270,11 @@ compositor 幫你處理
 
 ### 12.1 modetest
 
-```
+```bash
 modetest -M <driver>
 ```
 查看：
-```
+```text
 connector  
 crtc  
 plane
@@ -282,25 +282,25 @@ plane
 
 ### 12.2 強制 modeset
 
-```
+```bash
 modetest -s <conn_id>:<mode>
 ```
 
 ### 12.3 查看 DRM state
 
-```
+```bash
 cat /sys/kernel/debug/dri/0/state
 ```
 
 ### 12.4 DRM debug
 
-```
+```bash
 echo 0x1ff > /sys/module/drm/parameters/debug
 ```
 
 ### 12.5 GStreamer debug
 
-```
+```bash
 GST_DEBUG=3 gst-launch-1.0 v4l2src ! kmssink
 ```
 
@@ -310,13 +310,13 @@ GST_DEBUG=3 gst-launch-1.0 v4l2src ! kmssink
 
 ### 13.1 ① buffer 層
 
-```
+```text
 有沒有送到 kmssink？
 ```
 
 ### 13.2 ② DRM 層
 
-```
+```text
 fb 有沒有建立？  
 plane 有沒有設？  
 atomic commit 有沒有成功？
@@ -324,6 +324,6 @@ atomic commit 有沒有成功？
 
 ### 13.3 ③ hardware 層
 
-```
+```text
 timing / clock / enable 正確？
 ```

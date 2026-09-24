@@ -7,7 +7,7 @@
 
 ## 1. 記憶體層級架構
 
-``` cscc
+```text
 User Space (Virtual Memory)
 ↑ mmap / brk
 Kernel Space
@@ -61,7 +61,7 @@ Linux 將實體記憶體以 **4KB Page** 為單位管理，
 ## 4. User-space mmap 流程
 
 驅動程式若提供 mmap 功能，可讓應用程式直接訪問裝置記憶體。
-``` css
+```text
 User space mmap() call
 ↓
 sys_mmap()

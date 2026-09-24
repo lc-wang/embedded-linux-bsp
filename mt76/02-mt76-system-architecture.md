@@ -46,7 +46,7 @@ struct mt76_dev {
 -   MCU 驅動上下文
 -   DMA ring 狀態
 -   mac80211 結合（hw）
-    
+
 ### 2.2 struct ieee80211_ops（由 mt76 實作）
 
 mt76 的核心由以下回調構成：

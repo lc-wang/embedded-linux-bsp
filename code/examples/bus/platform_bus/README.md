@@ -28,7 +28,7 @@ platform bus
 - remoteproc
 
 ## 2. Kernel 原始碼對照
-```
+```text
 drivers/base/platform.c
 drivers/base/bus.c
 drivers/of/platform.c
@@ -36,7 +36,7 @@ drivers/of/base.c
 ```
 
 ## 3. 總體流程（Device Tree → probe）
-```
+```text
 Device Tree (.dts)
 └─ of_platform_populate()
 └─ platform_device_register()

@@ -20,7 +20,7 @@ Host PC 也運行 ROS2，用 rqt 操作。
 參考官方文件即可
 https://docs.ros.org/en/rolling/Installation/Ubuntu-Install-Debs.html
 ### 3.1 安裝 colcon
-#### 安裝 colcon 基本環境：
+#### 安裝 colcon 基本環境
 ```bash
 sudo apt install -y python3-colcon-common-extensions
 ```
@@ -30,8 +30,8 @@ sudo apt install -y python3-colcon-common-extensions
 -   `colcon build`
 -   常用的 Python extensions
 -   amment build 整套工具鏈
-    
-#### 確認 colcon 是否正常：
+
+#### 確認 colcon 是否正常
 ```bash
 colcon --version
 ```
@@ -133,7 +133,7 @@ Plugins → Services → Service Caller
 可以看到：
 -   `/cr52/start`
 -   `/cr52/stop`
-   
+
 按下 Call 即可控制 CR52。
 
 ## 9. 多機 ROS2 通訊設定（Network Discovery）
@@ -170,7 +170,7 @@ ros2 multicast send
 -   rqt 按下 `/cr52/start`
 -   RZT2H 上 remoteproc 沒反應
 -   `/sys/class/remoteproc/.../firmware` 沒有變更
-    
+
 檢查後發現：
 
 `ubuntu user 沒有權限寫入 sysfs` 
@@ -190,7 +190,7 @@ sudo chmod +s ~/ros2_ws/install/rzt2h_remoteproc/lib/rzt2h_remoteproc/cr52_remot
 
 -   ROS2 執行該程式時 → 以 root 身份執行    
 -   可以成功寫入：
-    
+
 ```bash
 /sys/class/remoteproc/remoteproc0/firmware
 /sys/class/remoteproc/remoteproc0/state

@@ -9,7 +9,7 @@ framebuffer = 一張圖片
 ```
 但：
 
-```
+```text
 圖片放在記憶體裡不代表會出現在螢幕
 ```
 
@@ -17,13 +17,13 @@ framebuffer = 一張圖片
 
 plane 的工作：
 
-```
+```text
 「選一張 framebuffer 來顯示」
 ```
 
 你可以理解成：
 
-```
+```text
 顯示圖層
 ```
 
@@ -31,13 +31,13 @@ plane 的工作：
 
 CRTC 的工作：
 
-```
+```text
 真正把像素送到輸出
 ```
 
 它會：
 
-```
+```text
 一行一行 scanout framebuffer
 ```
 
@@ -54,7 +54,7 @@ CRTC 的工作：
 
 atomic commit 本質上是在更新：
 
-```
+```text
 plane state
 crtc state
 connector state
@@ -62,13 +62,13 @@ connector state
 
 ### 4.2 最常見的更新
 
-```
+```text
 plane framebuffer 改了
 ```
 
 也就是：
 
-```
+```text
 這個 plane 現在要顯示新的 framebuffer
 ```
 
@@ -76,13 +76,13 @@ plane framebuffer 改了
 
 driver 最終通常會做：
 
-```
+```text
 設定 scanout address
 ```
 
 也就是：
 
-```
+```text
 告訴硬體：從哪塊 memory 開始掃描像素
 ```
 
@@ -90,27 +90,27 @@ driver 最終通常會做：
 
 ### 6.1 userspace commit
 
-```
+```text
 DRM_IOCTL_MODE_ATOMIC
 ```
 
 ↓
 
-```
+```text
 drm_mode_atomic_ioctl
  └─ drm_atomic_commit
 ```
 
 ### 6.2 helper commit flow
 
-```
+```text
 drm_atomic_helper_commit
  └─ drm_atomic_helper_commit_planes
 ```
 
 ### 6.3 最後到 driver callback
 
-```
+```text
 pipe->update()
 ```
 
@@ -132,14 +132,14 @@ driver 在這裡：
 
 scanout：
 
-```
+```text
 display controller
 持續從 framebuffer memory 讀像素
 ```
 
 例如：
 
-```
+```text
 pixel 0
 pixel 1
 pixel 2
@@ -152,7 +152,7 @@ pixel 2
 
 歷史名稱：
 
-```
+```text
 Cathode Ray Tube Controller
 ```
 
@@ -161,7 +161,7 @@ Cathode Ray Tube Controller
 但名稱保留下來。
 
 ## 10. 最後收斂
-```
+```text
 memory  
 ↓  
 framebuffer  
@@ -181,12 +181,12 @@ display
 
 本章新增：  
 
-```text  
+```text
 userspace/modeset_minimal.c
 ```
 它示範最小 legacy KMS 顯示流程：
 
-```
+```text
 open /dev/dri/card0
  ↓
 drmModeGetResources()

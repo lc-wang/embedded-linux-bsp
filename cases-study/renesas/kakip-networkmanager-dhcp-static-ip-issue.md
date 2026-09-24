@@ -13,43 +13,43 @@ Kakip 開發板接上 switch 後，網路介面 `end0` 無法取得 lab network 
 即使實體網路連線正常（RJ45、1000M link up），仍無法取得正確 IP，導致：
 
 -   無法連 lab network
-    
+
 -   無 default route
-    
+
 -   ping gateway 失敗
-    
+
 ### 1.2 問題現象
 
 #### 1.2.1 IP 狀態
-```
+```bash
 $ ifconfig end0
 
 inet 198.51.100.10 netmask 255.255.255.0
 ```
 #### 1.2.2 Routing table
-```
+```text
 $ ip route
 
 198.51.100.0/24 dev end0 scope link
 ```
 -   ✗ 無 `default via`
-    
+
 -   ✗ 無 gateway
-    
+
 #### 1.2.3 ARP / Neighbor
-```
+```text
 $ ip neigh
 
 (empty)
 ```
-  
-```
+
+```text
 $ arp -n
 
 (empty)
 ```
 #### 1.2.4 Ping gateway
-```
+```bash
 $ ping 198.51.100.1
 
 Destination Host Unreachable
@@ -58,25 +58,25 @@ Destination Host Unreachable
 ## 2. 系統環境
 
 -   Board：Kakip
-    
+
 -   OS：Ubuntu (custom / BSP image)
-    
+
 -   Network interface：`end0`（此板設計上即為 eth0）
-    
+
 -   Network manager：**NetworkManager**
-    
+
 -   ConnMan：未啟用
-    
+
 -   DHCP client：
-    
+
     -   `dhclient` ✗
-        
+
     -   `udhcpc` ✗
-        
+
 ## 3. 除錯過程
 
 ### 3.1 實體網路確認
-```
+```text
 $ ethtool end0
 
 Link detected: yes
@@ -85,7 +85,7 @@ Speed: 1000Mb/s
 
 Duplex: Full
 ```
-```
+```text
 $ ip -s link show end0
 
 RX packets: >10k
@@ -99,11 +99,11 @@ TX packets: normal
 #### 3.2.1 關鍵線索
 
 使用 NetworkManager 查詢 connection profile：
-```
+```bash
 $ nmcli connection show "有線接続 1"
 ```
 發現：
-```
+```text
 ipv4.method: manual
 
 ipv4.addresses: 198.51.100.10/24
@@ -126,7 +126,7 @@ ipv4.addresses: 198.51.100.10/24
 ## 5. 解決方案
 
 ### 5.1 將 IPv4 改回 DHCP
-```
+```text
 sudo nmcli connection modify "有線接続 1" \
 
 ipv4.method auto \
@@ -139,20 +139,20 @@ ipv4.dns ""
 ```
 
 ### 5.2 重新啟用連線
-```
+```bash
 sudo nmcli connection down "有線接続 1"
 
 sudo nmcli connection up "有線接続 1"
 ```
 
 ### 5.3 驗證結果
-```
+```text
 $ ip addr show end0
 
 inet 192.0.2.XX/24
 ```
-  
-```
+
+```text
 $ ip route
 
 default via 192.0.2.1 dev end0
@@ -164,27 +164,27 @@ default via 192.0.2.1 dev end0
 ### 6.1 最終狀態
 
 -   end0 正常由 NetworkManager 管理
-    
+
 -   DHCP DISCOVER / OFFER 正常
-    
+
 -   IP 正確取得 `192.0.2.X`
-    
+
 -   Gateway、ARP、routing table 全部正常
-    
+
 ### 6.2 問題總結
 
-#### 不是以下問題：
+#### 不是以下問題
 
 -   ✗ 非 switch 問題
-    
+
 -   ✗ 非 PHY / driver 問題
-    
+
 -   ✗ 非 cable 問題
-    
+
 -   ✗ 非 VLAN 錯誤
-    
+
 -   ✗ 非 DHCP server 故障
-    
-#### 真正原因：
+
+#### 真正原因
 
 > **NetworkManager connection profile 被設定為 static IP（manual）。**

@@ -25,7 +25,7 @@ Linux kernel 中最基本、也最容易被誤用的記憶體配置 API 範例�
 | vzalloc | ✓ | ✗ | ✗ | 大型 zeroed |
 
 ## 2. Kernel 原始碼對照
-```
+```text
 mm/slab.c
 mm/vmalloc.c
 include/linux/slab.h

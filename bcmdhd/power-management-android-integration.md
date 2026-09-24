@@ -21,7 +21,7 @@
 ## 1. bcmdhd 的 Power Management 架構總覽
 
 ### 1.1 三層 PM 同時存在
-```
+```text
 Android userspace  
 	└─ (suspend policy / power hints)  
 		Linux kernel PM  
@@ -71,17 +71,17 @@ Android userspace
 
 ### 3.1 Suspend 流程（高層）
 
-```
+```text
 system suspend
  └─ dhd_suspend()
      ├─ 停止 TX
      ├─ 設定 firmware power save
      ├─ bus suspend
      └─ (optional) enable WOWLAN
- ```    
+```
 
 ### 3.2 Resume 流程（高層）
-```
+```text
 system resume
  └─ dhd_resume()
      ├─ bus resume
@@ -94,11 +94,11 @@ system resume
 ### 3.3 Resume 常見問題
 
 -   bus 已醒，firmware 未醒
-    
+
 -   firmware 已醒，control state 未恢復
-    
+
 -   flow control / ring state 未重建
-    
+
 **症狀通常是「已連線但沒流量」**
 
 ## 4. WOWLAN（Wake on Wireless LAN）
@@ -108,27 +108,27 @@ system resume
 WOWLAN 允許：
 
 -   系統 suspend 狀態下
-    
+
 -   由 Wi-Fi event（magic packet / pattern）喚醒系統
-    
+
 在 bcmdhd 中：
 
 -   WOWLAN **完全由 firmware 實作**
-    
+
 -   Linux 只設定 pattern / enable
-    
+
 ### 4.2 WOWLAN 的現實限制
 
 -   開啟 WOWLAN ≠ firmware 一定穩定
-    
+
 -   某些 firmware 在 WOWLAN 下：
-    
+
     -   RX 正常
-        
+
     -   TX 被限制
-        
+
 -   resume 後需完整重新初始化 control state
-    
+
 **WOWLAN 是 PM 複雜度放大器**
 
 ## 5. Android 整合：PM 問題的放大來源
@@ -138,59 +138,59 @@ WOWLAN 允許：
 Android 透過：
 
 -   Wi-Fi HAL
-    
+
 -   Power HAL
-    
+
 -   ConnectivityService
-    
+
 動態改變：
 
 -   power save policy
-    
+
 -   roaming 行為
-    
+
 -   suspend 條件
-    
+
 **Linux driver 並不知道「為什麼」狀態被改**
 
 ### 5.2 wakelock（Android 專屬）
 
 -   bcmdhd 可能持有 wakelock
-    
+
 -   防止在關鍵時刻進入 suspend
-    
+
 -   錯誤使用會導致：
-    
+
     -   永不 suspend（耗電）
-        
+
     -   過早 suspend（Wi-Fi 掛）
-        
+
 ### 5.3 Android PM 常見陷阱
 
 -   螢幕關閉 → Wi-Fi 進 aggressive power save
-    
+
 -   Doze 模式干擾 runtime PM
-    
+
 -   userspace 與 kernel PM 狀態不同步
-    
+
 ## 6. PM × Data / Control Path 的交互影響
 
 ### 6.1 PM 與 Control Path
 
 -   control iovar 在 suspend/resume 間送出
-    
+
 -   firmware 忽略或丟失
-    
+
 -   導致 cfg80211 state 與實際不符
-    
+
 ### 6.2 PM 與 Data Path
 
 -   TX 在 firmware sleep 時送出
-    
+
 -   flow control 永久 block
-    
+
 -   RX event 永遠不回
-    
+
 **PM 問題經常「假裝成 data path bug」**
 
 ## 7. 常見問題與排查（常見 PM 故障模式）
@@ -198,21 +198,21 @@ Android 透過：
 ### 7.1 待機後 Wi-Fi 偶發死亡
 
 -   firmware 未正確 wake
-    
+
 -   WOWLAN state 未清
-    
+
 -   bus state 與 firmware 不一致
-    
+
 ### 7.2 螢幕關閉就斷線
 
 -   aggressive power save
-    
+
 -   userspace policy 強制變更
-    
+
 -   firmware roam / disconnect
-    
+
 ### 7.3 只有 reboot 才能救回
 
 -   recovery path 無法重設 PM state
-    
+
 -   firmware PM 狀態卡死

@@ -4,31 +4,31 @@
 
 假設：  
 
-```text  
+```text
 framebuffer A 正在顯示
 ```
 
 GPU 同時：
 
-```
+```text
 render framebuffer B
 ```
 
 當：
 
-```
+```text
 下一個 frame 時間到
 ```
 
 DRM：
 
-```
+```text
 切換 scanout framebuffer
 ```
 
 這就是：
 
-```
+```text
 page flip
 ```
 
@@ -36,19 +36,19 @@ page flip
 
 CRTC：
 
-```
+```text
 不是一次讀完整張圖
 ```
 
 而是：
 
-```
+```text
 一行一行持續讀 framebuffer
 ```
 
 例如：
 
-```
+```text
 line 0
 line 1
 line 2
@@ -59,13 +59,13 @@ line 2
 
 如果：
 
-```
+```text
 scanout 到一半 framebuffer 被換掉
 ```
 
 可能：
 
-```
+```text
 上半部是舊畫面
 下半部是新畫面
 ```
@@ -74,7 +74,7 @@ scanout 到一半 framebuffer 被換掉
 
 display timing：
 
-```
+```text
 掃完整張 frame
  ↓
 短暫空檔
@@ -84,20 +84,20 @@ display timing：
 
 這個空檔：
 
-```
+```text
 vertical blank
 (vblank)
 ```
 
 ## 5. page flip 最安全的時間
 
-```
+```text
 vblank
 ```
 
 因為：
 
-```
+```text
 下一 frame 還沒開始 scanout
 ```
 
@@ -105,13 +105,13 @@ vblank
 
 atomic commit：
 
-```
+```text
 建立新的 display state
 ```
 
 但：
 
-```
+```text
 真正 framebuffer 切換
 通常等 vblank
 ```
@@ -120,43 +120,43 @@ atomic commit：
 
 ### 7.1 userspace commit
 
-```
+```text
 DRM_IOCTL_MODE_ATOMIC
 ```
 
 ↓
 
-```
+```text
 drm_atomic_commit()
 ```
 
 ### 7.2 commit tail
 
-```
+```text
 drm_atomic_helper_commit_tail()
 ```
 
 這一步：
 
-```
+```text
 真正開始更新硬體 state
 ```
 
 ### 7.3 plane update
 
-```
+```text
 plane->atomic_update()
 ```
 
 driver：
 
-```
+```text
 更新 scanout address
 ```
 
 也就是：
 
-```
+```text
 下一 frame 要掃哪張 framebuffer
 ```
 
@@ -164,13 +164,13 @@ driver：
 
 display controller：
 
-```
+```text
 持續從某個 memory address 讀像素
 ```
 
 page flip 本質上：
 
-```
+```text
 就是換掉這個 address
 ```
 
@@ -178,13 +178,13 @@ page flip 本質上：
 
 下一次：
 
-```
+```text
 vblank IRQ
 ```
 
 發生時：
 
-```
+```text
 硬體真正切換 framebuffer
 ```
 
@@ -192,7 +192,7 @@ vblank IRQ
 
 之後 DRM：
 
-```
+```text
 通知 userspace：
 flip 完成
 ```
@@ -205,7 +205,7 @@ flip 完成
 
 就知道：
 
-```
+```text
 現在新 frame 已經真的上螢幕
 ```
 
@@ -213,14 +213,14 @@ flip 完成
 
 最常見：
 
-```
+```text
 front buffer
 back buffer
 ```
 
 ### 9.1 rendering flow
 
-```
+```text
 CRTC scanout:
     front buffer
 
@@ -230,7 +230,7 @@ GPU rendering:
 
 ↓
 
-```
+```text
 vblank
  ↓
 swap
@@ -238,7 +238,7 @@ swap
 
 ## 10. 最重要觀念
 
-```
+```text
 rendering
 與
 scanout
@@ -250,7 +250,7 @@ scanout
 
 因為：
 
-```
+```text
 GPU
 display controller
 compositor
@@ -259,20 +259,20 @@ applications
 
 全部都要：
 
-```
+```text
 同步 frame timing
 ```
 
 ## 12. 最重要一句話
 
-```
+```text
 page flip
 本質上是：
 「下一 frame 要掃哪張 framebuffer」
 ```
 
 ## 13. 最後總結（display timing mental model）
-```
+```text
 GPU render back buffer  
 ↓  
 atomic commit  
@@ -288,7 +288,7 @@ new frame visible
 
 本章新增：  
 
-```text  
+```text
 userspace/page_flip_minimal.c
 ```
 
@@ -296,7 +296,7 @@ userspace/page_flip_minimal.c
 
 它示範：
 
-```
+```text
 create dumb buffer A
 create dumb buffer B
  ↓
@@ -324,7 +324,7 @@ swap front/back buffer
 
 ### 14.2 page flip 的真正意義
 
-```
+```text
 drmModePageFlip()
 ```
 
@@ -332,14 +332,14 @@ drmModePageFlip()
 
 它是：
 
-```
+```text
 請 DRM 在下一個合適的 vblank
 把 CRTC scanout framebuffer 換成新的 fb_id
 ```
 
 ### 14.3 對應 kernel flow
 
-```
+```text
 drmModePageFlip()
  ↓
 DRM_IOCTL_MODE_PAGE_FLIP
@@ -361,19 +361,19 @@ userspace page_flip_handler()
 
 userspace 送出：
 
-```
+```text
 drmModePageFlip()
 ```
 
 之後要等 DRM event：
 
-```
+```text
 page flip complete
 ```
 
 所以需要：
 
-```
+```text
 select()
  ↓
 drmHandleEvent()
@@ -383,7 +383,7 @@ page_flip_handler()
 
 ### 14.5 最重要一句話
 
-```
+```text
 page flip = 切換 CRTC 下一個要 scanout 的 framebuffer
 
 page flip event = 通知 userspace 這次切換已經完成

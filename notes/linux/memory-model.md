@@ -219,7 +219,7 @@ dma_sync_single_for_cpu()
 
 ### 10.1 ftrace（追蹤 load/store）
 
-```sh
+```bash
 trace-cmd record -e kmem:* -e sched:* -e irq:*
 ```
 

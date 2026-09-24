@@ -38,7 +38,7 @@ spin_lock_init(&lock);
 spin_lock(&lock); 
 /* critical section */ 
 spin_unlock(&lock);
-``` 
+```
 
 -   變體：
 
@@ -58,7 +58,7 @@ mutex_init(&my_lock);
 mutex_lock(&my_lock); 
 /* critical section */ 
 mutex_unlock(&my_lock);
-``` 
+```
 
 -   若嘗試在中斷中使用 mutex → kernel 會警告 “sleeping function called from invalid context”。
 
@@ -72,7 +72,7 @@ sema_init(&sem, 1); // binary semaphore
 down(&sem); 
 /* critical section */ 
 up(&sem);
-``` 
+```
 
 ## 6. Completion
 

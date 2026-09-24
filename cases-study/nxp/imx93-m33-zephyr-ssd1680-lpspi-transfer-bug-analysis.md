@@ -42,7 +42,7 @@
 - `clk_ignore_unused` bootarg **無效**,因為這些時脈開機時就是關的(不是「開著但未使用」)。
 
 **驗證**(啟 M33 前):
-```
+```text
 $ grep -E 'lpuart2|lpspi3|gpio2' /sys/kernel/debug/clk/clk_summary
 lpuart2_root   0  0  0  24000000 ...   ← enable_count = 0(被關)
 lpuart2        0  0  0  24000000 ...
@@ -88,7 +88,7 @@ lpuart2        0  0  0  24000000 ...
 **做法**:自訂 binding `open-ep,pixpaper-213m`,把面板當 raw SPI device(硬體 PCS0),
 DC/RST/BUSY 用 GPIO,在 app 中完整重現 user-space 的初始化與 RAM 寫入序列:
 
-```
+```text
 reset → 0x12(SW reset)
 0x01 = F9 00 00     driver output:0xF9+1 = 250 gates
 0x11 = 01           data entry:X+ / Y-
@@ -350,7 +350,7 @@ west build -p always -b frdm_imx93/mimx9352/m33 \
 Footprint:FLASH ~32%(128KB)/ RAM ~14%(124KB),全程在 TCM。
 
 預期 console:
-```
+```text
 *** Booting Zephyr OS ... ***
 [inf] pixpaper_213m: Initializing pixpaper-213m over LPSPI3...
 [inf] pixpaper_213m: Init done
@@ -360,7 +360,7 @@ Footprint:FLASH ~32%(128KB)/ RAM ~14%(124KB),全程在 TCM。
 
 ### 5.4 sample 目錄結構與各檔案角色
 
-```
+```text
 samples/boards/nxp/frdm_imx93/pixpaper_213m/
 ├── CMakeLists.txt                              # Zephyr app 進入點(find_package + target_sources)
 ├── prj.conf                                    # Kconfig:只開 SPI / SPI_NXP_LPSPI / GPIO / LOG
@@ -510,7 +510,7 @@ echo start > /sys/class/remoteproc/remoteproc0/state
 #### 4) 觀察 M33 console
 
 M33 的 log 在 **LPUART2**(115200 8N1)。接上對應的 UART 即可看到:
-```
+```text
 *** Booting Zephyr OS ... ***
 [inf] pixpaper_213m: Init done
 [inf] pixpaper_213m: Displayed test.png (211x103)

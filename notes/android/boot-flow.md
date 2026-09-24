@@ -68,7 +68,7 @@ Kernel 啟動後的主要工作如下：
 | 輸出 log | 可從 `dmesg` 觀察 |
 
 關鍵 log 標誌：
-```
+```text
 [ 0.000000] Booting Linux on physical CPU
 [ 0.123456] Run /init as init process
 ```
@@ -139,7 +139,7 @@ Zygote fork 出的 SystemServer 負責啟動整個 Framework 層服務。
 
 流程概覽：
 
-``` scss
+```text
 Zygote → SystemServer.main()
      ↓
 createSystemContext()
@@ -169,7 +169,7 @@ Looper.loop()
 
 App 啟動由 AMS 發起：
 
-```scss
+```text
 Launcher → AMS.startActivity()
    ↓
 ActivityThread.main()
@@ -188,11 +188,11 @@ attachApplication()
 
 **補充說明**
 -   `ActivityManagerService` 為整個應用管理中心，位於 SystemServer 內。
-    
+
 -   `ActivityThread` 是每個應用程序的主執行緒（對應 UI thread）。
-    
+
 -   `ApplicationThread` 實際是 Binder 端點，負責 IPC 溝通。
-    
+
 -   `Instrumentation` 用於控制應用啟動與測試（例如單元測試框架會覆蓋它）。
 
 ## 8. Debug 與分析方法

@@ -10,7 +10,7 @@
 
 ## 1. 基本 DTS 架構
 
-```
+```dts
 ethernet@... {
     compatible = "...";
 
@@ -27,7 +27,7 @@ ethernet@... {
 
 ## 2. MAC ↔ PHY 關係
 
-```
+```text
 MAC driver
    ↓
 phy-handle
@@ -37,13 +37,13 @@ PHY node（MDIO）
 
 重點：
 
-```
+```dts
 phy-handle = <&phy0>;
 ```
 
 ## 3. MDIO bus 描述
 
-```
+```dts
 mdio {
     #address-cells = <1>;
     #size-cells = <0>;
@@ -56,25 +56,25 @@ mdio {
 
 ### 3.1 關鍵
 
-```
+```text
 reg = <1>  → PHY address（硬體 strap）
 ```
 
 如果錯：
 
-```
+```text
 No PHY found
 ```
 
 ## 4. phy-mode
 
-```
+```dts
 phy-mode = "rgmii";
 ```
 
 ### 4.1 常見值
 
-```
+```text
 mii
 rmii
 rgmii
@@ -86,9 +86,9 @@ sgmii
 
 ## 5. RGMII delay
 
-### 5.1 問題本質：
+### 5.1 問題本質
 
-```
+```text
 clock 與 data 必須有 timing skew（約 2ns）
 ```
 
@@ -103,7 +103,7 @@ clock 與 data 必須有 timing skew（約 2ns）
 
 ### 5.3 誰負責 delay？
 
-```
+```text
 MAC？
 PHY？
 PCB？
@@ -121,13 +121,13 @@ PCB？
 
 #### link up 但 ping 不通
 
-```
+```text
 RGMII delay 錯
 ```
 
 #### intermittent packet loss
 
-```
+```text
 skew 不穩
 ```
 
@@ -135,7 +135,7 @@ skew 不穩
 
 ### 6.1 stmmac（常見）
 
-```
+```dts
 ethernet@... {
     compatible = "snps,dwmac";
 
@@ -152,7 +152,7 @@ ethernet@... {
 
 ### 6.2 fec（NXP）
 
-```
+```dts
 fec@... {
     phy-mode = "rgmii";
 
@@ -162,7 +162,7 @@ fec@... {
 
 FEC 常常：
 
-```
+```text
 delay 在 MAC
 ```
 
@@ -170,7 +170,7 @@ delay 在 MAC
 
 ### 7.1 PHY reset
 
-```
+```dts
 reset-gpios = <&gpio1 5 GPIO_ACTIVE_LOW>;
 reset-assert-us = <10000>;
 reset-deassert-us = <10000>;
@@ -178,7 +178,7 @@ reset-deassert-us = <10000>;
 
 ### 7.2 clock
 
-```
+```dts
 clocks = <&clk ...>;
 ```
 
@@ -186,31 +186,31 @@ clocks = <&clk ...>;
 
 ### 8.1 Step 1：interface 有沒有？
 
-```
+```text
 ip link
 ```
 
 ### 8.2 Step 2：PHY 有沒有？
 
-```
+```bash
 dmesg | grep phy
 ```
 
 ### 8.3 Step 3：link 狀態
 
-```
+```bash
 ethtool eth0
 ```
 
 ### 8.4 Step 4：MDIO
 
-```
+```text
 mdio-tool dump eth0 1
 ```
 
 ### 8.5 Step 5：封包
 
-```
+```text
 pingtcpdump -i eth0
 ```
 
@@ -218,31 +218,31 @@ pingtcpdump -i eth0
 
 ### 9.1 PHY address 錯
 
-```
+```text
 No PHY found
 ```
 
 ### 9.2 phy-mode 錯
 
-```
+```text
 link up but no traffic
 ```
 
 ### 9.3 RGMII delay 錯
 
-```
+```text
 packet drop / CRC error
 ```
 
 ### 9.4 reset 沒設
 
-```
+```text
 PHY 不穩 / 抓不到
 ```
 
 ### 9.5 clock 沒開
 
-```
+```text
 MDIO timeout
 ```
 
@@ -250,7 +250,7 @@ MDIO timeout
 
 你要分層：
 
-```
+```text
 DTS 問題？
 PHY 問題？
 MAC driver 問題？

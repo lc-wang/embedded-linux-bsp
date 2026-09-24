@@ -76,7 +76,7 @@ GPIO 負責：
 系統在：
 -   driver probe 時套用 default
 -   suspend 時切到 sleep
-  
+
 若 sleep state 缺失：
 -   resume 後功能可能異常
 
@@ -96,7 +96,7 @@ GPIO 負責：
 可能原因：
 -   SDA / SCL 沒被 mux 成 I2C 
 -   pull-up 設定錯誤
-    
+
 ### 5.2 IRQ 永遠不觸發
 
 可能原因：
@@ -117,7 +117,7 @@ suspend/resume 期間：
 
 若 sleep state 不完整：
 -   resume 後裝置「看起來活著，但實際不工作」
-    
+
 ## 7. Pin Control Debug Toolbox
 
 ### 7.1 檢查 pinctrl 是否套用成功
@@ -142,7 +142,7 @@ cat /sys/kernel/debug/pinctrl/*/pins
 
 -   pin 是否被 claimed
 -   目前 function 為何
-    
+
 ### 7.3 GPIO 層確認
 
 ```bash

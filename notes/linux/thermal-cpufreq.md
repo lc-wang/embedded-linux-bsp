@@ -61,7 +61,7 @@ thermal-zones {
 };
 ```
 
-### 2.1 Trip points：
+### 2.1 Trip points
 
 | 類型 | 説明 |
 |--------|----------------|
@@ -80,7 +80,7 @@ thermal-zones {
 
 在 CPU cooling device 中，thermal 會要求：
 
-```sh
+```bash
 set_cur_state(level)
 ```
 kernel 依 level 降 CPU 頻率。
@@ -114,12 +114,12 @@ cpufreq table | 可用的頻率清單
 
 檢查 governor：
 
-```sh
+```bash
 cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 ```
 切換 governor：
 
-```sh
+```bash
 echo performance > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 ```
 
@@ -202,19 +202,19 @@ temp ↑ → thermal trip
 ## 9. User Space 觀察工具
 
 檢查溫度
-```sh
+```bash
 cat /sys/class/thermal/thermal_zone*/temp
 ```
 檢查 CPU 頻率
-```sh
+```bash
 cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq
 ```
 檢查 OPP
-```sh
+```bash
 cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies
 ```
 檢查 cooling device
-```sh
+```bash
 ls /sys/class/thermal/cooling_device*
 ```
 

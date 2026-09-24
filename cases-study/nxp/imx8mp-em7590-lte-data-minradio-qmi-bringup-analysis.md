@@ -66,14 +66,14 @@ EM7590 是 data-only（無語音）、且沒有廠商 Android HAL，所以這條
 **問題 ① — 預設 composition 沒有 QMI 節點。**
 EM7590 出廠 composition 下沒有乾淨的 QMI 控制口。用 AT 指令切成 QMI composition：
 
-```
+```text
 AT!USBCOMP=1,1,10D      # 切 QMI composition → 重新列舉後出現 wwan0(raw-IP) + /dev/cdc-wdm0
 ```
 
 **問題 ② — out-of-tree CDC 驅動撞 GKI KMI（重要坑）。**
 一開始把 `cdc_ncm` / `cdc_mbim` 一起編進來，開機 load 時炸：
 
-```
+```text
 brcmfmac 之外：cdc_ncm: Unknown symbol usbnet_cdc_update_filter (err -2)
 ```
 
@@ -88,7 +88,7 @@ kernel 設定（`<board>.fragment`）：`USB_SERIAL_{OPTION,QUALCOMM,SIERRAWIREL
 **問題 ③ — raw-QMI 撥號要自己刻。**
 沒有 libqmi。自寫最小 raw-QMI helper `qmistart2.c`，直接對 `/dev/cdc-wdm0` 下 QMUX：
 
-```
+```text
 CTL: AllocCID(service=WDS) → 拿到 client id
 WDS: Start-Network( APN TLV 0x14 = "internet", IPv4 TLV 0x2D ) → result = 0（成功）
 ```
@@ -104,14 +104,14 @@ WDS: Start-Network( APN TLV 0x14 = "internet", IPv4 TLV 0x2D ) → result = 0（
 **問題 ④ — 封包不通的元兇：raw-IP 模式（最隱蔽的坑）。**
 wwan0 設好 IP、路由都對，`ping` 卻 100% loss。根因：
 
-```
+```text
 /sys/class/net/wwan0/qmi/raw_ip  預設 = N   （802.3 / Ethernet 框架模式）
 ```
 
 EM7590 走的是 **raw-IP**，qmi_wwan 預設卻是 802.3。必須把它設成 `Y`，
 且**要在介面 down 的狀態下寫**：
 
-```sh
+```bash
 ip link set wwan0 down
 echo Y > /sys/class/net/wwan0/qmi/raw_ip
 ip link set wwan0 up
@@ -137,7 +137,7 @@ CS 會自動設 netd 路由 + DnsResolver + 跑 validation + 設為 default。
 **大坑 — `NET_CAPABILITY_NOT_VCN_MANAGED`。**
 NetworkAgent 的 capabilities 若少了這個 flag，會出現非常反直覺的症狀：
 
-```
+```text
 網路明明 VALIDATED，卻不滿足「預設網路請求」
 → dumpsys connectivity: Active default network: none
 → app 仍解不了 DNS
@@ -162,7 +162,7 @@ AOSP-16 tree 內已有 Google `minradio`（`hardware/interfaces/radio/aidl/minra
 
 **策略（Path C）**：不重寫框架，只把範例 `setupDataCall` 的假介面**換成真 wwan0**：
 
-```
+```text
 setupDataCall()
   → qmiStartNetwork("/dev/cdc-wdm0", apn)   // Phase 1 的 raw-QMI 撥號搬進 HAL
   → setWwanRawIp("wwan0")                    // 寫 raw_ip=Y（Phase 1 的坑）
@@ -177,7 +177,7 @@ ConnectivityService**，Phase 2 手動做的那組 LinkProperties 框架自動�
 早期直覺做法是「HAL 自己 `mknod` 建 `/dev/cdc-wdm0`、自己用 `DAC_OVERRIDE` 寫 root sysfs」。
 **這條路整個報廢**，因為 build 直接掛：
 
-```
+```text
 sepolicy_neverallows FAILED:
   neverallow ... self:capability mknod;          (system/sepolicy/private/domain.te)
   neverallow ... self:capability dac_override;   (同上)
@@ -192,7 +192,7 @@ sepolicy_neverallows FAILED:
    cdc-wdm 的 subsystem 是 `usbmisc`，被這行直接略過（所以連 re-trigger `add` 都不建節點）。
    但同函式對顯式 `subsystem` 規則的判斷在它**之前**，所以在 `ueventd.nxp.rc` 補：
 
-   ```
+   ```text
    subsystem usbmisc
        devname uevent_devname
    /dev/cdc-wdm*   0660   radio   radio
@@ -205,7 +205,7 @@ sepolicy_neverallows FAILED:
    `/sys/class/net/wwan0/qmi/raw_ip` 是 `root:root 0644`，HAL 沒權限寫。
    `init.imx8mp.rc` 在 `on property:sys.boot_completed=1` 時：
 
-   ```
+   ```bash
    chown radio radio /sys/class/net/wwan0/qmi/raw_ip
    chmod 0664        /sys/class/net/wwan0/qmi/raw_ip
    ```
@@ -307,7 +307,7 @@ bool isModemPresent() { return access("/sys/class/usbmisc/cdc-wdm0", F_OK) == 0;
 
 **node 委派 ueventd（HAL 不 mknod，避開 CAP_MKNOD neverallow）：**
 
-```
+```text
 # ueventd.nxp.rc
 subsystem usbmisc
     devname uevent_devname
@@ -316,7 +316,7 @@ subsystem usbmisc
 
 **raw_ip 屬性委派 init chown（避開 CAP_DAC_OVERRIDE neverallow）：**
 
-```
+```bash
 # init.imx8mp.rc
 on property:sys.boot_completed=1
     chown radio radio /sys/class/net/wwan0/qmi/raw_ip

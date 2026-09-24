@@ -9,7 +9,7 @@ GPU 畫好一張圖
 
 如果沒有 dma-buf：
 
-```
+```text
 GPU copy 一份
 ↓
 compositor copy 一份
@@ -23,7 +23,7 @@ DRM 再 copy 一份
 
 真正做法：
 
-```
+```text
 同一塊 memory大家一起用
 ```
 
@@ -31,7 +31,7 @@ DRM 再 copy 一份
 
 dma-buf 可以：
 
-```
+```text
 把 memory 變成 fd
 ```
 
@@ -46,7 +46,7 @@ dma-buf 可以：
 
 GPU driver：
 
-```
+```text
 GEM object
  ↓
 dma_buf
@@ -56,7 +56,7 @@ fd
 
 userspace 拿到：
 
-```
+```text
 dma-buf fd
 ```
 
@@ -64,7 +64,7 @@ dma-buf fd
 
 Wayland / SurfaceFlinger：
 
-```
+```text
 收到 dma-buf fd
 ```
 
@@ -76,7 +76,7 @@ Wayland / SurfaceFlinger：
 
 DRM：
 
-```
+```text
 fd
  ↓
 dma_buf_get()
@@ -88,25 +88,25 @@ drm_gem_prime_import()
 
 得到：
 
-```
+```text
 新的 GEM object reference
 ```
 
 但：
 
-```
+```text
 還是同一塊 physical memory
 ```
 
 ## 4. 最重要觀念
 
-```
+```text
 import 不等於 copy
 ```
 
 通常只是：
 
-```
+```text
 建立新的 reference
 ```
 
@@ -114,7 +114,7 @@ import 不等於 copy
 
 最後：
 
-```
+```text
 plane
  ↓
 framebuffer
@@ -130,13 +130,13 @@ CRTC scanout
 
 GPU driver：
 
-```
+```text
 drm_gem_prime_export()
 ```
 
 ↓
 
-```
+```text
 dma_buf_export()
 ```
 
@@ -144,7 +144,7 @@ dma_buf_export()
 
 建立：
 
-```
+```text
 struct dma_buf
 ```
 
@@ -152,7 +152,7 @@ struct dma_buf
 
 拿到：
 
-```
+```text
 dma-buf fd
 ```
 
@@ -160,19 +160,19 @@ dma-buf fd
 
 DRM driver：
 
-```
+```text
 drm_gem_prime_import()
 ```
 
 ↓
 
-```
+```text
 dma_buf_attach()
 ```
 
 ↓
 
-```
+```text
 dma_buf_map_attachment()
 ```
 
@@ -180,7 +180,7 @@ dma_buf_map_attachment()
 
 得到：
 
-```
+```text
 scatter-gather table
 ```
 
@@ -188,13 +188,13 @@ scatter-gather table
 
 因為：
 
-```
+```text
 memory 不一定 physical contiguous
 ```
 
 所以：
 
-```
+```text
 dma-buf 用 sg_table 描述 memory layout
 ```
 
@@ -211,7 +211,7 @@ dma-buf 用 sg_table 描述 memory layout
 
 Android gralloc：
 
-```
+```text
 alloc graphic buffer
  ↓
 dma-buf fd
@@ -243,7 +243,7 @@ dma-buf fd 一定要由 producer export 出來。
 
 ### 10.2 userspace PRIME import flow
 
-```
+```text
 external dma-buf fd
  ↓
 drmPrimeFDToHandle()
@@ -269,7 +269,7 @@ plane scanout
 
 ### 10.4 最重要觀念
 
-```
+```text
 drmPrimeFDToHandle()
 不是 copy memory
 
@@ -280,7 +280,7 @@ import 成目前 DRM device 可使用的 GEM handle
 
 ### 10.5 完整心智模型
 
-```
+```text
 producer memory
  ↓
 dma-buf fd

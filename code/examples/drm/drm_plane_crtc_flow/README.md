@@ -25,7 +25,7 @@ CRTC = 負責掃描輸出的核心
 
 ## 2. 最核心流程
 
-```
+```text
 framebuffer
  ↓
 plane
@@ -43,7 +43,7 @@ panel / monitor
 
 ### 3.1 framebuffer
 
-```
+```text
 只有像素資料
 ```
 
@@ -51,25 +51,25 @@ panel / monitor
 
 ### 3.2 plane
 
-```
+```text
 決定：「哪張 framebuffer 要被顯示」
 ```
 
 ### 3.3 CRTC
 
-```
+```text
 負責真正掃描輸出
 ```
 
 也就是：
 
-```
+```text
 一行一行把像素送到顯示硬體
 ```
 
 ## 4. 最重要觀念
 
-```
+```text
 framebuffer 不等於畫面
 
 plane 綁定 framebuffer
@@ -78,7 +78,7 @@ CRTC 掃描 plane
 
 ## 5. Kernel 原始碼對照
 
-```
+```text
 drivers/gpu/drm/drm_plane.c
 drivers/gpu/drm/drm_crtc.c
 drivers/gpu/drm/drm_atomic.c

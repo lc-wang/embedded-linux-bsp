@@ -35,7 +35,7 @@ sci0_pins: sci0 {
 
 -   `ttySC0` 為 active console
 -   對應 `SCIF@0x80005000`
-    
+
 `cat /sys/class/tty/console/active # tty0 ttySC0` 
 
 **結論**  
@@ -95,7 +95,7 @@ ls /dev/ttyGS0
 
 -   `/dev/ttyGS0`
 -   `g_serial ready`
-    
+
 **結論**  
 Linux USB gadget serial 功能正常
 
@@ -112,7 +112,7 @@ Linux USB gadget serial 功能正常
 CN33 為 **USB OTG port**，關鍵硬體條件：
 
 1.  **USB_OTG_ID 腳**
-    
+
     -   由 **CN89 jumper** 控制
     -   ID → GND = Host mode
     -   ID 浮接 = Device mode
@@ -126,7 +126,7 @@ CN33 為 **USB OTG port**，關鍵硬體條件：
 -   CN33 被固定為 **USB Host**
 -   SoC 未進入 Device mode
 -   即使 gadget ready，PC 端也不會枚舉
-    
+
 **結論**  
 CN33 在目前硬體設定下 **不適合作為 debug console**
 

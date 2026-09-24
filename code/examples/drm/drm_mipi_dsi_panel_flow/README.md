@@ -16,14 +16,14 @@ DRM MIPI DSI panel driver 最小範例。
 
 ## 1. 一句話先記住
 
-```text  
+```text
 MIPI DSI panel driver  
 = DSI peripheral driver + drm_panel
 ```
 
 ## 2. 基本架構
 
-```
+```text
 DRM encoder / bridge
  ↓
 MIPI DSI host

@@ -58,12 +58,12 @@ Crash / Hang / Live kernel
  ├─ GDB / KGDB
  ├─ netconsole
  └─ magic SysRq
- ```
+```
 第一步不是開工具，而是定位層級。
 
 ## 3. 工程決策模型：問題 → 層級 → 工具
 
-```
+```text
 App 卡住、無 crash
 → strace / logcat / atrace
 
@@ -91,7 +91,7 @@ random kernel crash
 
 ### 4.1 範例：Wi-Fi 偶發 connect timeout
 
-```
+```text
 strace
  → ioctl 阻塞
 
@@ -186,7 +186,7 @@ simpleperf report
 
 ### 6.2 Binder tracepoints — Binder transaction 追蹤
 
-```
+```bash
 echo 1 > /sys/kernel/debug/tracing/events/binder/enable 
 cat /sys/kernel/debug/tracing/trace_pipe
 ```
@@ -200,7 +200,7 @@ cat /sys/kernel/debug/tracing/trace_pipe
 
 ### 7.1 ftrace (function) — code 是否被呼叫
 
-```
+```bash
 echo  function > /sys/kernel/debug/tracing/current_tracer 
 echo my_driver_* > /sys/kernel/debug/tracing/set_ftrace_filter
 ```
@@ -217,13 +217,13 @@ echo my_driver_* > /sys/kernel/debug/tracing/set_ftrace_filter
 
 ### 7.3 tracepoints — 精準觀察 subsystem
 
-```
+```bash
 echo 1 > /sys/kernel/debug/tracing/events/sched/sched_switch/enable
 ```
 
 ### 7.4 dynamic_debug — 精準開 log
 
-```
+```bash
 echo  'file drivers/net/wireless/* +p' \
  > /sys/kernel/debug/dynamic_debug/control 
 ```
@@ -263,7 +263,7 @@ perf sched latency
 
 ### 8.5 bpftrace — 快速一次性分析
 
-```
+```text
 bpftrace -e 'tracepoint:sched:sched_switch { @[comm] = count(); }'
 ```
 
@@ -275,7 +275,7 @@ bpftrace -e 'tracepoint:sched:sched_switch { @[comm] = count(); }'
 
 ### 9.1 sched_switch / sched_wakeup
 
-```
+```bash
 echo 1 > /sys/kernel/debug/tracing/events/sched/sched_switch/enable 
 ```
 
@@ -311,7 +311,7 @@ echo 1 > /sys/kernel/debug/tracing/events/sched/sched_switch/enable
 
 ### 10.4 kmemleak
 
-```
+```bash
 echo scan > /sys/kernel/debug/kmemleak 
 cat /sys/kernel/debug/kmemleak
 ```
@@ -351,7 +351,7 @@ CONFIG_UBSAN=y
 
 ### 11.7 magic SysRq
 
-```
+```bash
 echo t > /proc/sysrq-trigger 
 echo w > /proc/sysrq-trigger
 ```

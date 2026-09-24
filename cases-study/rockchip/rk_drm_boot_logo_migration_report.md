@@ -5,10 +5,10 @@
 在不同 SoC 平台上，開機 Logo 的顯示機制並不一致。
 
 -   **NXP (i.MX 系列)** 採用 Linux **framebuffer（fbcon）** 機制顯示內建的 Tux 企鵝圖。
-    
+
 -   **Rockchip (RK 系列)** 則採用 **DRM 子系統 (Direct Rendering Manager)** 的自家早期顯示邏輯，  
     在 kernel 啟動初期讀取 BMP 檔顯示 Logo。
-    
+
 目標：  
 希望讓 Rockchip 平台的開機 Logo 也能顯示 Linux 企鵝圖，  
 達到與 NXP 平台一致的外觀與行為。
@@ -41,7 +41,7 @@
 Rockchip 自定義的 early boot logo 顯示路徑如下：
 
 1.  DRM core 啟動時，呼叫 `rockchip_drm_logo_init()`。
-    
+
 2.  解析 Device Tree 節點，例如：
   ```dts
 route_hdmi1: route-hdmi1 {
@@ -50,27 +50,27 @@ route_hdmi1: route-hdmi1 {
     logo,mode = "center";
     connect = <&vp1_out_hdmi1>;
 };
- ```
- 
+  ```
+
 3.  驅動載入 BMP 檔案並建立 framebuffer plane：
-    
+
     -   搜尋路徑：`/boot/`, `/lib/firmware/`, `/usr/lib/firmware/`
-        
+
     -   呼叫 `rockchip_show_bmp_logo()`
-        
+
 4.  在 framebuffer plane 上顯示 logo（覆蓋後續 console 輸出）。
-    
+
 > 此流程完全繞過 `drivers/video/logo`，  
 > 因此 `CONFIG_LOGO_ROCKCHIP_CLUT224`、`CONFIG_LOGO_LINUX_CLUT224` 等設定皆不影響顯示。
 
 ## 3. Root Cause 分析（問題本質）
 
 -   **Framebuffer 機制** 的 `logo_linux_clut224.ppm` 無法在 Rockchip 顯示，因未啟用 `CONFIG_FB`。
-    
+
 -   **Rockchip DRM** 只接受 **BMP 檔案**，不支援 `.ppm`。
-    
+
 -   若想顯示企鵝圖，需 **將 Linux 內建 logo 轉換成 BMP**，再由 DRM 顯示。
-    
+
 ## 4. 解決方案
 
 ### 4.1 解法評估

@@ -16,7 +16,7 @@
 
 ## 1. 最核心的顯示路徑
 
-```
+```text
 userspace buffer
  ↓
 framebuffer
@@ -43,7 +43,7 @@ display device / panel
 
 也就是：
 
-```
+```text
 「我只有一條很單純的顯示路徑」
 ```
 
@@ -60,7 +60,7 @@ display device / panel
 重點不是硬體細節，  
 而是看懂：
 
-```
+```text
 atomic commit
  ↓
 helper
@@ -70,7 +70,7 @@ driver callback
 
 ## 4. Kernel 原始碼對照
 
-```
+```text
 drivers/gpu/drm/drm_simple_kms_helper.c
 drivers/gpu/drm/drm_atomic_helper.c
 drivers/gpu/drm/drm_gem_shmem_helper.c

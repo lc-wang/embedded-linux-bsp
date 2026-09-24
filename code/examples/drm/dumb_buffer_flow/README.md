@@ -14,14 +14,14 @@
 
 ## 1. 一句話先記住
 
-```text  
+```text
 dumb buffer
 = 最簡單、CPU 可直接存取的 framebuffer memory
 ```
 
 ## 2. 完整流程
 
-```
+```text
 open(/dev/dri/card0)
  ↓
 DRM_IOCTL_MODE_CREATE_DUMB
@@ -54,13 +54,13 @@ driver update()
 
 就是：
 
-```
+```text
 「一塊最普通的 linear framebuffer」
 ```
 
 ## 4. Kernel 原始碼對照
 
-```
+```text
 drivers/gpu/drm/drm_dumb_buffers.c
 drivers/gpu/drm/drm_framebuffer.c
 drivers/gpu/drm/drm_ioctl.c

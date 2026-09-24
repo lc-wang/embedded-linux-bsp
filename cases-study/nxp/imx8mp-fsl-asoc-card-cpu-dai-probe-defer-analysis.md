@@ -9,7 +9,7 @@
 
 `dmesg` 在開機極早期（~0.9s）就報錯並放棄 probe：
 
-```
+```text
 fsl-asoc-card sound-alc5672: failed to find CPU DAI device
 fsl-asoc-card sound-alc5672: probe of sound-alc5672 failed with error -22
 ```
@@ -54,7 +54,7 @@ fsl-asoc-card sound-alc5672: probe of sound-alc5672 failed with error -22
 
 Yocto 建置採 `=m`，於是嘗試 `CONFIG_SND_SOC_FSL_ASOC_CARD=m` 並把 `.ko` 加進 `BOARD_VENDOR_RAMDISK_KERNEL_MODULES`：
 
-```
+```text
 init: Failed to insmod '/.../snd-soc-rt5670.ko': No such file or directory
 init: FatalReboot: signal 6 (InitFatalReboot)
 ```
@@ -74,7 +74,7 @@ init: FatalReboot: signal 6 (InitFatalReboot)
 
 開機完成後（此時 SAI platform device 早已存在）手動觸發 machine driver:
 
-```
+```bash
 echo sound-alc5672 > /sys/bus/platform/drivers/fsl-asoc-card/bind
 ```
 
@@ -105,7 +105,7 @@ echo sound-alc5672 > /sys/bus/platform/drivers/fsl-asoc-card/bind
 
 ### 4.1 背景與術語
 
-```
+```text
 of_platform_populate() 依 device tree 建立 platform_device — 順序「非框架保證」，且跨 kernel 版本改變
 
   6.6 :  … → SAI3 platform_device → … → sound-alc5672(machine)

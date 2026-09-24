@@ -104,7 +104,7 @@ Watchdog 並不是效能優化工具，而是：
 
 ### 4.1 高層 recovery 流程
 
-```
+```text
 watchdog detect stall
  └─ stop netdev
      └─ block TX
@@ -118,15 +118,15 @@ watchdog detect stall
 ### 4.2 Recovery 涉及的關鍵動作
 
 -   停止 TX queue
-    
+
 -   清空 flow ring / credits
-    
+
 -   reset bus
-    
+
 -   重新 download firmware / NVRAM
-    
+
 -   重新註冊 netdev / wiphy
-    
+
 ## 5. Recovery 常見失敗模式
 
 ### 5.1 Recovery 沒被觸發
@@ -134,63 +134,63 @@ watchdog detect stall
 可能原因：
 
 -   watchdog 條件太寬鬆
-    
+
 -   RX 還在進（但 TX 已死）
-    
+
 -   counter 沒歸零
-    
+
 ### 5.2 Recovery 被觸發，但沒救回來
 
 -   firmware reset 失敗
-    
+
 -   bus 沒完全 reset
-    
+
 -   舊 state 沒清乾淨（flow ring / flags）
-    
+
 ### 5.3 Recovery 與正常路徑 race
 
 -   recovery 執行時，cfg80211 仍在下指令
-    
+
 -   TX/RX 同時進入 reset path
-    
+
 -   導致二次 crash 或永久 dead state
-    
+
 ## 6. SDIO vs PCIe：Recovery 的差異
 
 ### 6.1 SDIO Recovery 特性
 
 -   reset 成本低
-    
+
 -   timing / sleep 狀態高度敏感
-    
+
 -   常見「reset 後第一包送不出去」
-    
+
 ### 6.2 PCIe Recovery 特性
 
 -   reset 成本高
-    
+
 -   ring 需完整重建
-    
+
 -   DMA state 若殘留，後果嚴重
-    
+
 ## 7. 常見問題與排查（Debug Concurrency / Watchdog 的實務方法）
 
 ### 7.1 建議觀察順序
 
 1.  TX 是否真的停了？
-    
+
 2.  RX / event 是否還在？
-    
+
 3.  watchdog 是否有觸發？
-    
+
 4.  recovery 是否完整跑完？
-    
+
 ### 7.2 實用 debug 手段
 
 -   在 watchdog 加詳細 counter log
-    
+
 -   記錄每次 netif_stop / wake
-    
+
 -   標記 firmware reset 的開始與結束
-    
+
 **沒有完整 timeline，很難 debug concurrency 問題**

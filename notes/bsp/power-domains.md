@@ -35,7 +35,7 @@ Power domain 是：
 可能狀況：
 -   clock enable，但 domain 沒電
 -   domain 有電，但 clock 沒開
-    
+
 **兩者必須同時正確，裝置才會正常。**
 
 ## 3. Linux Power Domain Framework 的角色
@@ -43,11 +43,11 @@ Power domain 是：
 Linux 提供：
 
 -   generic power domain (genpd)
-    
+
 它負責：
 -   管理 domain on/off
 -   與 runtime PM / system PM 整合
-    
+
 BSP 的責任是：
 -   正確描述 domain 關係
 -   確保 domain 拓撲正確
@@ -64,13 +64,13 @@ power-domains = <&pd_gpu>;
 
 這代表：
 -   裝置依賴該 power domain
-    
+
 ### 4.2 Domain 依賴關係錯誤的後果
 
 若：
 -   domain 漏描述  
 -   domain 關係錯誤
-    
+
 結果可能是：
 -   probe 成功
 -   runtime 使用時才失敗
@@ -99,10 +99,10 @@ runtime PM 假設：
 
 resume 時：
 -   domain 必須依正確順序重新啟動
-    
+
 若順序錯誤：
 -   裝置 resume 後無反應
-    
+
 ## 7. Power Domain Debug Toolbox
 
 ### 7.1 查看 power domain 狀態

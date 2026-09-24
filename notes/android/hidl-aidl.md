@@ -101,7 +101,7 @@ interface IExample {
 
 **編譯輸出**  
 使用 `aidl_interface` in `Android.bp`：
-``` bp
+```bp
 aidl_interface {
     name: "vendor.example.hardware.example",
     vendor_available: true,
@@ -201,7 +201,7 @@ aidl_interface {
 -   `registerAsService()` 是所有 HIDL HAL 的註冊入口。 
 -   AIDL-stable HAL 若設定錯誤，`vndservicemanager --list` 中不會出現對應服務。
 -   可使用以下指令檢查啟動狀態：
-``` bash
+```bash
 adb shell dmesg | grep binder
 adb shell vndservicemanager --list
 ```

@@ -61,7 +61,7 @@ cat /proc/meminfo | grep -i cache
 | Direct I/O | 直接寫入 block device，不經 page cache |
 
 Dirty page 清理：
-```sh
+```bash
 /proc/sys/vm/dirty_ratio
 /proc/sys/vm/dirty_background_ratio
 ```
@@ -116,7 +116,7 @@ driver send command
 RQ 是 driver 啟動 I/O 的唯一入口。
 
 查看 queue：
-```sh
+```bash
 ls /sys/block/mmcblk0/queue
 ```
 常見屬性：
@@ -163,8 +163,8 @@ eMMC / UFS / NVMe 常用。
 
 | 裝置 | 特點 | queue |
 |------|------|-------|
-| eMMC | 單 queue，速度中等 | 單 HW 队列 |
-| UFS | 多 queue，快 | 多 HW 队列 |
+| eMMC | 單 queue，速度中等 | 單 HW 佇列 |
+| UFS | 多 queue，快 | 多 HW 佇列 |
 | NVMe | 支援 64k 隊列 | 高效能、多核 |
 | SD | 最慢 | 單 queue |
 
@@ -218,7 +218,7 @@ Write 常被延遲因為：
 
 ### 10.1 查看 I/O 統計
 
-```sh
+```bash
 iostat -x 1
 ```
 檢查：
@@ -229,28 +229,28 @@ iostat -x 1
 
 ### 10.2 查看 block device 隊列
 
-```sh
+```bash
 cat /sys/block/mmcblk0/queue/nr_requests
 ```
 
 ### 10.3 Android Trace（systrace）
 
 看 block I/O 延遲：
-```sh
+```bash
 block:block_rq_issue
 block:block_rq_complete
 ```
 
 ### 10.4 使用 ftrace
 
-```sh
+```bash
 echo 1 > /sys/kernel/debug/tracing/events/block/enable
 cat trace
 ```
 
 ### 10.5 Page Cache 檢查
 
-```sh
+```bash
 cat /proc/meminfo | grep Dirty
 ```
 

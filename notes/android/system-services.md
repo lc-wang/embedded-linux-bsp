@@ -44,7 +44,7 @@ public static void main(String argv[]) {
 -   Java 層的服務會透過 JNI 呼叫到 `ServiceManager.cpp`。
 主要函式：
 
-```c++
+```cpp
 // frameworks/native/libs/binder/IServiceManager.cpp
 sp<IServiceManager> defaultServiceManager() {
     static sp<IServiceManager> gDefault = new BpServiceManager(...);

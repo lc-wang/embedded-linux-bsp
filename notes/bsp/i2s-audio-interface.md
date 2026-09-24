@@ -123,10 +123,10 @@ arecord -l
 觀察重點：
 -   是否看到預期的 sound card    
 -   card / device 編號是否穩定
-    
+
 若這一步就不存在：
 -   問題通常在 **DAI link / DTS / driver probe**
-    
+
 ### 7.2 確認 Mixer / Path 是否正確
 
 ```bash
@@ -162,7 +162,7 @@ cat /sys/kernel/debug/clk/clk_summary
 觀察重點：
 -   Audio 相關 clock 是否 enable 
 -   rate 是否符合 44.1k / 48k family
-    
+
 Audio 問題第一時間一定要看這裡。
 
 ### 7.5 Suspend / Resume Audio 檢查流程

@@ -56,7 +56,7 @@
 
 -   上層症狀 ≠ 下層錯誤 
 -   Kernel debug 的第一步是：**定位哪一層在違反合約**
-    
+
 ## 3. Logging：最低成本、但要節制
 
 ### 3.1 printk / dmesg（Baseline）
@@ -72,18 +72,18 @@ dmesg -wT
 ```
 -   只在關鍵路徑打
 -   一律加明確 prefix（driver / module）
-    
+
 ### 3.2 Dynamic Debug（取代亂加 printk）
 
 -   適用：driver / subsystem   
 -   優點：runtime 開關、不需重編
-    
+
 #### 查詢可用點
 
 ```bash
 ls /sys/kernel/debug/dynamic_debug/
 ```
-  
+
 #### 針對檔案開
 
 ```bash
@@ -99,7 +99,7 @@ echo 'file drivers/foo/bar.c +p' > /sys/kernel/debug/dynamic_debug/control
 -   suspend 卡住
 -   poweroff 變 reboot
 -   IRQ / sched 問題
-    
+
 ```bash
 mount -t tracefs nodev /sys/kernel/tracing
 ```
@@ -109,7 +109,7 @@ mount -t tracefs nodev /sys/kernel/tracing
 -   `function_graph`：看 call flow
 -   `sched_switch`：看切換
 -   `irq_handler_entry/exit`
-```bash   
+```bash
 echo function_graph > current_tracer
 
 echo do_suspend+0 > set_ftrace_filter
@@ -160,7 +160,7 @@ perf report
 
 -   CPU idle ≠ 沒問題  
 -   要搭配 scheduler trace
-    
+
 ### 6.2 PSI（Resource Pressure）
 
 ```bash
@@ -179,7 +179,7 @@ cat /proc/pressure/cpu
 
 -   reclaim 發生在哪一層
    -   是 kernel pressure 還是 Android policy
-    
+
 ## 8. Symbol / Address
 
 ### 8.1 kallsyms / vmlinux

@@ -53,7 +53,7 @@ U-Boot / Bootloader
         };
     };
 };
-``` 
+```
 
 | 元素 | 說明 |
 | --- | --- |
@@ -68,7 +68,7 @@ U-Boot / Bootloader
 ## 4. phandle 與引用
 
 -   **phandle** 是 DT 裡的「指標」，用來參照其他節點。
-    
+
 ```dts
 led_controller: gpio@1000 {
     compatible = "mychip,gpio";
@@ -113,11 +113,11 @@ module_platform_driver(myled_driver);
 ### 6.1 include
 
 -   共用設定放在 `.dtsi`，供多個板子引用。
-```dts    
+```dts
 #include "rk3588.dtsi"
 #include "rk3588-board.dtsi"
-```    
-    
+```
+
 ### 6.2 overlay
 
 -   用於動態修改部分節點（例如外接裝置）。
@@ -145,8 +145,8 @@ aliases {
     serial0 = &uart0;
     ethernet0 = &gmac1;
 };
-``` 
-    
+```
+
 ## 7. 常見屬性 (Properties)
 
 | 屬性 | 說明 |

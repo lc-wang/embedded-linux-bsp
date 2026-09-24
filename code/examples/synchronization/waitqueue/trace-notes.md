@@ -4,35 +4,35 @@
 
 想像：
 
-```
+```text
 沒有資料 → 先睡
 有資料 → 被叫醒
 這就是 waitqueue。
 ```
 
 ## 2. Level 2
-```
+```text
 Thread A (read):  
  wait_event()  
  ↓  
 條件不成立 → 睡眠  
-  ```
-  ```
+```
+  ```text
 Thread B (write):  
  更新條件  
  ↓  
 wake_up()  
  ↓  
 Thread A 被喚醒
-```
+  ```
 
 ## 3. Level 3
-```
+```text
 wait_event()  
  └─ prepare_to_wait()  
  └─ schedule()  
 ```
-```
+```text
 wake_up()  
  └─ try_to_wake_up()
 ```
@@ -47,11 +47,11 @@ wake_up()
 | 判斷條件   | 隱含         | 明確條件         |
 
 ## 5. wait_event 的本質
-```
+```text
 wait_event(wq, condition)
 ```
 等價於：
-```
+```text
 while (!condition)  
  sleep
 ```

@@ -7,7 +7,7 @@ i.MX8MP 平台從 vendor bcmdhd driver 遷移到 mainline brcmfmac 後，一般 
 
 典型失敗症狀（板子當 P2P client 連手機）：
 
-```
+```text
 P2P-GO-NEG-SUCCESS role=client freq=5745 ...
 P2P-GROUP-FORMATION-FAILURE
 P2P-GROUP-REMOVED wlan0 client reason=FORMATION_FAILED
@@ -15,7 +15,7 @@ P2P-GROUP-REMOVED wlan0 client reason=FORMATION_FAILED
 
 以及韌體端隨機崩潰（serial console）：
 
-```
+```text
 brcmfmac: brcmf_fil_cmd_data: WLC_SET_PROMISC (10) ... failed
 brcmfmac: firmware ... trap / no response
 ```
@@ -64,7 +64,7 @@ host 端則用 `logcat` 抓 wpa_supplicant 的 control event（`P2P-*`、`WPS-*`
 因為是「同板同韌體、換 driver」，最高價值的資訊是 **bcmdhd 對這顆韌體到底下了哪些命令、順序為何**。
 燒回 Android 15，抓 bcmdhd 的完整 P2P client 兩階段流程（WSC → WPA2）：
 
-```
+```text
 （a15 fresh trace，client formation 全程約 1.25s，一次成功）
 wlan: wl_cfgp2p_set_firm_p2p → apsta 已在 init 設好，未再 WLC_DOWN
 wlan: GC bsscfg：roam_off + buf_key_b4_m4 + wsec_info(BSS_ALGOS)
@@ -125,7 +125,7 @@ wlan: link-down 不送 WLC_DISASSOC（interface 直接 p2p_ifdel）
 
 一次 P2P client 入群的正常旅程：
 
-```
+```text
 [wpa_supplicant] P2P_CONNECT
    ↓ ① GO Negotiation（決定誰當 GO）→ role=client
 [cfg80211] .connect（SME 下發）─── 必須真的走到 driver 的 brcmf_cfg80211_connect
@@ -291,7 +291,7 @@ if (ifp && ifevent->action == BRCMF_E_IF_DEL) {
 
 **方向 A — 板子當 client 連手機（`connect -i 0`）：**
 
-```
+```text
 P2P-GO-NEG-SUCCESS role=client → WPS-SUCCESS
 WPA: Key negotiation completed [PTK=CCMP GTK=CCMP]
 CTRL-EVENT-CONNECTED / P2P-GROUP-STARTED p2p-wlan0-0 client
@@ -301,7 +301,7 @@ ping 192.168.49.1 → 4 packets, 0% loss ✓
 
 **方向 B — 板子當 GO 被手機連（`connect -i 15`）：**
 
-```
+```text
 P2P-GROUP-STARTED p2p-wlan0-0 GO freq=5785 (VHT80 / ch157)
 AP-STA-CONNECTED <phone-mac>
 手機 DHCP 取得 192.168.49.x

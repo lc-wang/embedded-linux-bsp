@@ -15,14 +15,14 @@ Linux dma-buf / DRM PRIME memory sharing flow 心智模型。
 
 ## 1. 一句話先記住
 
-```text  
+```text
 dma-buf  
 = Linux kernel 的共享 memory 機制
 ```
 
 ## 2. 最重要觀念
 
-```
+```text
 不是 copy memory
 
 而是：
@@ -33,20 +33,20 @@ dma-buf
 
 PRIME：
 
-```
+```text
 DRM 對 dma-buf sharing 的整合介面
 ```
 
 也就是：
 
-```
+```text
 DRM driver
 如何 import/export dma-buf
 ```
 
 ## 4. 真實 graphics stack
 
-```
+```text
 GPU render
  ↓
 dma-buf fd
@@ -62,7 +62,7 @@ scanout
 
 因為：
 
-```
+```text
 copy framebuffer 太貴
 ```
 
@@ -75,14 +75,14 @@ copy framebuffer 太貴
 
 ## 6. zero-copy 的核心
 
-```
+```text
 同一塊 physical memory
 被不同 subsystem 共用
 ```
 
 ## 7. Kernel 原始碼對照
 
-```
+```text
 drivers/dma-buf/
 drivers/gpu/drm/drm_prime.c
 drivers/gpu/drm/drm_gem_prime.c

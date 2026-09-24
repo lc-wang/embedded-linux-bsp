@@ -15,7 +15,7 @@ Linux kernel 中最基本的「不可睡眠鎖（non-sleeping lock）」範例�
 
 ## 1. 一句話先記住
 
-```
+```text
 spinlock
 = 拿不到就原地忙等（busy wait）
 = 不能睡眠
@@ -31,7 +31,7 @@ spinlock
 模擬「多執行緒 + 可能被中斷打斷」的情境
 
 ## 3. Kernel 原始碼對照
-```
+```text
 kernel/locking/spinlock.c  
 include/linux/spinlock.h  
 arch/*/include/asm/spinlock.h

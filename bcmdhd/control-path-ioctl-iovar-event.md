@@ -30,7 +30,7 @@ Host 的角色只有三個：
 3. **轉譯成 cfg80211 語意**
 
 ### 1.2 Control Path 的三個元件
-```
+```text
 cfg80211 ops
 │
 ▼
@@ -62,7 +62,7 @@ dhd_wl_ioctl(dhd_pub, cmd, buf, len, set);
 用途：
 
 -   舊功能
-    
+
 -   相容性保留
 
 ### 2.2 iovar（主流、也是最重要的介面）
@@ -70,11 +70,11 @@ dhd_wl_ioctl(dhd_pub, cmd, buf, len, set);
 **iovar = I/O Variable**
 
 -   以「字串名稱」識別功能
-    
+
 -   payload 格式彈性
-    
+
 -   幾乎所有新功能都用 iovar
-    
+
 範例：
 
 `wldev_iovar_setbuf(dev, "country", &ccode, sizeof(ccode), buf, buflen);` 
@@ -97,7 +97,7 @@ driver 只是把 name + payload 送出去
 ## 3. cfg80211 → iovar 的實際呼叫路徑
 
 ### 3.1 Scan 的完整 control flow
-```
+```text
 cfg80211_ops->scan
   └─ wl_cfg80211_scan()
       └─ wl_do_escan()
@@ -111,57 +111,57 @@ cfg80211_ops->scan
 對應檔案：
 
 -   `wl_cfg80211.c`
-    
+
 -   `wldev_common.c`
-    
+
 -   `dhd_common.c`
-    
+
 -   `dhd_sdio.c` / `dhd_pcie.c`
 
 ### 3.2 Connect（join）流程
-```
+```text
 cfg80211_connect()
   └─ wl_cfg80211_connect()
       ├─ set auth / akm / wsec
       ├─ set PMK (必要時)
       └─ wldev_iovar_setbuf("join")
- ```
+```
 
 **重點**
 
 -   Linux 不等待「結果」
-    
+
 -   真正結果由 **event** 回報
 
 ## 4. dhd_common.c：Control Path 核心
 ### 4.1 ioctl / iovar 的統一入口
-```
+```c
 int dhd_wl_ioctl(dhd_pub_t *dhdp, int cmd, void *buf, int len, bool set)
-````
+```
 
 職責：
 
 -   command 封裝
-    
+
 -   protocol header 填寫
-    
+
 -   呼叫 bus layer 傳送 control frame
 
 ### 4.2 protocol layer（與 bus 無關）
-```
+```text
 dhd_prot_ioctl()
 ```
 
 -   不知道是 SDIO / PCIe
-    
+
 -   只負責「邏輯格式」
 
 ### 4.3 bus layer 的 control 傳送
 
 -   SDIO：CMD52 / CMD53
-    
+
 -   PCIe：msgbuf / DMA
-    
+
 ## 5. Firmware Event：真正的「狀態來源」
 
 ### 5.1 為什麼 event 這麼重要？
@@ -169,31 +169,31 @@ dhd_prot_ioctl()
 在 FullMAC 架構中：
 
 -   **Event = 真實世界**
-    
+
 -   ioctl / iovar 只是「請求」
-    
+
 如果：
 
 -   指令送成功
-    
+
 -   但事件沒回來
-    
+
 **等同於什麼都沒發生**
 
 ### 5.2 Event packet 的來源
 
 -   event 是 **從 RX data path 回來**
-    
+
 -   與一般資料封包共用通道
-    
-```
+
+```text
 RX packet
   ├─ normal data
   └─ event packet
 ```
 
 ### 5.3 Event 判斷與解析流程
-```
+```text
 dhd_rx_frame()
   └─ dhd_event_process()
       └─ wl_cfg80211_event()
@@ -218,7 +218,7 @@ dhd_rx_frame()
 ## 6. Event 與 cfg80211 的對應關係
 
 ### 6.1 Link / Disconnect
-```
+```text
 cfg80211_connect_result()
 cfg80211_disconnected()
 ```
@@ -229,9 +229,9 @@ cfg80211_disconnected()
 ### 6.3 Scan result
 
 -   BSS entry 由 event 逐筆回報
-    
+
 -   scan complete event 結束流程
-    
+
 ## 7. 常見問題與排查（Control Path 常見問題模式）
 
 ### 7.1 指令送成功，但 Wi-Fi 沒動
@@ -239,23 +239,23 @@ cfg80211_disconnected()
 可能原因：
 
 -   firmware 忽略指令（狀態不允許）
-    
+
 -   iovar sequence 錯誤
-    
+
 -   前一個動作未完成
-    
+
 ### 7.2 Scan / connect 偶發失敗
 
 -   event 丟失
-    
+
 -   RX 被 flow control 卡住
-    
+
 -   firmware 忙於 roam / power transition
-    
+
 ### 7.3 Resume 後 control path 失效
 
 -   firmware state 與 host 不同步
-    
+
 -   control channel blocked
-    
+
 -   PM iovar 未正確重設

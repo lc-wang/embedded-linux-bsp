@@ -96,7 +96,7 @@ pm_runtime_disable(dev);
 struct  clk *clk = devm_clk_get(dev, "core");
 clk_prepare_enable(clk);
 clk_disable_unprepare(clk);
-``` 
+```
 
 -   **目的**
 
@@ -136,7 +136,7 @@ my_device@0 {
 my_device@0 {
 	power-domains = <&pd_vpu>;
 };
-```     
+```
 -   核心會自動呼叫 `pm_genpd` 介面控制該域。
 
 ## 8. Wakeup Source

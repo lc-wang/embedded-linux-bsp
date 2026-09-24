@@ -4,7 +4,7 @@
 
 如果兩個 thread 同時改同一個變數：
 
-```
+```text
 thread A: shared_counter += 1
 thread B: shared_counter += 1
 沒有鎖的話，就可能出現 race condition。
@@ -26,7 +26,7 @@ mutex 的作用就是：
 共享資源
 
 流程如下：
-```
+```text
 userspace write()  
  ↓  
 VFS  
@@ -41,12 +41,12 @@ mutex_unlock()
 ```
 
 ## 3. Level 3
-```
+```text
 mutex_lock()  
  └─ __mutex_lock()  
  └─ 可能睡眠等待  
- ```
 ```
+```text
 mutex_unlock()  
  └─ __mutex_unlock_slowpath()
 ```

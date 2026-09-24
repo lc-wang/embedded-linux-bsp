@@ -8,17 +8,17 @@ GStreamer 的設計核心是 **plugin architecture**。
 這使得 multimedia pipeline 可以透過不同 plugin 支援：
 
 -   camera
-    
+
 -   codec
-    
+
 -   display
-    
+
 -   network streaming
-    
+
 ## 1. Plugin Architecture
 
 GStreamer 採用 **動態 plugin 模型**：
-```
+```text
 GStreamer Core  
  │  
  ▼  
@@ -28,24 +28,24 @@ Plugin Loader
 Element (plugin implementation)
 ```
 plugin 通常是：
-```
+```text
 .so shared library
 ```
 例如：
-```
+```text
 libgstvideo4linux2.so  
 libgstwaylandsink.so  
 libgstkmssink.so
 ```
 位置通常在：
-```
+```text
 /usr/lib/gstreamer-1.0/
 ```
 
 ## 2. Plugin → Element → Pad
 
 GStreamer 的層級：
-```
+```text
 Plugin  
  │  
  ▼  
@@ -67,30 +67,30 @@ Pad
 GStreamer 啟動時會掃描 plugin。
 
 掃描方式：
-```
+```text
 GST_PLUGIN_PATH  
 /usr/lib/gstreamer-1.0
 ```
 使用指令可以查看 plugin：
-```
+```bash
 gst-inspect-1.0
 ```
 例如：
-```
+```bash
 gst-inspect-1.0 v4l2src
 ```
 輸出包含：
 
 -   element type
-    
+
 -   supported caps
-    
+
 -   pad template
-    
+
 ## 4. Element Lifecycle
 
 element 在 pipeline 中會經歷 lifecycle：
-```
+```text
 create  
  │  
  ▼  
@@ -111,23 +111,23 @@ streaming
 每個 element 會定義 pad template。
 
 例如：
-```
+```text
 SRC template: 'src'  
 SINK template: 'sink'
 ```
 這表示：
-```
+```text
 v4l2src  
  │  
  └── src pad
 ```
-```
+```text
 kmssink  
  │  
  └── sink pad
 ```
 連接方式：
-```
+```text
 v4l2src.src → kmssink.sink
 ```
 
@@ -136,7 +136,7 @@ v4l2src.src → kmssink.sink
 Caps negotiation 是 pipeline 成功運作的關鍵。
 
 過程：
-```
+```text
 upstream element  
  │  
  ▼  
@@ -149,7 +149,7 @@ downstream element
 accept / reject
 ```
 例如：
-```
+```text
 video/x-raw  
 format=NV12  
 width=1920  
@@ -164,14 +164,14 @@ pipeline 會 fail。
 Buffer allocation 通常由 **sink 或 downstream element** 決定。
 
 流程：
-```
+```text
 downstream propose allocation  
  │  
  ▼  
 upstream allocate buffer
 ```
 例如：
-```
+```text
 kmssink  
  │  
  ▼  
@@ -194,11 +194,11 @@ GStreamer buffer 支援多種 memory。
 | GL memory | GPU |
 
 embedded pipeline 常用：
-```
+```text
 DMABUF
 ```
 例如：
-```
+```text
 camera → v4l2src → dmabuf → kmssink
 ```
 
@@ -211,35 +211,35 @@ GStreamer plugin 通常只是 **userspace wrapper**。
 ### 9.1 v4l2src
 
 對應：
-```
+```text
 /dev/videoX
 ```
 呼叫：
-```
+```text
 VIDIOC_REQBUFS  
 VIDIOC_QBUF  
 VIDIOC_DQBUF  
 VIDIOC_STREAMON
 ```
 kernel：
-```
+```text
 drivers/media/
 ```
 
 ### 9.2 kmssink
 
 對應：
-```
+```text
 DRM device  
 /dev/dri/card0
 ```
 呼叫：
-```
+```text
 DRM_IOCTL_MODE_ATOMIC  
 DRM_IOCTL_MODE_SETPLANE
 ```
 kernel：
-```
+```text
 drivers/gpu/drm/
 ```
 
@@ -248,7 +248,7 @@ drivers/gpu/drm/
 waylandsink 不直接控制 DRM。
 
 流程：
-```
+```text
 waylandsink  
  │  
  ▼  
@@ -258,7 +258,7 @@ wayland compositor
 DRM
 ```
 例如：
-```
+```bash
 weston  
 kwin
 ```
@@ -266,11 +266,11 @@ kwin
 ## 10. Example Pipeline Lifecycle
 
 以下 pipeline：
-```
+```bash
 gst-launch-1.0 v4l2src ! kmssink
 ```
 完整流程：
-```
+```text
 load plugin  
  │  
 create element  
@@ -284,7 +284,7 @@ buffer allocation
 streaming
 ```
 Streaming：
-```
+```text
 camera frame  
  │  
  ▼  
@@ -305,39 +305,39 @@ DRM plane
 ### 11.1 pipeline 無法建立
 
 原因：
-```
+```text
 caps negotiation fail
 ```
 
 ### 11.2 pipeline hang
 
 原因：
-```
+```text
 driver block
 ```
 例如：
-```
+```text
 VIDIOC_DQBUF timeout
 ```
 
 ### 11.3 畫面沒有顯示
 
 原因：
-```
+```text
 DRM plane issue
 ```
 
 ## 12. BSP Debug 常用工具
 
 查看 element：
-```
+```bash
 gst-inspect-1.0
 ```
 查看 pipeline：
-```
+```bash
 GST_DEBUG=3 gst-launch-1.0 ...
 ```
 查看 caps：
-```
+```text
 GST_DEBUG=caps:6
 ```

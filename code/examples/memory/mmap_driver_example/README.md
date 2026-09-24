@@ -24,7 +24,7 @@ mmap
 = map（把同一塊頁面映射到 userspace）
 
 ## 2. Kernel 原始碼對照
-```
+```text
 mm/mmap.c
 mm/memory.c
 fs/read_write.c
@@ -43,13 +43,13 @@ dmesg | tail
 ls -l /dev/mymmap
 ```
 ### 3.2 編 userspace 測試程式
-```
+```text
 cd ../userspace
 make
 ./mmap_user
 ```
 ### 3.3 看 kernel log
-```
+```bash
 dmesg | tail -n 80
 ```
 ## 4. 注意

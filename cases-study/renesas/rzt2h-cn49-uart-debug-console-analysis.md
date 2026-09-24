@@ -123,7 +123,7 @@ P11_0_BSC_A5_LCDC_DATG0_PMOD2_RXD1
 
 -   **SW6-4 = ON**  
     → 連接 `P11_0 → PMOD2_RXD1`
-    
+
 同時需確保：
 
 -   其他與 P11_0 共用的功能（ESC_RESETOUT 等）**未同時打開**

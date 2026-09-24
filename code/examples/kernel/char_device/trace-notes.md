@@ -1,7 +1,7 @@
 # Kernel trace notes — char_device
 
 ## 1. /dev 節點從哪來？
-```
+```text
 device_create()
 └─ drivers/base/core.c
 └─ device_add()
@@ -10,7 +10,7 @@ device_create()
 ```
 
 ## 2. open() trace
-```
+```text
 open("/dev/mychardev")
 └─ sys_openat
 └─ do_sys_open
@@ -21,7 +21,7 @@ open("/dev/mychardev")
 ```
 
 ## 3. read() trace
-```
+```text
 read()
 └─ vfs_read()
 └─ file->f_op->read()
@@ -29,7 +29,7 @@ read()
 ```
 
 ## 4. write() trace
-```
+```text
 write()
 └─ vfs_write()
 └─ file->f_op->write()
@@ -37,7 +37,7 @@ write()
 ```
 
 ## 5. ioctl() trace
-```
+```text
 ioctl()
 └─ do_vfs_ioctl()
 └─ file->f_op->unlocked_ioctl()
@@ -45,7 +45,7 @@ ioctl()
 ```
 
 ## 6. 最重要心智模型
-```
+```text
 userspace
 ↓
 syscall

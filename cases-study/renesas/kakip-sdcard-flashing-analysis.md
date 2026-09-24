@@ -9,17 +9,17 @@ Kakip OS 提供完整的 SD card 映像檔，需要以 dd 寫入 SD card 作為�
 正常流程為：
 
 1.  清除舊 partition table（選擇性）
-    
+
 2.  使用 `dd` 寫入 SD card
-    
+
 3.  將 SD card 插入 Kakip 板並啟動
-    
+
 實際測試中發現以下異常：
 
 -   使用一般 dd 寫法（無 `oflag=direct`）燒錄後無法開機
-    
+
 -   加上 `oflag=direct` 後燒錄可正常開機
-    
+
 本文件分析原因並提供最佳實務建議。
 
 ### 1.2 問題描述
@@ -42,7 +42,7 @@ Kakip OS 提供完整的 SD card 映像檔，需要以 dd 寫入 SD card 作為�
 2.  Linux 標示為已寫入
 3.  實際裝置寫入延後進行，順序不可控
 4.  `sync` 後才強制 flush
-    
+
 此行為對 boot sector 造成風險：
 
 -   寫入順序可能錯亂
@@ -57,13 +57,13 @@ Direct I/O 特性：
 -   寫入順序維持一致
 -   寫入立即落盤
 -   block 大小與 offset 直接與底層裝置對齊
-    
+
 因此：
 
 -   MBR/GPT header
 -   SPL
 -   U-Boot image header
-    
+
 都能被完整寫入正確位置。
 
 ### 2.3 讀卡機差異造成的不一致性
@@ -74,7 +74,7 @@ Direct I/O 特性：
 -   使用非同步寫入
 -   延遲 flush
 -   做內部 sector re-map
-    
+
 因此，有些環境即使沒有 direct I/O 也可正常啟動，但部分裝置必須使用 direct I/O 才能保證寫入正確。
 
 ### 2.4 實測與驗證
@@ -87,7 +87,7 @@ Direct I/O 特性：
 -   開頭 sector 不一致
 -   前幾個 block 若為 `00 00`，表示未寫入成功
 -   SPL header 損壞
-    
+
 ## 3. Root Cause 分析（問題根因摘要）
 
 不加 `oflag=direct` 時，Linux 會使用 page cache 寫入 SD card，可能導致：
@@ -96,13 +96,13 @@ Direct I/O 特性：
 -   block 寫入順序被重新排序
 -   對齊不正確
 -   寫入延遲造成前幾個 sectors 的資料不完整
-    
+
 Kakip（RZ/V2H）啟動流程強依賴 SD 開頭區段：
 
 -   sector 0（MBR/GPT）
 -   SPL 在 SD card 前段
 -   U-Boot 與 FIT 在固定 offset
-    
+
 任意小塊損壞都會導致無法啟動。
 
 加入 `oflag=direct` 可以避免上述問題，確保所有 block 以對齊方式直接寫入裝置。
@@ -120,7 +120,7 @@ Kakip（RZ/V2H）啟動流程強依賴 SD 開頭區段：
 -   `oflag=direct` ：避免 cache 和 re-ordering
 -   `oflag=sync` ：每個 block 寫入後立即同步到 SD
 -   `bs=4M` ：效能與對齊兼具
-    
+
 ### 4.2 建議的完整燒錄流程
 
 #### 步驟一：清除舊 GPT/MBR（避免分割表殘留）
@@ -143,7 +143,7 @@ Kakip v7.4 映像檔在燒錄 SD card 時，若未使用 `oflag=direct`，Linux 
 -   部分 boot sector 未寫入
 -   SPL 或 GPT header 損壞
 -   導致板子無法啟動
-    
+
 加入 `oflag=direct,sync` 可確保：
 -   每個 block 寫入裝置
 -   排除 cache 與對齊問題

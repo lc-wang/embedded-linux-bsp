@@ -3,12 +3,12 @@
 ## 1. misc_register() 做了什麼？
 
 位置：
-```
+```text
 drivers/char/misc.c
 ```
 
 主要流程：
-```
+```text
 misc_register()
 ├─ ida_alloc() // 分配 minor
 ├─ cdev_init()
@@ -18,7 +18,7 @@ misc_register()
 ```
 
 ## 2. open() trace
-```
+```text
 open("/dev/mymisc")
 └─ chrdev_open()
 └─ file->f_op = my_fops
@@ -37,7 +37,7 @@ open("/dev/mymisc")
 - 快速建立 /dev 節點
 
 實例：
-```
+```text
 drivers/bluetooth/
 drivers/media/
 drivers/hwmon/

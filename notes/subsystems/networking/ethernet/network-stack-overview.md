@@ -51,7 +51,7 @@
 
 ## 2. TX Flow（送封包）
 
-```
+```text
 User space  
  ↓ send()  
 Socket layer  
@@ -70,18 +70,18 @@ PHY → Wire
 ### 2.1 關鍵點
 
 -   driver entry point：
-```
+```text
 ndo_start_xmit()
 ```
 -   常見 debug：
-```
+```bash
 ethtool -S eth0  
 cat /proc/net/dev
 ```
 
 ## 3. RX Flow（收封包）
 
-```
+```text
 Wire  
  ↓  
 PHY  
@@ -108,7 +108,7 @@ User space
 
 ## 4. 核心資料結構：`sk_buff`
 
-```
+```c
 struct  sk_buff {  
   unsigned  char  *data;  
   unsigned  int  len;  
@@ -122,18 +122,18 @@ struct  sk_buff {
 
 ## 5. `net_device`（Driver 核心）
 
-```
+```c
 struct  net_device {  
   const  struct  net_device_ops  *netdev_ops;  
  ...  
 };
 ```
 driver 會註冊：
-```
+```c
 dev->netdev_ops  =  &ops;
 ```
 常見 ops：
-```
+```text
 .ndo_open  
 .ndo_stop  
 .ndo_start_xmit
@@ -148,7 +148,7 @@ dev->netdev_ops  =  &ops;
 -   eqos（DesignWare EQOS）
 
 這些 driver 負責：
-```
+```text
 DMA descriptor  
 TX/RX ring buffer  
 interrupt  
@@ -157,7 +157,7 @@ MAC register control
 
 ## 7. PHY / MDIO 在 stack 中的位置
 
-```
+```text
 MAC driver  
  ↓  
 phylib  
@@ -176,20 +176,20 @@ PHY 負責：
 
 ### 8.1 開機 log
 
-```
+```bash
 dmesg | grep eth
 ```
 
 ### 8.2 link 狀態
 
-```
+```bash
 ip link  
 ethtool eth0
 ```
 
 ### 8.3 PHY
 
-```
+```bash
 dmesg | grep phy
 ```
 

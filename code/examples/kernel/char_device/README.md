@@ -27,7 +27,7 @@ Linux character device（字元裝置）最小實作範例。
 - remoteproc character interface
 
 ## 1. Kernel 原始碼對照
-```
+```text
 fs/char_dev.c
 fs/open.c
 fs/read_write.c
@@ -35,7 +35,7 @@ drivers/base/core.c
 ```
 
 ## 2. 完整資料流
-```
+```text
 userspace
 └─ open("/dev/mychardev")
 └─ sys_openat()

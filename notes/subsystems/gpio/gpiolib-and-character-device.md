@@ -3,7 +3,7 @@
 ## 1. 為什麼 sysfs 被淘汰？
 
 舊機制：
-```
+```text
 /sys/class/gpio/export
 /sys/class/gpio/gpioX/direction
 /sys/class/gpio/gpioX/value
@@ -38,7 +38,7 @@
 
 ### 2.1 核心流程
 
-```
+```text
 SoC gpio driver
       ↓
 gpiochip_add_data()
@@ -51,12 +51,12 @@ gpiolib 註冊 character device
 ## 3. gpiolib 內部結構
 
 核心檔案：
-```
+```text
 drivers/gpio/gpiolib.c
 drivers/gpio/gpiolib-cdev.c
 ```
 重要結構：
-```
+```text
 struct gpio_chip
 struct gpio_device
 struct gpio_desc
@@ -65,7 +65,7 @@ struct gpio_desc
 ### 3.1 gpio_device
 
 代表一個 gpio controller instance：
-```
+```c
 struct gpio_device {
     struct gpio_chip *chip;
     struct cdev chrdev;
@@ -77,7 +77,7 @@ struct gpio_device {
 ## 4. file_operations
 
 gpiolib 會註冊：
-```
+```c
 static const struct file_operations gpio_fileops = {
     .owner = THIS_MODULE,
     .open = gpio_chrdev_open,
@@ -95,14 +95,14 @@ static const struct file_operations gpio_fileops = {
 
 ### 5.1 v1 API（舊）
 
-```
+```text
 GPIO_GET_LINEHANDLE_IOCTL
 GPIO_GET_LINEEVENT_IOCTL
 ```
 
 ### 5.2 v2 API（推薦）
 
-```
+```text
 GPIO_V2_GET_LINE_IOCTL
 GPIO_V2_LINE_SET_VALUES_IOCTL
 GPIO_V2_LINE_GET_VALUES_IOCTL
@@ -116,7 +116,7 @@ GPIO_V2_LINE_GET_VALUES_IOCTL
 
 ### 6.2 Step 2 取得 line handle
 
-```
+```c
 struct gpio_v2_line_request req;
 ioctl(fd, GPIO_V2_GET_LINE_IOCTL, &req);
 ```
@@ -129,7 +129,7 @@ ioctl(fd, GPIO_V2_GET_LINE_IOCTL, &req);
 
 ### 6.4 Step 4 設定電平
 
-```
+```c
 struct gpio_v2_line_values vals;
 ioctl(line_fd, GPIO_V2_LINE_SET_VALUES_IOCTL, &vals);
 ```
@@ -161,12 +161,12 @@ v2 改善：
 ## 8. Edge Event 機制
 
 如果設定：
-```
+```text
 GPIO_V2_LINE_FLAG_EDGE_RISING
 GPIO_V2_LINE_FLAG_EDGE_FALLING
 ```
 Kernel 會：
-```
+```text
 interrupt
    ↓
 gpio_irq_handler
@@ -218,7 +218,7 @@ User space 使用：
 ## 11. gpio hog
 
 DT 可設定：
-```
+```dts
 gpio-hog;
 output-high;
 ```
@@ -234,10 +234,10 @@ output-high;
 
 ## 12. Debug 建議
 
-```
+```bash
 ls -l /dev/gpiochip*
 ```
-```
+```bash
 gpioinfo
 ```
 `cat /sys/kernel/debug/gpio`

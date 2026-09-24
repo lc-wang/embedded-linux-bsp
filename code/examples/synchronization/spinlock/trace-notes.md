@@ -4,16 +4,16 @@
 
 mutex：
 
-```
+```text
 拿不到鎖 → 去睡覺
 ```
 spinlock：
-```
+```text
 拿不到鎖 → 原地一直轉（忙等）
 ```
 
 ## 2. Level 2
-```
+```text
 spin_lock()  
  ↓  
 檢查鎖是否被持有  
@@ -33,7 +33,7 @@ while (lock_taken)
 一直「空轉」
 
 ## 3. Level 3
-```
+```text
 spin_lock()  
  └─ raw_spin_lock()  
  └─ arch_spin_lock()  
@@ -41,7 +41,7 @@ spin_lock()
 ```
 
 ## 4. spin_lock_irqsave 在幹嘛？
-```
+```c
 spin_lock_irqsave(&lock, flags);
 ```
 做兩件事：
@@ -68,7 +68,7 @@ CPU0 拿 lock
 ✗ msleep
 
 因為：
-```
+```text
 spinlock 區段不能睡眠
 ```
 

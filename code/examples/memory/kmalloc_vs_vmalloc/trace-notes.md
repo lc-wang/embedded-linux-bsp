@@ -1,7 +1,7 @@
 # Kernel trace notes — kmalloc_vs_vmalloc
 
 ## 1. kmalloc() 走哪裡？
-```
+```text
 kmalloc()
 	└─ slab allocator
 		└─ page allocator
@@ -12,7 +12,7 @@ kmalloc()
 - 可能失敗（高階 order）
 
 ## 2. vmalloc() 走哪裡？
-```
+```text
 vmalloc()
 	└─ vmap()
 		└─ 建立虛擬連續映射

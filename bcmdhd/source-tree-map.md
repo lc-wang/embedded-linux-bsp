@@ -9,12 +9,12 @@
 ## 1. Source Tree 高層分類
 
 在 Android / vendor kernel 中，bcmdhd 通常集中於：
-```
+```text
 drivers/net/wireless/bcmdhd/
 ```
 
 可以邏輯上分成 **四大區塊**：
-```
+```text
 bcmdhd/
 ├── cfg80211 glue
 ├── DHD core

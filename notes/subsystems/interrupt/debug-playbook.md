@@ -23,7 +23,7 @@
 
 ## 2. 標準 Debug 流程
 
-```
+```text
 Step 1  → 確認 DT interrupt 設定  
 Step 2  → 確認 pinctrl（input + mux）  
 Step 3  → 確認 irq_domain mapping  
@@ -37,7 +37,7 @@ Step 7  → 確認 user space event
 
 ### 3.1 Step 1 檢查 Device Tree
 
-```
+```dts
 interrupt-parent = <&gpio3>;  
 interrupts = <5 IRQ_TYPE_EDGE_FALLING>;
 ```
@@ -48,7 +48,7 @@ interrupts = <5 IRQ_TYPE_EDGE_FALLING>;
 
 ### 3.2 Step 2 檢查 pinctrl
 
-```
+```bash
 cat /sys/kernel/debug/pinctrl/*/pinmux-pins
 ```
 確認：
@@ -60,7 +60,7 @@ cat /sys/kernel/debug/pinctrl/*/pinmux-pins
 
 ### 3.3 Step 3 檢查 GPIO controller 是否支援 IRQ
 
-```
+```dts
 gpio3: gpio@xxxx {
     interrupt-controller;
 };
@@ -68,7 +68,7 @@ gpio3: gpio@xxxx {
 
 ### 3.4 Step 4 檢查 mapping
 
-```
+```bash
 cat /proc/interrupts
 ```
 如果完全沒有該 IRQ：
@@ -82,7 +82,7 @@ cat /proc/interrupts
 ### 3.5 Step 5 手動觸發
 
 用：
-```
+```bash
 gpioset / gpioget
 ```
 或直接硬體觸發
@@ -95,39 +95,39 @@ gpioset / gpioget
 
 #### interrupt-parent 錯
 
-```
+```dts
 interrupt-parent = <&wrong_node>;
 ```
 
 #### gpio 沒接 GIC
 
 缺少：
-```
+```dts
 interrupt-parent = <&gic>;
 ```
 （或 inheritance 錯）
 
 #### #interrupt-cells 錯
 
-```
+```dts
 #interrupt-cells = <2>;
 ```
 與 driver 不匹配
 
 #### driver 沒 request_irq
 
-```
+```text
 request_irq(...)
 ```
 沒被呼叫
 
 ## 5. Case 3：counter 不增加
 
-```
+```bash
 cat /proc/interrupts
 ```
 看到：
-```
+```text
 123: 0 0 GICv3 89 gpio-keys
 ```
 一直是 0
@@ -141,7 +141,7 @@ cat /proc/interrupts
 
 #### trigger type 錯
 
-```
+```text
 EDGE vs LEVEL  
 HIGH vs LOW
 ```
@@ -153,7 +153,7 @@ active-low 搞反
 
 ## 6. Case 4：interrupt storm
 
-```
+```text
 CPU usage 100%  
 interrupt 不斷觸發
 ```
@@ -177,20 +177,20 @@ line 永遠被拉低
 
 ### 7.1 檢查 request_irq
 
-```
+```c
 request_irq(virq, handler, ...);
 ```
 
 ### 7.2 用 ftrace
 
-```
+```bash
 echo  function > /sys/kernel/debug/tracing/current_tracer  
 echo irq_handler_entry > set_ftrace_filter
 ```
 
 ### 7.3 看 log
 
-```
+```bash
 dmesg | grep irq
 ```
 
@@ -204,7 +204,7 @@ dmesg | grep irq
 
 ### 8.2 檢查 libgpiod
 
-```
+```bash
 gpiomon gpiochip0 5
 ```
 
@@ -227,26 +227,26 @@ GPIO output OK
 
 ### 10.1 查看 IRQ 詳細資訊
 
-```
+```bash
 cat /sys/kernel/debug/irq/irqs/<n>
 ```
 
 ### 10.2 查看 irq_domain
 
-```
+```bash
 cat /sys/kernel/debug/irq_domain/*
 ```
 
 ### 10.3 Trace IRQ flow
 
-```
+```bash
 echo  function > tracing/current_tracer  
 echo gic_handle_irq > set_ftrace_filter
 ```
 
 ### 10.4 dynamic debug
 
-```
+```bash
 echo  'file drivers/irqchip/* +p' > dynamic_debug/control
 ```
 
@@ -265,7 +265,7 @@ GPIO 是否真的有 edge
 
 ## 12. 最終 Debug Flow
 
-```
+```text
 GPIO edge 有沒有？  
  ↓  
 /proc/interrupts 有沒有？  

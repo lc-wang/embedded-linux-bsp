@@ -197,13 +197,13 @@ SurfaceFlinger → HWC → DRM → Panel
 
 -   較高的 `uclamp.min`
 -   允許使用 big core
-    
+
 效果是：
 
 -   thread 剛 wakeup 時，即使 util_avg 很低
 -   scheduler 仍會選擇高效能 CPU
 -   確保 frame 能在 vsync deadline 前完成
-    
+
 這是 Android 能避免「首幀慢、動畫卡」的關鍵。
 
 ### 10.3 為什麼 graphics pipeline 正確，畫面仍然會卡
@@ -213,7 +213,7 @@ SurfaceFlinger → HWC → DRM → Panel
 -   BufferQueue 正常流動
 -   HWC composition 正確
 -   DRM atomic commit 成功
-    
+
 但仍有 jank。
 
 **根本原因往往是 scheduler 層級問題**：
@@ -230,13 +230,13 @@ SurfaceFlinger → HWC → DRM → Panel
 
 #### 1. 確認 thread 所屬 cgroup
 
-```sh
+```bash
 ps -e -o pid,tid,comm,cgroup | grep surfaceflinger
 ```
 
 #### 2. 檢查 uclamp 設定
 
-```sh
+```bash
 cat /sys/fs/cgroup/top-app/uclamp.min cat /sys/fs/cgroup/top-app/uclamp.max
 ```
 
@@ -247,7 +247,7 @@ cat /sys/fs/cgroup/top-app/uclamp.min cat /sys/fs/cgroup/top-app/uclamp.max
     -   thread wakeup
     -   實際 run time
     -   是否錯過 vsync
-        
+
 ### 10.5 BSP / vendor 常見踩雷點（graphics 專屬）
 
 1.  **vendor kernel scheduler patch 與 uclamp 衝突** 

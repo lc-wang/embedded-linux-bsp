@@ -56,31 +56,31 @@
     startup_cr52.S      ← 稍後新增
   script/
     rzt2h_cr52_remoteproc.ld  ← 稍後新增
- ```
+```
 
 ## 4. 新增自訂 linker script（remoteproc 專用）
 
 為了配合 Linux remoteproc 的啟動位址，CR52 firmware 需要對齊 DTS 中設定的 `renesas,rz-start_address`。以下示範使用：
 
 -   CR52 SRAM 範圍：`0x10000000 - 0x101FFFFF`（2MB）
-    
+
 -   remoteproc start_address：`0x10061000`
-    
+
 ### 4.1 新增檔案
 
 1.  在 e² studio 專案上按右鍵：
-    
+
     -   `New` → `Folder` → 建立資料夾：`script`
-        
+
 2.  在 `script` 上按右鍵：
-    
+
     -   `New` → `File` → 檔名輸入：`rzt2h_cr52_remoteproc.ld`
-        
+
 ### 4.2 貼上 linker script 內容
 
 在 `script/rzt2h_cr52_remoteproc.ld` 中貼入：
 
-```sh
+```bash
 ENTRY(_start)
 
 /* Firmware in CR52 SRAM
@@ -178,11 +178,11 @@ Linux remoteproc 會將 PC 設為 `0x10061000`，因此需要在該位址放入�
 ### 5.1 新增檔案
 
 1.  在 `src` 目錄上按右鍵：
-    
+
     -   `New` → `File` → 檔名：`startup_cr52.S`
-        
+
 ### 5.2 貼上 startup 程式碼（簡化版）
-```sh
+```bash
     .syntax unified
     .cpu cortex-r52
     .fpu neon-fp-armv8
@@ -207,7 +207,7 @@ _start:
 
 1:
     B     1b   /* main() 返回時停在這裡 */
- ```
+```
 
 ## 6. 關閉 FSP 預設 startup（如果存在）
 
@@ -217,23 +217,23 @@ _start:
 處理方式：
 
 1.  在專案的 `src/` 或 `rzt_gen/` 目錄中，尋找類似檔案：
-    
+
     -   `startup.c`
-        
+
     -   `startup_core.c`
-        
+
     -   其他包含向量表與重置處理的檔案
-        
+
 2.  對每個檔案：
-    
+
     -   右鍵 → `Properties`
-        
+
     -   `C/C++ Build` → `Settings`
-        
+
     -   勾選 **"Exclude resource from build"**
-        
+
 3.  如果專案中不存在這些檔案，則可略過此步驟。
-    
+
 ## 7. 實作 HelloWorld firmware：`hal_entry.c`
 
 目標行為：CR52 firmware 週期性向一個固定位址寫入數值，A55 端可以用 `devmem2` 看到數值不斷增長。
@@ -276,20 +276,20 @@ void hal_entry(void)
 ## 8. 設定專案使用自訂 linker script
 
 1.  專案按右鍵 → `Properties`
-    
+
 2.  左側選擇：
-    
+
     -   `C/C++ Build` → `Settings`
-        
+
 3.  在 Tool Settings 中找到 **Linker** 設定（名稱可能類似）：
-    
+
     -   例如：`Cross ARM C Linker` 或 Renesas toolchain 對應項目
-        
+
 4.  尋找 Script / Command line 選項：
-    
+
     -   將 `-T` 參數指向自訂 linker script，例如：
 
-```sh
+```bash
 -Tscript/rzt2h_cr52_remoteproc.ld
 ```
 套用後關閉設定視窗。
@@ -297,25 +297,25 @@ void hal_entry(void)
 ## 9. 編譯專案並產生 ELF
 
 1.  在 e² studio：
-    
+
     -   `Project` → `Clean`
-        
+
     -   `Project` → `Build Project`
-        
+
 2.  確認輸出：
-    
+
     -   在例如 `Debug/` 或 `Release/` 目錄下，產生：
 
-```sh
+```bash
 HelloWorld.elf
 ```
 
 若編譯出現錯誤，優先檢查：
 
 -   是否有多個 startup 檔未排除
-    
+
 -   linker script 路徑是否正確
-    
+
 -   `_start` 是否有定義（`startup_cr52.S` 有 `global _start`）
 
 ## 10. Linux 端：透過 remoteproc 啟動 CR52
@@ -323,34 +323,34 @@ HelloWorld.elf
 以下假設：
 
 -   CR52 對應 device 為 `/sys/class/remoteproc/remoteproc0`
-    
+
 -   firmware 路徑為 `/lib/firmware/HelloWorld.elf`
-    
+
 ### 10.1 確認 remoteproc device 存在
-```sh
+```bash
 ls /sys/class/remoteproc
 # 預期看到 remoteproc0
 ```
 如設備編號不同（例如 remoteproc1），後續請相應替換路徑。
 
 ### 10.2 放置 firmware
-```sh
+```bash
 sudo cp HelloWorld.elf /lib/firmware/
 ```
 ### 10.3 設定 firmware 名稱
-```sh
+```bash
 echo HelloWorld.elf | sudo tee /sys/class/remoteproc/remoteproc0/firmware
 ```
 ### 10.4 啟動 CR52
-```sh
+```bash
 echo start | sudo tee /sys/class/remoteproc/remoteproc0/state
 ```
 ### 10.5 查看 kernel log
-```sh
+```bash
 dmesg | tail -n 20
 ```
 預期看到類似訊息：
-```sh
+```bash
 remoteproc remoteproc0: powering up cr52_0
 remoteproc remoteproc0: Booting fw image HelloWorld.elf, size 8504
 remoteproc remoteproc0: no resource table found for this firmware
@@ -366,20 +366,20 @@ remoteproc remoteproc0: remote processor cr52_0 is now up
 
 例如在 Debian/Ubuntu：
 
-```sh
+```bash
 sudo apt-get install devmem2
 ```
 或自行下載原始碼編譯。
 
 ### 11.2 持續讀取測試位址
-```sh
+```bash
 sudo devmem2 0x10070000
 sudo devmem2 0x10070000
 sudo devmem2 0x10070000
 ```
 若看到輸出類似：
 
-```sh
+```bash
 Value at address 0x10070000 (0xffff8aa34000): 0x12341C62
 Value at address 0x10070000 (0xffff9670c000): 0x12341C77
 Value at address 0x10070000 (0xffff9abcd000): 0x12341C8B
@@ -388,7 +388,7 @@ Value at address 0x10070000 (0xffff9abcd000): 0x12341C8B
 代表：
 
 -   CR52 firmware 正在執行 `hal_entry()` 內的迴圈
-    
+
 -   remoteproc 已成功啟動 firmware 並讓 CR52 持續跑
 
 ## 12. 常見問題與排查
@@ -398,25 +398,25 @@ Value at address 0x10070000 (0xffff9abcd000): 0x12341C8B
 可能原因：
 
 -   linker script 未對齊 `0x10061000`
-    
+
 -   `_start` 未正確放在 `.vectors` 區段
-    
+
 -   startup 檔未使用 ARM mode
-    
+
 建議：
 
 -   確認 `ENTRY(_start)` 是否存在
-    
+
 -   確認 `.vectors` 區段位於 `FW (rxw)` 區內
-    
+
 -   確認 `startup_cr52.S` 第一個指令是 `.arm` 狀態
-    
+
 ### 12.2 `Boot failed: -12` 或 `Registered carveout doesn't fit len request`
 
 此教學的 HelloWorld 未使用 resource table。  
 若手動加入 resource table 但未與 DTS 對齊，可能出現：
 
-```sh
+```bash
 remoteproc remoteproc0: Registered carveout doesn't fit len request
 remoteproc remoteproc0: Boot failed: -12
 ```
@@ -424,7 +424,7 @@ remoteproc remoteproc0: Boot failed: -12
 處理方式：
 
 -   HelloWorld 階段建議 **完全不要放 resource table**，維持本教學提供的狀態。
-    
+
 -   若需要 OpenAMP / RPMsg，應以官方 OpenAMP 範例專案為基準，另行整合。
 
 ### 12.3 CR52 似乎無動作，但 remoteproc 顯示已啟動
@@ -432,11 +432,11 @@ remoteproc remoteproc0: Boot failed: -12
 建議檢查：
 
 -   `hal_entry()` 是否確實被呼叫：
-    
+
     -   若有 `main.c`，確認其中有呼叫 `hal_entry()`
-        
+
 -   `TEST_ADDR` 是否位於 CR52 實際可存取的記憶體範圍
-    
+
 -   `devmem2` 使用的位址是否一致（0x10070000）
 
 ## 附錄
@@ -444,14 +444,14 @@ remoteproc remoteproc0: Boot failed: -12
 ### A. 停止 / 重新啟動 CR52
 
 如需停止 CR52：
-```sh
+```bash
 `echo stop | sudo tee /sys/class/remoteproc/remoteproc0/state`
 ```
 重新啟動：
-```sh
+```bash
 echo start | sudo tee /sys/class/remoteproc/remoteproc0/state
 ```
 若修改 firmware 後重新部署：
-```sh
+```bash
 sudo cp HelloWorld.elf /lib/firmware/ echo stop  | sudo tee /sys/class/remoteproc/remoteproc0/state
 ```

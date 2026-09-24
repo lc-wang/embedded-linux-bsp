@@ -24,7 +24,7 @@ BL2 的核心責任不是 runtime service，也不是 power management，而是�
 ## 1. BL2 在 Boot Flow 中的位置
 
 整體 boot flow 中，BL2 的位置如下：
-```
+```text
 Boot ROM
 │
 ▼
@@ -102,7 +102,7 @@ BL2 的工作就是把這些 descriptor 填好。
 ## 5. BL2 Image Loading 的高階流程
 
 BL2 的 image loading 流程可概括如下：
-```
+```text
 bl2_main()
   │
   ├─ early platform setup
@@ -139,7 +139,7 @@ BL2 並不直接實作 storage driver，
 ### 6.2 IO 抽象層（概念）
 
 BL2 透過 TF-A 的 IO abstraction layer 存取 image：
-```
+```text
 BL2
  └─ IO layer
       └─ platform storage driver
@@ -217,7 +217,7 @@ BL2 **不會直接跳到 BL33**，而是：
 -   BL31：負責 **決定何時跳轉**
 
 流程如下：
-```
+```text
 BL2
  └─ load BL31 + BL33
  └─ prepare entry info
