@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-03T09:54:55.386Z",
+  "generated_at": "2026-11-04T06:43:46.351Z",
   "index": {
     "notes": [
       {
@@ -514,6 +514,11 @@
             "name": "imx95-neutron-npu-rproc-serror-panic-analysis.md",
             "path": "cases-study/nxp/imx95-neutron-npu-rproc-serror-panic-analysis.md",
             "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/nxp/imx95-neutron-npu-rproc-serror-panic-analysis.md"
+          },
+          {
+            "name": "imx95-tpm-tis-spi-resume-null-suspend-eio-analysis.md",
+            "path": "cases-study/nxp/imx95-tpm-tis-spi-resume-null-suspend-eio-analysis.md",
+            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/nxp/imx95-tpm-tis-spi-resume-null-suspend-eio-analysis.md"
           },
           {
             "name": "imx95-yocto-bitbake-timeout-io-stall-analysis.md",
