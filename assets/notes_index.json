@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-04T06:58:25.593Z",
+  "generated_at": "2026-11-10T10:17:38.346Z",
   "index": {
     "notes": [
       {
@@ -509,6 +509,11 @@
             "name": "imx95-gstreamer-v4l2videodec-eos-lost-race-analysis.md",
             "path": "cases-study/nxp/imx95-gstreamer-v4l2videodec-eos-lost-race-analysis.md",
             "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/nxp/imx95-gstreamer-v4l2videodec-eos-lost-race-analysis.md"
+          },
+          {
+            "name": "imx95-max98090-mic-boost-dapm-reset-analysis.md",
+            "path": "cases-study/nxp/imx95-max98090-mic-boost-dapm-reset-analysis.md",
+            "raw_url": "https://raw.githubusercontent.com/lc-wang/embedded-linux-bsp/main/cases-study/nxp/imx95-max98090-mic-boost-dapm-reset-analysis.md"
           },
           {
             "name": "imx95-neutron-npu-rproc-serror-panic-analysis.md",
